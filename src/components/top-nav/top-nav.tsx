@@ -1,80 +1,121 @@
+import { useState, type ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 import { SearchBar } from './search-bar';
 import { Avatar } from '../avatar/avatar';
 
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
 export interface TopNavProps {
-  /** Title shown in the left area (page/section name). */
-  title?: string;
-  /**
-   * Whether to show the search bar.
-   * @default true
-   */
-  showSearch?: boolean;
-  /** Logged-in user's name (used for avatar initials). */
+  /** Controlled search value. */
+  searchValue?: string;
+  /** Placeholder text shown in the search input. */
+  searchPlaceholder?: string;
+  /** Called on every search keystroke. */
+  onSearchChange?: (value: string) => void;
+  /** Called when the search is submitted (Enter). */
+  onSearchSubmit?: (value: string) => void;
+  /** Trailing 24x24 icon (Figma "Icon Placeholder", `currentColor`). Defaults to a bell/notifications glyph. */
+  icon?: ReactNode;
+  /** Logged-in user's name (used for avatar initials/alt text). */
   userName?: string;
   /** Logged-in user's avatar image URL. */
   userAvatar?: string;
-  /** Called when search value changes. */
-  onSearch?: (value: string) => void;
-  /** Actions/buttons to render on the right side. */
-  actions?: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
 /**
- * TopNav (Top Navigation Bar)
+ * TopNav
  *
- * Figma: "Top Nav" COMPONENT inside "Top Navigation Bar" frame.
- * - Background: neutral-4 (#2C2F33)
- * - Height: 64px
- * - Left: page title
- * - Center: SearchBar
- * - Right: action buttons + user avatar
- * - Border-bottom: 1px solid neutral-3
+ * Figma: "Search Bar" COMPONENT_SET (Top Navigation Bar00/01.md), confirmed against
+ * the real in-context instance in `Dashboard Mockup.md` (`left: 296px` — flush against
+ * the 232px sidebar — `right: 36px`, `top: 32px`, height 64px). This is the full bar:
+ * neutral-4 background, 16px radius (`--radius-md`), 12px/24px padding, containing the
+ * `SearchBar` icon+input on the left (Frame 649) and a trailing icon/avatar slot on the
+ * right (Frame 648).
+ *
+ * Property 1=Default vs Property 1=Selected differ structurally: Frame 648 is 88px wide
+ * (1 icon + avatar) in Default and 136px (2 icons + avatar) in Selected — the extra
+ * 24px+gap exactly accounts for one more icon. The only real desktop mockup instance
+ * (`Dashboard Mockup.md`) always renders Default, and the Selected variant's second icon
+ * has no legible glyph or label in the export, so its purpose isn't specified — reusing it
+ * as a clear-search affordance (shown once there's a value to clear) is the most
+ * conservative reading that both matches the structural 88px->136px delta and doesn't
+ * invent unrelated functionality. No `title` prop: no title/heading layer exists anywhere
+ * in the real component (the "Navigation"/"SidebarItem" text layers a few hundred px above
+ * it belong to the isolated doc frame's own header, not the Top Nav bar itself).
  */
 export function TopNav({
-  title,
-  showSearch = true,
+  searchValue: controlledSearchValue,
+  searchPlaceholder,
+  onSearchChange,
+  onSearchSubmit,
+  icon,
   userName,
   userAvatar,
-  onSearch,
-  actions,
   className,
 }: TopNavProps) {
+  const [internalSearchValue, setInternalSearchValue] = useState('');
+  const isControlled = controlledSearchValue !== undefined;
+  const searchValue = isControlled ? controlledSearchValue : internalSearchValue;
+
+  const handleSearchChange = (v: string) => {
+    if (!isControlled) setInternalSearchValue(v);
+    onSearchChange?.(v);
+  };
+
+  const clearSearch = () => {
+    if (!isControlled) setInternalSearchValue('');
+    onSearchChange?.('');
+  };
+
   return (
     <header
       className={cn(
-        'flex items-center gap-4 h-16 px-6 bg-neutral-4 border-b border-neutral-3/50 shrink-0',
+        'flex items-center justify-between gap-6 px-6 py-3 bg-neutral-4 rounded-md',
         className
       )}
     >
-      {/* Left: Title */}
-      {title ? (
-        <h1 className="font-sans font-bold text-lg text-neutral-1 truncate shrink-0 mr-2">
-          {title}
-        </h1>
-      ) : null}
+      <SearchBar
+        placeholder={searchPlaceholder}
+        value={searchValue}
+        onChange={handleSearchChange}
+        onSubmit={onSearchSubmit}
+        className="flex-1"
+      />
 
-      {/* Center: Search */}
-      {showSearch ? (
-        <div className="flex-1 max-w-xs">
-          <SearchBar
-            placeholder="Search tasks, projects..."
-            onChange={onSearch}
-            className="w-full"
-          />
-        </div>
-      ) : (
-        <div className="flex-1" />
-      )}
+      <div className="flex items-center gap-6 shrink-0">
+        <span className="w-6 h-6 text-neutral-2 shrink-0 [&>svg]:w-full [&>svg]:h-full">
+          {icon ?? <BellIcon />}
+        </span>
 
-      {/* Right: Actions + User */}
-      <div className="flex items-center gap-6 shrink-0 ml-auto">
-        {actions}
-        {(userName || userAvatar) ? (
-          <Avatar src={userAvatar} name={userName} size="md" />
+        {searchValue ? (
+          <button
+            type="button"
+            onClick={clearSearch}
+            aria-label="Clear search"
+            className="w-6 h-6 shrink-0 text-neutral-2 hover:text-neutral-1 transition-colors cursor-pointer [&>svg]:w-full [&>svg]:h-full"
+          >
+            <CloseIcon />
+          </button>
         ) : null}
+
+        {userName || userAvatar ? <Avatar src={userAvatar} name={userName} size="md" /> : null}
       </div>
     </header>
   );

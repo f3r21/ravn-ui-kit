@@ -21,11 +21,15 @@ export interface SearchBarProps {
 /**
  * SearchBar
  *
- * Figma: "Search Bar" COMPONENT_SET inside "Top Navigation Bar" frame.
- * - Background: neutral-4 (#2C2F33), border-radius: 16px
- * - Left: search icon (magnifier)
- * - Right: clear button (×) when value is non-empty
- * - font: SF Pro Display 15px/24px, letter-spacing 0.75px, text color: neutral-2
+ * Figma: "Frame 649" inside the "Search Bar" component (Top Navigation Bar00/01.md,
+ * confirmed against the in-context instance in `Dashboard Mockup.md`). This is only
+ * the icon+input portion — Frame 649 has a fixed `width: 171px` (24px icon + 24px
+ * gap + 123px text) with no fill/padding of its own, so it renders transparently
+ * and is meant to be composed inside a container that supplies the neutral-4
+ * background (see `TopNav`, which wraps this plus the trailing icon/avatar slot
+ * to match the full "Search Bar" component).
+ * - Icon: 24x24, neutral-2
+ * - Text: Desktop/Body/M/regular — SF Pro Display 15px/24px, letter-spacing 0.75px, neutral-2
  */
 export function SearchBar({
   placeholder = 'Search...',
@@ -50,25 +54,14 @@ export function SearchBar({
       onKeyDown: (e) => {
         if (e.key === 'Enter') onSubmit?.(value);
       },
-      'aria-label': 'Buscar',
+      'aria-label': 'Search',
       placeholder,
     },
     ref
   );
 
-  const clear = () => {
-    if (!isControlled) setInternalValue('');
-    onChange?.('');
-    ref.current?.focus();
-  };
-
   return (
-    <div
-      className={cn(
-        'relative inline-flex items-center gap-6 h-12 px-6 bg-neutral-4 rounded-md border border-transparent transition-colors focus-within:border-neutral-2',
-        className
-      )}
-    >
+    <div className={cn('inline-flex items-center gap-6 min-w-0', className)}>
       {/* Search icon */}
       <svg
         className="w-6 h-6 text-neutral-2 shrink-0"
@@ -87,20 +80,6 @@ export function SearchBar({
         ref={ref}
         className="flex-1 bg-transparent text-[15px] leading-6 tracking-wider text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
       />
-
-      {/* Clear button */}
-      {value ? (
-        <button
-          type="button"
-          onClick={clear}
-          aria-label="Limpiar búsqueda"
-          className="shrink-0 text-neutral-2 hover:text-neutral-1 transition-colors cursor-pointer"
-        >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
-            <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-          </svg>
-        </button>
-      ) : null}
     </div>
   );
 }

@@ -7,6 +7,8 @@ const meta: Meta<typeof SearchBar> = {
   title: 'Layout/SearchBar',
   component: SearchBar,
   tags: ['autodocs'],
+  // Frame 649 has no fill of its own in Figma — it's always composited on the
+  // neutral-4 "Search Bar" surface it lives inside (see `TopNav`).
   decorators: [withSurface('neutral-4')],
   args: {
     onChange: fn(),
