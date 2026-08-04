@@ -48,7 +48,13 @@ const CELL_TEXT = 'text-body-m font-normal text-main font-sans';
 // (0 gap in the Figma auto-layout), so only `border-r` is applied per cell (plus `border-l` on
 // the row's first cell) to avoid doubling the shared vertical edges -- top/bottom edges already
 // coincide exactly between cells so they need no special handling.
-const CELL_BASE = 'flex items-center h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3';
+//
+// Deliberately does NOT include `flex`/`items-center` -- an explicit `display` value on a <td>
+// makes it stop participating in the table's layout algorithm (it "unboxes" from the table and
+// renders as a plain block box instead), which breaks the fixed-width column layout entirely.
+// Each cell's flex/gap/centering lives on an inner wrapping <div> instead (see TaskTableRow /
+// TaskTableRowSkeleton below), the same pattern the group-header cell already used correctly.
+const CELL_BASE = 'h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3';
 
 export interface DueDateCellProps {
   /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
@@ -237,61 +243,71 @@ export function TaskTableRow({
     <tr onClick={onClick} className={cn('group', onClick && 'cursor-pointer')}>
       {/* Task Name Cell: padding 4px 16px 4px 0px -- the left edge is 0 so the accent stripe
           sits flush against it. */}
-      <td className={cn(CELL_BASE, 'gap-2 pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
-        <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
-        <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-1">
-          <input
-            type="checkbox"
-            className="sr-only"
-            checked={isSelected}
-            onChange={(e) => onSelectedChange?.(e.target.checked)}
-            aria-label={`Select ${title}`}
-          />
-          <CheckIcon
-            className={cn(
-              'w-6 h-6 text-main transition-opacity',
-              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
-            )}
-          />
-        </label>
-        <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>{String(index).padStart(2, '0')}</span>
-        <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
-        {reactions.map((r) => (
-          <span key={r.emoji} className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}>
-            <span className="tabular-nums">{r.count}</span>
-            <span>{r.emoji}</span>
-          </span>
-        ))}
-        {onViewDetails ? (
-          <button
-            type="button"
-            onClick={onViewDetails}
-            className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
-          >
-            <span>Details</span>
-            <ArrowRightIcon className="w-4 h-4" />
-          </button>
-        ) : null}
+      <td className={cn(CELL_BASE, 'pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
+        <div className="flex items-center gap-2 h-full">
+          <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
+          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-1">
+            <input
+              type="checkbox"
+              className="sr-only"
+              checked={isSelected}
+              onChange={(e) => onSelectedChange?.(e.target.checked)}
+              aria-label={`Select ${title}`}
+            />
+            <CheckIcon
+              className={cn(
+                'w-6 h-6 text-main transition-opacity',
+                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
+              )}
+            />
+          </label>
+          <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>{String(index).padStart(2, '0')}</span>
+          <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
+          {reactions.map((r) => (
+            <span key={r.emoji} className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}>
+              <span className="tabular-nums">{r.count}</span>
+              <span>{r.emoji}</span>
+            </span>
+          ))}
+          {onViewDetails ? (
+            <button
+              type="button"
+              onClick={onViewDetails}
+              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
+            >
+              <span>Details</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          ) : null}
+        </div>
       </td>
 
       {/* Task Tag Cell */}
-      <td className={cn(CELL_BASE, 'gap-2 pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
-        {tags.length > 0 ? <TagCell labels={tags} /> : null}
+      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
+        <div className="flex items-center gap-2 h-full">
+          {tags.length > 0 ? <TagCell labels={tags} /> : null}
+        </div>
       </td>
 
       {/* Estimation Cell */}
-      <td className={cn(CELL_BASE, 'gap-2 pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
-        {estimationPoints !== undefined ? <EstimationCell points={estimationPoints} /> : null}
+      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
+        <div className="flex items-center gap-2 h-full">
+          {estimationPoints !== undefined ? <EstimationCell points={estimationPoints} /> : null}
+        </div>
       </td>
 
       {/* Task Assign Name Cell */}
-      <td className={cn(CELL_BASE, 'gap-2 pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
-        {assigneeName ? <AssigneeNameCell name={assigneeName} avatarSrc={assigneeAvatar} /> : null}
+      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
+        <div className="flex items-center gap-2 h-full">
+          {assigneeName ? <AssigneeNameCell name={assigneeName} avatarSrc={assigneeAvatar} /> : null}
+        </div>
       </td>
 
       {/* Due Date Cell */}
-      <td className={cn(CELL_BASE, 'gap-2 pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
-        {dueDate ? <DueDateCell date={dueDate} urgency={dueDateUrgency} /> : null}
+      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
+        <div className="flex items-center gap-2 h-full">
+          {dueDate ? <DueDateCell date={dueDate} urgency={dueDateUrgency} /> : null}
+        </div>
       </td>
     </tr>
   );
@@ -330,23 +346,31 @@ export interface TaskTableProps {
 function TaskTableRowSkeleton() {
   return (
     <tr>
-      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
-        <Skeleton className="h-4 w-full" />
+      <td className={cn(CELL_BASE, 'pl-4 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
+        <div className="flex items-center gap-2 h-full">
+          <Skeleton className="h-4 w-full" />
+        </div>
       </td>
-      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
-        <Skeleton className="h-6 w-16 rounded" />
+      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
+        <div className="flex items-center gap-2 h-full">
+          <Skeleton className="h-6 w-16 rounded" />
+        </div>
       </td>
-      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
-        <Skeleton className="h-4 w-16" />
+      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
+        <div className="flex items-center gap-2 h-full">
+          <Skeleton className="h-4 w-16" />
+        </div>
       </td>
-      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
-        <div className="flex items-center gap-2">
+      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
+        <div className="flex items-center gap-2 h-full">
           <Skeleton className="w-8 h-8 rounded-full shrink-0" />
           <Skeleton className="h-4 w-20" />
         </div>
       </td>
-      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
-        <Skeleton className="h-4 w-20" />
+      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
+        <div className="flex items-center gap-2 h-full">
+          <Skeleton className="h-4 w-20" />
+        </div>
       </td>
     </tr>
   );
