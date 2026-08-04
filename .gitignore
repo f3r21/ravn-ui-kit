@@ -21,6 +21,9 @@ storybook-static/
 # Claude Code session state
 .claude/
 
+# Internal audit doc — kept local only, not pushed
+UI_KIT_MASTER_PLAN.md
+
 # corvus — managed, do not edit this block
 .corvusrc
 .claude/skills/figma-to-react-components/
