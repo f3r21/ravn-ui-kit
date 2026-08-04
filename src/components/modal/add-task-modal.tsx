@@ -38,7 +38,7 @@ export function AddTaskModal({ isOpen, onClose, onSubmit }: AddTaskModalProps) {
 
   return (
     <Modal title="Add Task" isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <Input
           label="Task name"
           placeholder="Enter task title..."
@@ -74,13 +74,13 @@ export function AddTaskModal({ isOpen, onClose, onSubmit }: AddTaskModalProps) {
         </div>
 
         {/* Tags preview */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-4 flex-wrap">
           <Tag variant="secondary">BACKEND</Tag>
           <Tag variant="tertiary">HIGH</Tag>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-3/30">
+        <div className="flex items-center justify-end gap-6">
           <TextButton onPress={onClose}>Cancel</TextButton>
           <Button variant="primary" type="submit" isDisabled={!title.trim()}>
             Create Task

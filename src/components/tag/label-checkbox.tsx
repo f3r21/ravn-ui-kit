@@ -67,7 +67,8 @@ export function LabelCheckbox({
     <label
       {...labelProps}
       className={cn(
-        'inline-flex items-center gap-2.5 cursor-pointer select-none group',
+        // gap: 8px -- matches Figma "Label Checkbox" component (Property 1=Default/Selected, Tags01)
+        'inline-flex items-center gap-2 cursor-pointer select-none group',
         isDisabled && 'opacity-50 cursor-not-allowed',
         className
       )}

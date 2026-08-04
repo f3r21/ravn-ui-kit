@@ -34,10 +34,14 @@ const accentMap = {
  *
  * Kanban board column matching the Figma "Task Column" frame.
  * - Background: neutral-4 (#2C2F33)
- * - Border-radius: 12px
- *   NOTE: comment says 12px but shipped class (rounded-xl) resolves to 40px per
- *   theme.css --radius-xl -- discrepancy pending Figma confirmation, do not
- *   resolve without Figma data.
+ * - Border-radius: 20px
+ *   CONFIRMED via Figma export: the "Task Column" frame comment block
+ *   declares `border-radius: 20px` identically across all four
+ *   Task Column00-03.md exports. Previous shipped class (rounded-xl) resolved
+ *   to 40px per theme.css --radius-xl, which was wrong. 20px does not match
+ *   any existing --radius-* token (sm 8 / md 16 / lg 24 / xl 40), so it is
+ *   shipped here as an arbitrary value -- flag as a candidate for a new
+ *   theme.css token (e.g. a radius step between --radius-md and --radius-lg).
  * - 4px colored top stripe (accent)
  * - Header: column title + task count badge
  * - Body: scrollable list of TaskCards
@@ -54,7 +58,7 @@ export function TaskColumn({
   return (
     <div
       className={cn(
-        'flex flex-col w-72 min-w-[18rem] bg-neutral-4 rounded-xl overflow-hidden shrink-0',
+        'flex flex-col w-72 min-w-[18rem] bg-neutral-4 rounded-[20px] overflow-hidden shrink-0',
         className
       )}
     >

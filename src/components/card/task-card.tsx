@@ -5,7 +5,11 @@ import { Avatar } from '../avatar/avatar';
 export interface TaskCardProps {
   /** Task title, shown in the header row and truncated to a single line. */
   title: string;
-  /** Story point estimate shown in a badge next to the title. Omitted entirely when `undefined`. */
+  /**
+   * Story point estimate. Omitted entirely when `undefined`.
+   * Rendered as plain text in the due-date row (Figma "Timer" auto-layout has no
+   * pill/background behind the "N Pts" text — see Cards01.md L340-359).
+   */
   points?: number;
   /** Due date label rendered inside the urgency badge (e.g. `'3 DAYS'`). The badge is hidden when not provided. */
   dueDateText?: string;
@@ -39,7 +43,13 @@ export interface TaskCardProps {
   onClick?: () => void;
 }
 
-/** Kanban-style task summary card showing title, points, due date, tags, assignee, and activity counters. */
+/**
+ * Kanban-style task summary card showing title, points, due date, tags, assignee, and activity counters.
+ *
+ * Figma: "Task Card" COMPONENT (Cards00.md / Cards01.md), consistent across the IOS/Android/Desktop
+ * variants. Anatomy is 4 stacked rows: "Project Info" (title + trailing icon), "Timer" (points text +
+ * due-date "Tag"), "Tags" (colored variant tags), "Reactions" (avatar + activity counters).
+ */
 export function TaskCard({
   title,
   points,
@@ -54,7 +64,12 @@ export function TaskCard({
   onClick,
 }: TaskCardProps) {
   const urgencyVariants = {
-    normal: 'bg-neutral-1/10 text-neutral-1 border-neutral-2',
+    // "Tag" bg matches rgba(148, 151, 154, 0.1) == neutral-2/10 (Cards01.md L380); no border is
+    // ever rendered on this pill in the export, so the border color is transparent rather than
+    // dropping the shared `border` utility (kept for the warning/overdue variants below).
+    normal: 'bg-neutral-2/10 text-neutral-1 border-transparent',
+    // No warning/overdue instance of this due-date "Tag" appears in Cards00.md/Cards01.md, so these
+    // combinations are left as-is per the confirmed-token note — not verified against real evidence here.
     warning: 'bg-warning-1/10 text-warning-5 border-warning-2',
     overdue: 'bg-danger-1/10 text-danger-5 border-danger-2',
   };
@@ -63,35 +78,51 @@ export function TaskCard({
     <div
       onClick={onClick}
       className={cn(
-        'flex flex-col gap-4 p-4 bg-neutral-4 text-neutral-1 rounded-lg border border-neutral-3/30 shadow-xs hover:border-neutral-2 transition-all cursor-pointer select-none',
+        // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
+        // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
+        // No border is ever rendered on the card in the export, so the resting border is transparent
+        // (kept as a real border utility, not removed, so the hover reveal below still works).
+        'flex flex-col gap-4 p-4 bg-neutral-4 text-neutral-1 rounded-sm border border-transparent shadow-xs hover:border-neutral-2 transition-all cursor-pointer select-none',
         className
       )}
     >
-      {/* Title & Points Row */}
+      {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317). Figma also shows a
+          trailing chevron/expand "Icon Placeholder" next to the title with no corresponding prop —
+          flagged rather than guessed at, not implemented. */}
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-sans font-semibold text-lg text-neutral-1 truncate">
           {title}
         </h3>
-        {points !== undefined ? (
-          <span className="text-sm font-bold text-neutral-1 bg-neutral-3/50 px-2 py-0.5 rounded-md">
-            {points} Pts
-          </span>
-        ) : null}
       </div>
 
-      {/* Tags Row */}
-      {tags.length > 0 || dueDateText ? (
-        <div className="flex flex-wrap items-center gap-2">
+      {/* Timer Row: Points & Due Date (Figma "Timer" auto-layout, Cards01.md L319-437 — points is
+          plain text sharing this row with the due-date "Tag", not a badge in the title row). */}
+      {points !== undefined || dueDateText ? (
+        <div className="flex items-center justify-between gap-2">
+          {points !== undefined ? (
+            <span className="font-sans text-sm font-bold text-neutral-1">
+              {points} Pts
+            </span>
+          ) : null}
           {dueDateText ? (
             <span
               className={cn(
-                'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border font-sans',
+                // gap-2/px-4 match Figma's Tag padding (4px 16px) and gap (8px) exactly (Cards01.md
+                // L373-374). border-radius is a real 4px, same as tag.tsx's pill -- Tailwind's own
+                // unmodified default `rounded` step, not a project token.
+                'inline-flex items-center gap-2 px-4 py-1 text-xs font-semibold rounded border font-sans',
                 urgencyVariants[dueDateUrgency]
               )}
             >
               ⏱ {dueDateText}
             </span>
           ) : null}
+        </div>
+      ) : null}
+
+      {/* Tags Row (Figma "Tags" auto-layout, Cards01.md L439-550 — separate row from Timer above). */}
+      {tags.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
           {tags.map((t, idx) => (
             <Tag key={idx} variant={t.variant || 'neutral'}>
               {t.label}
@@ -100,18 +131,23 @@ export function TaskCard({
         </div>
       ) : null}
 
-      {/* Footer Row: Assignee & Reaction Counters */}
-      <div className="flex items-center justify-between pt-2 border-t border-neutral-3/20">
+      {/* Footer Row: Assignee & Reaction Counters (Figma "Reactions" auto-layout, Cards01.md
+          L552-833 — no top divider/border is ever rendered above this row). */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar src={assigneeAvatar} name={assigneeName} size="sm" />
           {assigneeName ? (
-            <span className="text-xs font-medium text-neutral-2 truncate max-w-[120px]">
+            <span className="font-sans text-xs font-medium text-neutral-2 truncate max-w-[120px]">
               {assigneeName}
             </span>
           ) : null}
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-neutral-2">
+        {/* gap-4 matches Figma's "Frame 653" gap (16px, Cards01.md L614); counter text/icon is
+            neutral-1 (white) in every captured instance, not neutral-2. Figma shows 3 icon+count
+            "Reactions" widgets here (vs. 2 supported counters below) with unlabeled icon glyphs --
+            flagged as ambiguous, not adding an invented third counter. */}
+        <div className="flex items-center gap-4 text-xs font-sans text-neutral-1">
           {commentsCount > 0 ? (
             <span className="flex items-center gap-1">
               💬 {commentsCount}

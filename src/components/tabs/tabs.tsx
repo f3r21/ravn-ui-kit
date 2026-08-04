@@ -66,7 +66,7 @@ export function Tabs({
       {/* Tab list — role="tablist" */}
       <div
         role="tablist"
-        aria-label="Navegación por tabs"
+        aria-label="Tab navigation"
         className="flex items-end border-b border-neutral-3/50"
       >
         {items.map((item) => {
@@ -81,7 +81,13 @@ export function Tabs({
               type="button"
               onClick={() => handleSelect(item.id)}
               className={cn(
-                'relative flex items-center gap-2 px-5 py-3.5 text-sm font-semibold font-sans transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-4',
+                // Figma "Tabs" Frame 299: padding 12px 0px 8px (asymmetric
+                // vertical padding around the label) -- was symmetric py-3.5.
+                // Horizontal padding (px-5) is kept: Figma's own value there
+                // is 0px, but that's an artifact of a fixed-width (120px)
+                // demo box, not a real horizontal-padding spec for
+                // arbitrary-length labels.
+                'relative flex items-center gap-2 px-5 pt-3 pb-2 text-sm font-semibold font-sans transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-4',
                 isSelected
                   ? 'text-primary-4'
                   : 'text-neutral-2 hover:text-neutral-1'

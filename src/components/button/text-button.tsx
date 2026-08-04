@@ -18,9 +18,22 @@ export interface TextButtonProps extends AriaButtonProps {
  * TextButton
  *
  * Figma: "Text Button" COMPONENT_SET inside "Button, Switch Button" frame.
- * - No background, no border
  * - Text: primary-4 (#DA584B) with underline on hover
  * - Used for secondary actions like "View all", "Cancel", "Forgot password"
+ *
+ * @remarks
+ * FLAGGED, NOT APPLIED: the real "Text Button" frame in the Figma export
+ * (Button, Switch Button01.md) actually contains solid-fill pill states
+ * (State=Default/Hover/Selected/Disable x Type=Primary/Secondary, all
+ * ~62x40px with 8px padding and primary-4/primary-2/primary-3/neutral-2/
+ * neutral-3 backgrounds) -- not the underline/no-background link style
+ * this component implements. Only "Type=Secondary, State=Default/Disable"
+ * happen to have no fill. This looks like a Figma naming collision (the
+ * frame is literally named "Text Button" but visually matches a solid
+ * Button variant instead), so it was NOT used to change this component's
+ * styling -- left as-is pending a human decision on whether this data
+ * should instead inform Button's "secondary" variant. See segmented-control
+ * and button.tsx summary notes for the same ambiguity.
  */
 export function TextButton({
   size = 'md',

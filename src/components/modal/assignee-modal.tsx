@@ -68,7 +68,7 @@ export function AssigneeModal({
               type="button"
               onClick={() => toggle(a.id)}
               className={cn(
-                'flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-colors cursor-pointer',
+                'flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors cursor-pointer',
                 isSelected
                   ? 'bg-primary-4/15 border border-primary-4/40'
                   : 'hover:bg-neutral-3/50 border border-transparent'
@@ -85,7 +85,7 @@ export function AssigneeModal({
         })}
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-neutral-3/30">
+      <div className="flex items-center justify-end gap-6 pt-4 mt-2">
         <TextButton onPress={onClose}>Cancel</TextButton>
         <Button variant="primary" onPress={handleConfirm}>
           Confirm ({selected.length})

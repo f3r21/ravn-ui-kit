@@ -25,12 +25,16 @@ export interface DatePickerMenuProps {
  * DatePickerMenu
  *
  * Figma: "DatePicker / Menu" COMPONENT inside "Datepicker" frame.
- * - Background: neutral-4 (#2C2F33), border-radius: 12px
- * - Header: month/year navigation with prev/next arrows
- * - Day grid: 7 columns (Sun–Sat)
- * - Selected day: bg-primary-4 (#DA584B), text neutral-1, rounded-full
- * - Today: text-primary-4, font-bold
- * - Other month days: text-neutral-2/50 (muted)
+ * - Background: neutral-5 (#222528), border: 1px solid neutral-2 (#94979A), border-radius: 4px
+ * - Header: month/year navigation with prev/next arrows; label is SF Pro Text Semibold 14px, text-neutral-1
+ * - Day grid: 7 columns (Sun–Sat); each day cell ("DatePicker / Menu Item") is 24x24 with border-radius: 2px
+ *   (a near-square corner, not a circle) and font-weight 400 (regular) in every observed instance
+ * - Selected day: bg-primary-4 (#DA584B), text neutral-1, rounded-xs -- NOTE: this specific export has no
+ *   distinct "selected" (filled) day-cell instance to verify against; only "today" (bordered) and plain/muted
+ *   states are present, so this line is unconfirmed against Datepicker.md and should be double-checked
+ *   against a live "Selected" variant if one exists in Figma.
+ * - Today: border 1px solid primary-4 (#DA584B), text-neutral-1, font-normal (NOT text-primary-4/font-bold)
+ * - Other month days: text-neutral-2 (muted, solid #94979A -- Figma shows no opacity reduction)
  */
 export function DatePickerMenu({
   value: controlledValue,
@@ -100,7 +104,10 @@ export function DatePickerMenu({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 p-4 bg-neutral-4 rounded-xl shadow-lg border border-neutral-3/30 w-72 select-none',
+        // bg-neutral-5, border-neutral-2, rounded (4px) and w-[280px] match Figma
+        // "DatePicker / Menu": background #222528, border 1px solid #94979A,
+        // border-radius: 4px, width: 280px.
+        'flex flex-col gap-4 p-4 bg-neutral-5 rounded shadow-lg border border-neutral-2 w-[280px] select-none',
         className
       )}
     >
@@ -110,14 +117,16 @@ export function DatePickerMenu({
           type="button"
           onClick={prevMonth}
           aria-label="Mes anterior"
-          className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-2 hover:bg-neutral-3 hover:text-neutral-1 transition-colors cursor-pointer"
+          // text-neutral-1 matches Figma "Icon / Outlined / Left" vector fill: #FFFFFF
+          className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-1 hover:bg-neutral-3 transition-colors cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
 
-        <span className="font-sans font-bold text-sm text-neutral-1">
+        {/* font-semibold matches Figma "Dec 2020" label: font-weight 600 (Semibold/14px | 22px) */}
+        <span className="font-sans font-semibold text-sm text-neutral-1">
           {MONTHS[viewMonth]} {viewYear}
         </span>
 
@@ -125,7 +134,8 @@ export function DatePickerMenu({
           type="button"
           onClick={nextMonth}
           aria-label="Mes siguiente"
-          className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-2 hover:bg-neutral-3 hover:text-neutral-1 transition-colors cursor-pointer"
+          // text-neutral-1 matches Figma "Icon / Outlined / Right" vector fill: #FFFFFF
+          className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-1 hover:bg-neutral-3 transition-colors cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
             <path d="m9 18 6-6-6-6" />
@@ -154,14 +164,19 @@ export function DatePickerMenu({
               aria-label={date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
               aria-pressed={isSelected}
               className={cn(
-                'flex items-center justify-center w-9 h-9 mx-auto rounded-full text-sm font-sans transition-all cursor-pointer',
+                // w-6 h-6 (24px) and rounded-xs (2px) match Figma "DatePicker / Menu Item":
+                // width/height: 24px, border-radius: 2px -- a near-square cell, not a circle.
+                'flex items-center justify-center w-6 h-6 mx-auto rounded-xs text-sm font-sans transition-all cursor-pointer',
                 isSelected
-                  ? 'bg-primary-4 text-neutral-1 font-bold'
+                  ? 'bg-primary-4 text-neutral-1'
                   : isToday
-                  ? 'text-primary-4 font-bold hover:bg-neutral-3'
+                  ? // matches Figma "today" instance: border 1px solid primary-4 (#DA584B),
+                    // text-neutral-1 (#FFFFFF), font-normal -- not text-primary-4/font-bold
+                    'border border-primary-4 text-neutral-1 hover:bg-neutral-3'
                   : isCurrentMonth
                   ? 'text-neutral-1 hover:bg-neutral-3'
-                  : 'text-neutral-2/40 hover:bg-neutral-3/50'
+                  : // text-neutral-2 (solid #94979A) matches Figma; no opacity reduction observed
+                    'text-neutral-2 hover:bg-neutral-3/50'
               )}
             >
               {date.getDate()}

@@ -54,7 +54,8 @@ export function UserRow({
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 min-w-0',
+        // padding: 4px 16px, gap: 8px -- matches Figma "User" component (Avatar frame, 239x56)
+        'flex items-center gap-2 px-4 py-1 min-w-0',
         onClick && 'cursor-pointer hover:opacity-80 transition-opacity',
         className
       )}

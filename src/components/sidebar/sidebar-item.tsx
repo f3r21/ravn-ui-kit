@@ -2,11 +2,21 @@ import { cn } from '../../utils/cn';
 
 /**
  * @remarks
- * Figma defines a `SidebarItemWithOptions` variant that inherits from this
- * component (Figma master: "SidebarGlobalItem"), adding extra affordances.
- * That variant is not implemented here yet — it is gated behind Figma
- * anatomy data (padding, active-state, extra-affordance diff) that hasn't
- * been provided. See the project plan for tracking.
+ * Figma (`SideBarItem00`/`SideBarItem01` exports) shows the abstract
+ * "SidebarItem" master component — captioned "This master component is
+ * meant to be an abstract class. The SidebarItem and the
+ * SidebarItemWIthOptions should inherit from this class." — with three
+ * states: Normal, Hover, Selected. Those three map to this component's
+ * default / hover / `isActive` states respectively, and have now been
+ * cross-checked against the real exported CSS and reference screenshots
+ * (colors, the 4px indicator bar, gap, and corner radius).
+ *
+ * Neither export actually contains an instance, frame, or anatomy for
+ * `SidebarItemWithOptions` itself — no kebab-menu, extra icon-button, or
+ * distinguishing padding/layout shows up anywhere in either file, only that
+ * one caption sentence naming it. So the variant is still not implementable
+ * from available data and remains unimplemented, gated on real anatomy data
+ * that has not been provided yet.
  */
 export interface SidebarItemProps {
   /** Optional icon rendered before the label. */
@@ -39,14 +49,14 @@ export function SidebarItem({
       type="button"
       onClick={onClick}
       className={cn(
-        'relative w-full flex items-center justify-between px-4 py-3.5 rounded-md font-sans text-sm font-semibold transition-all cursor-pointer select-none overflow-hidden',
+        'relative w-full flex items-center justify-between px-4 py-3.5 font-sans text-sm font-semibold transition-all cursor-pointer select-none overflow-hidden',
         isActive
-          ? 'text-primary-4 bg-gradient-to-r from-transparent to-red-500/10'
+          ? 'text-primary-4 bg-gradient-to-r from-transparent to-primary-4/10'
           : 'text-neutral-2 hover:text-primary-4 hover:bg-neutral-4/50',
         className
       )}
     >
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-4">
         {icon ? <span className="text-lg shrink-0">{icon}</span> : null}
         <span className="truncate tracking-wide">{label}</span>
       </div>
@@ -65,9 +75,9 @@ export function SidebarItem({
           </span>
         ) : null}
 
-        {/* 4px Right indicator bar for active state matching Figma */}
+        {/* 4px Right indicator bar for active state matching Figma (sharp corners, no radius) */}
         {isActive ? (
-          <span className="absolute right-0 top-0 bottom-0 w-1 bg-primary-4 rounded-r-sm" />
+          <span className="absolute right-0 top-0 bottom-0 w-1 bg-primary-4" />
         ) : null}
       </div>
     </button>

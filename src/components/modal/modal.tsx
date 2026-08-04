@@ -51,10 +51,10 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
           <div
             {...dialogProps}
             ref={dialogRef}
-            className="flex flex-col bg-neutral-4 rounded-2xl shadow-2xl border border-neutral-3/30 overflow-hidden"
+            className="flex flex-col bg-neutral-4 rounded-sm shadow-2xl border border-neutral-3/30 overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-3/30">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-3/30">
               <h2
                 {...titleProps}
                 className="font-sans font-bold text-base text-neutral-1"
@@ -74,7 +74,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5">
+            <div className="px-4 py-4">
               {children}
             </div>
           </div>

@@ -39,11 +39,17 @@ export function Button({
   );
 
   const baseStyles =
-    'inline-flex items-center justify-center font-sans font-semibold rounded-md transition-all focus-visible:outline-2 focus-visible:outline-primary-4 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+    // rounded-sm (8px) matches every real button shape in the Figma export
+    // (icon buttons and pill buttons alike are all border-radius: 8px) --
+    // was rounded-md (16px), which doesn't appear anywhere in the source data.
+    'inline-flex items-center justify-center font-sans font-semibold rounded-sm transition-all focus-visible:outline-2 focus-visible:outline-primary-4 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
   const variants = {
+    // Figma "State=Hover/Selected, Type=Primary": hover -> primary-2 (#EBA59E),
+    // pressed/selected -> primary-3 (#E27D73). Was hover:bg-primary-3 (wrong
+    // shade for hover -- that's actually the pressed color).
     primary:
-      'bg-primary-4 text-neutral-1 hover:bg-primary-3 active:scale-[0.98]',
+      'bg-primary-4 text-neutral-1 hover:bg-primary-2 active:bg-primary-3 active:scale-[0.98]',
     secondary:
       'bg-neutral-1 text-neutral-4 border border-neutral-2 hover:bg-neutral-1 active:scale-[0.98]',
     ghost:

@@ -33,6 +33,16 @@ export interface SwitchProps {
  *
  * ON  → bg-primary-4 (#DA584B), thumb slides right
  * OFF → bg-neutral-3 (#393D41), thumb stays left
+ *
+ * @remarks
+ * NOT VERIFIED against real Figma data: the assigned export files
+ * ("Button, Switch Button00.md" / "01.md") contain no track+thumb boolean
+ * toggle shape at all -- every "Switch button" layer in that export is
+ * actually a two-option pill selector (matching SegmentedControl, not this
+ * component). No literal switch/thumb/track CSS exists to cross-check
+ * these on/off colors or the 44x24px track / 20x20px thumb sizing against.
+ * Left unchanged; flagging for a human to confirm against the correct
+ * Figma frame if one exists elsewhere.
  */
 export function Switch({
   label,

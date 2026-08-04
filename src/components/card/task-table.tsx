@@ -14,10 +14,21 @@ export interface DueDateCellProps {
   urgency?: 'normal' | 'warning' | 'overdue';
 }
 
-/** Renders a task's due date with color-coded urgency. */
+/**
+ * Renders a task's due date with color-coded urgency.
+ *
+ * Figma "Due Date Cell" (Task Column02.md) shows the default-state date text
+ * ("6 July, 2020") in neutral.1 (#FFFFFF), not neutral.2 -- fixed below.
+ * No warning/overdue-state sample exists in the assigned Figma exports, so
+ * `warning` (text-tertiary-4) and `overdue` (text-danger-4) are left as-is;
+ * `tertiary-4` is a brand accent color rather than one of the dedicated
+ * `--color-warning-*` tokens, which reads as a semantic mismatch, but there is
+ * no real Figma evidence to confirm the correct replacement value -- flagging
+ * for human decision rather than guessing.
+ */
 export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
   const styles = {
-    normal: 'text-neutral-2',
+    normal: 'text-neutral-1',
     warning: 'text-tertiary-4',
     overdue: 'text-danger-4',
   };
@@ -35,7 +46,12 @@ export interface AssigneeNameCellProps {
   avatarSrc?: string;
 }
 
-/** Renders an assignee's avatar and name together in a table cell. */
+/**
+ * Renders an assignee's avatar and name together in a table cell.
+ *
+ * Figma "Task Assign Name Cell" (Task Column02.md) confirms the name text
+ * color as neutral.1 (#FFFFFF) -- already correct here, no change needed.
+ */
 export function AssigneeNameCell({ name, avatarSrc }: AssigneeNameCellProps) {
   return (
     <div className="flex items-center gap-2">
@@ -50,7 +66,16 @@ export interface EstimationCellProps {
   points: number;
 }
 
-/** Renders a task's estimation points as a small numeric badge. */
+/**
+ * Renders a task's estimation points as a small numeric badge.
+ *
+ * Figma "Estimation Cell" (Task Column02.md) confirms the text color as
+ * neutral.1 (#FFFFFF) -- already correct here. Note the Figma sample renders
+ * plain text like "3 Days" directly in the cell (no badge chrome), which is
+ * a structural/content difference (days vs. points, no badge) from this
+ * component -- flagged for human review, not changed since it exceeds a
+ * color/spacing fidelity fix and no note authorizes reworking the prop shape.
+ */
 export function EstimationCell({ points }: EstimationCellProps) {
   return (
     <span className="inline-flex items-center justify-center w-8 h-6 rounded-md bg-neutral-3 text-xs font-bold text-neutral-1 font-sans tabular-nums">
@@ -84,13 +109,22 @@ export interface TableHeaderCellProps {
   className?: string;
 }
 
-/** Table `<th>` cell with optional sort-indicator affordance. */
+/**
+ * Table `<th>` cell with optional sort-indicator affordance.
+ *
+ * Figma "Table Header Cell" (Task Column02.md, "# Task Name" instance) shows
+ * the label text in neutral.1 (#FFFFFF), not neutral.2 -- fixed below. The
+ * uppercase/small/bold treatment and per-cell background+border+radius seen
+ * in that same Figma frame are a larger structural difference from this
+ * flat-table implementation and are intentionally not replicated here (out
+ * of scope for a color/spacing fidelity pass) -- flagged for human review.
+ */
 export function TableHeaderCell({ children, sortable, className }: TableHeaderCellProps) {
   return (
     <th
       scope="col"
       className={cn(
-        'px-4 py-3 text-left text-xs font-bold text-neutral-2 uppercase tracking-wider font-sans select-none',
+        'px-4 py-3 text-left text-xs font-bold text-neutral-1 uppercase tracking-wider font-sans select-none',
         sortable && 'cursor-pointer hover:text-neutral-1 transition-colors',
         className
       )}
@@ -148,6 +182,16 @@ export interface TaskTableRowProps {
  *
  * Figma: "Task Table Row" COMPONENT inside "Task Column" frame.
  * One row of the table view of the task management board.
+ *
+ * STRUCTURAL NOTE (flagged, not changed): the Figma "Task Table Row" shows
+ * each cell (Task Name Cell, Task Tag Cell, Estimation Cell, Task Assign
+ * Name Cell, Due Date Cell) individually boxed -- own neutral.4 (#2C2F33)
+ * background, 1px neutral.3 (#393D41) border, and its own border-radius
+ * (mostly 0px, 4px on the header row) -- rather than a flat row with a single
+ * bottom border and hover background as implemented here. This is a real
+ * structural difference beyond a color/spacing tweak, so it was not
+ * replicated; a human should decide whether to redesign the row as a
+ * per-cell "boxed grid" to match Figma.
  */
 export function TaskTableRow({
   title,
@@ -224,6 +268,13 @@ export interface TaskTableProps {
 /**
  * TaskTable
  * Full table view wrapping TaskTableRows with a styled header.
+ *
+ * NOTE: no Figma layer for an outer "Task Table" wrapper was found in the
+ * assigned exports (Task Column00-03.md) to confirm/deny this wrapper's
+ * `rounded-xl` (40px). Individual cells there use 0px (body cells) or 4px
+ * (header cell), which is a different visual system (per-cell boxed grid,
+ * see TaskTableRow note below) rather than a single outer radius -- leaving
+ * `rounded-xl` as-is since there is no direct Figma evidence to change it.
  */
 export function TaskTable({ rows, className }: TaskTableProps) {
   return (

@@ -27,9 +27,14 @@ export interface SegmentedControlProps {
  * SegmentedControl
  *
  * Figma: "Segmented Control" COMPONENT inside "Button, Switch Button" frame.
- * - Container: bg-neutral-3, border-radius: 8px, padding: 4px
- * - Active segment: bg-neutral-4 pill, text neutral-1
- * - Inactive: text neutral-2
+ * - Container: bg-neutral-4, padding: 4px, border-radius: 10px (matches no
+ *   existing --radius-* step, so rendered as an arbitrary-value class,
+ *   same convention as application-sidebar.tsx's w-[232px]).
+ * - Segments: 0 gap between them, height 32px, padding 4px 24px, rounded-sm.
+ * - Active segment: bg-neutral-2 pill, text neutral-1.
+ * - Inactive: text neutral-1 too -- Figma shows identical (white) label
+ *   color for both states, distinguishing selection purely via the pill
+ *   background fill, not a text-color change.
  */
 export function SegmentedControl({
   options,
@@ -52,9 +57,9 @@ export function SegmentedControl({
   return (
     <div
       role="group"
-      aria-label="Vista"
+      aria-label="View"
       className={cn(
-        'inline-flex items-center gap-1 p-1 bg-neutral-3 rounded-lg',
+        'inline-flex items-center gap-0 p-1 bg-neutral-4 rounded-[10px]',
         className
       )}
     >
@@ -68,10 +73,8 @@ export function SegmentedControl({
             aria-checked={isSelected}
             onClick={() => handleSelect(opt.id)}
             className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-all cursor-pointer font-sans select-none',
-              isSelected
-                ? 'bg-neutral-4 text-neutral-1 shadow-sm'
-                : 'text-neutral-2 hover:text-neutral-1'
+              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-sm font-semibold rounded-sm transition-all cursor-pointer font-sans select-none text-neutral-1',
+              isSelected ? 'bg-neutral-2 shadow-sm' : ''
             )}
           >
             {opt.icon ? (

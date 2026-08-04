@@ -31,7 +31,11 @@ export function Tag({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border tracking-wide uppercase font-sans select-none',
+        // padding: 4px 16px, gap: 8px, border-radius: 4px -- matches Figma "Tag" component exactly
+        // (Style=Solid/Outline, all Type variants, Tags00/Tags01). 4px doesn't match any --radius-*
+        // token (smallest is --radius-sm at 8px) but is exactly Tailwind's own unmodified default
+        // `rounded` step, used directly rather than inventing a new named token.
+        'inline-flex items-center gap-2 px-4 py-1 text-xs font-semibold rounded border tracking-wide uppercase font-sans select-none',
         variants[variant],
         className
       )}
@@ -41,7 +45,7 @@ export function Tag({
         <button
           type="button"
           onClick={onRemove}
-          aria-label="Eliminar tag"
+          aria-label="Remove tag"
           className="hover:opacity-75 focus:outline-none cursor-pointer"
         >
           ×

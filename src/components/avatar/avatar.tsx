@@ -16,9 +16,12 @@ export interface AvatarProps {
 
 /** Circular user avatar that shows an image, or initials derived from `name` when no `src` is provided. */
 export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
+  // Sizes match the Figma "Avatar" component variants (Property 1=Default/Variant2/Variant3):
+  // 32px / 40px / 48px. Initials font-size per variant has no dedicated Figma spec (exported
+  // examples are all image-filled), so existing text sizes are kept as-is.
   const sizes = {
-    sm: 'w-7 h-7 text-xs font-semibold',
-    md: 'w-9 h-9 text-sm font-semibold',
+    sm: 'w-8 h-8 text-xs font-semibold',
+    md: 'w-10 h-10 text-sm font-semibold',
     lg: 'w-12 h-12 text-base font-bold',
   };
 
@@ -42,7 +45,7 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
       {src ? (
         <img
           src={src}
-          alt={name || 'Avatar de usuario'}
+          alt={name || 'User avatar'}
           className="w-full h-full object-cover"
         />
       ) : (

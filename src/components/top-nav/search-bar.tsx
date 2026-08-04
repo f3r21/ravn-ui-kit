@@ -22,10 +22,10 @@ export interface SearchBarProps {
  * SearchBar
  *
  * Figma: "Search Bar" COMPONENT_SET inside "Top Navigation Bar" frame.
- * - Background: neutral-3 (#393D41), border-radius: 8px
+ * - Background: neutral-4 (#2C2F33), border-radius: 16px
  * - Left: search icon (magnifier)
  * - Right: clear button (×) when value is non-empty
- * - font: Open Sans 14px, text color: neutral-2
+ * - font: SF Pro Display 15px/24px, letter-spacing 0.75px, text color: neutral-2
  */
 export function SearchBar({
   placeholder = 'Search...',
@@ -65,13 +65,13 @@ export function SearchBar({
   return (
     <div
       className={cn(
-        'relative inline-flex items-center gap-2 h-10 px-3 bg-neutral-3 rounded-lg border border-transparent transition-colors focus-within:border-neutral-2',
+        'relative inline-flex items-center gap-6 h-12 px-6 bg-neutral-4 rounded-md border border-transparent transition-colors focus-within:border-neutral-2',
         className
       )}
     >
       {/* Search icon */}
       <svg
-        className="w-4 h-4 text-neutral-2 shrink-0"
+        className="w-6 h-6 text-neutral-2 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -85,7 +85,7 @@ export function SearchBar({
       <input
         {...inputProps}
         ref={ref}
-        className="flex-1 bg-transparent text-sm text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
+        className="flex-1 bg-transparent text-[15px] leading-6 tracking-wider text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
       />
 
       {/* Clear button */}
@@ -96,7 +96,7 @@ export function SearchBar({
           aria-label="Limpiar búsqueda"
           className="shrink-0 text-neutral-2 hover:text-neutral-1 transition-colors cursor-pointer"
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
+          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
             <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
           </svg>
         </button>

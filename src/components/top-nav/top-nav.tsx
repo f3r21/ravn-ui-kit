@@ -27,7 +27,7 @@ export interface TopNavProps {
  *
  * Figma: "Top Nav" COMPONENT inside "Top Navigation Bar" frame.
  * - Background: neutral-4 (#2C2F33)
- * - Height: 72px
+ * - Height: 64px
  * - Left: page title
  * - Center: SearchBar
  * - Right: action buttons + user avatar
@@ -45,7 +45,7 @@ export function TopNav({
   return (
     <header
       className={cn(
-        'flex items-center gap-4 h-[72px] px-6 bg-neutral-4 border-b border-neutral-3/50 shrink-0',
+        'flex items-center gap-4 h-16 px-6 bg-neutral-4 border-b border-neutral-3/50 shrink-0',
         className
       )}
     >
@@ -70,7 +70,7 @@ export function TopNav({
       )}
 
       {/* Right: Actions + User */}
-      <div className="flex items-center gap-3 shrink-0 ml-auto">
+      <div className="flex items-center gap-6 shrink-0 ml-auto">
         {actions}
         {(userName || userAvatar) ? (
           <Avatar src={userAvatar} name={userName} size="md" />

@@ -88,7 +88,7 @@ export function EstimateModal({ isOpen, onClose, currentPoints, onConfirm }: Est
           Select story points for this task using the Fibonacci scale.
         </p>
         <EstimatePoints selected={points} onChange={setPoints} />
-        <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-3/30">
+        <div className="flex items-center justify-end gap-6 pt-2">
           <TextButton onPress={onClose}>Cancel</TextButton>
           <Button variant="primary" onPress={handleConfirm}>
             Set {points} point{points !== 1 ? 's' : ''}
