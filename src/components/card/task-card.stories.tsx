@@ -14,6 +14,7 @@ const meta: Meta<typeof TaskCard> = {
   },
   args: {
     onClick: fn(),
+    onReactionToggle: fn(),
     title: 'Working (03) - RAVN Challenge',
   },
 };
@@ -25,15 +26,17 @@ export const Default: Story = {
   args: {
     title: 'Working (03) - RAVN Challenge',
     points: 3,
-    dueDateText: '3 DÍAS',
+    dueDateText: '3 DAYS',
     dueDateUrgency: 'warning',
     tags: [
       { label: 'BACKEND', variant: 'secondary' },
       { label: 'HIGH', variant: 'tertiary' },
     ],
     assigneeName: 'Jerome Bell',
-    commentsCount: 5,
-    attachmentsCount: 2,
+    reactions: [
+      { emoji: '💬', count: 5 },
+      { emoji: '📎', count: 2 },
+    ],
   },
 };
 
@@ -41,7 +44,7 @@ export const Playground: Story = {
   args: {
     title: 'Working (03) - RAVN Challenge',
     points: 3,
-    dueDateText: '3 DÍAS',
+    dueDateText: '3 DAYS',
     dueDateUrgency: 'warning',
   },
 };
@@ -50,10 +53,10 @@ export const Overdue: Story = {
   args: {
     title: 'Fix Critical GraphQL Bug',
     points: 5,
-    dueDateText: 'VENCIDO',
+    dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue',
     tags: [{ label: 'BUG', variant: 'primary' }],
-    assigneeName: 'Fernando Ramírez',
-    commentsCount: 12,
+    assigneeName: 'Fernando Ramirez',
+    reactions: [{ emoji: '💬', count: 12 }],
   },
 };

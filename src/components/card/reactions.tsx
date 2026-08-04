@@ -23,12 +23,15 @@ export interface ReactionsProps {
  *
  * Figma: "Reactions" COMPONENT inside "Task Card" (Cards00.md L595-875, Cards01.md L552-833,
  * also cataloged standalone under "utils/sectionHeader" in Cards01.md L895-959).
- * Row of count+emoji reaction counters — used in TaskCard footer.
+ * Row of count+emoji reaction counters — used in TaskCard footer ("Frame 653").
  * Every captured instance (6+, across IOS/Android/Desktop variants in both files) renders as
  * plain white text+icon with no fill, border, or radius, and count-before-icon ordering
  * (`order: 0`/`order: 1` in the export) — the inactive state below matches that exactly.
- * Active reaction gets a primary-4 border + background tint; no active-state instance was
- * captured in the export to confirm this against, so it's preserved as-is rather than guessed at.
+ * Typography is Desktop/Body/M/regular: SF Pro Display, 15px/24px, weight 400, letter-spacing
+ * 0.75px (tracking-wider, exact at this size per the Chunk 2/3 convention) — was previously a
+ * fabricated `text-xs font-semibold` (12px/700) with no spec basis. Active reaction gets a
+ * primary-4 border + background tint; no active-state instance was captured in the export to
+ * confirm this against, so it's preserved as-is rather than guessed at.
  */
 export function Reactions({ reactions, onToggle, className }: ReactionsProps) {
   return (
@@ -41,7 +44,7 @@ export function Reactions({ reactions, onToggle, className }: ReactionsProps) {
           onClick={() => onToggle?.(r.emoji)}
           aria-pressed={r.isActive}
           className={cn(
-            'inline-flex items-center gap-1 text-xs font-semibold font-sans transition-all cursor-pointer select-none',
+            'inline-flex items-center gap-1 text-[15px] leading-6 font-normal tracking-wider font-sans transition-all cursor-pointer select-none',
             r.isActive
               ? 'px-2 py-0.5 rounded-full border bg-primary-4/10 border-primary-4/50 text-neutral-1'
               : 'text-neutral-1 hover:text-primary-4'

@@ -27,18 +27,18 @@ const sampleTasks = [
   {
     title: 'Set up project scaffolding',
     points: 3,
-    dueDateText: '2 DÍAS',
+    dueDateText: '2 DAYS',
     dueDateUrgency: 'warning' as const,
     tags: [{ label: 'FRONTEND', variant: 'secondary' as const }],
     assigneeName: 'Jerome Bell',
-    commentsCount: 3,
+    reactions: [{ emoji: '💬', count: 3 }],
   },
   {
     title: 'Design system token mapping',
     points: 5,
     tags: [{ label: 'DESIGN', variant: 'tertiary' as const }],
     assigneeName: 'Jane Doe',
-    attachmentsCount: 2,
+    reactions: [{ emoji: '📎', count: 2 }],
   },
 ];
 
@@ -95,11 +95,11 @@ export const Blocked: Story = {
       {
         title: 'Fix critical auth bug',
         points: 8,
-        dueDateText: 'VENCIDO',
+        dueDateText: 'OVERDUE',
         dueDateUrgency: 'overdue' as const,
         tags: [{ label: 'BUG', variant: 'primary' as const }],
         assigneeName: 'Fernando Ramirez',
-        commentsCount: 12,
+        reactions: [{ emoji: '💬', count: 12 }],
       },
     ],
     onAddTask: undefined,

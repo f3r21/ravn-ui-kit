@@ -1,77 +1,37 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
+import { withSurface } from '../../../.storybook/decorators';
 import { ProjectInfo } from './project-info';
+
+const ChevronIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
 
 const meta: Meta<typeof ProjectInfo> = {
   title: 'Components/ProjectInfo',
   component: ProjectInfo,
   tags: ['autodocs'],
-  argTypes: {
-    status: {
-      control: 'select',
-      options: ['active', 'on-hold', 'completed'],
-    },
-    accentColor: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'neutral'],
-    },
-  },
+  decorators: [withSurface('neutral-4')],
   args: {
-    name: 'RAVN Task Management Challenge',
-    onClick: fn(),
+    title: 'Working (03) - RAVN Challenge',
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const Default: Story = {};
+
+export const WithIcon: Story = {
   args: {
-    description: 'Build a task management dashboard with React 19 and TypeScript.',
-    status: 'active',
-    totalTasks: 24,
-    completedTasks: 9,
-    accentColor: 'primary',
+    icon: <ChevronIcon />,
   },
 };
 
-export const Playground: Story = {
+export const LongTitle: Story = {
   args: {
-    name: 'Project Name',
-    status: 'active',
-    totalTasks: 10,
-    completedTasks: 4,
-    accentColor: 'primary',
-  },
-};
-
-export const Active: Story = {
-  args: {
-    name: 'RAVN Task Management Challenge',
-    description: 'Build a task management dashboard with React 19 and TypeScript.',
-    status: 'active',
-    totalTasks: 24,
-    completedTasks: 9,
-    accentColor: 'primary',
-  },
-};
-
-export const OnHold: Story = {
-  args: {
-    name: 'Mobile App Redesign',
-    status: 'on-hold',
-    totalTasks: 12,
-    completedTasks: 3,
-    accentColor: 'tertiary',
-  },
-};
-
-export const Completed: Story = {
-  args: {
-    name: 'API Integration Sprint',
-    status: 'completed',
-    totalTasks: 8,
-    completedTasks: 8,
-    accentColor: 'secondary',
+    title: 'A much longer task title that truncates once it runs out of room',
+    icon: <ChevronIcon />,
   },
 };
