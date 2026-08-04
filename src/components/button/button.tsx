@@ -3,10 +3,24 @@ import { useButton, type AriaButtonProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface ButtonProps extends AriaButtonProps {
+  /**
+   * Visual style of the button.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  /**
+   * Controls height, horizontal padding, and font size.
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  /** Button label / content. */
   children: React.ReactNode;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /**
+   * Shows an inline spinner and forces the disabled state while `true`.
+   * @default false
+   */
   isLoading?: boolean;
 }
 
