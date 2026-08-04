@@ -23,7 +23,6 @@ export * from './components/tabs/segmented-control';
 // ─── Cards & Kanban ───────────────────────────────────────────────
 export * from './components/card/card';
 export * from './components/card/task-card';
-export * from './components/card/task-column';
 export * from './components/card/task-list-view';
 export * from './components/card/task-table';
 export * from './components/card/reactions';

@@ -101,7 +101,14 @@
   --radius-2: 2px; /* Datepicker.md day-grid cell (24x24px cells) */
   --radius-4: 4px; /* Tags00/01.md chips/pills; Task Column tag chips (most common radius in the kit) */
   --radius-10: 10px; /* Button, Switch Button00/01.md segmented-control track */
-  --radius-20: 20px; /* Task Column00.md and ApplicationSidebar00.md outer container frame */
+  /* --radius-20 removed in Chunk 14: its only sources (Task Column00/02/03.md,
+     ApplicationSidebar00.md "outer container frame") turned out to be the same
+     reused 1470x1818 neutral.5 documentation-page canvas template that backs
+     nearly every Components/*.md export (confirmed via a cross-file "utils/
+     frameHeader" grep) - never a real shipped component, and not even
+     internally consistent (Datepicker.md's copy of the same canvas uses
+     border-radius: 0px). See task-list-view.tsx for the real "Task List
+     View"/"Project Info" shape this token was fabricated to support. */
 
   /* Shadows */
   /* Only tokenizing shadows confirmed used on a real component - "Drop

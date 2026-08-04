@@ -124,9 +124,8 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
 | `--radius-sm` | 8px | `Button, Switch Button00/01.md` icon buttons |
 | `--radius-10` | 10px | `Button, Switch Button00/01.md` segmented-control track |
 | `--radius-md` | 16px | `Top Navigation Bar00/01.md` search bar |
-| `--radius-20` | 20px | `Task Column00.md` / `ApplicationSidebar00.md` outer container frame |
 | `--radius-lg` | 24px | `ApplicationSidebar00/01.md` inner sidebar |
-| `--radius-xl` | 40px | **Unverified** — only ground-truth occurrence is a 40×40px circular button (`border-radius` = half of width/height, i.e. `rounded-full`), not a distinct 40px token. Current consumers (`project-info.tsx`, `task-column.tsx`, `task-table.tsx`) need re-checking against their own specs in their dedicated chunks. |
+| `--radius-xl` | 40px | **Unverified** — only ground-truth occurrence is a 40×40px circular button (`border-radius` = half of width/height, i.e. `rounded-full`), not a distinct 40px token. Current consumer (`task-table.tsx`) needs re-checking against its own spec in Chunk 15. |
 | `--radius-full` | 9999px | circles/pills |
 
 ## Shadows
