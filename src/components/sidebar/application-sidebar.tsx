@@ -30,7 +30,7 @@ export function ApplicationSidebar({
 }: ApplicationSidebarProps) {
   return (
     <nav
-      aria-label="Navegación principal"
+      aria-label="Main navigation"
       className={cn(
         // 232px matches the Figma "Sidebar" frame (ApplicationSidebar01.md); rounded-lg = 24px border-radius on that same frame.
         'flex flex-col w-[232px] h-full bg-neutral-4 rounded-lg select-none shrink-0',

@@ -2,24 +2,43 @@ import { cn } from '../../utils/cn';
 
 /**
  * @remarks
- * Figma (`SideBarItem00`/`SideBarItem01` exports) shows the abstract
- * "SidebarItem" master component — captioned "This master component is
- * meant to be an abstract class. The SidebarItem and the
- * SidebarItemWIthOptions should inherit from this class." — with three
- * states: Normal, Hover, Selected. Those three map to this component's
- * default / hover / `isActive` states respectively, and have now been
- * cross-checked against the real exported CSS and reference screenshots
- * (colors, the 4px indicator bar, gap, and corner radius).
+ * Source: `SideBarItem00/01.md`, the "Sidebar Tab" component
+ * (States=Default/Hover/Selected block in `01.md`, the isolated,
+ * unambiguous component definition — `00.md`'s in-context instances use
+ * mixed Android/iOS text styles for the same layers, which is Figma
+ * mobile-breakpoint noise, out of scope per the master-plan mobile note).
  *
- * Neither export actually contains an instance, frame, or anatomy for
+ * Real anatomy: fixed 56px-tall row, `padding: 0 0 0 16px` (no right/vertical
+ * padding — content is vertically centered by the fixed height), `gap: 16px`,
+ * Icon Placeholder (24×24) then label (`flex-grow: 1`) then a 4px-wide,
+ * full-height "Rectangle 33" indicator bar flush against the row's right
+ * edge. Label is Desktop/Body/M/bold: SF Pro Display, 15px/24px, weight 600,
+ * letter-spacing 0.75px (`tracking-wider`, the Chunk 2/3 convention).
+ *
+ * State matrix (colors only — icon/label always share one color):
+ * - Default: `neutral.2` (#94979A), no background, indicator `opacity: 0`.
+ * - Hover: `primary.4` (#DA584B), still **no background** (the Hover export
+ *   has no `background` line at all — only Selected does), indicator stays
+ *   `opacity: 0`.
+ * - Selected: `primary.4`, `linear-gradient(90deg, transparent, primary.4
+ *   @ 10%)` background, indicator visible (`opacity: 1`).
+ *
+ * The indicator is kept mounted across all states with only its opacity
+ * toggled (matching the spec, which always includes the Rectangle 33 layer)
+ * rather than conditionally rendered, so it can transition in/out.
+ *
+ * `badgeCount` has no ground-truth basis (no export shows a count/dot on
+ * this component) but is kept as a non-contradicted, opt-in addition, same
+ * treatment earlier chunks gave unspecced extras.
+ *
+ * Neither export contains an instance, frame, or anatomy for
  * `SidebarItemWithOptions` itself — no kebab-menu, extra icon-button, or
- * distinguishing padding/layout shows up anywhere in either file, only that
- * one caption sentence naming it. So the variant is still not implementable
- * from available data and remains unimplemented, gated on real anatomy data
- * that has not been provided yet.
+ * distinguishing padding/layout shows up anywhere, only one caption
+ * sentence naming it as a sibling of this abstract class. So that variant
+ * remains unimplemented, gated on real anatomy data not yet provided.
  */
 export interface SidebarItemProps {
-  /** Optional icon rendered before the label. */
+  /** Optional icon rendered before the label (Figma "Icon Placeholder", 24×24). Should use `currentColor` so it inherits the row's state color. */
   icon?: React.ReactNode;
   /** Text label displayed for the item. */
   label: string;
@@ -48,38 +67,40 @@ export function SidebarItem({
     <button
       type="button"
       onClick={onClick}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative w-full flex items-center justify-between px-4 py-3.5 font-sans text-sm font-semibold transition-all cursor-pointer select-none overflow-hidden',
+        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-[15px] leading-6 font-semibold tracking-wider transition-colors cursor-pointer select-none',
         isActive
           ? 'text-primary-4 bg-gradient-to-r from-transparent to-primary-4/10'
-          : 'text-neutral-2 hover:text-primary-4 hover:bg-neutral-4/50',
+          : 'text-neutral-2 hover:text-primary-4',
         className
       )}
     >
-      <div className="flex items-center gap-4">
-        {icon ? <span className="text-lg shrink-0">{icon}</span> : null}
-        <span className="truncate tracking-wide">{label}</span>
-      </div>
+      {icon ? (
+        <span className="flex items-center justify-center w-6 h-6 shrink-0">{icon}</span>
+      ) : null}
 
-      <div className="flex items-center gap-2">
-        {badgeCount !== undefined ? (
-          <span
-            className={cn(
-              'px-2 py-0.5 text-xs font-bold rounded-full',
-              isActive
-                ? 'bg-primary-4 text-neutral-1'
-                : 'bg-neutral-3 text-neutral-1'
-            )}
-          >
-            {badgeCount}
-          </span>
-        ) : null}
+      <span className="flex-1 truncate">{label}</span>
 
-        {/* 4px Right indicator bar for active state matching Figma (sharp corners, no radius) */}
-        {isActive ? (
-          <span className="absolute right-0 top-0 bottom-0 w-1 bg-primary-4" />
-        ) : null}
-      </div>
+      {badgeCount !== undefined ? (
+        <span
+          className={cn(
+            'px-2 py-0.5 text-xs font-bold rounded-full shrink-0',
+            isActive
+              ? 'bg-primary-4 text-neutral-1'
+              : 'bg-neutral-3 text-neutral-1'
+          )}
+        >
+          {badgeCount}
+        </span>
+      ) : null}
+
+      <span
+        className={cn(
+          'w-1 h-full shrink-0 bg-primary-4 transition-opacity',
+          isActive ? 'opacity-100' : 'opacity-0'
+        )}
+      />
     </button>
   );
 }
