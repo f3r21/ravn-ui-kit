@@ -36,6 +36,7 @@ export * from './components/modal/estimate-modal';
 
 // ─── Feedback ─────────────────────────────────────────────────────
 export * from './components/badge/badge';
+export * from './components/skeleton/skeleton';
 
 // ─── Data display ─────────────────────────────────────────────────
 export * from './components/avatar/avatar';

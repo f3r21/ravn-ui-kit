@@ -52,7 +52,7 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
           onClick={() => onSelect(points)}
           aria-pressed={value === points}
           className={cn(
-            'flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans transition-colors cursor-pointer',
+            'flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
             value === points ? 'bg-neutral-2' : 'hover:bg-neutral-2'
           )}
         >

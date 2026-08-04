@@ -35,7 +35,7 @@ export function Input({ label, error, className, ...props }: InputProps) {
         {...inputProps}
         ref={ref}
         className={cn(
-          'h-10 px-3 py-2 text-sm bg-neutral-1 text-neutral-5 border border-neutral-2 rounded-md placeholder:text-neutral-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:border-transparent disabled:opacity-50 disabled:bg-neutral-1',
+          'h-10 px-3 py-2 text-sm bg-neutral-1 text-neutral-5 border border-neutral-2 rounded-md placeholder:text-neutral-2 transition-colors outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-neutral-1',
           error && 'border-danger-5 focus-visible:outline-danger-5',
           className
         )}

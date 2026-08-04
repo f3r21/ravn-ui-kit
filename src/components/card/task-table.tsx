@@ -1,6 +1,7 @@
 import { cn } from '../../utils/cn';
 import { Avatar } from '../avatar/avatar';
 import { Tag } from '../tag/tag';
+import { Skeleton } from '../skeleton/skeleton';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -219,7 +220,7 @@ export function TaskTableRow({
           sits flush against it. */}
       <td className={cn(CELL_BASE, 'gap-2 pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
         <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
-        <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer">
+        <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-1">
           <input
             type="checkbox"
             className="sr-only"
@@ -230,7 +231,7 @@ export function TaskTableRow({
           <CheckIcon
             className={cn(
               'w-6 h-6 text-neutral-1 transition-opacity',
-              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
             )}
           />
         </label>
@@ -286,8 +287,40 @@ export interface TaskTableGroup {
 export interface TaskTableProps {
   /** Status groups rendered top to bottom, each its own bordered box per Figma's "Task Table". */
   groups: TaskTableGroup[];
+  /**
+   * Renders the header row plus 5 skeleton rows instead of `groups` while data is in
+   * flight. No ground-truth basis (static exports have no loading state) — an
+   * engineering-only addition, same precedent as `Skeleton` itself.
+   * @default false
+   */
+  isLoading?: boolean;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+}
+
+function TaskTableRowSkeleton() {
+  return (
+    <tr>
+      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
+        <Skeleton className="h-4 w-full" />
+      </td>
+      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
+        <Skeleton className="h-6 w-16 rounded" />
+      </td>
+      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
+        <Skeleton className="h-4 w-16" />
+      </td>
+      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+      </td>
+      <td className={cn(CELL_BASE, 'gap-2 pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
+        <Skeleton className="h-4 w-20" />
+      </td>
+    </tr>
+  );
 }
 
 const headerCells: { key: keyof typeof COLUMN_WIDTHS; label: string }[] = [
@@ -309,7 +342,7 @@ const headerCells: { key: keyof typeof COLUMN_WIDTHS; label: string }[] = [
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export function TaskTable({ groups, className }: TaskTableProps) {
+export function TaskTable({ groups, isLoading = false, className }: TaskTableProps) {
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
       <div className="flex flex-col gap-4 min-w-[1108px]">
@@ -331,31 +364,50 @@ export function TaskTable({ groups, className }: TaskTableProps) {
           ))}
         </div>
 
-        {groups.map((group, gi) => (
-          <table key={gi} className="border-collapse table-fixed">
+        {isLoading ? (
+          <table className="border-collapse table-fixed">
             <colgroup>
               {headerCells.map(({ key }) => (
                 <col key={key} style={{ width: COLUMN_WIDTHS[key] }} />
               ))}
             </colgroup>
             <tbody>
-              <tr>
-                <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
-                  <div className="flex items-center gap-2 h-14 px-4 bg-neutral-4 rounded-t-4">
-                    <CaretIcon className="w-6 h-6 shrink-0 text-neutral-2" />
-                    <h3 className="flex-1 min-w-0 truncate text-[18px] leading-8 font-semibold tracking-[0.75px] text-neutral-1 font-sans">
-                      {group.title}
-                    </h3>
-                    {group.actions}
-                  </div>
-                </td>
-              </tr>
-              {group.rows.map((row, ri) => (
-                <TaskTableRow key={ri} {...row} />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TaskTableRowSkeleton key={i} />
               ))}
             </tbody>
           </table>
-        ))}
+        ) : groups.length === 0 ? (
+          <div className="flex items-center justify-center py-16 text-neutral-2 font-sans text-sm">
+            No tasks yet.
+          </div>
+        ) : (
+          groups.map((group, gi) => (
+            <table key={gi} className="border-collapse table-fixed">
+              <colgroup>
+                {headerCells.map(({ key }) => (
+                  <col key={key} style={{ width: COLUMN_WIDTHS[key] }} />
+                ))}
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
+                    <div className="flex items-center gap-2 h-14 px-4 bg-neutral-4 rounded-t-4">
+                      <CaretIcon className="w-6 h-6 shrink-0 text-neutral-2" />
+                      <h3 className="flex-1 min-w-0 truncate text-[18px] leading-8 font-semibold tracking-[0.75px] text-neutral-1 font-sans">
+                        {group.title}
+                      </h3>
+                      {group.actions}
+                    </div>
+                  </td>
+                </tr>
+                {group.rows.map((row, ri) => (
+                  <TaskTableRow key={ri} {...row} />
+                ))}
+              </tbody>
+            </table>
+          ))
+        )}
       </div>
     </div>
   );

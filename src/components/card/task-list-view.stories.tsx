@@ -51,6 +51,10 @@ export const Empty: Story = {
   args: { title: 'Backlog (0)', tasks: [] },
 };
 
+export const Loading: Story = {
+  args: { title: 'Working (03)', tasks: [], isLoading: true },
+};
+
 /**
  * Figma's `Frame 654` (`Mockups/Dashboard Default View/Dashboard Mockup.md`)
  * lays out 3 `Task List View` instances side by side, `flex-direction: row`,

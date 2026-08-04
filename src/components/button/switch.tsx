@@ -88,7 +88,7 @@ export function Switch({
         aria-checked={state.isSelected}
         disabled={isDisabled}
         className={cn(
-          'relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-primary-4 shrink-0',
+          'relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 shrink-0',
           state.isSelected ? 'bg-primary-4' : 'bg-neutral-3'
         )}
       >

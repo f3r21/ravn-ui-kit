@@ -109,7 +109,7 @@ export function TopNav({
             type="button"
             onClick={clearSearch}
             aria-label="Clear search"
-            className="w-6 h-6 shrink-0 text-neutral-2 hover:text-neutral-1 transition-colors cursor-pointer [&>svg]:w-full [&>svg]:h-full"
+            className="w-6 h-6 shrink-0 text-neutral-2 hover:text-neutral-1 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full"
           >
             <CloseIcon />
           </button>

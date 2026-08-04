@@ -44,7 +44,7 @@ export function Reactions({ reactions, onToggle, className }: ReactionsProps) {
           onClick={() => onToggle?.(r.emoji)}
           aria-pressed={r.isActive}
           className={cn(
-            'inline-flex items-center gap-1 text-[15px] leading-6 font-normal tracking-wider font-sans transition-all cursor-pointer select-none',
+            'inline-flex items-center gap-1 text-[15px] leading-6 font-normal tracking-wider font-sans transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs',
             r.isActive
               ? 'px-2 py-0.5 rounded-full border bg-primary-4/10 border-primary-4/50 text-neutral-1'
               : 'text-neutral-1 hover:text-primary-4'

@@ -161,7 +161,7 @@ export function DatePickerMenu({
             type="button"
             onClick={prevYear}
             aria-label="Previous year"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer"
+            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronDoubleLeftIcon />
           </button>
@@ -169,7 +169,7 @@ export function DatePickerMenu({
             type="button"
             onClick={prevMonth}
             aria-label="Previous month"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer"
+            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronLeftIcon />
           </button>
@@ -184,7 +184,7 @@ export function DatePickerMenu({
             type="button"
             onClick={nextMonth}
             aria-label="Next month"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer"
+            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronRightIcon />
           </button>
@@ -192,7 +192,7 @@ export function DatePickerMenu({
             type="button"
             onClick={nextYear}
             aria-label="Next year"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer"
+            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronDoubleRightIcon />
           </button>
@@ -223,7 +223,7 @@ export function DatePickerMenu({
                 aria-label={date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                 aria-pressed={isSelected}
                 className={cn(
-                  'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-sm leading-[22px] font-normal font-sans transition-colors cursor-pointer',
+                  'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-sm leading-[22px] font-normal font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
                   isSelected
                     ? 'border border-primary-4 text-neutral-1'
                     : isCurrentMonth
@@ -245,7 +245,7 @@ export function DatePickerMenu({
         <button
           type="button"
           onClick={goToday}
-          className="text-sm leading-[22px] font-normal font-sans text-primary-4 hover:opacity-80 transition-opacity cursor-pointer"
+          className="text-sm leading-[22px] font-normal font-sans text-primary-4 hover:opacity-80 transition-opacity cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
         >
           Today
         </button>

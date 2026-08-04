@@ -93,3 +93,11 @@ export const Playground: Story = {
     ],
   },
 };
+
+export const Empty: Story = {
+  args: { groups: [] },
+};
+
+export const Loading: Story = {
+  args: { groups: [], isLoading: true },
+};

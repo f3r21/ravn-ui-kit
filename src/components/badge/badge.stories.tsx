@@ -12,7 +12,7 @@ const meta: Meta<typeof Badge> = {
     },
   },
   args: {
-    children: 'Borrador',
+    children: 'Draft',
     variant: 'neutral',
   },
 };
@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { variant: 'neutral', children: 'Borrador' },
+  args: { variant: 'neutral', children: 'Draft' },
 };
 
 export const Playground: Story = {
@@ -42,28 +42,28 @@ export const Variants: Story = {
 
 export const Neutral: Story = {
   args: {
-    children: 'Borrador',
+    children: 'Draft',
     variant: 'neutral',
   },
 };
 
 export const Success: Story = {
   args: {
-    children: 'Completado',
+    children: 'Completed',
     variant: 'success',
   },
 };
 
 export const Warning: Story = {
   args: {
-    children: 'En Progreso',
+    children: 'In Progress',
     variant: 'warning',
   },
 };
 
 export const Danger: Story = {
   args: {
-    children: 'Bloqueado',
+    children: 'Blocked',
     variant: 'danger',
   },
 };

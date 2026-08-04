@@ -84,12 +84,24 @@ export function TaskCard({
   return (
     <div
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       className={cn(
         // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
         // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
-        'flex flex-col gap-4 p-4 bg-neutral-4 text-neutral-1 rounded-sm border border-transparent shadow-xs hover:border-neutral-2 transition-all cursor-pointer select-none',
+        'flex flex-col gap-4 p-4 bg-neutral-4 text-neutral-1 rounded-sm border border-transparent shadow-xs hover:border-neutral-2 transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
         className
       )}
     >

@@ -140,14 +140,18 @@ export function AddTaskModal({
         {/* Estimate trigger */}
         <div className="relative">
           {points === undefined ? (
-            <button type="button" onClick={() => togglePopover('estimate')} className="cursor-pointer">
+            <button
+              type="button"
+              onClick={() => togglePopover('estimate')}
+              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+            >
               <Tag icon={<PointsIcon />}>Estimate</Tag>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => togglePopover('estimate')}
-              className="flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer"
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
               {points} Point{points !== 1 ? 's' : ''}
@@ -165,14 +169,18 @@ export function AddTaskModal({
         {/* Assignee trigger */}
         <div className="relative">
           {!assignee ? (
-            <button type="button" onClick={() => togglePopover('assignee')} className="cursor-pointer">
+            <button
+              type="button"
+              onClick={() => togglePopover('assignee')}
+              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+            >
               <Tag icon={<PersonIcon />}>Assignee</Tag>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => togglePopover('assignee')}
-              className="flex items-center gap-2 h-8 px-2 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer"
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
               {assignee.name}
@@ -189,7 +197,11 @@ export function AddTaskModal({
 
         {/* Due date trigger */}
         <div className="relative">
-          <button type="button" onClick={() => togglePopover('date')} className="cursor-pointer">
+          <button
+            type="button"
+            onClick={() => togglePopover('date')}
+            className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+          >
             <Tag icon={<CalendarIcon />}>
               {dueDate ? dueDate.toLocaleDateString('en-US') : 'Due date'}
             </Tag>

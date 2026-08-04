@@ -58,7 +58,7 @@ export function Button({
       {...buttonProps}
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
         className
       )}
