@@ -41,10 +41,14 @@ export function UserRow({
   className,
   onClick,
 }: UserRowProps) {
-  const textSizes = {
-    sm: { name: 'text-xs', role: 'text-[10px]' },
-    md: { name: 'text-sm', role: 'text-xs' },
-    lg: { name: 'text-base', role: 'text-sm' },
+  // Name text is fixed (SF Pro Display 15px/24px regular, tracking 0.75px) per the
+  // Figma "User" component — the only avatar+name typography spec in the ground
+  // truth, unaffected by the avatar size variant. Role has no Figma spec; sizes
+  // below are scaled by eye to pair with each avatar size.
+  const roleTextSizes = {
+    sm: 'text-[10px]',
+    md: 'text-xs',
+    lg: 'text-sm',
   };
 
   const Wrapper = onClick ? 'button' : 'div';
@@ -70,19 +74,14 @@ export function UserRow({
 
       {/* Name + Role */}
       <div className="flex flex-col min-w-0">
-        <span
-          className={cn(
-            'font-sans font-semibold text-neutral-1 truncate leading-tight',
-            textSizes[size].name
-          )}
-        >
+        <span className="font-sans font-normal text-[15px] leading-6 tracking-wider text-neutral-1 truncate">
           {name}
         </span>
         {role ? (
           <span
             className={cn(
               'font-sans text-neutral-2 truncate leading-tight',
-              textSizes[size].role
+              roleTextSizes[size]
             )}
           >
             {role}
