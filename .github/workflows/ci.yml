@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Build library
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Upload Storybook artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: storybook-static
+          retention-days: 7
+          if-no-files-found: error
+
+      # audit-level=high: repo has one known, accepted moderate vuln (uuid via
+      # @storybook/addon-essentials -> @storybook/addon-actions). Fixing it
+      # requires downgrading @storybook/addon-essentials to 7.0.6 (a breaking
+      # Storybook change), tracked separately — not fixed here. This level
+      # still fails CI on any new high/critical vulnerability.
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
