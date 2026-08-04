@@ -12,18 +12,84 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    rows: [
-      { title: 'Set up project scaffolding', assigneeName: 'Jerome Bell', dueDate: 'Aug 10', estimationPoints: 3, tags: [{ label: 'FRONTEND', variant: 'secondary' }] },
-      { title: 'Fix critical auth bug', assigneeName: 'Jane Doe', dueDate: 'Aug 5', dueDateUrgency: 'overdue', estimationPoints: 8, tags: [{ label: 'BUG', variant: 'primary' }] },
-      { title: 'Design token mapping', dueDate: 'Aug 15', dueDateUrgency: 'warning', estimationPoints: 5, tags: [{ label: 'DESIGN', variant: 'tertiary' }] },
+    groups: [
+      {
+        title: 'To Do (05)',
+        rows: [
+          {
+            index: 1,
+            title: 'Create wireframe',
+            indicatorColor: 'primary',
+            estimationPoints: 4,
+            assigneeName: 'Amelia Nellson',
+            dueDate: 'Yesterday',
+            dueDateUrgency: 'overdue',
+          },
+          {
+            index: 2,
+            title: 'Slack Logo Design',
+            indicatorColor: 'secondary',
+            reactions: [{ emoji: '💬', count: 3 }, { emoji: '🔗', count: 5 }],
+            tags: [{ label: 'IOS APP', variant: 'secondary' }, { label: '+2', variant: 'neutral' }],
+            estimationPoints: 2,
+            assigneeName: 'Jonah Doe',
+            dueDate: 'Today',
+            dueDateUrgency: 'warning',
+          },
+          {
+            index: 3,
+            title: 'Dashboard Design',
+            indicatorColor: 'tertiary',
+            reactions: [{ emoji: '🔗', count: 5 }],
+            estimationPoints: 8,
+            assigneeName: 'Jason Joe',
+            dueDate: '6 July, 2020',
+          },
+          {
+            index: 4,
+            title: 'Create wireframe',
+            indicatorColor: 'secondary',
+            estimationPoints: 4,
+            assigneeName: 'Martina Strand',
+            dueDate: '6 July, 2020',
+          },
+          {
+            index: 5,
+            title: 'Micromax Logo Design',
+            indicatorColor: 'primary',
+            estimationPoints: 4,
+            assigneeName: 'Macky Nielsen',
+            dueDate: '6 July, 2020',
+          },
+        ],
+      },
+      {
+        title: 'In Progress',
+        rows: [
+          { index: 1, title: 'Dashboard Design', assigneeName: 'Amelia Nellson', dueDate: '6 July, 2020' },
+          { index: 2, title: 'Extramark Logo Design', assigneeName: 'Jonah Doe', dueDate: '6 July, 2020' },
+        ],
+      },
     ],
   },
 };
 
 export const Playground: Story = {
   args: {
-    rows: [
-      { title: 'Write onboarding docs', assigneeName: 'Fernando Ramirez', dueDate: 'Aug 20', estimationPoints: 2, tags: [{ label: 'DOCS', variant: 'neutral' }] },
+    groups: [
+      {
+        title: 'Reviews (01)',
+        rows: [
+          {
+            index: 1,
+            title: 'Write onboarding docs',
+            estimationPoints: 1,
+            assigneeName: 'Fernando Ramirez',
+            dueDate: 'Aug 20',
+            tags: [{ label: 'DOCS', variant: 'neutral' }],
+          },
+        ],
+      },
     ],
   },
 };

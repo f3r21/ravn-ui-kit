@@ -80,19 +80,20 @@
   /* Border Radii */
   /* sm/md/lg re-verified directly against ground truth: sm=8px (Button,
      Switch Button00/01.md icon buttons), md=16px (Top Navigation Bar00/01.md
-     search bar), lg=24px (ApplicationSidebar00/01.md inner sidebar).
-     xl=40px is UNVERIFIED as a real distinct radius: its only ground-truth
-     occurrence is a 40x40px button with border-radius:40px, i.e. a circle
-     (radius = half of width/height), which is `rounded-full`, not a
-     standalone 40px token. Current consumers (project-info.tsx, task-column.tsx,
-     task-table.tsx) need to be re-checked against their own component specs
-     in their dedicated chunks (11/14/15) to see if they should be
-     `rounded-full` instead - not resolved here. */
+     search bar), lg=24px (ApplicationSidebar00/01.md inner sidebar). */
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  --radius-xl: 40px;
   --radius-full: 9999px;
+  /* --radius-xl (40px) removed in Chunk 15: it was UNVERIFIED as a real distinct
+     radius from the start (Chunk 1) - its only ground-truth occurrence is a
+     40x40px button with border-radius:40px, i.e. a circle (radius = half of
+     width/height), which is `rounded-full`, not a standalone 40px token. Its 3
+     flagged consumers are now all resolved without it: project-info.tsx and
+     task-column.tsx in Chunks 11/14 (the latter deleted outright), task-table.tsx
+     in Chunk 15 (rebuilt around the real `--radius-4` header/group-header corners
+     instead). Zero remaining consumers - same fabricated-token precedent as
+     --radius-20's removal in Chunk 14. */
 
   /* Added via Chunk 1 ground-truth audit - values confirmed present in real
      component specs but missing from the sm/md/lg/xl ladder above (they
