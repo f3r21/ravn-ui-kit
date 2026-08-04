@@ -12,12 +12,12 @@ const items = [
 const panels = {
   board: (
     <div className="p-6 text-neutral-2 font-sans text-sm">
-      Vista Tablero (Kanban)
+      Board view (Kanban)
     </div>
   ),
-  list: <div className="p-6 text-neutral-2 font-sans text-sm">Vista Lista</div>,
+  list: <div className="p-6 text-neutral-2 font-sans text-sm">List view</div>,
   table: (
-    <div className="p-6 text-neutral-2 font-sans text-sm">Vista Tabla</div>
+    <div className="p-6 text-neutral-2 font-sans text-sm">Table view</div>
   ),
 };
 

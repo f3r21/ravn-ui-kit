@@ -29,9 +29,18 @@ export interface TabsProps {
 /**
  * Tabs
  *
- * Figma: "Tabs" COMPONENT_SET inside "Button, Switch Button" frame.
- * - Active tab: text primary-4 + 2px bottom border primary-4
- * - Inactive: text neutral-2, hover text neutral-1
+ * Figma: "Tabs" COMPONENT_SET inside "Button, Switch Button" frame
+ * (Property 1=Selected / Variant2). Frame 299: flex column, padding
+ * 12px 0px 8px, gap 8px, label + 2px indicator strip below it.
+ * Label: Android/Body/S/regular (13px/20px, weight 400, letter-spacing
+ * 0.25px, centered) -- per the Chunk 1 precedent, mobile-labeled Figma
+ * text styles (Android/Roboto here, iOS/SF Pro elsewhere) don't get a
+ * separate font-family token, they render on the shared `--font-sans`.
+ * Active tab: text + indicator primary-4. Inactive: text neutral-2,
+ * indicator same as background (i.e. invisible) -- hover:text-neutral-1
+ * is a spec-free, non-contradicted addition. The full-width `border-b`
+ * previously under the tablist had no grounding in spec (only the
+ * per-tab indicator strip is real) and has been removed.
  *
  * @remarks
  * This is a hand-rolled `role="tablist"`/`role="tab"`/`role="tabpanel"`
@@ -67,7 +76,7 @@ export function Tabs({
       <div
         role="tablist"
         aria-label="Tab navigation"
-        className="flex items-end border-b border-neutral-3/50"
+        className="flex items-end"
       >
         {items.map((item) => {
           const isSelected = selectedKey === item.id;
@@ -87,7 +96,7 @@ export function Tabs({
                 // is 0px, but that's an artifact of a fixed-width (120px)
                 // demo box, not a real horizontal-padding spec for
                 // arbitrary-length labels.
-                'relative flex items-center gap-2 px-5 pt-3 pb-2 text-sm font-semibold font-sans transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-4',
+                'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-[13px] leading-5 font-normal tracking-[0.25px] text-center font-sans transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-4',
                 isSelected
                   ? 'text-primary-4'
                   : 'text-neutral-2 hover:text-neutral-1'
