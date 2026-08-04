@@ -40,3 +40,28 @@ export const Default: Story = {
     );
   },
 };
+
+/**
+ * `Mockups/Dashboard Edit Task/Add  Task Modal00.md` reopens this exact same
+ * widget pre-filled (Estimate "0 Points", Assignee "Jerome Bell" already
+ * set) rather than showing a distinct edit component.
+ */
+export const Edit: Story = {
+  render: (args) => {
+    const { isOpen, open, close } = useModal(true);
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <TextButton onPress={open}>Reopen for editing</TextButton>
+        <AddTaskModal
+          assignees={args.assignees ?? ASSIGNEES}
+          onSubmit={args.onSubmit}
+          isOpen={isOpen}
+          onClose={close}
+          initialTitle="Fix critical GraphQL bug"
+          initialPoints={0}
+          initialAssignee={ASSIGNEES[0]}
+        />
+      </div>
+    );
+  },
+};

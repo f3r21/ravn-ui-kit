@@ -36,6 +36,14 @@ export interface AddTaskModalProps {
   assignees?: Assignee[];
   /** Called with the form values when the user submits a valid (non-empty title) task. */
   onSubmit?: (data: { title: string; dueDate?: Date; points?: number; assignee?: Assignee }) => void;
+  /** Pre-fills the title field (edit flow — reopening on an existing task). */
+  initialTitle?: string;
+  /** Pre-fills the due-date trigger (edit flow). */
+  initialDueDate?: Date;
+  /** Pre-fills the estimate trigger (edit flow). */
+  initialPoints?: number;
+  /** Pre-fills the assignee trigger (edit flow). */
+  initialAssignee?: Assignee;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -60,12 +68,29 @@ export interface AddTaskModalProps {
  * surface); the primary Create button's disabled color (title empty) is `primary-2`, its enabled
  * color is `primary-4` — already exactly `TextButton`'s existing disabled/enabled primary styling
  * (Chunk 4), so `isDisabled={!title.trim()}` reproduces the empty-vs-typed contrast for free.
+ *
+ * `Mockups/Dashboard Edit Task/Add  Task Modal00.md` (note: source filename has a double
+ * space) reuses this exact same "Add Task Modal" component (identical 578×184/neutral-3/8px
+ * anatomy) reopened with the Estimate ("0 Points") and Assignee ("Jerome Bell") triggers
+ * already filled — confirming Edit is this same widget pre-populated, not a distinct
+ * component. `initialTitle`/`initialDueDate`/`initialPoints`/`initialAssignee` (all optional,
+ * defaulting to the prior blank-create behavior) seed the internal state for that reuse.
  */
-export function AddTaskModal({ isOpen, onClose, assignees = [], onSubmit, className }: AddTaskModalProps) {
-  const [title, setTitle] = React.useState('');
-  const [dueDate, setDueDate] = React.useState<Date | undefined>();
-  const [points, setPoints] = React.useState<number | undefined>();
-  const [assignee, setAssignee] = React.useState<Assignee | undefined>();
+export function AddTaskModal({
+  isOpen,
+  onClose,
+  assignees = [],
+  onSubmit,
+  initialTitle = '',
+  initialDueDate,
+  initialPoints,
+  initialAssignee,
+  className,
+}: AddTaskModalProps) {
+  const [title, setTitle] = React.useState(initialTitle);
+  const [dueDate, setDueDate] = React.useState<Date | undefined>(initialDueDate);
+  const [points, setPoints] = React.useState<number | undefined>(initialPoints);
+  const [assignee, setAssignee] = React.useState<Assignee | undefined>(initialAssignee);
 
   const [openPopover, setOpenPopover] = React.useState<'estimate' | 'assignee' | 'date' | null>(null);
   const togglePopover = (name: 'estimate' | 'assignee' | 'date') =>

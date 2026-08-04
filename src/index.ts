@@ -50,3 +50,7 @@ export * from './components/datepicker/datepicker-menu';
 // ─── Navigation ───────────────────────────────────────────────────
 export * from './components/sidebar/sidebar-item';
 export * from './components/sidebar/application-sidebar';
+
+// ─── Layout ───────────────────────────────────────────────────────
+export * from './components/layout/view-switcher';
+export * from './components/layout/app-shell';
