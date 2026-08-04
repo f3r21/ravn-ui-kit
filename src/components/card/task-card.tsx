@@ -2,7 +2,7 @@ import { cn } from '../../utils/cn';
 import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
 import { ProjectInfo } from './project-info';
-import { Reactions, type Reaction } from './reactions';
+import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
 
 const AlarmIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
@@ -41,13 +41,12 @@ export interface TaskCardProps {
   /** Avatar image URL for the assignee, forwarded to `Avatar`. */
   assigneeAvatar?: string;
   /**
-   * Reaction counters rendered in the footer (Figma "Frame 653"), via `Reactions`.
-   * Hidden entirely when empty.
+   * Metadata badges (e.g. attachment/subtask/comment counts) rendered in the footer (Figma
+   * "Frame 653"), via `TaskMetaBadges`. Hidden entirely when empty. Read-only — see
+   * `TaskMetaBadges`'s doc comment for why this is no longer a toggleable emoji-reaction row.
    * @default []
    */
-  reactions?: Reaction[];
-  /** Called with the emoji of the reaction pill that was clicked. */
-  onReactionToggle?: (emoji: string) => void;
+  metaBadges?: TaskMetaBadge[];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
   /** Called when the card is clicked. */
@@ -66,7 +65,7 @@ const urgencyVariantMap = {
  * Figma: "Task Card" COMPONENT (Cards00.md / Cards01.md), consistent across the IOS/Android/Desktop
  * variants. Anatomy is 4 stacked rows: "Project Info" (title + trailing icon, via the `ProjectInfo`
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
- * (avatar + `Reactions` counters).
+ * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
 export function TaskCard({
   title,
@@ -76,8 +75,7 @@ export function TaskCard({
   tags = [],
   assigneeName,
   assigneeAvatar,
-  reactions = [],
-  onReactionToggle,
+  metaBadges = [],
   className,
   onClick,
 }: TaskCardProps) {
@@ -149,7 +147,7 @@ export function TaskCard({
         </div>
       ) : null}
 
-      {/* Footer Row: Assignee & Reaction Counters (Figma "Reactions" auto-layout, Cards01.md
+      {/* Footer Row: Assignee & Metadata Badges (Figma "Reactions" auto-layout, Cards01.md
           L552-833 — no top divider/border is ever rendered above this row). */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -161,16 +159,12 @@ export function TaskCard({
           ) : null}
         </div>
 
-        {/* Figma's "Frame 653" (gap 16px) also shows a leading icon-only reaction slot with no
-            count ever rendered ahead of the 2 count+icon widgets below. A full-file Figma check
-            (Chunk 24) confirmed this is a consistent, deliberate pattern (identical across all 505
-            "Reactions" instances in the file, not a one-off), and that the 3 real icons used here
-            are named "attachment-2", "node-tree", and "chat-3-line" — not emoji — suggesting this
-            row may represent attachment/subtask/comment badges rather than user-togglable emoji
-            reactions (see `reactions.tsx`'s doc comment). Left unimplemented pending a product
-            decision on that mismatch, not guessed at here. */}
-        {reactions.length > 0 ? (
-          <Reactions reactions={reactions} onToggle={onReactionToggle} />
+        {/* Figma's "Frame 653" (gap 16px) shows a leading icon-only badge (no count) ahead of 2
+            count+icon widgets — resolved in Chunk 26 by redesigning `Reactions` into the
+            read-only `TaskMetaBadges` (see its doc comment): `count` is optional, so the
+            icon-only leading slot is just a badge with `count` omitted, not a special case. */}
+        {metaBadges.length > 0 ? (
+          <TaskMetaBadges badges={metaBadges} />
         ) : null}
       </div>
     </div>

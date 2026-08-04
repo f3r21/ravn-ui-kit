@@ -24,6 +24,14 @@ const CaretIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// remix-icons/line/system/arrow-right-s-line — the real icon paired with the "Details" link
+// text below, confirmed via live Figma access (Chunk 25).
+const ArrowRightIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="m9 18 6-6-6-6" />
+  </svg>
+);
+
 const CheckIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
     <rect x="4" y="4" width="16" height="16" rx="3" />
@@ -146,12 +154,19 @@ export interface TaskTableRowProps {
   /**
    * Reaction counters (e.g. comment count, subtask count) rendered after the title, via a plain
    * `count`+`emoji` pair -- read-only, not the clickable/toggleable footer reactions `Reactions`
-   * renders on `TaskCard`. Figma's 3rd "Details"-style slot in this same row (Task Column02.md)
-   * has no legible glyph/count content in the export, so it's left unimplemented, consistent
-   * with Chunk 11's precedent for TaskCard's un-glyphed 3rd reaction slot.
+   * renders on `TaskCard`. Figma's 3rd slot in this same row is a separate "Details" link, not
+   * another count widget -- see `onViewDetails` below.
    * @default []
    */
   reactions?: TaskTableReaction[];
+  /**
+   * Called when the row's trailing "Details" link is clicked; renders a "Details" label with a
+   * right-chevron icon when provided, hidden otherwise. Confirmed via live Figma access (Chunk 25,
+   * fileKey `ZUAB3jXFyKFktoAzvN7h1T`) that this row's 3rd slot -- previously documented as having
+   * "no legible glyph/count content" -- is in fact literal text "Details" paired with
+   * `remix-icons/line/system/arrow-right-s-line`, not another reaction-style count.
+   */
+  onViewDetails?: () => void;
   /**
    * Shows a checkbox before the row index. Figma's "Task Name Cell" renders this icon slot at
    * `opacity: 0` in "Property 1=Default" and fully opaque in "Property 1=Hover" -- an evidenced
@@ -213,6 +228,7 @@ export function TaskTableRow({
   dueDate,
   dueDateUrgency = 'normal',
   onClick,
+  onViewDetails,
 }: TaskTableRowProps) {
   return (
     <tr onClick={onClick} className={cn('group', onClick && 'cursor-pointer')}>
@@ -243,6 +259,16 @@ export function TaskTableRow({
             <span>{r.emoji}</span>
           </span>
         ))}
+        {onViewDetails ? (
+          <button
+            type="button"
+            onClick={onViewDetails}
+            className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
+          >
+            <span>Details</span>
+            <ArrowRightIcon className="w-4 h-4" />
+          </button>
+        ) : null}
       </td>
 
       {/* Task Tag Cell */}

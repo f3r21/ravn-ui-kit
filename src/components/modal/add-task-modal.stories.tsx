@@ -11,6 +11,13 @@ const ASSIGNEES = [
   { id: '3', name: 'Fernando Ramirez' },
 ];
 
+const LABELS = [
+  { id: '1', text: 'Bug', variant: 'primary' as const },
+  { id: '2', text: 'Feature', variant: 'secondary' as const },
+  { id: '3', text: 'Urgent', variant: 'tertiary' as const },
+  { id: '4', text: 'Docs', variant: 'neutral' as const },
+];
+
 const meta: Meta<typeof AddTaskModal> = {
   title: 'Components/Modal/AddTask',
   component: AddTaskModal,
@@ -18,6 +25,7 @@ const meta: Meta<typeof AddTaskModal> = {
   decorators: [withSurface('neutral-5')],
   args: {
     assignees: ASSIGNEES,
+    labels: LABELS,
     onSubmit: fn(),
   },
 };
@@ -32,6 +40,7 @@ export const Default: Story = {
         <TextButton onPress={open}>Open Add Task widget</TextButton>
         <AddTaskModal
           assignees={args.assignees ?? ASSIGNEES}
+          labels={args.labels ?? LABELS}
           onSubmit={args.onSubmit}
           isOpen={isOpen}
           onClose={close}
@@ -54,12 +63,14 @@ export const Edit: Story = {
         <TextButton onPress={open}>Reopen for editing</TextButton>
         <AddTaskModal
           assignees={args.assignees ?? ASSIGNEES}
+          labels={args.labels ?? LABELS}
           onSubmit={args.onSubmit}
           isOpen={isOpen}
           onClose={close}
           initialTitle="Fix critical GraphQL bug"
           initialPoints={0}
           initialAssignee={ASSIGNEES[0]}
+          initialLabel={LABELS[0]}
         />
       </div>
     );

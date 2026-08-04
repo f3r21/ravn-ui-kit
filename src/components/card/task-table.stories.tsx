@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { TaskTable } from './task-table';
 
 const meta: Meta<typeof TaskTable> = {
@@ -35,6 +36,7 @@ export const Default: Story = {
             assigneeName: 'Jonah Doe',
             dueDate: 'Today',
             dueDateUrgency: 'warning',
+            onViewDetails: fn(),
           },
           {
             index: 3,

@@ -24,7 +24,7 @@ export * from './components/card/card';
 export * from './components/card/task-card';
 export * from './components/card/task-list-view';
 export * from './components/card/task-table';
-export * from './components/card/reactions';
+export * from './components/card/task-meta-badges';
 export * from './components/card/project-info';
 
 // ─── Modals ───────────────────────────────────────────────────────
@@ -32,6 +32,7 @@ export * from './components/modal/modal';
 export * from './components/modal/add-task-modal';
 export * from './components/modal/assignee-modal';
 export * from './components/modal/estimate-modal';
+export * from './components/modal/label-modal';
 
 // ─── Feedback ─────────────────────────────────────────────────────
 export * from './components/badge/badge';
