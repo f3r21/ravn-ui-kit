@@ -24,7 +24,7 @@ export function EstimatePoints({ selected, onChange, className }: EstimatePoints
   return (
     <div
       role="group"
-      aria-label="Puntos de estimación"
+      aria-label="Estimate points"
       className={cn('flex flex-wrap gap-2', className)}
     >
       {POINT_OPTIONS.map(pts => {

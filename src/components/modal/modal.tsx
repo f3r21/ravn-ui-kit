@@ -51,10 +51,10 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
           <div
             {...dialogProps}
             ref={dialogRef}
-            className="flex flex-col bg-neutral-4 rounded-sm shadow-2xl border border-neutral-3/30 overflow-hidden"
+            className="flex flex-col bg-neutral-3 rounded-sm border border-neutral-2 overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-3/30">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-4">
               <h2
                 {...titleProps}
                 className="font-sans font-bold text-base text-neutral-1"
@@ -64,8 +64,8 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Cerrar modal"
-                className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-2 hover:bg-neutral-3 hover:text-neutral-1 transition-colors cursor-pointer"
+                aria-label="Close modal"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-neutral-2 hover:bg-neutral-4 hover:text-neutral-1 transition-colors cursor-pointer"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
                   <path d="M18 6 6 18M6 6l12 12" />
