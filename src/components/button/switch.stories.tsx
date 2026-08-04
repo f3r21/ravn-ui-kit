@@ -21,14 +21,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Notificaciones',
+    label: 'Notifications',
     defaultSelected: false,
   },
 };
 
 export const Playground: Story = {
   args: {
-    label: 'Notificaciones',
+    label: 'Notifications',
     defaultSelected: false,
     isDisabled: false,
   },
@@ -36,14 +36,14 @@ export const Playground: Story = {
 
 export const On: Story = {
   args: {
-    label: 'Modo oscuro',
+    label: 'Dark mode',
     defaultSelected: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
-    label: 'Opción deshabilitada',
+    label: 'Disabled option',
     defaultSelected: false,
     isDisabled: true,
   },

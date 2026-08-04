@@ -1,0 +1,76 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Introduction" />
+
+# Ravn UI Kit
+
+An accessible, reusable React component library built with **React 19,
+TypeScript, Tailwind CSS v4, React Aria** and documented here in Storybook.
+
+Every component in this kit was audited against real Figma ground-truth
+exports (component CSS, not eyeballed screenshots) rather than built from
+guesses — see `UI_KIT_MASTER_PLAN.md` in the repository root for the full
+chunk-by-chunk audit log, including what was fixed, what was intentionally
+left unbuilt (no legible spec), and why.
+
+## How this documentation is organized
+
+- **Design Tokens** — the raw color, radius, typography and shadow values
+  every component is built from, each one verified against a specific
+  ground-truth export. Start here if you're building something new and need
+  to know which token to reach for.
+- **Primitives** — the smallest reusable building blocks (Button, TextButton,
+  Tag, Input, Switch, Tabs, SegmentedControl, LabelCheckbox, Badge, Skeleton).
+- **Components** — composed pieces built from primitives (Avatar, UserRow,
+  Card, TaskCard, ProjectInfo, Reactions, Modal and its task-flow variants,
+  DatePicker).
+- **Layout** — page-level composites (ApplicationSidebar, SidebarItem,
+  TopNav, SearchBar, TaskListView, TaskTable, ViewSwitcher, AppShell) that
+  assemble the above into the real product screens.
+
+## Installation
+
+```bash
+npm install @ravn/ui-kit
+```
+
+Import the token stylesheet once at your app's entry point:
+
+```tsx
+import '@ravn/ui-kit/theme.css';
+```
+
+Then use any component:
+
+```tsx
+import { Button, Input, Card, Badge } from '@ravn/ui-kit';
+
+export function UserForm() {
+  return (
+    <Card className="max-w-md mx-auto flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-bold text-neutral-5">User registration</h2>
+        <Badge variant="success">Active</Badge>
+      </div>
+      <Input label="Email" placeholder="user@ravn.co" />
+      <Button variant="primary" onPress={() => console.log('Saved')}>
+        Save
+      </Button>
+    </Card>
+  );
+}
+```
+
+## Fidelity notes worth knowing
+
+- There is no semantic color-alias layer (`text-main`, `surface-neutral`,
+  etc.) yet — components consume the numbered ramps directly
+  (`--color-primary-4`, `--color-neutral-3`, …). Adding aliases is a
+  separate, larger follow-up, not bundled into this audit.
+- Border radii are literal per-component values in the source designs, not a
+  clean t-shirt ramp — see **Design Tokens → Colors** for the full token
+  table and which real component each one was verified against.
+- A handful of primitives (`Switch`, `Skeleton`, `Datepicker`'s native
+  `<input type="date">`) have no direct Figma component behind them. They're
+  kept because they're genuinely useful and don't contradict anything in the
+  spec, not because they were found in an export.

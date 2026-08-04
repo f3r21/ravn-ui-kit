@@ -14,8 +14,8 @@ export const Default: Story = {
   args: {
     children: (
       <div className="flex flex-col gap-2">
-        <h4 className="font-bold text-neutral-1 text-base">Título de la Tarjeta</h4>
-        <p className="text-xs text-neutral-2">Contenido explicativo de la tarjeta dentro de la interfaz.</p>
+        <h4 className="font-bold text-neutral-1 text-base">Card title</h4>
+        <p className="text-xs text-neutral-2">Explanatory card content within the interface.</p>
       </div>
     ),
   },
@@ -25,8 +25,8 @@ export const Playground: Story = {
   args: {
     children: (
       <div className="flex flex-col gap-2">
-        <h4 className="font-bold text-neutral-1 text-base">Título de la Tarjeta</h4>
-        <p className="text-xs text-neutral-2">Contenido explicativo de la tarjeta dentro de la interfaz.</p>
+        <h4 className="font-bold text-neutral-1 text-base">Card title</h4>
+        <p className="text-xs text-neutral-2">Explanatory card content within the interface.</p>
       </div>
     ),
   },
