@@ -4,11 +4,9 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
 
 # Colors
 
-> **Pending Figma verification.** These are the raw ramps currently defined in
-> `src/styles/theme.css` (Tailwind v4 `@theme` block). Figma access is
-> rate-limited this session — once the Colors frame data (node-id=2-2) is
-> pasted, this page must be re-verified against it and updated if any value
-> differs. No semantic aliases exist yet — see `README.md` for why.
+> **Verified against `UI Guidelines/Design. Colors.md`** (the ground-truth
+> Figma CSS export) — every ramp below matches its source hex value exactly.
+> No semantic aliases exist yet — see `README.md` for why.
 
 <ColorPalette>
   <ColorItem
@@ -110,14 +108,33 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
       '95%': 'rgba(20, 20, 43, 0.95)',
     }}
   />
+  <ColorItem
+    title="Blue (Tags only)"
+    subtitle="--color-blue, not part of any core ramp — used only by the Tag component's Blue type"
+    colors={{ blue: '#2f61bf' }}
+  />
 </ColorPalette>
 
 ## Border radius
 
-| Token | Value |
-| --- | --- |
-| `--radius-sm` | 8px |
-| `--radius-md` | 16px |
-| `--radius-lg` | 24px |
-| `--radius-xl` | 40px |
-| `--radius-full` | 9999px |
+| Token | Value | Verified against |
+| --- | --- | --- |
+| `--radius-2` | 2px | `Datepicker.md` day-grid cell |
+| `--radius-4` | 4px | `Tags00/01.md` chips/pills (most common radius in the kit) |
+| `--radius-sm` | 8px | `Button, Switch Button00/01.md` icon buttons |
+| `--radius-10` | 10px | `Button, Switch Button00/01.md` segmented-control track |
+| `--radius-md` | 16px | `Top Navigation Bar00/01.md` search bar |
+| `--radius-20` | 20px | `Task Column00.md` / `ApplicationSidebar00.md` outer container frame |
+| `--radius-lg` | 24px | `ApplicationSidebar00/01.md` inner sidebar |
+| `--radius-xl` | 40px | **Unverified** — only ground-truth occurrence is a 40×40px circular button (`border-radius` = half of width/height, i.e. `rounded-full`), not a distinct 40px token. Current consumers (`project-info.tsx`, `task-column.tsx`, `task-table.tsx`) need re-checking against their own specs in their dedicated chunks. |
+| `--radius-full` | 9999px | circles/pills |
+
+## Shadows
+
+Only shadows confirmed present on a real shipped component are tokenized. "Drop Shadow Large" (`0 0 72px`) only appears on the Branding guideline documentation page frame itself, never on a product component, so it's intentionally not included.
+
+| Token | Value | Verified against |
+| --- | --- | --- |
+| `--shadow-small` | `0px 0px 16px rgba(0,0,0,0.04)` | `Button, Switch Button00/01.md` segmented-control active pill |
+| `--shadow-elevation` | `0px 9px 28px 8px rgba(0,0,0,0.05), 0px 6px 16px rgba(0,0,0,0.08), 0px 3px 6px -4px rgba(0,0,0,0.12)` | `Datepicker.md` dropdown |
+| `--shadow-nav` | `0px 2px 0px #2c2f33` | `Top Navigation Bar00.md` hard-edge separator |

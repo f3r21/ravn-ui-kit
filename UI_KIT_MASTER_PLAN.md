@@ -1,0 +1,49 @@
+# UI-Kit Master Plan
+
+Source of truth for chunked, checkpointed work on this Storybook UI-Kit. Target repo: `ravn-ui-kit` (this repo). Ground truth: `/Users/99/Developer/RAVN/RAVN/Coding Challenge/UI-Kit`. Reference styles worth reusing (not authoritative, but reliable): `/Users/99/Developer/RAVN/ravn-task-management-challenge/src/styles/tokens.css`.
+
+Scope: full ground-up re-audit of every component against the ground-truth Figma exports, even where prior commits already touched a component — nothing is treated as pre-verified.
+
+Workflow per chunk (see project CLAUDE.md-equivalent instructions):
+1. Pull exact spec values for the chunk's component(s) from the ground-truth spec file(s); diff against current implementation.
+2. Implement fixes directly in component + story files (CSF3 object syntax, co-located files, exhaustive variants).
+3. Run `npm run typecheck` (and relevant tests).
+4. Check off the item below.
+5. `git add .` + `git commit -m "Completed Chunk N: <name>"`.
+6. `/compact` or `/clear` before starting the next chunk.
+
+## Known ground-truth facts (already established, do not re-derive)
+
+- **Colors**: `neutral.1-5`, `primary.1-4`, `secondary.1-4`, `tertiary.1-4`, `success`, `warning.1-6`, `danger.3-6`, `transparent.light/dark` (6 alpha steps each) match `src/styles/theme.css` hex-for-hex already. One outlier not yet tokenized: standalone `Blue #2F61BF` (used in Tags).
+- **Radii**: ground truth uses literal per-component values (4px pills/tags/datepicker-dropdown, 8px buttons/cards, 16-20px containers, 24px sidebar-inner, 40px guideline-frame), not a clean ramp. Current scale (`sm 8/md 16/lg 24/xl 40`) is **missing a 4px step** — root cause of the already-flagged `task-column.tsx` 20px-literal issue; likely affects Tags/Datepicker too.
+- **Typography**: Desktop body/UI text is `SF Pro Display`/`SF Pro Text` (current `--font-sans`, fixed in a prior commit). **Display-style headings use `DM Sans`** — no token yet. Mobile variants (Roboto/Android, SF Pro/iOS) are out of scope for a web Storybook; note only.
+- **Shadows**: no tokens exist yet for: Drop Shadow Large (`0 0 72px rgba(0,0,0,.04)`), Drop Shadow Small (`0 0 16px rgba(0,0,0,.04)`), Datepicker elevation (3-layer), Top Nav hard-edge (`0 2px 0 #2C2F33`).
+
+## Chunks
+
+### Foundation
+- [x] Chunk 1: Design Tokens audit. Colors: added `--color-blue: #2f61bf` (Tags-only accent, not part of a core ramp). Radii: confirmed sm(8)/md(16)/lg(24) are real (buttons, search bar, sidebar-inner respectively); added `--radius-2` (2px, datepicker day cell), `--radius-4` (4px, tags/pills — most common radius in the kit), `--radius-10` (10px, segmented-control track), `--radius-20` (20px, task-column/sidebar outer frame); flagged `--radius-xl` (40px) as likely fabricated — its only ground-truth occurrence is a 40×40 circular button (`rounded-full`), not a real distinct token; its 3 current consumers need re-checking in Chunks 11/14/15. Typography: re-verified `--font-sans: 'SF Pro Display'` is correct — DM Sans only appears in doc-table specimen labels and in `Date Picker.md`, which (per the existing typography.mdx note) doesn't correspond to any shipped component; no `--font-display` token added. Shadows: added `--shadow-small` (switch pill), `--shadow-elevation` (datepicker dropdown), `--shadow-nav` (top-nav hard edge); "Drop Shadow Large" intentionally excluded — only appears on the Figma documentation page frame, never a real component. Updated `colors.mdx` (removed stale "pending verification" banner, added Blue swatch, radius/shadow tables). `typography.mdx` needed no changes. `npm run typecheck` passes.
+
+### Primitives
+- [ ] Chunk 2: Avatar + UserRow — 3 sizes (32/40/48px). Source: `Avatar00/01.md`.
+- [ ] Chunk 3: Tag + LabelCheckbox — style×icon×type matrix, 4px radius, `Blue` token wiring. Source: `Tags00/01.md`.
+- [ ] Chunk 4: Button (icon button) + TextButton — full state×type matrix (Default/Disable/Hover/Selected × Primary/Secondary). Source: `Button, Switch Button00/01.md`.
+- [ ] Chunk 5: Switch (segmented/toggle control) — track/pill dimensions, Drop Shadow Small. Source: `Button, Switch Button00/01.md`.
+- [ ] Chunk 6: Input — verify `useTextField` label association still correct post-rebuild.
+- [ ] Chunk 7: Tabs (underline variant) — Selected/Variant2 states. Source: `Button, Switch Button00.md` tab section.
+
+### Composites
+- [ ] Chunk 8: SidebarItem — Default/Selected/Hover states, gradient, 56px row, 4px indicator bar. Source: `SideBarItem00/01.md`.
+- [ ] Chunk 9: ApplicationSidebar — 310px/232px variants, logo, user footer. Source: `ApplicationSidebar00/01.md`.
+- [ ] Chunk 10: TopNav + SearchBar — search input, avatar/notification icons, tab bar Default/Selected. Source: `Top Navigation Bar00/01.md`.
+- [ ] Chunk 11: Card family — TaskCard, ProjectInfo, Reactions — timer chip, tag chips, avatar row, reaction counters. Source: `Cards00/01.md`.
+- [ ] Chunk 12: Modal (base) — radius correction re-verify (`rounded-2xl`→8px).
+- [ ] Chunk 13: AddTaskModal, AssigneeModal, EstimateModal — cross-check against `Task Column01.md` inline modal spec and `Mockups/Dashboard Add Task/`.
+- [ ] Chunk 14: TaskColumn + TaskListView — header, stacked TaskCards, 20px/24px container radius (post-Chunk-1 token). Source: `Task Column00/03.md`.
+- [ ] Chunk 15: TaskTable + TaskTableRow — resolve the already-flagged boxed-grid vs flat-row structural mismatch against `Task Column02.md`.
+- [ ] Chunk 16: Datepicker + DatepickerMenu. Chunk 1 found: `typography.mdx` already notes `Date Picker.md` (hero-style) "doesn't correspond to any shipped component" since `datepicker.tsx` is currently a plain `<input type="date">` — so the dropdown spec (`Datepicker.md`) is the one real target for `datepicker-menu.tsx`; confirm this holds and apply its day-grid cell states (`--radius-2` from Chunk 1), footer text buttons, and `--shadow-elevation`. Re-evaluate whether `datepicker.tsx`'s native `<input type="date">` approach is acceptable or should become a custom trigger matching `Datepicker.md`'s compact style.
+
+### Validation & Polish
+- [ ] Chunk 17: Mockup validation pass — spot-check composed layouts against `Mockups/Dashboard *` and `Mockups/Task *` for integration issues invisible at the component level.
+- [ ] Chunk 18: Premium polish pass — hover/focus/transition micro-interactions benchmarked against design-system.schoolai.com; empty/loading states.
+- [ ] Chunk 19: Documentation pass — finalize `colors.mdx`/`typography.mdx` (remove "pending Figma verification" banners), add intro/overview docs, ensure `storySort` hierarchy is complete.

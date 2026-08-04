@@ -63,18 +63,52 @@
   --color-transparent-dark-75: rgba(20, 20, 43, 0.75);
   --color-transparent-dark-95: rgba(20, 20, 43, 0.95);
 
+  /* Standalone accent - Tags "Blue" type only, not part of any core ramp
+     (Components/Tags00.md, Tags01.md) */
+  --color-blue: #2f61bf;
+
   /* Typography Families */
-  /* Confirmed against real Figma component exports (not the Colors/Branding
-     documentation tables, which use Open Sans for their own table text only):
-     every real UI element inspected (button labels, tags, inputs, avatar
-     names, sidebar nav labels) renders in SF Pro Display, at varying sizes —
-     there is no separate heading/display family in the actual desktop spec. */
+  /* Re-verified directly against UI Guidelines/Branding. Desktop.md: every
+     "Desktop/Display/*" and "Desktop/Body/*" layer (the real component type
+     scale) renders in SF Pro Display. DM Sans only appears on the unrelated
+     "Body/xL/..." specimen labels inside that file's own "Documentation"
+     section (the Key=Value showcase text describing the scale) - it never
+     appears on a real Desktop/* component style, so no separate display
+     family is needed. */
   --font-sans: 'SF Pro Display', system-ui, sans-serif;
 
   /* Border Radii */
+  /* sm/md/lg re-verified directly against ground truth: sm=8px (Button,
+     Switch Button00/01.md icon buttons), md=16px (Top Navigation Bar00/01.md
+     search bar), lg=24px (ApplicationSidebar00/01.md inner sidebar).
+     xl=40px is UNVERIFIED as a real distinct radius: its only ground-truth
+     occurrence is a 40x40px button with border-radius:40px, i.e. a circle
+     (radius = half of width/height), which is `rounded-full`, not a
+     standalone 40px token. Current consumers (project-info.tsx, task-column.tsx,
+     task-table.tsx) need to be re-checked against their own component specs
+     in their dedicated chunks (11/14/15) to see if they should be
+     `rounded-full` instead - not resolved here. */
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 40px;
   --radius-full: 9999px;
+
+  /* Added via Chunk 1 ground-truth audit - values confirmed present in real
+     component specs but missing from the sm/md/lg/xl ladder above (they
+     don't fit that scale numerically, so kept as bare numeric tokens rather
+     than forcing an artificial t-shirt name): */
+  --radius-2: 2px; /* Datepicker.md day-grid cell (24x24px cells) */
+  --radius-4: 4px; /* Tags00/01.md chips/pills; Task Column tag chips (most common radius in the kit) */
+  --radius-10: 10px; /* Button, Switch Button00/01.md segmented-control track */
+  --radius-20: 20px; /* Task Column00.md and ApplicationSidebar00.md outer container frame */
+
+  /* Shadows */
+  /* Only tokenizing shadows confirmed used on a real component - "Drop
+     Shadow Large" (0 0 72px) only ever appears on the Branding guideline
+     documentation page frame itself, never on a product component, so it is
+     intentionally NOT tokenized here. */
+  --shadow-small: 0px 0px 16px rgba(0, 0, 0, 0.04); /* Button, Switch Button00/01.md - segmented-control active pill */
+  --shadow-elevation: 0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12); /* Datepicker.md dropdown */
+  --shadow-nav: 0px 2px 0px #2c2f33; /* Top Navigation Bar00.md hard-edge separator */
 }
