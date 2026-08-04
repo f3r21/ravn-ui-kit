@@ -99,7 +99,7 @@ export function TaskCard({
         // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
-        'flex flex-col gap-4 p-4 bg-neutral-4 text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
+        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
         className
       )}
     >
@@ -153,7 +153,7 @@ export function TaskCard({
         <div className="flex items-center gap-2">
           <Avatar src={assigneeAvatar} name={assigneeName} size="sm" />
           {assigneeName ? (
-            <span className="font-sans text-xs font-medium text-neutral-2 truncate max-w-[120px]">
+            <span className="font-sans text-xs font-medium text-muted truncate max-w-[120px]">
               {assigneeName}
             </span>
           ) : null}

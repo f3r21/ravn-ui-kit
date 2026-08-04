@@ -45,7 +45,7 @@ export function ApplicationSidebar({ logo, items, className }: ApplicationSideba
       aria-label="Main navigation"
       className={cn(
         // 232px / rounded-lg (24px) matches the real "Sidebar" layer (ApplicationSidebar01.md + Dashboard Mockup.md).
-        'flex flex-col w-[232px] h-full bg-neutral-4 rounded-lg select-none shrink-0',
+        'flex flex-col w-[232px] h-full bg-surface-panel rounded-lg select-none shrink-0',
         className
       )}
     >

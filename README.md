@@ -75,13 +75,14 @@ see `colors.mdx`/`typography.mdx` in Storybook for the exact source of each one.
 - `--color-transparent-light-*` / `--color-transparent-dark-*` (overlay opacities)
 - `--color-blue` (standalone accent, used only by Tag's `blue` type)
 - `--color-main` / `--color-muted` / `--color-interactive` / `--color-danger` / `--color-surface-neutral` / `--color-subtle` (semantic aliases over the ramps above)
+- `--color-surface-overlay` / `--color-surface-panel` / `--color-surface-shell` (dark-surface-hierarchy aliases: popover/dialog, card/panel, and outermost-shell backgrounds)
 - `--font-sans` (verified against real Figma component exports as `'SF Pro Display'`)
 - `--text-body-m` / `--text-body-l` / `--text-body-xl` / `--text-body-sm` / `--text-field-label` / `--text-tab-label` / `--text-control-label` (type scale: size + line-height + letter-spacing)
 - `--radius-2` / `--radius-4` / `--radius-sm` (8px) / `--radius-10` / `--radius-md` (16px) / `--radius-lg` (24px) / `--radius-full`
 - `--shadow-small` / `--shadow-elevation` / `--shadow-nav`
 
 See **Design Tokens → Colors** and **Design Tokens → Typography** in Storybook
-for a rendered reference. The semantic aliases are consumed by a small
-proof-of-concept subset of components so far — the remaining call sites
-intentionally still use raw ramp tokens directly, pending a tracked future
-cleanup — while the type scale was migrated everywhere it applies.
+for a rendered reference. Both the semantic aliases and the type scale are
+now migrated everywhere their role actually applies — a small number of
+same-color, different-role usages are deliberately left as raw ramp classes
+rather than force-fit; see **Design Tokens → Colors** for exactly which.

@@ -45,7 +45,7 @@ export function ViewSwitcher({
   className,
 }: ViewSwitcherProps) {
   return (
-    <div className={cn('flex items-center w-20 h-10 bg-neutral-5 rounded-sm', className)}>
+    <div className={cn('flex items-center w-20 h-10 bg-surface-shell rounded-sm', className)}>
       <Button
         variant="secondary"
         isSelected={value === 'left'}

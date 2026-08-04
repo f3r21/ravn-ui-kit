@@ -39,12 +39,12 @@ export function LabelModal({ labels, onSelect, className }: LabelModalProps) {
   return (
     <div
       className={cn(
-        'flex flex-col w-[160px] py-2 bg-neutral-3 border border-neutral-2 rounded-sm',
+        'flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm',
         className
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-neutral-2 font-sans truncate">
+        <span className="text-body-xl font-semibold text-muted font-sans truncate">
           Label
         </span>
       </div>

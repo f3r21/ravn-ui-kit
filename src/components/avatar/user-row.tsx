@@ -76,13 +76,13 @@ export function UserRow({
 
       {/* Name + Role */}
       <div className="flex flex-col min-w-0">
-        <span className="font-sans font-normal text-body-m text-neutral-1 truncate">
+        <span className="font-sans font-normal text-body-m text-main truncate">
           {name}
         </span>
         {role ? (
           <span
             className={cn(
-              'font-sans text-neutral-2 truncate leading-tight',
+              'font-sans text-muted truncate leading-tight',
               roleTextSizes[size]
             )}
           >

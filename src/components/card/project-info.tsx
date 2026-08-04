@@ -28,11 +28,11 @@ export function ProjectInfo({ title, icon, className }: ProjectInfoProps) {
       {/* Desktop/Body/L/bold: SF Pro Display, 18px/32px, weight 600, letter-spacing 0.75px.
           tracking-wider (0.05em) is only exact at 15px (the Chunk 2/3 convention) — at 18px
           that resolves to 0.9px, so an arbitrary value is used here instead for pixel accuracy. */}
-      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-neutral-1 font-sans">
+      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
         {title}
       </h3>
       {icon ? (
-        <span className="flex items-center justify-center w-6 h-6 shrink-0 text-neutral-2">
+        <span className="flex items-center justify-center w-6 h-6 shrink-0 text-muted">
           {icon}
         </span>
       ) : null}

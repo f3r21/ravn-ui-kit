@@ -44,7 +44,7 @@ export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
       {badges.map((b) => (
         <span
           key={b.label}
-          className="inline-flex items-center gap-1 text-body-m font-normal font-sans text-neutral-1"
+          className="inline-flex items-center gap-1 text-body-m font-normal font-sans text-main"
           aria-label={b.label}
         >
           {b.count !== undefined ? (

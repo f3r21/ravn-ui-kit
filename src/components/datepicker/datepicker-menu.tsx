@@ -150,7 +150,7 @@ export function DatePickerMenu({
   return (
     <div
       className={cn(
-        'flex flex-col w-[280px] bg-neutral-5 border border-neutral-2 rounded-4 shadow-elevation select-none',
+        'flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none',
         className
       )}
     >
@@ -161,7 +161,7 @@ export function DatePickerMenu({
             type="button"
             onClick={prevYear}
             aria-label="Previous year"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronDoubleLeftIcon />
           </button>
@@ -169,13 +169,13 @@ export function DatePickerMenu({
             type="button"
             onClick={prevMonth}
             aria-label="Previous month"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronLeftIcon />
           </button>
         </div>
 
-        <span className="font-sans font-semibold text-body-sm text-neutral-1">
+        <span className="font-sans font-semibold text-body-sm text-main">
           {MONTHS[viewMonth]} {viewYear}
         </span>
 
@@ -184,7 +184,7 @@ export function DatePickerMenu({
             type="button"
             onClick={nextMonth}
             aria-label="Next month"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronRightIcon />
           </button>
@@ -192,7 +192,7 @@ export function DatePickerMenu({
             type="button"
             onClick={nextYear}
             aria-label="Next year"
-            className="flex items-center justify-center w-4 h-4 text-neutral-1 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
           >
             <ChevronDoubleRightIcon />
           </button>
@@ -205,7 +205,7 @@ export function DatePickerMenu({
       <div className="flex flex-col px-3 py-2">
         <div className="grid grid-cols-7">
           {DAYS.map(d => (
-            <span key={d} className="text-center text-body-sm font-normal text-neutral-1 font-sans">
+            <span key={d} className="text-center text-body-sm font-normal text-main font-sans">
               {d}
             </span>
           ))}
@@ -225,10 +225,10 @@ export function DatePickerMenu({
                 className={cn(
                   'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-body-sm font-normal font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
                   isSelected
-                    ? 'border border-primary-4 text-neutral-1'
+                    ? 'border border-primary-4 text-main'
                     : isCurrentMonth
-                    ? 'text-neutral-1 hover:bg-neutral-3'
-                    : 'text-neutral-2 hover:bg-neutral-3/50'
+                    ? 'text-main hover:bg-neutral-3'
+                    : 'text-muted hover:bg-neutral-3/50'
                 )}
               >
                 {date.getDate()}
@@ -245,7 +245,7 @@ export function DatePickerMenu({
         <button
           type="button"
           onClick={goToday}
-          className="text-body-sm font-normal font-sans text-primary-4 hover:opacity-80 transition-opacity cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
+          className="text-body-sm font-normal font-sans text-interactive hover:opacity-80 transition-opacity cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
         >
           Today
         </button>

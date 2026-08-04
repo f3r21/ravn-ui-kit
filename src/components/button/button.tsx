@@ -47,10 +47,10 @@ export function Button({
   const { buttonProps } = useButton({ ...props, isDisabled }, ref);
 
   const variants = {
-    primary: 'bg-primary-4 text-neutral-1 border border-transparent',
+    primary: 'bg-primary-4 text-main border border-transparent',
     secondary: isSelected
-      ? 'bg-transparent text-primary-4 border border-primary-4'
-      : 'bg-transparent text-neutral-1 border border-transparent',
+      ? 'bg-transparent text-interactive border border-primary-4'
+      : 'bg-transparent text-main border border-transparent',
   };
 
   return (

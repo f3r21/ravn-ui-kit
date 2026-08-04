@@ -40,9 +40,13 @@ export function Tag({
   // Tags00/01.md exactly.
   const styles = {
     neutral: {
-      solid: 'bg-neutral-2/10 text-neutral-1',
-      outline: 'border border-neutral-1 text-neutral-1',
+      solid: 'bg-neutral-2/10 text-main',
+      outline: 'border border-neutral-1 text-main',
     },
+    // text-primary-4 kept raw here, not aliased to `text-interactive` — this is Tag's own
+    // categorical "primary" color variant (parallel to secondary/tertiary/blue), not an
+    // interactive affordance; aliasing it would wrongly imply every primary-colored tag is
+    // interactive.
     primary: {
       solid: 'bg-primary-4/10 text-primary-4',
       outline: 'border border-primary-4 text-primary-4',

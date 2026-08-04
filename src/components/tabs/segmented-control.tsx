@@ -68,7 +68,7 @@ export function SegmentedControl({
       role="group"
       aria-label="View"
       className={cn(
-        'inline-flex items-center gap-0 p-1 bg-neutral-4 rounded-10',
+        'inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10',
         className
       )}
     >
@@ -82,7 +82,7 @@ export function SegmentedControl({
             aria-checked={isSelected}
             onClick={() => handleSelect(opt.id)}
             className={cn(
-              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-neutral-1 outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
+              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
               isSelected ? 'bg-neutral-2 shadow-small' : ''
             )}
           >

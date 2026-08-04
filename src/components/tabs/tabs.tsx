@@ -98,8 +98,8 @@ export function Tabs({
                 // arbitrary-length labels.
                 'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
                 isSelected
-                  ? 'text-primary-4'
-                  : 'text-neutral-2 hover:text-neutral-1'
+                  ? 'text-interactive'
+                  : 'text-muted hover:text-main'
               )}
             >
               {item.icon ? (

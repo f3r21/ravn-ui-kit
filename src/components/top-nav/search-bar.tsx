@@ -64,7 +64,7 @@ export function SearchBar({
     <div className={cn('inline-flex items-center gap-6 min-w-0', className)}>
       {/* Search icon */}
       <svg
-        className="w-6 h-6 text-neutral-2 shrink-0"
+        className="w-6 h-6 text-muted shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -78,7 +78,7 @@ export function SearchBar({
       <input
         {...inputProps}
         ref={ref}
-        className="flex-1 bg-transparent text-body-m text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
+        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted outline-none font-sans min-w-0"
       />
     </div>
   );

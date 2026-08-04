@@ -23,7 +23,7 @@ export interface TaskListViewProps {
 
 function TaskCardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 p-4 bg-neutral-4 rounded-sm border border-transparent">
+    <div className="flex flex-col gap-4 p-4 bg-surface-panel rounded-sm border border-transparent">
       <Skeleton className="h-6 w-3/4" />
       <div className="flex items-center justify-between gap-2">
         <Skeleton className="h-6 w-16" />
@@ -63,7 +63,7 @@ export function TaskListView({ title, icon, tasks, isLoading = false, className 
           <TaskCardSkeleton />
         </>
       ) : tasks.length === 0 ? (
-        <div className="flex items-center justify-center py-16 text-neutral-2 font-sans text-sm">
+        <div className="flex items-center justify-center py-16 text-muted font-sans text-sm">
           No tasks in this view.
         </div>
       ) : (

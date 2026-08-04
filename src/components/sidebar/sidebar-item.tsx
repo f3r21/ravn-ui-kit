@@ -72,7 +72,7 @@ export function SidebarItem({
         'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
         isActive
           ? 'text-interactive bg-gradient-to-r from-transparent to-primary-4/10'
-          : 'text-neutral-2 hover:text-primary-4',
+          : 'text-muted hover:text-interactive',
         className
       )}
     >
@@ -87,8 +87,8 @@ export function SidebarItem({
           className={cn(
             'px-2 py-0.5 text-xs font-bold rounded-full shrink-0',
             isActive
-              ? 'bg-primary-4 text-neutral-1'
-              : 'bg-neutral-3 text-neutral-1'
+              ? 'bg-primary-4 text-main'
+              : 'bg-neutral-3 text-main'
           )}
         >
           {badgeCount}

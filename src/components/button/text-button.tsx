@@ -43,14 +43,14 @@ export function TextButton({
 
   const variants = {
     primary: cn(
-      'text-neutral-1',
+      'text-main',
       isDisabled ? 'bg-primary-2' : isSelected ? 'bg-primary-3' : 'bg-primary-4 hover:bg-primary-2'
     ),
     secondary: isDisabled
-      ? 'bg-transparent text-neutral-2'
+      ? 'bg-transparent text-muted'
       : isSelected
-        ? 'bg-neutral-3 text-neutral-1'
-        : 'bg-transparent text-neutral-1 hover:bg-neutral-2',
+        ? 'bg-neutral-3 text-main'
+        : 'bg-transparent text-main hover:bg-neutral-2',
   };
 
   return (

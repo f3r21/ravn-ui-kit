@@ -41,14 +41,14 @@ const CheckIcon = ({ className }: { className?: string }) => (
 // Desktop/Body/M/regular: SF Pro Display, 15px/24px, weight 400, letter-spacing 0.75px
 // (tracking-wider, exact at this size per the Chunk 2/3 convention) -- shared by every cell's
 // text content across the whole table (body cells and header cells alike).
-const CELL_TEXT = 'text-body-m font-normal text-neutral-1 font-sans';
+const CELL_TEXT = 'text-body-m font-normal text-main font-sans';
 
 // Every body/header cell in "Task Table Row" and "Table Header Cell" shares this exact chrome:
 // neutral.4 fill, 1px neutral.3 border, fixed 56px height. Cells sit flush against each other
 // (0 gap in the Figma auto-layout), so only `border-r` is applied per cell (plus `border-l` on
 // the row's first cell) to avoid doubling the shared vertical edges -- top/bottom edges already
 // coincide exactly between cells so they need no special handling.
-const CELL_BASE = 'flex items-center h-14 shrink-0 bg-neutral-4 border-y border-r border-neutral-3';
+const CELL_BASE = 'flex items-center h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3';
 
 export interface DueDateCellProps {
   /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
@@ -63,8 +63,11 @@ export interface DueDateCellProps {
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
 export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
   const styles = {
-    normal: 'text-neutral-1',
+    normal: 'text-main',
     warning: 'text-tertiary-4',
+    // text-primary-4 kept as a raw ramp class, not aliased to `text-interactive` — this is a
+    // status/urgency signal, not an interactive affordance, so the "interactive" alias would
+    // misrepresent its role even though it happens to share the same color value.
     overdue: 'text-primary-4',
   };
   return <span className={cn(CELL_TEXT, styles[urgency])}>{date}</span>;
@@ -246,7 +249,7 @@ export function TaskTableRow({
           />
           <CheckIcon
             className={cn(
-              'w-6 h-6 text-neutral-1 transition-opacity',
+              'w-6 h-6 text-main transition-opacity',
               isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
             )}
           />
@@ -263,7 +266,7 @@ export function TaskTableRow({
           <button
             type="button"
             onClick={onViewDetails}
-            className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-primary-4 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
+            className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
           >
             <span>Details</span>
             <ArrowRightIcon className="w-4 h-4" />
@@ -404,7 +407,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
             </tbody>
           </table>
         ) : groups.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-neutral-2 font-sans text-sm">
+          <div className="flex items-center justify-center py-16 text-muted font-sans text-sm">
             No tasks yet.
           </div>
         ) : (
@@ -418,9 +421,9 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
               <tbody>
                 <tr>
                   <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
-                    <div className="flex items-center gap-2 h-14 px-4 bg-neutral-4 rounded-t-4">
-                      <CaretIcon className="w-6 h-6 shrink-0 text-neutral-2" />
-                      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-neutral-1 font-sans">
+                    <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
+                      <CaretIcon className="w-6 h-6 shrink-0 text-muted" />
+                      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
                         {group.title}
                       </h3>
                       {group.actions}

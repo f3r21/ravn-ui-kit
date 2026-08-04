@@ -83,7 +83,7 @@ export function LabelCheckbox({
     >
       <input {...inputProps} ref={ref} className="sr-only" />
       <svg
-        className="w-6 h-6 shrink-0 text-neutral-1"
+        className="w-6 h-6 shrink-0 text-main"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -98,7 +98,7 @@ export function LabelCheckbox({
         ) : null}
       </svg>
       {/* Desktop/Body/M/regular -- SF Pro Display, 15px/24px, letter-spacing 0.75px (tracking-wider) */}
-      <span className="text-body-m font-normal font-sans text-neutral-1">
+      <span className="text-body-m font-normal font-sans text-main">
         {children}
       </span>
     </label>

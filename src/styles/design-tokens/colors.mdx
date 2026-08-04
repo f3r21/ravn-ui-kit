@@ -123,27 +123,43 @@ at an already-verified token — no new hex introduced. Named as bare nouns
 `{property}-{token-name}` utilities — prefixing the name with the property
 would double up (`text-text-main`) instead of the intended `text-main`.
 
-| Alias | Aliases | Utility | Role | Consumers |
-| --- | --- | --- | --- | --- |
-| `--color-main` | `neutral-1` | `text-main` | Primary readable text on the dark shell | `task-card.tsx` |
-| `--color-muted` | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, placeholders | `input.tsx` |
-| `--color-interactive` | `primary-4` | `text-interactive` | Active/interactive text & icons | `sidebar-item.tsx` |
-| `--color-danger` | `danger-5` | `text-danger` | Error/validation text | `input.tsx` |
-| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral` | Light input/card background | `card.tsx`, `input.tsx` |
-| `--color-subtle` | `neutral-2` | `border-subtle` | Default hairline border | `card.tsx`, `input.tsx`, `task-card.tsx` |
+| Alias | Aliases | Utility | Role |
+| --- | --- | --- | --- |
+| `--color-main` | `neutral-1` | `text-main` | Primary readable text on the dark shell, and icon tint via `currentColor` |
+| `--color-muted` | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, dim icons, placeholders |
+| `--color-interactive` | `primary-4` | `text-interactive` | Active/interactive/hover-clickable text & icons |
+| `--color-danger` | `danger-5` | `text-danger` | Error/validation/status-danger text |
+| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral` | Light input/card background |
+| `--color-subtle` | `neutral-2` | `border-subtle` | Default hairline border |
+| `--color-surface-overlay` | `neutral-3` | `bg-surface-overlay` | Floating popover/dialog/modal backgrounds |
+| `--color-surface-panel` | `neutral-4` | `bg-surface-panel` | Card/container/panel backgrounds |
+| `--color-surface-shell` | `neutral-5` | `bg-surface-shell` | Outermost app-shell / deepest dropdown backgrounds |
 
 `--color-muted` and `--color-subtle` both intentionally alias `neutral-2` —
 same ramp step, different role depending on which property consumes it; this
-is exactly why a role-based layer earns its keep over the raw ramp.
+is exactly why a role-based layer earns its keep over the raw ramp. The three
+`surface-*` depth-tier aliases follow the same pattern one level further:
+`surface-neutral` (light, `neutral-1`), `surface-overlay` (`neutral-3`),
+`surface-panel` (`neutral-4`), and `surface-shell` (`neutral-5`) each name the
+single most consistent background role at that ramp step.
 
-Only `task-card.tsx`, `input.tsx`, `card.tsx`, and `sidebar-item.tsx` consume
-these aliases so far (a deliberate proof-of-concept subset, not a full sweep —
-choosing which alias fits a given raw-ramp call site is a real per-site
-judgment call, unlike the type-scale migration below). The remaining ~40
-call sites across the kit intentionally still use raw ramp tokens directly,
-pending a tracked future cleanup chunk. Dark-surface-hierarchy aliases
-(distinguishing `neutral-3`/`neutral-4`/`neutral-5` as card-bg vs. hover-bg
-vs. shell-bg) are a natural next-phase candidate, not included here.
+Every `text-main`/`text-muted`/`text-interactive`/`text-danger`/
+`bg-surface-neutral`/`border-subtle` call site across the kit now uses these
+aliases — a small number of genuinely different-role usages of the same raw
+color are deliberately left as raw ramp classes rather than force-fit:
+`text-primary-4` on `Tag`'s own `primary` color variant and on `Avatar`'s
+decorative initials tint (categorical/decorative, not interactive), and on
+`TaskTable`'s "overdue" due-date text (a status signal, not interactivity).
+
+Similarly, `neutral-3`/`neutral-4`/`neutral-5` each play other real roles
+beyond the one `surface-*` alias above captures — deliberately left
+un-aliased since they don't share one coherent name: `neutral-3` as a
+hover/selected-state background (`text-button.tsx`, `datepicker-menu.tsx`,
+`sidebar-item.tsx`'s badge pill), as a border (`task-table.tsx`'s cells), and
+as label text (`input.tsx`/`datepicker.tsx`); `neutral-4` as a divider border
+and button-hover background (`modal.tsx`) and as text (`badge.tsx`);
+`neutral-5` as body text (`input.tsx`/`datepicker.tsx`) and as a border
+(`user-row.tsx`'s status-dot cutout).
 
 ## Border radius
 

@@ -67,15 +67,15 @@ like the one above.
 
 ## Fidelity notes worth knowing
 
-- A semantic color-alias layer (`text-main`, `surface-neutral`, etc. — see
-  **Design Tokens → Colors**) and a type-scale layer (`text-body-m`, etc. —
-  see **Design Tokens → Typography**) now exist. Aliases are consumed by a
-  small proof-of-concept subset (`task-card.tsx`, `input.tsx`, `card.tsx`,
-  `sidebar-item.tsx`); the remaining ~40 legacy call sites intentionally
-  still use raw ramp tokens directly (`--color-primary-4`,
-  `--color-neutral-3`, …), pending a tracked future cleanup. The type-scale
-  layer, by contrast, was fully migrated everywhere it applies — see its own
-  page for why that migration strategy differs from the color aliases'.
+- A semantic color-alias layer (`text-main`, `surface-neutral`, etc., now
+  including the `surface-overlay`/`surface-panel`/`surface-shell`
+  dark-surface-hierarchy tier — see **Design Tokens → Colors**) and a
+  type-scale layer (`text-body-m`, etc. — see **Design Tokens → Typography**)
+  now exist and are both fully migrated everywhere the aliased role actually
+  applies. A small number of same-color, genuinely-different-role usages are
+  deliberately left as raw ramp classes rather than force-fit into an alias
+  that would misrepresent their role — see **Design Tokens → Colors** for
+  exactly which ones and why.
 - Border radii are literal per-component values in the source designs, not a
   clean t-shirt ramp — see **Design Tokens → Colors** for the full token
   table and which real component each one was verified against.

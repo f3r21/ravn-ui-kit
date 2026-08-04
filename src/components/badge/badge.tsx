@@ -14,10 +14,10 @@ export interface BadgeProps {
 
 export function Badge({ variant = 'neutral', children, className }: BadgeProps) {
   const variants = {
-    neutral: 'bg-neutral-1 text-neutral-4 border-neutral-2',
+    neutral: 'bg-surface-neutral text-neutral-4 border-subtle',
     success: 'bg-success-1 text-success-4 border-success-2',
     warning: 'bg-warning-1 text-warning-5 border-warning-2',
-    danger: 'bg-danger-1 text-danger-5 border-danger-2',
+    danger: 'bg-danger-1 text-danger border-danger-2',
   };
 
   return (

@@ -51,7 +51,7 @@ export interface AppShellProps {
  */
 export function AppShell({ logo, sidebarItems, topNavProps, topBar, children, className }: AppShellProps) {
   return (
-    <div className={cn('flex items-start gap-8 w-full min-h-screen bg-neutral-5 p-8', className)}>
+    <div className={cn('flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8', className)}>
       <ApplicationSidebar logo={logo} items={sidebarItems} className="self-stretch" />
 
       <div className="flex flex-col gap-8 flex-1 min-w-0">
