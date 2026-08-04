@@ -1,91 +1,190 @@
 import React from 'react';
-import { Modal } from './modal';
-import { Input } from '../input/input';
+import { cn } from '../../utils/cn';
 import { TextButton } from '../button/text-button';
 import { Tag } from '../tag/tag';
+import { Avatar } from '../avatar/avatar';
 import { DatePickerMenu } from '../datepicker/datepicker-menu';
+import { EstimateModal } from './estimate-modal';
+import { AssigneeModal, type Assignee } from './assignee-modal';
+
+const PointsIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+    <path d="M6 21V4a1 1 0 0 1 1-1h10.5a1 1 0 0 1 .8 1.6L15 9l3.3 4.4a1 1 0 0 1-.8 1.6H7" />
+  </svg>
+);
+
+const PersonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 20c0-4 3.5-6 8-6s8 2 8 6" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </svg>
+);
 
 export interface AddTaskModalProps {
-  /** Whether the modal is currently open. */
+  /** Whether the widget is currently mounted. */
   isOpen: boolean;
-  /** Called when the modal should close without submitting. */
+  /** Called when the widget should close without submitting (Cancel button). */
   onClose: () => void;
+  /** People selectable in the assignee trigger's popover. */
+  assignees?: Assignee[];
   /** Called with the form values when the user submits a valid (non-empty title) task. */
-  onSubmit?: (data: { title: string; description?: string; dueDate?: Date }) => void;
+  onSubmit?: (data: { title: string; dueDate?: Date; points?: number; assignee?: Assignee }) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
+  className?: string;
 }
 
 /**
  * AddTaskModal
  *
- * Figma: "Add Task Modal" COMPONENT inside "Task Column" frame.
+ * Figma: "Add Task Modal" COMPONENT (`Mockups/Dashboard Add Task/Add Task Modal00-06.md`,
+ * cross-checked against the in-context instance in `Components/Task Column01.md`). This is an
+ * inline widget (578×184, neutral-3 bg, 8px radius) composited directly into a Task Column, not
+ * a centered dialog — no backdrop, no header/close button, so unlike the other modals in this
+ * folder it does not use the shared `Modal` shell. Anatomy: a borderless title input (Desktop/
+ * Body/XL/bold, 20px, neutral-2 placeholder), a "Tags" row of trigger chips (Estimate/Assignee/
+ * Due date), and a Cancel/Create Task button pair. The two remaining ground-truth chip slots in
+ * that row (fixed ~40px/~65px label widths, never shown filled in any of the 7 export snapshots)
+ * have no legible glyph or contradiction-free semantic — left unimplemented rather than guessed
+ * at, consistent with the Chunk 11 "Reactions" 3rd-slot precedent.
+ *
+ * Row 2's unfilled trigger chips render as the real muted "Tag" component (`bg: rgba(148,151,154,.1)`
+ * = neutral-2/10%, exactly `Tag`'s solid/neutral style) — confirmed by pixel match. Once a value is
+ * picked, the spec drops that background entirely (plain icon+text on the modal's own neutral-3
+ * surface); the primary Create button's disabled color (title empty) is `primary-2`, its enabled
+ * color is `primary-4` — already exactly `TextButton`'s existing disabled/enabled primary styling
+ * (Chunk 4), so `isDisabled={!title.trim()}` reproduces the empty-vs-typed contrast for free.
  */
-export function AddTaskModal({ isOpen, onClose, onSubmit }: AddTaskModalProps) {
+export function AddTaskModal({ isOpen, onClose, assignees = [], onSubmit, className }: AddTaskModalProps) {
   const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
   const [dueDate, setDueDate] = React.useState<Date | undefined>();
-  const [showCalendar, setShowCalendar] = React.useState(false);
+  const [points, setPoints] = React.useState<number | undefined>();
+  const [assignee, setAssignee] = React.useState<Assignee | undefined>();
+
+  const [openPopover, setOpenPopover] = React.useState<'estimate' | 'assignee' | 'date' | null>(null);
+  const togglePopover = (name: 'estimate' | 'assignee' | 'date') =>
+    setOpenPopover(prev => (prev === name ? null : name));
+
+  if (!isOpen) return null;
+
+  const reset = () => {
+    setTitle('');
+    setDueDate(undefined);
+    setPoints(undefined);
+    setAssignee(undefined);
+    setOpenPopover(null);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    onSubmit?.({ title: title.trim(), description: description.trim() || undefined, dueDate });
-    setTitle('');
-    setDescription('');
-    setDueDate(undefined);
+    onSubmit?.({ title: title.trim(), dueDate, points, assignee });
+    reset();
+    onClose();
+  };
+
+  const handleCancel = () => {
+    reset();
     onClose();
   };
 
   return (
-    <Modal title="Add Task" isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <Input
-          label="Task name"
-          placeholder="Enter task title..."
-          value={title}
-          onChange={setTitle}
-        />
-        <Input
-          label="Description"
-          placeholder="Add a description..."
-          value={description}
-          onChange={setDescription}
-        />
+    <form
+      onSubmit={handleSubmit}
+      className={cn(
+        'flex flex-col items-end gap-6 w-[578px] p-4 bg-neutral-3 rounded-sm',
+        className
+      )}
+    >
+      <input
+        autoFocus
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        placeholder="Task name"
+        aria-label="Task name"
+        className="w-full bg-transparent text-[20px] leading-8 font-semibold tracking-wider text-neutral-1 placeholder:text-neutral-2 font-sans outline-none"
+      />
 
-        {/* Due date */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-neutral-3 uppercase tracking-wider font-sans">
-            Due date
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowCalendar(v => !v)}
-            className="h-10 px-3 text-sm text-left bg-neutral-1 text-neutral-5 border border-neutral-2 rounded-md font-sans hover:border-neutral-3 transition-colors cursor-pointer"
-          >
-            {dueDate ? dueDate.toLocaleDateString('es-MX') : 'Select a date...'}
-          </button>
-          {showCalendar ? (
-            <DatePickerMenu
-              value={dueDate}
-              onChange={(d) => { setDueDate(d); setShowCalendar(false); }}
-              className="mt-1"
+      <div className="flex items-center gap-4 w-full">
+        {/* Estimate trigger */}
+        <div className="relative">
+          {points === undefined ? (
+            <button type="button" onClick={() => togglePopover('estimate')} className="cursor-pointer">
+              <Tag icon={<PointsIcon />}>Estimate</Tag>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => togglePopover('estimate')}
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer"
+            >
+              <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
+              {points} Point{points !== 1 ? 's' : ''}
+            </button>
+          )}
+          {openPopover === 'estimate' ? (
+            <EstimateModal
+              value={points}
+              onSelect={p => { setPoints(p); setOpenPopover(null); }}
+              className="absolute top-full left-0 mt-1 z-10"
             />
           ) : null}
         </div>
 
-        {/* Tags preview */}
-        <div className="flex gap-4 flex-wrap">
-          <Tag variant="secondary">BACKEND</Tag>
-          <Tag variant="tertiary">HIGH</Tag>
+        {/* Assignee trigger */}
+        <div className="relative">
+          {!assignee ? (
+            <button type="button" onClick={() => togglePopover('assignee')} className="cursor-pointer">
+              <Tag icon={<PersonIcon />}>Assignee</Tag>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => togglePopover('assignee')}
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer"
+            >
+              <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
+              {assignee.name}
+            </button>
+          )}
+          {openPopover === 'assignee' ? (
+            <AssigneeModal
+              assignees={assignees}
+              onSelect={a => { setAssignee(a); setOpenPopover(null); }}
+              className="absolute top-full left-0 mt-1 z-10"
+            />
+          ) : null}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-6">
-          <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
-          <TextButton variant="primary" type="submit" isDisabled={!title.trim()}>
-            Create Task
-          </TextButton>
+        {/* Due date trigger */}
+        <div className="relative">
+          <button type="button" onClick={() => togglePopover('date')} className="cursor-pointer">
+            <Tag icon={<CalendarIcon />}>
+              {dueDate ? dueDate.toLocaleDateString('en-US') : 'Due date'}
+            </Tag>
+          </button>
+          {openPopover === 'date' ? (
+            <DatePickerMenu
+              value={dueDate}
+              onChange={d => { setDueDate(d); setOpenPopover(null); }}
+              className="absolute top-full left-0 mt-1 z-10"
+            />
+          ) : null}
         </div>
-      </form>
-    </Modal>
+      </div>
+
+      <div className="flex items-center gap-6">
+        <TextButton variant="secondary" onPress={handleCancel}>Cancel</TextButton>
+        <TextButton variant="primary" type="submit" isDisabled={!title.trim()}>
+          Create Task
+        </TextButton>
+      </div>
+    </form>
   );
 }

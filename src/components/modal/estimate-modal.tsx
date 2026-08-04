@@ -1,99 +1,67 @@
-import React from 'react';
-import { Modal } from './modal';
-import { TextButton } from '../button/text-button';
 import { cn } from '../../utils/cn';
 
-// Figma shows: 0, 1, 2, 3, 5, 8, 13, 21 (Fibonacci sequence)
-const POINT_OPTIONS = [0, 1, 2, 3, 5, 8, 13, 21];
+// Figma "Estimate Modal" (Task Column01.md L1800-2231) shows exactly 5 rows, all sharing the
+// literal placeholder text "0 Points" but with 5 distinct widths (57/54/56/57/57px) — read as 5
+// story-point values rather than one value repeated 5 times. Width 54 (shortest) is singular
+// ("1 Point"); the other 4 (~56-57px, all plural) match the classic Fibonacci-style scale.
+const POINT_OPTIONS = [1, 2, 3, 5, 8];
 
-export interface EstimatePointsProps {
-  /** Currently selected point value, if any. */
-  selected?: number;
-  /** Called with the newly selected point value when the user picks a pill. */
-  onChange?: (points: number) => void;
-  className?: string;
-}
-
-/**
- * EstimatePoints
- *
- * Figma: "Estimate Points" COMPONENT_SET inside "Task Column" frame.
- * Fibonacci point selector pill group used inside EstimateModal.
- */
-export function EstimatePoints({ selected, onChange, className }: EstimatePointsProps) {
-  return (
-    <div
-      role="group"
-      aria-label="Estimate points"
-      className={cn('flex flex-wrap gap-2', className)}
-    >
-      {POINT_OPTIONS.map(pts => {
-        const isSelected = selected === pts;
-        return (
-          <button
-            key={pts}
-            type="button"
-            onClick={() => onChange?.(pts)}
-            aria-pressed={isSelected}
-            className={cn(
-              'flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold font-sans transition-all cursor-pointer select-none',
-              isSelected
-                ? 'bg-primary-4 text-neutral-1 scale-110'
-                : 'bg-neutral-3 text-neutral-2 hover:bg-neutral-3/80 hover:text-neutral-1'
-            )}
-          >
-            {pts}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── EstimateModal ────────────────────────────────────────────────
+const PointsIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+    <path d="M6 21V4a1 1 0 0 1 1-1h10.5a1 1 0 0 1 .8 1.6L15 9l3.3 4.4a1 1 0 0 1-.8 1.6H7" />
+  </svg>
+);
 
 export interface EstimateModalProps {
-  /** Whether the modal is currently open. */
-  isOpen: boolean;
-  /** Called when the modal should close without confirming. */
-  onClose: () => void;
-  /**
-   * Point value to pre-select when opened.
-   * @default 0
-   */
-  currentPoints?: number;
-  /** Called with the confirmed point value. */
-  onConfirm?: (points: number) => void;
+  /** Currently selected point value, if any — highlights the matching row. */
+  value?: number;
+  /** Called with the point value of the row the user clicked. */
+  onSelect: (points: number) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
+  className?: string;
 }
 
 /**
  * EstimateModal
  *
- * Figma: "Estimate Modal" COMPONENT inside "Task Column" frame.
- * Shows EstimatePoints selector in a modal for the user to pick story points.
+ * Figma: "Estimate Modal" COMPONENT inside "Task Column" frame (Task Column01.md L1800-2231).
+ * A small anchored popover (122×208, neutral-3 bg, 1px neutral-2 border, 8px radius) — not a
+ * centered dialog, so unlike the shared `Modal` shell this has no backdrop/close chrome and no
+ * isOpen/onClose: the parent conditionally mounts it, same convention as `DatePickerMenu`.
+ * Anatomy is a decorative header label (Figma's "Input text" placeholder style, Desktop/Body/XL/bold,
+ * neutral-2) followed by 5 point-value rows (icon + label, 4px/16px padding, 4px radius, no
+ * background by default) with no footer — clicking a row is the confirm action.
  */
-export function EstimateModal({ isOpen, onClose, currentPoints, onConfirm }: EstimateModalProps) {
-  const [points, setPoints] = React.useState<number>(currentPoints ?? 0);
-
-  const handleConfirm = () => {
-    onConfirm?.(points);
-    onClose();
-  };
-
+export function EstimateModal({ value, onSelect, className }: EstimateModalProps) {
   return (
-    <Modal title="Estimate" isOpen={isOpen} onClose={onClose} width="max-w-sm">
-      <div className="flex flex-col gap-5">
-        <p className="text-sm text-neutral-2 font-sans">
-          Select story points for this task using the Fibonacci scale.
-        </p>
-        <EstimatePoints selected={points} onChange={setPoints} />
-        <div className="flex items-center justify-end gap-6 pt-2">
-          <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
-          <TextButton variant="primary" onPress={handleConfirm}>
-            Set {points} point{points !== 1 ? 's' : ''}
-          </TextButton>
-        </div>
+    <div
+      className={cn(
+        'flex flex-col w-[122px] py-2 bg-neutral-3 border border-neutral-2 rounded-sm',
+        className
+      )}
+    >
+      <div className="flex items-center h-8 px-4">
+        <span className="text-[20px] leading-8 font-semibold tracking-wider text-neutral-2 font-sans truncate">
+          Estimate
+        </span>
       </div>
-    </Modal>
+      {POINT_OPTIONS.map(points => (
+        <button
+          key={points}
+          type="button"
+          onClick={() => onSelect(points)}
+          aria-pressed={value === points}
+          className={cn(
+            'flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans transition-colors cursor-pointer',
+            value === points ? 'bg-neutral-2' : 'hover:bg-neutral-2'
+          )}
+        >
+          <span className="w-6 h-6 shrink-0">
+            <PointsIcon />
+          </span>
+          {points} Point{points !== 1 ? 's' : ''}
+        </button>
+      ))}
+    </div>
   );
 }

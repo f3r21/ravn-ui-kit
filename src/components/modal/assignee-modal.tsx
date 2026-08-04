@@ -1,95 +1,62 @@
-import React from 'react';
-import { Modal } from './modal';
-import { UserRow } from '../avatar/user-row';
-import { TextButton } from '../button/text-button';
 import { cn } from '../../utils/cn';
+import { UserRow } from '../avatar/user-row';
 
 export interface Assignee {
-  /** Unique identifier, echoed back in `onConfirm`/`selectedIds`. */
+  /** Unique identifier, echoed back in `onSelect`. */
   id: string;
   /** Display name shown in the row. */
   name: string;
-  /** Optional secondary text (job title/role) shown under the name. */
+  /** Optional secondary text (job title/role) — no ground-truth "User" row instance shows one; kept as a non-contradicted, opt-in field forwarded to `UserRow`. */
   role?: string;
   /** Optional avatar image URL; falls back to initials when omitted. */
   avatarSrc?: string;
 }
 
 export interface AssigneeModalProps {
-  /** Whether the modal is currently open. */
-  isOpen: boolean;
-  /** Called when the modal should close without confirming. */
-  onClose: () => void;
-  /** Full list of assignable people shown as selectable rows. */
+  /** Full list of assignable people shown as rows. */
   assignees: Assignee[];
-  /** Controlled set of selected assignee ids. Omit for uncontrolled internal state. */
-  selectedIds?: string[];
-  /** Called with the final selected ids when the user confirms. */
-  onConfirm?: (selectedIds: string[]) => void;
+  /** Called with the assignee of the row the user clicked. */
+  onSelect: (assignee: Assignee) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
+  className?: string;
 }
 
 /**
  * AssigneeModal
  *
- * Figma: "Assignee Modal" COMPONENT_SET inside "Task Column" frame.
+ * Figma: "Assignee Modal" COMPONENT inside "Task Column" frame (Task Column01.md L762-1386).
+ * A small anchored popover (239×432 for the full 7-row export, height scales with the list here),
+ * neutral-3 bg, 1px neutral-2 border, 8px radius — not a centered dialog, so unlike the shared
+ * `Modal` shell this has no backdrop/close chrome and no isOpen/onClose: the parent conditionally
+ * mounts it, same convention as `DatePickerMenu`. Anatomy is a decorative header label (Figma's
+ * "Input text" placeholder style, Desktop/Body/XL/bold, neutral-2) followed by one 56px-tall "User"
+ * row (Avatar + name, reusing `UserRow`) per assignee, no selection checkmark and no footer —
+ * clicking a row is the assign action (every real "User" row instance renders identically, with
+ * no highlighted/selected variant anywhere in the export).
  */
-export function AssigneeModal({
-  isOpen,
-  onClose,
-  assignees,
-  selectedIds: controlledIds,
-  onConfirm,
-}: AssigneeModalProps) {
-  const [internalIds, setInternalIds] = React.useState<string[]>(controlledIds ?? []);
-  const isControlled = controlledIds !== undefined;
-  const selected = isControlled ? controlledIds : internalIds;
-
-  const toggle = (id: string) => {
-    if (isControlled) return;
-    setInternalIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleConfirm = () => {
-    onConfirm?.(selected);
-    onClose();
-  };
-
+export function AssigneeModal({ assignees, onSelect, className }: AssigneeModalProps) {
   return (
-    <Modal title="Assign to" isOpen={isOpen} onClose={onClose} width="max-w-sm">
-      <div className="flex flex-col gap-2">
-        {assignees.map(a => {
-          const isSelected = selected.includes(a.id);
-          return (
-            <button
-              key={a.id}
-              type="button"
-              onClick={() => toggle(a.id)}
-              className={cn(
-                'flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-colors cursor-pointer',
-                isSelected
-                  ? 'bg-primary-4/15 border border-primary-4/40'
-                  : 'hover:bg-neutral-3/50 border border-transparent'
-              )}
-            >
-              <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />
-              {isSelected ? (
-                <svg className="w-4 h-4 text-primary-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              ) : null}
-            </button>
-          );
-        })}
+    <div
+      className={cn(
+        'flex flex-col w-[239px] pt-2 bg-neutral-3 border border-neutral-2 rounded-sm',
+        className
+      )}
+    >
+      <div className="flex items-center h-8 px-4">
+        <span className="text-[20px] leading-8 font-semibold tracking-wider text-neutral-2 font-sans truncate">
+          Assignee
+        </span>
       </div>
-
-      <div className="flex items-center justify-end gap-6 pt-4 mt-2">
-        <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
-        <TextButton variant="primary" onPress={handleConfirm}>
-          Confirm ({selected.length})
-        </TextButton>
-      </div>
-    </Modal>
+      {assignees.map(a => (
+        <button
+          key={a.id}
+          type="button"
+          onClick={() => onSelect(a)}
+          className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer"
+        >
+          <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />
+        </button>
+      ))}
+    </div>
   );
 }
