@@ -3,13 +3,16 @@ import { useButton, type AriaButtonProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface TextButtonProps extends AriaButtonProps {
+  /**
+   * Figma "Type": Primary is a solid primary-4 fill by default. Secondary
+   * starts fully transparent and only gains a fill on hover/selected.
+   * @default 'primary'
+   */
+  variant?: 'primary' | 'secondary';
+  /** Figma "State=Selected" — a persisted toggle state, distinct from hover/press. */
+  isSelected?: boolean;
   /** Button label / content. */
   children: React.ReactNode;
-  /**
-   * Controls font size and gap between content.
-   * @default 'md'
-   */
-  size?: 'sm' | 'md' | 'lg';
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -17,36 +20,37 @@ export interface TextButtonProps extends AriaButtonProps {
 /**
  * TextButton
  *
- * Figma: "Text Button" COMPONENT_SET inside "Button, Switch Button" frame.
- * - Text: primary-4 (#DA584B) with underline on hover
- * - Used for secondary actions like "View all", "Cancel", "Forgot password"
+ * Figma: "Text Button" COMPONENT_SET inside "Button, Switch Button" frame
+ * (Button, Switch Button01.md). Despite the name, this is a solid-fill pill
+ * (State=Default/Disable/Hover/Selected × Type=Primary/Secondary), not an
+ * underline/link style. Desktop/Body/M/regular: SF Pro Display, 15px/24px,
+ * weight 400, letter-spacing 0.75px (tracking-wider). Padding 8px on all
+ * sides, border-radius 8px (--radius-sm).
  *
- * @remarks
- * FLAGGED, NOT APPLIED: the real "Text Button" frame in the Figma export
- * (Button, Switch Button01.md) actually contains solid-fill pill states
- * (State=Default/Hover/Selected/Disable x Type=Primary/Secondary, all
- * ~62x40px with 8px padding and primary-4/primary-2/primary-3/neutral-2/
- * neutral-3 backgrounds) -- not the underline/no-background link style
- * this component implements. Only "Type=Secondary, State=Default/Disable"
- * happen to have no fill. This looks like a Figma naming collision (the
- * frame is literally named "Text Button" but visually matches a solid
- * Button variant instead), so it was NOT used to change this component's
- * styling -- left as-is pending a human decision on whether this data
- * should instead inform Button's "secondary" variant. See segmented-control
- * and button.tsx summary notes for the same ambiguity.
+ * Note: the spec's Type=Primary "Disable" state (bg primary-2) is literally
+ * identical to its "Hover" state — not a transcription error, both frames
+ * use the same #EBA59E swatch.
  */
 export function TextButton({
-  size = 'md',
+  variant = 'primary',
+  isSelected = false,
   className,
+  isDisabled,
   ...props
 }: TextButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const { buttonProps, isPressed } = useButton(props, ref);
+  const { buttonProps } = useButton({ ...props, isDisabled }, ref);
 
-  const sizes = {
-    sm: 'text-xs gap-1',
-    md: 'text-sm gap-1.5',
-    lg: 'text-base gap-2',
+  const variants = {
+    primary: cn(
+      'text-neutral-1',
+      isDisabled ? 'bg-primary-2' : isSelected ? 'bg-primary-3' : 'bg-primary-4 hover:bg-primary-2'
+    ),
+    secondary: isDisabled
+      ? 'bg-transparent text-neutral-2'
+      : isSelected
+        ? 'bg-neutral-3 text-neutral-1'
+        : 'bg-transparent text-neutral-1 hover:bg-neutral-2',
   };
 
   return (
@@ -54,9 +58,8 @@ export function TextButton({
       {...buttonProps}
       ref={ref}
       className={cn(
-        'inline-flex items-center font-sans font-semibold text-primary-4 transition-all cursor-pointer outline-none focus-visible:underline disabled:opacity-50 disabled:pointer-events-none hover:underline underline-offset-2',
-        sizes[size],
-        isPressed && 'opacity-75',
+        'inline-flex items-center justify-center p-2 text-[15px] leading-6 font-normal tracking-wider rounded-sm transition-colors cursor-pointer font-sans select-none disabled:pointer-events-none',
+        variants[variant],
         className
       )}
     >

@@ -4,64 +4,53 @@ import { cn } from '../../utils/cn';
 
 export interface ButtonProps extends AriaButtonProps {
   /**
-   * Visual style of the button.
-   * @default 'primary'
+   * Figma "Property 1": Primary is a single documented state (solid fill,
+   * no selected/unselected toggle). Secondary is icon-only chrome that
+   * toggles via `isSelected`.
+   * @default 'secondary'
    */
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary';
   /**
-   * Controls height, horizontal padding, and font size.
-   * @default 'md'
-   */
-  size?: 'sm' | 'md' | 'lg';
-  /** Button label / content. */
-  children: React.ReactNode;
-  /** Additional class names, merged last via `cn()` so they can override defaults. */
-  className?: string;
-  /**
-   * Shows an inline spinner and forces the disabled state while `true`.
+   * Figma "State=Selected/Unselected" — only meaningful for `variant="secondary"`;
+   * `variant="primary"` has no selected/unselected state in the source.
    * @default false
    */
-  isLoading?: boolean;
+  isSelected?: boolean;
+  /** 24×24 icon content. Should use `currentColor` so it inherits the button's icon color. */
+  children: React.ReactNode;
+  /** Required — icon-only buttons need an accessible name. */
+  'aria-label': string;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
+  className?: string;
 }
 
+/**
+ * Button (icon button)
+ *
+ * Figma: "Button" COMPONENT_SET inside "Button, Switch Button" frame
+ * (Button, Switch Button01.md). Fixed 40×40px, border-radius 8px (--radius-sm).
+ * - Property 1=Primary, State=Normal: bg primary-4, white icon, no border.
+ * - Property 1=Secondary, State=Selected: transparent bg, 1px primary-4
+ *   border, primary-4 icon.
+ * - Property 1=Secondary, State=Unselected: transparent bg, no border,
+ *   white icon.
+ */
 export function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = 'secondary',
+  isSelected = false,
+  children,
   className,
-  isLoading = false,
   isDisabled,
   ...props
 }: ButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const { buttonProps, isPressed } = useButton(
-    { ...props, isDisabled: isDisabled || isLoading },
-    ref
-  );
-
-  const baseStyles =
-    // rounded-sm (8px) matches every real button shape in the Figma export
-    // (icon buttons and pill buttons alike are all border-radius: 8px) --
-    // was rounded-md (16px), which doesn't appear anywhere in the source data.
-    'inline-flex items-center justify-center font-sans font-semibold rounded-sm transition-all focus-visible:outline-2 focus-visible:outline-primary-4 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+  const { buttonProps } = useButton({ ...props, isDisabled }, ref);
 
   const variants = {
-    // Figma "State=Hover/Selected, Type=Primary": hover -> primary-2 (#EBA59E),
-    // pressed/selected -> primary-3 (#E27D73). Was hover:bg-primary-3 (wrong
-    // shade for hover -- that's actually the pressed color).
-    primary:
-      'bg-primary-4 text-neutral-1 hover:bg-primary-2 active:bg-primary-3 active:scale-[0.98]',
-    secondary:
-      'bg-neutral-1 text-neutral-4 border border-neutral-2 hover:bg-neutral-1 active:scale-[0.98]',
-    ghost:
-      'bg-transparent text-neutral-3 hover:bg-transparent-light-10',
-    danger:
-      'bg-danger-5 text-neutral-1 hover:bg-danger-6 active:scale-[0.98]',
-  };
-
-  const sizes = {
-    sm: 'h-8 px-3 text-xs gap-1.5',
-    md: 'h-10 px-4 text-sm gap-2',
-    lg: 'h-12 px-6 text-base gap-2.5',
+    primary: 'bg-primary-4 text-neutral-1 border border-transparent',
+    secondary: isSelected
+      ? 'bg-transparent text-primary-4 border border-primary-4'
+      : 'bg-transparent text-neutral-1 border border-transparent',
   };
 
   return (
@@ -69,17 +58,12 @@ export function Button({
       {...buttonProps}
       ref={ref}
       className={cn(
-        baseStyles,
+        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
-        sizes[size],
-        isPressed && 'scale-[0.98]',
         className
       )}
     >
-      {isLoading ? (
-        <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
-      ) : null}
-      {props.children}
+      <span className="w-6 h-6 shrink-0 [&>svg]:w-full [&>svg]:h-full">{children}</span>
     </button>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal } from './modal';
-import { Button } from '../button/button';
 import { TextButton } from '../button/text-button';
 import { cn } from '../../utils/cn';
 
@@ -89,10 +88,10 @@ export function EstimateModal({ isOpen, onClose, currentPoints, onConfirm }: Est
         </p>
         <EstimatePoints selected={points} onChange={setPoints} />
         <div className="flex items-center justify-end gap-6 pt-2">
-          <TextButton onPress={onClose}>Cancel</TextButton>
-          <Button variant="primary" onPress={handleConfirm}>
+          <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
+          <TextButton variant="primary" onPress={handleConfirm}>
             Set {points} point{points !== 1 ? 's' : ''}
-          </Button>
+          </TextButton>
         </div>
       </div>
     </Modal>

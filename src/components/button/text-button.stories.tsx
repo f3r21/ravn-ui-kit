@@ -9,14 +9,16 @@ const meta: Meta<typeof TextButton> = {
   tags: ['autodocs'],
   decorators: [withSurface('neutral-4')],
   argTypes: {
-    size: {
+    variant: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
+      options: ['primary', 'secondary'],
     },
+    isSelected: { control: 'boolean' },
     isDisabled: { control: 'boolean' },
   },
   args: {
     onPress: fn(),
+    children: 'Button',
   },
 };
 
@@ -24,31 +26,30 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { children: 'View all tasks', size: 'md' },
+  args: { variant: 'primary' },
 };
 
 export const Playground: Story = {
-  args: { children: 'Click me', size: 'md' },
+  args: { children: 'Click me' },
 };
 
-export const Sizes: Story = {
+/** State=Default/Hover/Selected/Disable × Type=Primary/Secondary (Button, Switch Button01.md). */
+export const StateMatrix: Story = {
   render: (args) => (
-    <div className="flex items-center gap-3">
-      {(['sm', 'md', 'lg'] as const).map((s) => (
-        <TextButton key={s} {...args} size={s}>
-          {s}
-        </TextButton>
+    <div className="flex flex-col gap-4">
+      {(['primary', 'secondary'] as const).map((variant) => (
+        <div key={variant} className="flex items-center gap-3">
+          <TextButton {...args} variant={variant}>Default</TextButton>
+          <TextButton {...args} variant={variant} isSelected>Selected</TextButton>
+          <TextButton {...args} variant={variant} isDisabled>Disable</TextButton>
+        </div>
       ))}
     </div>
   ),
 };
 
-export const Small: Story = {
-  args: { children: 'Cancel', size: 'sm' },
-};
-
-export const Large: Story = {
-  args: { children: 'Forgot password?', size: 'lg' },
+export const Selected: Story = {
+  args: { variant: 'primary', isSelected: true },
 };
 
 export const Disabled: Story = {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Modal } from './modal';
 import { UserRow } from '../avatar/user-row';
-import { Button } from '../button/button';
 import { TextButton } from '../button/text-button';
 import { cn } from '../../utils/cn';
 
@@ -86,10 +85,10 @@ export function AssigneeModal({
       </div>
 
       <div className="flex items-center justify-end gap-6 pt-4 mt-2">
-        <TextButton onPress={onClose}>Cancel</TextButton>
-        <Button variant="primary" onPress={handleConfirm}>
+        <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
+        <TextButton variant="primary" onPress={handleConfirm}>
           Confirm ({selected.length})
-        </Button>
+        </TextButton>
       </div>
     </Modal>
   );

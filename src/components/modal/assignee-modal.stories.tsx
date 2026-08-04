@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { useModal } from './modal';
 import { AssigneeModal } from './assignee-modal';
-import { Button } from '../button/button';
+import { TextButton } from '../button/text-button';
 
 const ASSIGNEES = [
   { id: '1', name: 'Jerome Bell', role: 'Frontend Developer' },
@@ -27,7 +27,7 @@ export const Default: Story = {
     const { isOpen, open, close } = useModal();
     return (
       <div className="bg-neutral-5 p-8 min-h-48 flex items-center justify-center">
-        <Button onPress={open}>Open Assignee modal</Button>
+        <TextButton onPress={open}>Open Assignee modal</TextButton>
         <AssigneeModal
           assignees={args.assignees ?? ASSIGNEES}
           selectedIds={args.selectedIds}

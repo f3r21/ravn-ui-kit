@@ -1,7 +1,6 @@
 import React from 'react';
 import { Modal } from './modal';
 import { Input } from '../input/input';
-import { Button } from '../button/button';
 import { TextButton } from '../button/text-button';
 import { Tag } from '../tag/tag';
 import { DatePickerMenu } from '../datepicker/datepicker-menu';
@@ -81,10 +80,10 @@ export function AddTaskModal({ isOpen, onClose, onSubmit }: AddTaskModalProps) {
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-6">
-          <TextButton onPress={onClose}>Cancel</TextButton>
-          <Button variant="primary" type="submit" isDisabled={!title.trim()}>
+          <TextButton variant="secondary" onPress={onClose}>Cancel</TextButton>
+          <TextButton variant="primary" type="submit" isDisabled={!title.trim()}>
             Create Task
-          </Button>
+          </TextButton>
         </div>
       </form>
     </Modal>
