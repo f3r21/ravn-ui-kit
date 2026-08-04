@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  /* Neutral Ramp */
+  --color-neutral-1: #ffffff;
+  --color-neutral-2: #94979a;
+  --color-neutral-3: #393d41;
+  --color-neutral-4: #2c2f33;
+  --color-neutral-5: #222528;
+
+  /* Primary Ramp */
+  --color-primary-1: #f4ccc8;
+  --color-primary-2: #eba59e;
+  --color-primary-3: #e27d73;
+  --color-primary-4: #da584b;
+
+  /* Secondary Ramp */
+  --color-secondary-1: #c8e1bc;
+  --color-secondary-2: #aad199;
+  --color-secondary-3: #8dc275;
+  --color-secondary-4: #70b252;
+
+  /* Tertiary Ramp */
+  --color-tertiary-1: #f9eed7;
+  --color-tertiary-2: #f2daab;
+  --color-tertiary-3: #ebc77f;
+  --color-tertiary-4: #e5b454;
+
+  /* Success Ramp */
+  --color-success-1: #f6ffed;
+  --color-success-2: #d9f7be;
+  --color-success-3: #a5e46c;
+  --color-success-4: #80da5b;
+
+  /* Warning Ramp */
+  --color-warning-1: #fff8f3;
+  --color-warning-2: #ffdbc7;
+  --color-warning-3: #ffb388;
+  --color-warning-4: #ff9a61;
+  --color-warning-5: #fe833d;
+  --color-warning-6: #8e4f0b;
+
+  /* Danger Ramp */
+  --color-danger-1: #fff1f0;
+  --color-danger-2: #ffdedb;
+  --color-danger-3: #ffa19e;
+  --color-danger-4: #ff7875;
+  --color-danger-5: #e82f39;
+  --color-danger-6: #a8071a;
+
+  /* Transparent Overlays */
+  --color-transparent-light-10: rgba(239, 240, 246, 0.1);
+  --color-transparent-light-25: rgba(239, 240, 246, 0.25);
+  --color-transparent-light-40: rgba(239, 240, 246, 0.4);
+  --color-transparent-light-65: rgba(239, 240, 246, 0.65);
+  --color-transparent-light-75: rgba(239, 240, 246, 0.75);
+  --color-transparent-light-95: rgba(239, 240, 246, 0.95);
+
+  --color-transparent-dark-10: rgba(20, 20, 43, 0.1);
+  --color-transparent-dark-25: rgba(20, 20, 43, 0.25);
+  --color-transparent-dark-40: rgba(20, 20, 43, 0.4);
+  --color-transparent-dark-65: rgba(20, 20, 43, 0.65);
+  --color-transparent-dark-75: rgba(20, 20, 43, 0.75);
+  --color-transparent-dark-95: rgba(20, 20, 43, 0.95);
+
+  /* Typography Families */
+  --font-sans: 'Open Sans', 'SF Pro Text', system-ui, sans-serif;
+  --font-display: 'SF Pro Display', 'DM Sans', sans-serif;
+  --font-heading: 'Poppins', 'Montserrat', sans-serif;
+
+  /* Border Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  --radius-full: 9999px;
+}

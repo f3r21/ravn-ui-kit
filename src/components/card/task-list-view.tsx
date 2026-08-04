@@ -1,0 +1,30 @@
+import { cn } from '../../utils/cn';
+import { TaskCard, type TaskCardProps } from './task-card';
+
+export interface TaskListViewProps {
+  tasks: TaskCardProps[];
+  className?: string;
+}
+
+/**
+ * TaskListView
+ *
+ * Figma: "Task List View" COMPONENT inside "Task Column" frame.
+ * Vertical stack of TaskCards — alternative to the Kanban board view.
+ * Used when the user switches to "List" mode via SegmentedControl/Tabs.
+ */
+export function TaskListView({ tasks, className }: TaskListViewProps) {
+  return (
+    <div className={cn('flex flex-col gap-3 w-full', className)}>
+      {tasks.length === 0 ? (
+        <div className="flex items-center justify-center py-16 text-neutral-2 font-sans text-sm">
+          No hay tareas en esta vista.
+        </div>
+      ) : (
+        tasks.map((task, idx) => (
+          <TaskCard key={idx} {...task} className="w-full" />
+        ))
+      )}
+    </div>
+  );
+}
