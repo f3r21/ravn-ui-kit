@@ -32,7 +32,7 @@ buckets:
 | Bucket | Use for |
 | --- | --- |
 | `Design Tokens/*` | Colors, Typography, and any future raw token reference pages (MDX) |
-| `Primitives/*` | Small, single-purpose controls with no internal component dependencies (Button, Input, Badge, Tag, Switch, Tabs, ...) |
+| `Primitives/*` | Small, single-purpose controls with no internal component dependencies (Button, Input, Badge, Tag, Tabs, SegmentedControl, ...) |
 | `Components/*` | Composed, self-contained widgets (Avatar, UserRow, Card, TaskCard, DatePicker, Modal, ...) |
 | `Layout/*` | App-shell / composition-heavy pieces that arrange other components (ApplicationSidebar, TopNav, TaskListView, TaskTable, AppShell, ...) |
 

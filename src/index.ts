@@ -7,7 +7,6 @@ export * from './utils/cn';
 // ─── Button family ────────────────────────────────────────────────
 export * from './components/button/button';
 export * from './components/button/text-button';
-export * from './components/button/switch';
 
 // ─── Inputs ───────────────────────────────────────────────────────
 export * from './components/input/input';

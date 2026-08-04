@@ -20,7 +20,7 @@ left unbuilt (no legible spec), and why.
   ground-truth export. Start here if you're building something new and need
   to know which token to reach for.
 - **Primitives** — the smallest reusable building blocks (Button, TextButton,
-  Tag, Input, Switch, Tabs, SegmentedControl, LabelCheckbox, Badge, Skeleton).
+  Tag, Input, Tabs, SegmentedControl, LabelCheckbox, Badge, Skeleton).
 - **Components** — composed pieces built from primitives (Avatar, UserRow,
   Card, TaskCard, ProjectInfo, Reactions, Modal and its task-flow variants,
   DatePicker).
@@ -43,7 +43,7 @@ import '@ravn/ui-kit/theme.css';
 Then use any component:
 
 ```tsx
-import { Button, Input, Card, Badge } from '@ravn/ui-kit';
+import { TextButton, Input, Card, Badge } from '@ravn/ui-kit';
 
 export function UserForm() {
   return (
@@ -53,13 +53,17 @@ export function UserForm() {
         <Badge variant="success">Active</Badge>
       </div>
       <Input label="Email" placeholder="user@ravn.co" />
-      <Button variant="primary" onPress={() => console.log('Saved')}>
+      <TextButton variant="primary" onPress={() => console.log('Saved')}>
         Save
-      </Button>
+      </TextButton>
     </Card>
   );
 }
 ```
+
+Note: `Button` (from `Primitives/Button`) is a fixed 40×40px icon-only control
+requiring an `aria-label` — use it for icon buttons, not labeled text CTAs
+like the one above.
 
 ## Fidelity notes worth knowing
 
@@ -70,7 +74,13 @@ export function UserForm() {
 - Border radii are literal per-component values in the source designs, not a
   clean t-shirt ramp — see **Design Tokens → Colors** for the full token
   table and which real component each one was verified against.
-- A handful of primitives (`Switch`, `Skeleton`, `Datepicker`'s native
+- A handful of primitives (`Skeleton`, `Datepicker`'s native
   `<input type="date">`) have no direct Figma component behind them. They're
   kept because they're genuinely useful and don't contradict anything in the
-  spec, not because they were found in an export.
+  spec, not because they were found in an export. A previous `Switch`
+  primitive (an iOS-style boolean toggle) was removed after live Figma access
+  confirmed the real "Switch button" component isn't a toggle at all — it's a
+  single 157px pill/chip (Default/Selected states, no on/off semantic),
+  dimensionally identical to `SegmentedControl`'s pill items, which already
+  covers this shape. Unlike `Skeleton`/`Datepicker`, this one *was*
+  contradicted by spec once checked, so it didn't meet the bar above.

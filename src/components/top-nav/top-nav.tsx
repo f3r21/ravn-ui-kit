@@ -49,16 +49,20 @@ export interface TopNavProps {
  * `SearchBar` icon+input on the left (Frame 649) and a trailing icon/avatar slot on the
  * right (Frame 648).
  *
- * Property 1=Default vs Property 1=Selected differ structurally: Frame 648 is 88px wide
- * (1 icon + avatar) in Default and 136px (2 icons + avatar) in Selected — the extra
- * 24px+gap exactly accounts for one more icon. The only real desktop mockup instance
- * (`Dashboard Mockup.md`) always renders Default, and the Selected variant's second icon
- * has no legible glyph or label in the export, so its purpose isn't specified — reusing it
- * as a clear-search affordance (shown once there's a value to clear) is the most
- * conservative reading that both matches the structural 88px->136px delta and doesn't
- * invent unrelated functionality. No `title` prop: no title/heading layer exists anywhere
- * in the real component (the "Navigation"/"SidebarItem" text layers a few hundred px above
- * it belong to the isolated doc frame's own header, not the Top Nav bar itself).
+ * Confirmed via live Figma access (node 82:2742, fileKey ZUAB3jXFyKFktoAzvN7h1T) after
+ * shipping with an unverified guess: Property 1=Default vs Property 1=Selected differ
+ * structurally — Frame 648 is 88px wide (bell icon + avatar) in Default, 136px (close icon +
+ * bell icon + avatar) in Selected. Selected's search input also renders a bare text-cursor
+ * glyph in place of the "Search" placeholder, i.e. Selected is the *focused* state. The extra
+ * icon in Selected is a literal close/X glyph — confirming the clear-search interpretation
+ * this component already shipped with. One real correction from the live check: the close
+ * icon is the FIRST child of the trailing group in Selected, not appended after the bell
+ * icon as previously implemented — order is close (when shown), then bell, then avatar.
+ * Not yet re-verified: whether the real trigger is strictly "focused" vs this component's
+ * "has a non-empty value" (Selected's cursor glyph doesn't prove which) — kept the
+ * value-based trigger since showing a clear button with nothing to clear is the weaker UX
+ * default, but this is a values-based judgment call, not a confirmed fact. No `title` prop:
+ * no title/heading layer exists anywhere in the real component.
  */
 export function TopNav({
   searchValue: controlledSearchValue,
@@ -100,10 +104,6 @@ export function TopNav({
       />
 
       <div className="flex items-center gap-6 shrink-0">
-        <span className="w-6 h-6 text-neutral-2 shrink-0 [&>svg]:w-full [&>svg]:h-full">
-          {icon ?? <BellIcon />}
-        </span>
-
         {searchValue ? (
           <button
             type="button"
@@ -114,6 +114,10 @@ export function TopNav({
             <CloseIcon />
           </button>
         ) : null}
+
+        <span className="w-6 h-6 text-neutral-2 shrink-0 [&>svg]:w-full [&>svg]:h-full">
+          {icon ?? <BellIcon />}
+        </span>
 
         {userName || userAvatar ? <Avatar src={userAvatar} name={userName} size="md" /> : null}
       </div>
