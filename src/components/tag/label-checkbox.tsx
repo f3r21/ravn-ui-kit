@@ -33,8 +33,14 @@ export interface LabelCheckboxProps {
 /**
  * LabelCheckbox
  *
- * Figma: "Label Checkbox" COMPONENT_SET inside "Tags" frame.
- * Checkbox input with an inline label — used in filter dropdowns and forms.
+ * Figma: "Label Checkbox" COMPONENT_SET inside "Tags" frame (Tags01.md,
+ * Add Task Modal04/05.md). Structurally identical to the Tag "Icon=Left"
+ * chip - a 24x24 icon slot + a Desktop/Body/M/regular label, 4px padding
+ * 16px, gap 8px, radius 4px, no fill/border. The ground-truth export gives
+ * Property 1=Default and Property 1=Selected byte-for-byte identical style
+ * values (no distinguishing color), so the checked/unchecked distinction is
+ * carried entirely by the icon glyph (empty box vs. checked box), exactly
+ * like the two vector states a real checkbox input would render.
  * Uses react-aria useCheckbox for full accessibility.
  */
 export function LabelCheckbox({
@@ -67,34 +73,32 @@ export function LabelCheckbox({
     <label
       {...labelProps}
       className={cn(
-        // gap: 8px -- matches Figma "Label Checkbox" component (Property 1=Default/Selected, Tags01)
-        'inline-flex items-center gap-2 cursor-pointer select-none group',
+        // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
+        // `rounded` step) -- matches Figma "Label Checkbox" component exactly
+        // (Property 1=Default/Selected, Tags01.md / Add Task Modal04/05.md).
+        'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group',
         isDisabled && 'opacity-50 cursor-not-allowed',
         className
       )}
     >
-      <div className="relative flex items-center justify-center shrink-0">
-        <input {...inputProps} ref={ref} className="sr-only" />
-        <div
-          className={cn(
-            'w-4 h-4 rounded border-2 transition-all',
-            state.isSelected || isIndeterminate
-              ? 'bg-primary-4 border-primary-4'
-              : 'bg-transparent border-neutral-2 group-hover:border-neutral-1'
-          )}
-        >
-          {state.isSelected && !isIndeterminate ? (
-            <svg className="w-full h-full text-neutral-1 p-[1px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          ) : isIndeterminate ? (
-            <svg className="w-full h-full text-neutral-1 p-[2px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" aria-hidden>
-              <path d="M5 12h14" />
-            </svg>
-          ) : null}
-        </div>
-      </div>
-      <span className="text-sm font-sans font-medium text-neutral-1 leading-tight">
+      <input {...inputProps} ref={ref} className="sr-only" />
+      <svg
+        className="w-6 h-6 shrink-0 text-neutral-1"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        aria-hidden
+      >
+        <rect x="4" y="4" width="16" height="16" rx="3" />
+        {state.isSelected && !isIndeterminate ? (
+          <path d="M8 12.5 11 15.5 16 9.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        ) : isIndeterminate ? (
+          <path d="M8 12h8" strokeWidth={2} strokeLinecap="round" />
+        ) : null}
+      </svg>
+      {/* Desktop/Body/M/regular -- SF Pro Display, 15px/24px, letter-spacing 0.75px (tracking-wider) */}
+      <span className="text-[15px] leading-6 tracking-wider font-normal font-sans text-neutral-1">
         {children}
       </span>
     </label>
