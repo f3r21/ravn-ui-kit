@@ -6,11 +6,18 @@ import { cn } from '../../utils/cn';
 // ─── Shared Modal Shell ───────────────────────────────────────────
 
 export interface ModalProps {
+  /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
   title: string;
+  /** Whether the modal is currently open. When `false`, nothing is rendered. */
   isOpen: boolean;
+  /** Called when the modal should close — backdrop click, Escape key, or the header close button. */
   onClose: () => void;
+  /** Modal body content. */
   children: React.ReactNode;
-  /** Width class — defaults to max-w-md */
+  /**
+   * Tailwind max-width class controlling the dialog's width.
+   * @default 'max-w-md'
+   */
   width?: string;
 }
 

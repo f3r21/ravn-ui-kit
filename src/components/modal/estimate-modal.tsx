@@ -1,3 +1,4 @@
+import React from 'react';
 import { Modal } from './modal';
 import { Button } from '../button/button';
 import { TextButton } from '../button/text-button';
@@ -7,7 +8,9 @@ import { cn } from '../../utils/cn';
 const POINT_OPTIONS = [0, 1, 2, 3, 5, 8, 13, 21];
 
 export interface EstimatePointsProps {
+  /** Currently selected point value, if any. */
   selected?: number;
+  /** Called with the newly selected point value when the user picks a pill. */
   onChange?: (points: number) => void;
   className?: string;
 }
@@ -51,9 +54,16 @@ export function EstimatePoints({ selected, onChange, className }: EstimatePoints
 // ─── EstimateModal ────────────────────────────────────────────────
 
 export interface EstimateModalProps {
+  /** Whether the modal is currently open. */
   isOpen: boolean;
+  /** Called when the modal should close without confirming. */
   onClose: () => void;
+  /**
+   * Point value to pre-select when opened.
+   * @default 0
+   */
   currentPoints?: number;
+  /** Called with the confirmed point value. */
   onConfirm?: (points: number) => void;
 }
 
@@ -88,5 +98,3 @@ export function EstimateModal({ isOpen, onClose, currentPoints, onConfirm }: Est
     </Modal>
   );
 }
-
-import React from 'react';

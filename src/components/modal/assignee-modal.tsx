@@ -6,17 +6,26 @@ import { TextButton } from '../button/text-button';
 import { cn } from '../../utils/cn';
 
 export interface Assignee {
+  /** Unique identifier, echoed back in `onConfirm`/`selectedIds`. */
   id: string;
+  /** Display name shown in the row. */
   name: string;
+  /** Optional secondary text (job title/role) shown under the name. */
   role?: string;
+  /** Optional avatar image URL; falls back to initials when omitted. */
   avatarSrc?: string;
 }
 
 export interface AssigneeModalProps {
+  /** Whether the modal is currently open. */
   isOpen: boolean;
+  /** Called when the modal should close without confirming. */
   onClose: () => void;
+  /** Full list of assignable people shown as selectable rows. */
   assignees: Assignee[];
+  /** Controlled set of selected assignee ids. Omit for uncontrolled internal state. */
   selectedIds?: string[];
+  /** Called with the final selected ids when the user confirms. */
   onConfirm?: (selectedIds: string[]) => void;
 }
 

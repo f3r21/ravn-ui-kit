@@ -29,7 +29,14 @@ export interface TabsProps {
  * Figma: "Tabs" COMPONENT_SET inside "Button, Switch Button" frame.
  * - Active tab: text primary-4 + 2px bottom border primary-4
  * - Inactive: text neutral-2, hover text neutral-1
- * - Uses react-aria useTabList + useTab + useTabPanel (low-level hooks)
+ *
+ * @remarks
+ * This is a hand-rolled `role="tablist"`/`role="tab"`/`role="tabpanel"`
+ * implementation with click-based selection only — it does not use
+ * react-aria's `useTabListState`/`useTabList`/`useTab`/`useTabPanel` hooks
+ * and does not yet support the WAI-ARIA APG's arrow-key tab navigation.
+ * Tracked as a follow-up accessibility improvement, not a Figma-fidelity
+ * issue.
  */
 export function Tabs({
   items,

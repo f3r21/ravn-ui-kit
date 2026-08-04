@@ -7,8 +7,11 @@ import { Tag } from '../tag/tag';
 import { DatePickerMenu } from '../datepicker/datepicker-menu';
 
 export interface AddTaskModalProps {
+  /** Whether the modal is currently open. */
   isOpen: boolean;
+  /** Called when the modal should close without submitting. */
   onClose: () => void;
+  /** Called with the form values when the user submits a valid (non-empty title) task. */
   onSubmit?: (data: { title: string; description?: string; dueDate?: Date }) => void;
 }
 
