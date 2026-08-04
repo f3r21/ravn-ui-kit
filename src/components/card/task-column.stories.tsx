@@ -1,12 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { TaskColumn } from './task-column';
 
 const meta: Meta<typeof TaskColumn> = {
-  title: 'UI/TaskColumn',
+  title: 'Layout/TaskColumn',
   component: TaskColumn,
   tags: ['autodocs'],
   parameters: {
     layout: 'padded',
+  },
+  argTypes: {
+    accentColor: {
+      control: 'select',
+      options: ['primary', 'secondary', 'tertiary', 'neutral'],
+    },
+  },
+  args: {
+    onAddTask: fn(),
   },
 };
 
@@ -32,13 +42,29 @@ const sampleTasks = [
   },
 ];
 
+export const Default: Story = {
+  args: {
+    title: 'To Do',
+    count: 8,
+    accentColor: 'neutral',
+    tasks: sampleTasks,
+  },
+};
+
+export const Playground: Story = {
+  args: {
+    title: 'To Do',
+    count: sampleTasks.length,
+    tasks: sampleTasks,
+  },
+};
+
 export const ToDo: Story = {
   args: {
     title: 'To Do',
     count: 8,
     accentColor: 'neutral',
     tasks: sampleTasks,
-    onAddTask: () => alert('Nueva tarea'),
   },
 };
 
@@ -48,7 +74,6 @@ export const InProgress: Story = {
     count: 3,
     accentColor: 'tertiary',
     tasks: [sampleTasks[0]],
-    onAddTask: () => alert('Nueva tarea'),
   },
 };
 
@@ -58,7 +83,6 @@ export const Done: Story = {
     count: 14,
     accentColor: 'secondary',
     tasks: [],
-    onAddTask: () => alert('Nueva tarea'),
   },
 };
 
@@ -78,5 +102,6 @@ export const Blocked: Story = {
         commentsCount: 12,
       },
     ],
+    onAddTask: undefined,
   },
 };

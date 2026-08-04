@@ -4,12 +4,29 @@ import { useToggleState } from 'react-stately';
 import { cn } from '../../utils/cn';
 
 export interface LabelCheckboxProps {
+  /** Label content rendered next to the checkbox. */
   children: React.ReactNode;
+  /** Controlled selected state. Omit to let the component manage its own state via `defaultSelected`. */
   isSelected?: boolean;
+  /**
+   * Initial selected state for uncontrolled usage.
+   * @default false
+   */
   defaultSelected?: boolean;
+  /** Called with the next selected state whenever the checkbox is toggled. */
   onChange?: (isSelected: boolean) => void;
+  /**
+   * Disables interaction and applies a dimmed, non-interactive style.
+   * @default false
+   */
   isDisabled?: boolean;
+  /**
+   * Renders the indeterminate ("mixed") visual state, overriding the checkmark
+   * regardless of `isSelected`.
+   * @default false
+   */
   isIndeterminate?: boolean;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

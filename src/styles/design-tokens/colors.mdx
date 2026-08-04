@@ -1,0 +1,123 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+
+<Meta title="Design Tokens/Colors" />
+
+# Colors
+
+> **Pending Figma verification.** These are the raw ramps currently defined in
+> `src/styles/theme.css` (Tailwind v4 `@theme` block). Figma access is
+> rate-limited this session — once the Colors frame data (node-id=2-2) is
+> pasted, this page must be re-verified against it and updated if any value
+> differs. No semantic aliases exist yet — see `README.md` for why.
+
+<ColorPalette>
+  <ColorItem
+    title="Neutral"
+    subtitle="--color-neutral-1 .. 5"
+    colors={{
+      'neutral-1': '#ffffff',
+      'neutral-2': '#94979a',
+      'neutral-3': '#393d41',
+      'neutral-4': '#2c2f33',
+      'neutral-5': '#222528',
+    }}
+  />
+  <ColorItem
+    title="Primary"
+    subtitle="--color-primary-1 .. 4"
+    colors={{
+      'primary-1': '#f4ccc8',
+      'primary-2': '#eba59e',
+      'primary-3': '#e27d73',
+      'primary-4': '#da584b',
+    }}
+  />
+  <ColorItem
+    title="Secondary"
+    subtitle="--color-secondary-1 .. 4"
+    colors={{
+      'secondary-1': '#c8e1bc',
+      'secondary-2': '#aad199',
+      'secondary-3': '#8dc275',
+      'secondary-4': '#70b252',
+    }}
+  />
+  <ColorItem
+    title="Tertiary"
+    subtitle="--color-tertiary-1 .. 4"
+    colors={{
+      'tertiary-1': '#f9eed7',
+      'tertiary-2': '#f2daab',
+      'tertiary-3': '#ebc77f',
+      'tertiary-4': '#e5b454',
+    }}
+  />
+  <ColorItem
+    title="Success"
+    subtitle="--color-success-1 .. 4"
+    colors={{
+      'success-1': '#f6ffed',
+      'success-2': '#d9f7be',
+      'success-3': '#a5e46c',
+      'success-4': '#80da5b',
+    }}
+  />
+  <ColorItem
+    title="Warning"
+    subtitle="--color-warning-1 .. 6"
+    colors={{
+      'warning-1': '#fff8f3',
+      'warning-2': '#ffdbc7',
+      'warning-3': '#ffb388',
+      'warning-4': '#ff9a61',
+      'warning-5': '#fe833d',
+      'warning-6': '#8e4f0b',
+    }}
+  />
+  <ColorItem
+    title="Danger"
+    subtitle="--color-danger-1 .. 6"
+    colors={{
+      'danger-1': '#fff1f0',
+      'danger-2': '#ffdedb',
+      'danger-3': '#ffa19e',
+      'danger-4': '#ff7875',
+      'danger-5': '#e82f39',
+      'danger-6': '#a8071a',
+    }}
+  />
+  <ColorItem
+    title="Transparent (light overlay)"
+    subtitle="--color-transparent-light-10 .. 95, base rgb(239, 240, 246)"
+    colors={{
+      '10%': 'rgba(239, 240, 246, 0.1)',
+      '25%': 'rgba(239, 240, 246, 0.25)',
+      '40%': 'rgba(239, 240, 246, 0.4)',
+      '65%': 'rgba(239, 240, 246, 0.65)',
+      '75%': 'rgba(239, 240, 246, 0.75)',
+      '95%': 'rgba(239, 240, 246, 0.95)',
+    }}
+  />
+  <ColorItem
+    title="Transparent (dark overlay)"
+    subtitle="--color-transparent-dark-10 .. 95, base rgb(20, 20, 43)"
+    colors={{
+      '10%': 'rgba(20, 20, 43, 0.1)',
+      '25%': 'rgba(20, 20, 43, 0.25)',
+      '40%': 'rgba(20, 20, 43, 0.4)',
+      '65%': 'rgba(20, 20, 43, 0.65)',
+      '75%': 'rgba(20, 20, 43, 0.75)',
+      '95%': 'rgba(20, 20, 43, 0.95)',
+    }}
+  />
+</ColorPalette>
+
+## Border radius
+
+| Token | Value |
+| --- | --- |
+| `--radius-sm` | 8px |
+| `--radius-md` | 16px |
+| `--radius-lg` | 24px |
+| `--radius-xl` | 40px |
+| `--radius-full` | 9999px |

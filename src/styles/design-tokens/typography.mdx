@@ -1,0 +1,44 @@
+import { Meta, Typeset } from '@storybook/blocks';
+
+<Meta title="Design Tokens/Typography" />
+
+# Typography
+
+> **Pending Figma verification.** These font families are the raw values
+> currently defined in `src/styles/theme.css` (Tailwind v4 `@theme` block).
+> Figma access is rate-limited this session — once the Typography frame data
+> (node-id=2-2) is pasted, this page must be re-verified and updated. Only the
+> Desktop typography variant is expected to be relevant to this web library;
+> the Mobile Android/iOS variants noted in the design file are assumed
+> native-app-only pending confirmation. There is no type-scale (font-size /
+> line-height / letter-spacing) token layer yet — components currently use
+> Tailwind's default text utilities directly.
+
+## Font families
+
+<Typeset
+  fontSizes={[12, 14, 16, 20, 24, 32]}
+  fontWeight={400}
+  sampleText="Ravn UI Kit — Aa Bb Cc 0123"
+  fontFamily="'Open Sans', 'SF Pro Text', system-ui, sans-serif"
+/>
+
+**`--font-sans`**: `'Open Sans', 'SF Pro Text', system-ui, sans-serif` — default body text.
+
+<Typeset
+  fontSizes={[12, 14, 16, 20, 24, 32]}
+  fontWeight={400}
+  sampleText="Ravn UI Kit — Aa Bb Cc 0123"
+  fontFamily="'SF Pro Display', 'DM Sans', sans-serif"
+/>
+
+**`--font-display`**: `'SF Pro Display', 'DM Sans', sans-serif` — large display text.
+
+<Typeset
+  fontSizes={[12, 14, 16, 20, 24, 32]}
+  fontWeight={600}
+  sampleText="Ravn UI Kit — Aa Bb Cc 0123"
+  fontFamily="'Poppins', 'Montserrat', sans-serif"
+/>
+
+**`--font-heading`**: `'Poppins', 'Montserrat', sans-serif'` — section/card headings.

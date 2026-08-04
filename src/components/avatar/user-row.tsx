@@ -8,11 +8,19 @@ export interface UserRowProps {
   role?: string;
   /** Avatar image URL */
   avatarSrc?: string;
-  /** Size variant — matches Avatar sizes */
+  /**
+   * Size variant — matches Avatar sizes
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
-  /** Whether to show a status dot (online indicator) */
+  /**
+   * Whether to show a status dot (online indicator)
+   * @default false
+   */
   isOnline?: boolean;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /** Called when the row is clicked. When provided, the row renders as a `<button>` instead of a `<div>`. */
   onClick?: () => void;
 }
 

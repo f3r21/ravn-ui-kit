@@ -1,12 +1,20 @@
 import { cn } from '../../utils/cn';
 
 export interface AvatarProps {
+  /** Image URL to render. Falls back to initials derived from `name` when omitted. */
   src?: string;
+  /** Full name used for the fallback initials and the image `alt` text. */
   name?: string;
+  /**
+   * Controls the avatar's width, height, and initials font size.
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
+/** Circular user avatar that shows an image, or initials derived from `name` when no `src` is provided. */
 export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
   const sizes = {
     sm: 'w-7 h-7 text-xs font-semibold',

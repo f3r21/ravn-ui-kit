@@ -1,22 +1,33 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import { withSurface } from '../../../.storybook/decorators';
 import { SegmentedControl } from './segmented-control';
 
 const meta: Meta<typeof SegmentedControl> = {
-  title: 'UI/SegmentedControl',
+  title: 'Primitives/SegmentedControl',
   component: SegmentedControl,
   tags: ['autodocs'],
-};
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
+  decorators: [withSurface('neutral-5')],
   args: {
     options: [
       { id: 'board', label: 'Board' },
       { id: 'list', label: 'List' },
       { id: 'table', label: 'Table' },
     ],
+    onChange: fn(),
+  },
+};
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
     defaultValue: 'board',
   },
-  decorators: [(Story) => <div className="bg-neutral-5 p-6"><Story /></div>],
+};
+
+export const Playground: Story = {
+  args: {
+    defaultValue: 'board',
+  },
 };

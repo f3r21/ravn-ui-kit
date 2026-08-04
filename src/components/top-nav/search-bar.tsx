@@ -3,14 +3,18 @@ import { useTextField } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface SearchBarProps {
-  /** Placeholder text shown in the input */
+  /**
+   * Placeholder text shown in the input.
+   * @default 'Search...'
+   */
   placeholder?: string;
-  /** Controlled value */
+  /** Controlled value. */
   value?: string;
-  /** Called on every keystroke */
+  /** Called on every keystroke. */
   onChange?: (value: string) => void;
-  /** Called when user submits (Enter) */
+  /** Called when user submits (Enter). */
   onSubmit?: (value: string) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

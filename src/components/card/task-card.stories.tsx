@@ -1,10 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { TaskCard } from './task-card';
 
 const meta: Meta<typeof TaskCard> = {
-  title: 'UI/TaskCard',
+  title: 'Components/TaskCard',
   component: TaskCard,
   tags: ['autodocs'],
+  argTypes: {
+    dueDateUrgency: {
+      control: 'select',
+      options: ['normal', 'warning', 'overdue'],
+    },
+  },
+  args: {
+    onClick: fn(),
+    title: 'Working (03) - RAVN Challenge',
+  },
 };
 
 export default meta;
@@ -23,6 +34,15 @@ export const Default: Story = {
     assigneeName: 'Jerome Bell',
     commentsCount: 5,
     attachmentsCount: 2,
+  },
+};
+
+export const Playground: Story = {
+  args: {
+    title: 'Working (03) - RAVN Challenge',
+    points: 3,
+    dueDateText: '3 DÍAS',
+    dueDateUrgency: 'warning',
   },
 };
 

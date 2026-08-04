@@ -1,12 +1,20 @@
 import { cn } from '../../utils/cn';
 
 export interface TagProps {
+  /**
+   * Visual color style of the tag.
+   * @default 'neutral'
+   */
   variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
+  /** Tag label content. */
   children: React.ReactNode;
+  /** Called when the remove (×) button is pressed. When provided, a remove button is rendered. */
   onRemove?: () => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
+/** Compact labeled pill, optionally removable via a trailing "×" button. */
 export function Tag({
   variant = 'neutral',
   children,

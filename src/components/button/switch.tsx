@@ -4,16 +4,23 @@ import { useToggleState } from 'react-stately';
 import { cn } from '../../utils/cn';
 
 export interface SwitchProps {
-  /** Visible label next to the switch */
+  /** Visible label rendered next to the switch. */
   label?: string;
-  /** Controlled checked state */
+  /** Controlled checked state. Omit and use `defaultSelected` for uncontrolled usage. */
   isSelected?: boolean;
-  /** Default state (uncontrolled) */
+  /**
+   * Initial checked state when the switch is uncontrolled (no `isSelected` passed).
+   * @default false
+   */
   defaultSelected?: boolean;
-  /** Called when the switch is toggled */
+  /** Called with the new checked state whenever the switch is toggled. */
   onChange?: (isSelected: boolean) => void;
-  /** Disable interaction */
+  /**
+   * Disables interaction and applies the disabled visual style.
+   * @default false
+   */
   isDisabled?: boolean;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

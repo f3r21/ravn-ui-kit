@@ -3,7 +3,9 @@ import { cn } from '../../utils/cn';
 
 
 export interface TabItem {
+  /** Unique identifier for the tab; used to key the tab button, its panel, and their ARIA relationships. */
   id: string;
+  /** Text label displayed inside the tab button. */
   label: string;
   /** Optional icon to show before the label */
   icon?: React.ReactNode;
@@ -20,6 +22,7 @@ export interface TabsProps {
   selectedKey?: string;
   /** Called when selected tab changes */
   onSelectionChange?: (key: string) => void;
+  /** Additional class names applied to the root container, merged last via `cn()`. */
   className?: string;
 }
 

@@ -3,9 +3,14 @@ import { useButton, type AriaButtonProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface TextButtonProps extends AriaButtonProps {
+  /** Button label / content. */
   children: React.ReactNode;
-  /** Size variant */
+  /**
+   * Controls font size and gap between content.
+   * @default 'md'
+   */
   size?: 'sm' | 'md' | 'lg';
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

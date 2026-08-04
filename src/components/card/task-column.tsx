@@ -6,12 +6,19 @@ export interface TaskColumnProps {
   title: string;
   /** Total count of tasks — shown as a badge next to the title */
   count?: number;
-  /** Accent color for the top border stripe. Defaults to neutral. */
+  /**
+   * Accent color for the top border stripe.
+   * @default 'neutral'
+   */
   accentColor?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
-  /** List of task cards to render in the column */
+  /**
+   * List of task cards to render in the column.
+   * @default []
+   */
   tasks?: TaskCardProps[];
-  /** Optional callback when user clicks "Add task" */
+  /** Optional callback when user clicks "Add task". When omitted, the footer is not rendered. */
   onAddTask?: () => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
@@ -28,6 +35,9 @@ const accentMap = {
  * Kanban board column matching the Figma "Task Column" frame.
  * - Background: neutral-4 (#2C2F33)
  * - Border-radius: 12px
+ *   NOTE: comment says 12px but shipped class (rounded-xl) resolves to 40px per
+ *   theme.css --radius-xl -- discrepancy pending Figma confirmation, do not
+ *   resolve without Figma data.
  * - 4px colored top stripe (accent)
  * - Header: column title + task count badge
  * - Body: scrollable list of TaskCards

@@ -8,6 +8,7 @@ export interface ApplicationSidebarProps {
   items: SidebarItemProps[];
   /** Optional footer content (e.g. user profile) */
   footer?: React.ReactNode;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

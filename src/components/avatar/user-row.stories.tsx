@@ -1,10 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { UserRow } from './user-row';
+import { withSurface } from '../../../.storybook/decorators';
 
 const meta: Meta<typeof UserRow> = {
-  title: 'UI/UserRow',
+  title: 'Components/UserRow',
   component: UserRow,
   tags: ['autodocs'],
+  argTypes: {
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+    },
+    isOnline: { control: 'boolean' },
+  },
+  args: {
+    name: 'Jerome Bell',
+    onClick: fn(),
+  },
 };
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -15,7 +28,17 @@ export const Default: Story = {
     role: 'Frontend Developer',
     size: 'md',
   },
-  decorators: [(Story) => <div className="bg-neutral-5 p-6 w-64"><Story /></div>],
+  decorators: [withSurface('neutral-5', 'w-64')],
+};
+
+export const Playground: Story = {
+  args: {
+    name: 'Jerome Bell',
+    role: 'Frontend Developer',
+    size: 'md',
+    isOnline: false,
+  },
+  decorators: [withSurface('neutral-5', 'w-64')],
 };
 
 export const Online: Story = {
@@ -25,7 +48,7 @@ export const Online: Story = {
     isOnline: true,
     size: 'md',
   },
-  decorators: [(Story) => <div className="bg-neutral-5 p-6 w-64"><Story /></div>],
+  decorators: [withSurface('neutral-5', 'w-64')],
 };
 
 export const Small: Story = {
@@ -34,5 +57,5 @@ export const Small: Story = {
     role: 'Designer',
     size: 'sm',
   },
-  decorators: [(Story) => <div className="bg-neutral-4 p-4 w-56"><Story /></div>],
+  decorators: [withSurface('neutral-4', 'p-4 w-56')],
 };

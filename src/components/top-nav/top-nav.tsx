@@ -3,18 +3,22 @@ import { SearchBar } from './search-bar';
 import { Avatar } from '../avatar/avatar';
 
 export interface TopNavProps {
-  /** Title shown in the left area (page/section name) */
+  /** Title shown in the left area (page/section name). */
   title?: string;
-  /** Whether to show the search bar */
+  /**
+   * Whether to show the search bar.
+   * @default true
+   */
   showSearch?: boolean;
-  /** Logged-in user's name (used for avatar initials) */
+  /** Logged-in user's name (used for avatar initials). */
   userName?: string;
-  /** Logged-in user's avatar image URL */
+  /** Logged-in user's avatar image URL. */
   userAvatar?: string;
-  /** Called when search value changes */
+  /** Called when search value changes. */
   onSearch?: (value: string) => void;
-  /** Actions/buttons to render on the right side */
+  /** Actions/buttons to render on the right side. */
   actions?: React.ReactNode;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

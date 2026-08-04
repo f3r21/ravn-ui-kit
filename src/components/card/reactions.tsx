@@ -1,14 +1,20 @@
 import { cn } from '../../utils/cn';
 
 export interface Reaction {
+  /** Emoji glyph shown on the pill, also used as its unique key. */
   emoji: string;
+  /** Number of reactors, rendered next to the emoji. */
   count: number;
+  /** Whether the current user has reacted with this emoji. */
   isActive?: boolean;
 }
 
 export interface ReactionsProps {
+  /** Ordered list of reaction pills to render. */
   reactions: Reaction[];
+  /** Called with the emoji of the pill that was clicked. */
   onToggle?: (emoji: string) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

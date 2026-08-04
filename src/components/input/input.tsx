@@ -3,15 +3,21 @@ import { useTextField, type AriaTextFieldProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface InputProps extends AriaTextFieldProps {
+  /** Label text rendered above the input. When omitted, no label is shown. */
   label?: string;
+  /**
+   * Error message rendered below the input. When set, also switches the
+   * input to its error visual state (danger border/outline).
+   */
   error?: string;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
 export function Input({ label, error, className, ...props }: InputProps) {
   const ref = useRef<HTMLInputElement>(null);
   const { labelProps, inputProps, errorMessageProps } =
-    useTextField(props, ref);
+    useTextField({ ...props, label }, ref);
 
   return (
     <div className="flex flex-col gap-1.5 w-full">

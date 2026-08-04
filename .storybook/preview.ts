@@ -17,6 +17,11 @@ const preview: Preview = {
         'panel-dark': { name: 'panel-dark (neutral-4)', value: '#2C2F33' },
       },
     },
+    options: {
+      storySort: {
+        order: ['Design Tokens', ['Colors', 'Typography'], 'Primitives', 'Components', 'Layout'],
+      },
+    },
   },
 };
 

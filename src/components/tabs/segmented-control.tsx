@@ -2,16 +2,24 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export interface SegmentedControlOption {
+  /** Unique identifier for the option, used to match against `value`/`defaultValue` and reported by `onChange`. */
   id: string;
+  /** Text label displayed for the option. */
   label: string;
+  /** Optional icon rendered before the label. */
   icon?: React.ReactNode;
 }
 
 export interface SegmentedControlProps {
+  /** The list of segments rendered as selectable options, in display order. */
   options: SegmentedControlOption[];
+  /** Selected option `id` for controlled usage. When provided, the component no longer manages its own selection state. */
   value?: string;
+  /** Initial selected option `id` for uncontrolled usage. Falls back to the first option's `id` when omitted. */
   defaultValue?: string;
+  /** Called with the newly selected option's `id` whenever the user picks a segment. */
   onChange?: (value: string) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

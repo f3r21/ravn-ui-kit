@@ -1,21 +1,33 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import { withSurface } from '../../../.storybook/decorators';
 import { Reactions } from './reactions';
 
 const meta: Meta<typeof Reactions> = {
-  title: 'UI/Reactions',
+  title: 'Components/Reactions',
   component: Reactions,
   tags: ['autodocs'],
-};
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
+  decorators: [withSurface('neutral-4')],
   args: {
     reactions: [
       { emoji: '👍', count: 4, isActive: true },
       { emoji: '🎉', count: 2 },
       { emoji: '🔥', count: 7 },
     ],
+    onToggle: fn(),
   },
-  decorators: [(Story) => <div className="bg-neutral-4 p-4 rounded-lg"><Story /></div>],
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};
+
+export const Playground: Story = {
+  args: {
+    reactions: [
+      { emoji: '👍', count: 4, isActive: true },
+      { emoji: '🎉', count: 2 },
+    ],
+  },
 };

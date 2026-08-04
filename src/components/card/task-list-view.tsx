@@ -2,7 +2,9 @@ import { cn } from '../../utils/cn';
 import { TaskCard, type TaskCardProps } from './task-card';
 
 export interface TaskListViewProps {
+  /** Tasks rendered as a vertical stack, each spread onto a `TaskCard`. Renders an empty-state message when the array is empty. */
   tasks: TaskCardProps[];
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

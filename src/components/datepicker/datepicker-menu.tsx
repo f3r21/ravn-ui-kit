@@ -8,12 +8,16 @@ const MONTHS = [
 ];
 
 export interface DatePickerMenuProps {
-  /** Currently selected date */
+  /**
+   * Currently selected date. Passing this makes the component controlled;
+   * pair it with `onChange` to update the selection.
+   */
   value?: Date;
-  /** Default date (uncontrolled) */
+  /** Initial selected date when the component is uncontrolled. */
   defaultValue?: Date;
-  /** Called when a date is selected */
+  /** Called with the newly selected date when the user clicks a day. */
   onChange?: (date: Date) => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

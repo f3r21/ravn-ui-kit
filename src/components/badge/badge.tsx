@@ -1,8 +1,14 @@
 import { cn } from '../../utils/cn';
 
 export interface BadgeProps {
+  /**
+   * Visual style of the badge.
+   * @default 'neutral'
+   */
   variant?: 'neutral' | 'success' | 'warning' | 'danger';
+  /** Badge label / content. */
   children: React.ReactNode;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 

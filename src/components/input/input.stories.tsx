@@ -1,10 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
-  title: 'UI/Input',
+  title: 'Primitives/Input',
   component: Input,
   tags: ['autodocs'],
+  argTypes: {
+    isDisabled: { control: 'boolean' },
+  },
+  args: {
+    onChange: fn(),
+  },
 };
 
 export default meta;
@@ -17,7 +24,14 @@ export const Default: Story = {
   },
 };
 
-export const WithError: Story = {
+export const Playground: Story = {
+  args: {
+    label: 'Label',
+    placeholder: 'Type here...',
+  },
+};
+
+export const Error: Story = {
   args: {
     label: 'Correo Electrónico',
     placeholder: 'usuario@ravn.co',

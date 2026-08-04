@@ -2,19 +2,33 @@ import { cn } from '../../utils/cn';
 import { Badge } from '../badge/badge';
 
 export interface ProjectInfoProps {
-  /** Project name */
+  /** Project name. */
   name: string;
-  /** Short description or subtitle */
+  /** Short description or subtitle. */
   description?: string;
-  /** Status of the project */
+  /**
+   * Status of the project. Drives the badge label/color via `statusMap`.
+   * @default 'active'
+   */
   status?: 'active' | 'on-hold' | 'completed';
-  /** Total tasks count */
+  /**
+   * Total tasks count. The progress bar/row is hidden entirely when this is `0`.
+   * @default 0
+   */
   totalTasks?: number;
-  /** Completed tasks count */
+  /**
+   * Completed tasks count, used together with `totalTasks` to compute progress.
+   * @default 0
+   */
   completedTasks?: number;
-  /** Color accent for the left border stripe */
+  /**
+   * Color accent for the left border stripe and progress bar fill.
+   * @default 'primary'
+   */
   accentColor?: 'primary' | 'secondary' | 'tertiary' | 'neutral';
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /** Called when the card is clicked. When provided, the card also gets pointer/hover affordances. */
   onClick?: () => void;
 }
 

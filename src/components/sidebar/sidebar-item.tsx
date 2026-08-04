@@ -1,11 +1,28 @@
 import { cn } from '../../utils/cn';
 
+/**
+ * @remarks
+ * Figma defines a `SidebarItemWithOptions` variant that inherits from this
+ * component (Figma master: "SidebarGlobalItem"), adding extra affordances.
+ * That variant is not implemented here yet — it is gated behind Figma
+ * anatomy data (padding, active-state, extra-affordance diff) that hasn't
+ * been provided. See the project plan for tracking.
+ */
 export interface SidebarItemProps {
+  /** Optional icon rendered before the label. */
   icon?: React.ReactNode;
+  /** Text label displayed for the item. */
   label: string;
+  /**
+   * Whether the item is styled as the current/active selection.
+   * @default false
+   */
   isActive?: boolean;
+  /** Optional numeric badge rendered at the end of the item (e.g. unread count). */
   badgeCount?: number;
+  /** Called when the item is clicked. */
   onClick?: () => void;
+  /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
