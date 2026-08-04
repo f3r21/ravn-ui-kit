@@ -6,8 +6,6 @@ export interface ApplicationSidebarProps {
   logo?: React.ReactNode;
   /** Navigation items to render */
   items: SidebarItemProps[];
-  /** Optional footer content (e.g. user profile) */
-  footer?: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -15,33 +13,47 @@ export interface ApplicationSidebarProps {
 /**
  * ApplicationSidebar
  *
- * Full-width sidebar container matching the Figma "Sidebar" component
- * (ApplicationSidebar01.md).
- * - Background: neutral-4 (#2C2F33)
- * - Width: 232px (fixed, per Figma)
- * - Border-radius: 24px (radius-lg)
- * - Stacks SidebarItem list with a logo at top and an optional footer
+ * @remarks
+ * Source: `ApplicationSidebar00/01.md`, cross-checked against the real
+ * in-context "Sidebar" layer in `Mockups/Dashboard Default View/Dashboard
+ * Mockup.md` (the only ground-truth signal that resolves which of the two
+ * component-doc exports is the real desktop size).
+ *
+ * `01.md`'s "Sidebar" (232×836, `neutral.4` #2C2F33, `border-radius: 24px`,
+ * logo top:12px, "Sidebar Tab List" starting at top:96px) matches the
+ * Dashboard Mockup's Sidebar layer property-for-property (same width,
+ * height, radius, and offsets). `00.md`'s "Sidebar" (310×844, no
+ * border-radius, logo top:36px, tab list top:120px) never appears in any
+ * real desktop screen — its only other occurrences are `SideBarItem00.md`
+ * (already flagged in Chunk 8 as Android/iOS mobile-breakpoint noise) and
+ * `Mockups/Mobile/Android/.../Sidebar.md`. So 310px is the mobile-Android
+ * sidebar width, not a second real desktop variant — no `size` prop here,
+ * matching the single-size precedent Chunk 8 set for the mobile-vs-desktop
+ * split on SidebarItem's source files.
+ *
+ * No export — the isolated component doc, the in-context Dashboard Mockup,
+ * or any other mockup file — shows a footer/user-profile row anywhere
+ * inside the Sidebar's bounds; the only Avatar near this layout belongs to
+ * the Top Nav bar (Chunk 10's scope), not the sidebar. A previously-added
+ * `footer` prop had zero ground-truth basis and zero real consumers in this
+ * codebase — removed as fabricated, same treatment Chunk 4 gave Button's
+ * unfounded `size`/`isLoading` props.
  */
-export function ApplicationSidebar({
-  logo,
-  items,
-  footer,
-  className,
-}: ApplicationSidebarProps) {
+export function ApplicationSidebar({ logo, items, className }: ApplicationSidebarProps) {
   return (
     <nav
       aria-label="Main navigation"
       className={cn(
-        // 232px matches the Figma "Sidebar" frame (ApplicationSidebar01.md); rounded-lg = 24px border-radius on that same frame.
+        // 232px / rounded-lg (24px) matches the real "Sidebar" layer (ApplicationSidebar01.md + Dashboard Mockup.md).
         'flex flex-col w-[232px] h-full bg-neutral-4 rounded-lg select-none shrink-0',
         className
       )}
     >
-      {/* Logo / Branding -- horizontally centered per Figma ("Ravn / Logomark", left: calc(50% - 20px), top: 12px) */}
+      {/* Logo -- horizontally centered, top:12px, per Figma ("Ravn / Logomark", left: calc(50% - 20px), top: 12px).
+          Fixed h-24 (96px) so the tab list below always starts at the spec's top:96 offset regardless of the
+          supplied logo's intrinsic size. */}
       {logo ? (
-        <div className="flex items-center justify-center px-6 pt-3 pb-6 shrink-0">
-          {logo}
-        </div>
+        <div className="flex justify-center pt-3 h-24 shrink-0">{logo}</div>
       ) : null}
 
       {/* Navigation Items -- gap: 8px (gap-2) and 0 horizontal padding per Figma "Sidebar Tab List" (each SidebarItem carries its own inset) */}
@@ -50,13 +62,6 @@ export function ApplicationSidebar({
           <SidebarItem key={idx} {...item} />
         ))}
       </div>
-
-      {/* Footer (e.g. user profile row) */}
-      {footer ? (
-        <div className="px-4 py-5 border-t border-neutral-3/30 shrink-0">
-          {footer}
-        </div>
-      ) : null}
     </nav>
   );
 }

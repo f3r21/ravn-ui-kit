@@ -39,7 +39,7 @@ export const Default: Story = {
     <>
       <ApplicationSidebar logo={args.logo} items={args.items ?? navItems} />
       <div className="flex-1 p-8 bg-neutral-5 text-neutral-2 font-sans text-sm">
-        ← Área de contenido principal
+        ← Main content area
       </div>
     </>
   ),

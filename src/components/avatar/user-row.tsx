@@ -29,7 +29,8 @@ export interface UserRowProps {
  *
  * Figma: "User" COMPONENT inside the "Avatar" frame.
  * - Layout: Avatar (left) + name + role (stacked, right)
- * - Used in the ApplicationSidebar footer and in Assignee Modal
+ * - Used in the Assignee Modal (no ApplicationSidebar footer exists in the
+ *   ground truth — see the Chunk 9 note in `application-sidebar.tsx`)
  * - Background: transparent
  */
 export function UserRow({
