@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Fecha de Vencimiento',
+    label: 'Due Date',
   },
 };
 
@@ -31,14 +31,14 @@ export const Playground: Story = {
 
 export const Error: Story = {
   args: {
-    label: 'Fecha Requerida',
-    error: 'La fecha no puede ser en el pasado.',
+    label: 'Required Date',
+    error: 'The date cannot be in the past.',
   },
 };
 
 export const Disabled: Story = {
   args: {
-    label: 'Fecha Deshabilitada',
+    label: 'Disabled Date',
     isDisabled: true,
   },
 };

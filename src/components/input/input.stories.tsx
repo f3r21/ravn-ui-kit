@@ -19,8 +19,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Nombre de la Tarea',
-    placeholder: 'Ej. Diseñar prototipo...',
+    label: 'Task Name',
+    placeholder: 'E.g. Design prototype...',
   },
 };
 
@@ -33,16 +33,16 @@ export const Playground: Story = {
 
 export const Error: Story = {
   args: {
-    label: 'Correo Electrónico',
-    placeholder: 'usuario@ravn.co',
-    error: 'El correo ingresado no es válido.',
+    label: 'Email',
+    placeholder: 'user@ravn.co',
+    error: 'The email entered is not valid.',
   },
 };
 
 export const Disabled: Story = {
   args: {
-    label: 'Campo Deshabilitado',
-    value: 'Valor no editable',
+    label: 'Disabled Field',
+    value: 'Non-editable value',
     isDisabled: true,
   },
 };

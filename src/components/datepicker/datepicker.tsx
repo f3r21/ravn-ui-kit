@@ -17,7 +17,7 @@ export interface DatepickerProps extends AriaTextFieldProps {
 export function Datepicker({ label, error, className, ...props }: DatepickerProps) {
   const ref = useRef<HTMLInputElement>(null);
   const { labelProps, inputProps, errorMessageProps } = useTextField(
-    { ...props, label, type: 'date' },
+    { ...props, label, type: 'date', isInvalid: !!error, errorMessage: error },
     ref
   );
 

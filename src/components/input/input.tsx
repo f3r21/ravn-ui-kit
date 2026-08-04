@@ -16,8 +16,10 @@ export interface InputProps extends AriaTextFieldProps {
 
 export function Input({ label, error, className, ...props }: InputProps) {
   const ref = useRef<HTMLInputElement>(null);
-  const { labelProps, inputProps, errorMessageProps } =
-    useTextField({ ...props, label }, ref);
+  const { labelProps, inputProps, errorMessageProps } = useTextField(
+    { ...props, label, isInvalid: !!error, errorMessage: error },
+    ref
+  );
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
