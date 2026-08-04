@@ -70,11 +70,11 @@ export interface DatePickerMenuProps {
  *   "today"); resolved to the one verified treatment (border only) applied to the selected date.
  * - Two full-width 1px neutral-2 dividers (header/content, content/footer) were missing entirely.
  * - Footer: centered text-only button, primary-4, SF Pro Text Regular 14px/22px, with a
- *   permanently-hidden ("display: none") search icon slot. Its label renders as the literal
- *   layer name "Button" in all 3 real instances (never customized), so the exact wording is
- *   unverified -- interpreted as the standard "jump to today" action, the most conservative
- *   fit for a lone accent-colored footer button in a due-date picker (same class of judgment
- *   call as Chunk 10's Frame 648 clear-search interpretation).
+ *   permanently-hidden ("display: none") search icon slot. Confirmed via direct Figma
+ *   inspection (Dev Mode "Content" field, not just the layer's name -- the static CSS export
+ *   only captured the layer name "Button" and couldn't distinguish it from actual rendered
+ *   text) that the button's real content is literally "Today", matching the "jump to today"
+ *   behavior already implemented -- this was a correct guess, now a confirmed fact.
  */
 export function DatePickerMenu({
   value: controlledValue,
