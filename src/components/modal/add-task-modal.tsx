@@ -128,6 +128,12 @@ export function AddTaskModal({
       )}
     >
       <input
+        // This widget only mounts in response to an explicit user "add task"
+        // action (Chunk 13: borderless inline widget, no dialog wrapper), so
+        // moving focus to the title field immediately is the same intentional
+        // open-focus pattern as Modal's FocusScope autoFocus above, not the
+        // anti-pattern this rule targets.
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
         value={title}
         onChange={e => setTitle(e.target.value)}

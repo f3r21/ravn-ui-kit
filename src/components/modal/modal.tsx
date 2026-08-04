@@ -42,6 +42,10 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
       {...underlayProps}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     >
+      {/* eslint-disable-next-line jsx-a11y/no-autofocus -- react-aria's FocusScope
+          `autoFocus` is the WAI-ARIA dialog focus-management pattern (move focus
+          into the dialog on open, restore it on close), not the raw DOM
+          autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
         <div
           {...overlayProps}

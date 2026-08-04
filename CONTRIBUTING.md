@@ -34,7 +34,7 @@ buckets:
 | `Design Tokens/*` | Colors, Typography, and any future raw token reference pages (MDX) |
 | `Primitives/*` | Small, single-purpose controls with no internal component dependencies (Button, Input, Badge, Tag, Switch, Tabs, ...) |
 | `Components/*` | Composed, self-contained widgets (Avatar, UserRow, Card, TaskCard, DatePicker, Modal, ...) |
-| `Layout/*` | App-shell / composition-heavy pieces that arrange other components (ApplicationSidebar, TopNav, TaskColumn, TaskTable, ...) |
+| `Layout/*` | App-shell / composition-heavy pieces that arrange other components (ApplicationSidebar, TopNav, TaskListView, TaskTable, AppShell, ...) |
 
 If a component is really several facets of one Figma Component Set split into
 separate files for tooling reasons (e.g. `DatePicker/Field` + `DatePicker/Menu`,
@@ -103,6 +103,7 @@ that controlled mode doesn't mutate internal state on its own.
 ## Before committing
 
 ```bash
+npm run lint
 npm run typecheck
 npm run test
 npm run build
