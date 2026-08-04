@@ -26,15 +26,24 @@ export interface SegmentedControlProps {
 /**
  * SegmentedControl
  *
- * Figma: "Segmented Control" COMPONENT inside "Button, Switch Button" frame.
- * - Container: bg-neutral-4, padding: 4px, border-radius: 10px (matches no
- *   existing --radius-* step, so rendered as an arbitrary-value class,
- *   same convention as application-sidebar.tsx's w-[232px]).
- * - Segments: 0 gap between them, height 32px, padding 4px 24px, rounded-sm.
- * - Active segment: bg-neutral-2 pill, text neutral-1.
- * - Inactive: text neutral-1 too -- Figma shows identical (white) label
- *   color for both states, distinguishing selection purely via the pill
- *   background fill, not a text-color change.
+ * Figma: "Segmented Control" COMPONENT inside "Button, Switch Button00/01.md" frame.
+ * - Container: bg-neutral-4, padding: 4px, border-radius: 10px, now via the
+ *   `--radius-10` token (`rounded-10`) added in Chunk 1 -- previously an
+ *   arbitrary-value class before that token existed.
+ * - Segments: 0 gap between them, height 32px, padding 4px 24px, radius 8px
+ *   (`rounded-sm`, which Chunk 1 redefined to 8px).
+ * - Active segment: bg-neutral-2 pill + Drop Shadow Small (`shadow-small`
+ *   token, Chunk 1). Text: IOS/Subheadline/S.regular -- 13px/13px,
+ *   letter-spacing 1px, weight 400 -- rendered via the shared `--font-sans`
+ *   token per the Chunk 1 "no separate SF Pro Text token" precedent.
+ * - Inactive: same 13px/regular/neutral-1 label -- Figma shows identical
+ *   (white) label color for both states, distinguishing selection purely via
+ *   the pill background fill, not a text-color change. Spec also carries a
+ *   `filter: drop-shadow` on the inactive pill, but that's a Figma effect on
+ *   an otherwise-transparent shape with no visible box -- applying our
+ *   `shadow-small` (a `box-shadow`, which always renders behind the full
+ *   element box) there would draw a visible phantom rectangle that doesn't
+ *   exist in the reference; intentionally omitted.
  */
 export function SegmentedControl({
   options,
@@ -59,7 +68,7 @@ export function SegmentedControl({
       role="group"
       aria-label="View"
       className={cn(
-        'inline-flex items-center gap-0 p-1 bg-neutral-4 rounded-[10px]',
+        'inline-flex items-center gap-0 p-1 bg-neutral-4 rounded-10',
         className
       )}
     >
@@ -73,8 +82,8 @@ export function SegmentedControl({
             aria-checked={isSelected}
             onClick={() => handleSelect(opt.id)}
             className={cn(
-              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-sm font-semibold rounded-sm transition-all cursor-pointer font-sans select-none text-neutral-1',
-              isSelected ? 'bg-neutral-2 shadow-sm' : ''
+              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-[13px] leading-[13px] tracking-[1px] font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-neutral-1',
+              isSelected ? 'bg-neutral-2 shadow-small' : ''
             )}
           >
             {opt.icon ? (

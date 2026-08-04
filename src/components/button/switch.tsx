@@ -35,14 +35,16 @@ export interface SwitchProps {
  * OFF → bg-neutral-3 (#393D41), thumb stays left
  *
  * @remarks
- * NOT VERIFIED against real Figma data: the assigned export files
- * ("Button, Switch Button00.md" / "01.md") contain no track+thumb boolean
- * toggle shape at all -- every "Switch button" layer in that export is
- * actually a two-option pill selector (matching SegmentedControl, not this
- * component). No literal switch/thumb/track CSS exists to cross-check
- * these on/off colors or the 44x24px track / 20x20px thumb sizing against.
- * Left unchanged; flagging for a human to confirm against the correct
- * Figma frame if one exists elsewhere.
+ * NOT VERIFIED against real Figma data. Re-confirmed in Chunk 5: grepped
+ * the entire ground-truth `UI-Kit` export (not just the assigned "Button,
+ * Switch Button00/01.md" files) for "toggle"/"thumb"/"track" -- no hits.
+ * Every "Switch button" layer in the real export is a two-option pill
+ * selector (see `SegmentedControl`), not a boolean track+thumb toggle.
+ * There is no literal switch/thumb/track CSS anywhere in the ground truth
+ * to cross-check these on/off colors or the 44x24px track / 20x20px thumb
+ * sizing against. Left unchanged since nothing contradicts it and it's a
+ * reasonable standalone pattern; flagging for a human to confirm against
+ * the correct Figma frame if one exists elsewhere outside this export.
  */
 export function Switch({
   label,
