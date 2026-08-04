@@ -26,7 +26,7 @@ export function Input({ label, error, className, ...props }: InputProps) {
       {label ? (
         <label
           {...labelProps}
-          className="text-xs font-semibold text-neutral-3 uppercase tracking-wider font-sans"
+          className="text-field-label font-semibold text-neutral-3 uppercase font-sans"
         >
           {label}
         </label>
@@ -35,13 +35,13 @@ export function Input({ label, error, className, ...props }: InputProps) {
         {...inputProps}
         ref={ref}
         className={cn(
-          'h-10 px-3 py-2 text-sm bg-neutral-1 text-neutral-5 border border-neutral-2 rounded-md placeholder:text-neutral-2 transition-colors outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-neutral-1',
+          'h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md placeholder:text-muted transition-colors outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral',
           error && 'border-danger-5 focus-visible:outline-danger-5',
           className
         )}
       />
       {error ? (
-        <span {...errorMessageProps} className="text-xs text-danger-5 font-sans">
+        <span {...errorMessageProps} className="text-xs text-danger font-sans">
           {error}
         </span>
       ) : null}

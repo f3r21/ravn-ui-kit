@@ -98,7 +98,7 @@ export function LabelCheckbox({
         ) : null}
       </svg>
       {/* Desktop/Body/M/regular -- SF Pro Display, 15px/24px, letter-spacing 0.75px (tracking-wider) */}
-      <span className="text-[15px] leading-6 tracking-wider font-normal font-sans text-neutral-1">
+      <span className="text-body-m font-normal font-sans text-neutral-1">
         {children}
       </span>
     </label>

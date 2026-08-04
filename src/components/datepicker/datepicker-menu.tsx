@@ -175,7 +175,7 @@ export function DatePickerMenu({
           </button>
         </div>
 
-        <span className="font-sans font-semibold text-sm leading-[22px] text-neutral-1">
+        <span className="font-sans font-semibold text-body-sm text-neutral-1">
           {MONTHS[viewMonth]} {viewYear}
         </span>
 
@@ -205,7 +205,7 @@ export function DatePickerMenu({
       <div className="flex flex-col px-3 py-2">
         <div className="grid grid-cols-7">
           {DAYS.map(d => (
-            <span key={d} className="text-center text-sm leading-[22px] font-normal text-neutral-1 font-sans">
+            <span key={d} className="text-center text-body-sm font-normal text-neutral-1 font-sans">
               {d}
             </span>
           ))}
@@ -223,7 +223,7 @@ export function DatePickerMenu({
                 aria-label={date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                 aria-pressed={isSelected}
                 className={cn(
-                  'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-sm leading-[22px] font-normal font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
+                  'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-body-sm font-normal font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
                   isSelected
                     ? 'border border-primary-4 text-neutral-1'
                     : isCurrentMonth
@@ -245,7 +245,7 @@ export function DatePickerMenu({
         <button
           type="button"
           onClick={goToday}
-          className="text-sm leading-[22px] font-normal font-sans text-primary-4 hover:opacity-80 transition-opacity cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
+          className="text-body-sm font-normal font-sans text-primary-4 hover:opacity-80 transition-opacity cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
         >
           Today
         </button>

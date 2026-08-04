@@ -78,7 +78,7 @@ export function SearchBar({
       <input
         {...inputProps}
         ref={ref}
-        className="flex-1 bg-transparent text-[15px] leading-6 tracking-wider text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
+        className="flex-1 bg-transparent text-body-m text-neutral-1 placeholder:text-neutral-2 outline-none font-sans min-w-0"
       />
     </div>
   );

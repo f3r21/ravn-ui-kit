@@ -33,7 +33,7 @@ const CheckIcon = ({ className }: { className?: string }) => (
 // Desktop/Body/M/regular: SF Pro Display, 15px/24px, weight 400, letter-spacing 0.75px
 // (tracking-wider, exact at this size per the Chunk 2/3 convention) -- shared by every cell's
 // text content across the whole table (body cells and header cells alike).
-const CELL_TEXT = 'text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans';
+const CELL_TEXT = 'text-body-m font-normal text-neutral-1 font-sans';
 
 // Every body/header cell in "Task Table Row" and "Table Header Cell" shares this exact chrome:
 // neutral.4 fill, 1px neutral.3 border, fixed 56px height. Cells sit flush against each other
@@ -394,7 +394,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
                   <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
                     <div className="flex items-center gap-2 h-14 px-4 bg-neutral-4 rounded-t-4">
                       <CaretIcon className="w-6 h-6 shrink-0 text-neutral-2" />
-                      <h3 className="flex-1 min-w-0 truncate text-[18px] leading-8 font-semibold tracking-[0.75px] text-neutral-1 font-sans">
+                      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-neutral-1 font-sans">
                         {group.title}
                       </h3>
                       {group.actions}

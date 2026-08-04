@@ -67,10 +67,15 @@ like the one above.
 
 ## Fidelity notes worth knowing
 
-- There is no semantic color-alias layer (`text-main`, `surface-neutral`,
-  etc.) yet — components consume the numbered ramps directly
-  (`--color-primary-4`, `--color-neutral-3`, …). Adding aliases is a
-  separate, larger follow-up, not bundled into this audit.
+- A semantic color-alias layer (`text-main`, `surface-neutral`, etc. — see
+  **Design Tokens → Colors**) and a type-scale layer (`text-body-m`, etc. —
+  see **Design Tokens → Typography**) now exist. Aliases are consumed by a
+  small proof-of-concept subset (`task-card.tsx`, `input.tsx`, `card.tsx`,
+  `sidebar-item.tsx`); the remaining ~40 legacy call sites intentionally
+  still use raw ramp tokens directly (`--color-primary-4`,
+  `--color-neutral-3`, …), pending a tracked future cleanup. The type-scale
+  layer, by contrast, was fully migrated everywhere it applies — see its own
+  page for why that migration strategy differs from the color aliases'.
 - Border radii are literal per-component values in the source designs, not a
   clean t-shirt ramp — see **Design Tokens → Colors** for the full token
   table and which real component each one was verified against.

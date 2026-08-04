@@ -16,12 +16,6 @@ import { Meta, Typeset } from '@storybook/blocks';
 > `--font-display` and `--font-heading` were also unused by any component in
 > this codebase, so removing them carries no behavior change.
 >
-> There is still no type-scale (font-size / line-height / letter-spacing)
-> token layer — components use Tailwind's default text utilities directly.
-> The Branding spec does define a clean `Desktop/Display/*` and
-> `Desktop/Body/*` size scale that could back one; that's a separate,
-> larger follow-up, not bundled into this fix.
->
 > Two things intentionally NOT encoded as tokens, despite appearing in the
 > exports: `'Roboto'` only appears inside `Android/*`-prefixed reference
 > frames (the native Android app shown for comparison, not real desktop web
@@ -40,3 +34,43 @@ import { Meta, Typeset } from '@storybook/blocks';
 />
 
 **`--font-sans`**: `'SF Pro Display', system-ui, sans-serif` — the only font family used across the real desktop UI, applied via Tailwind's `font-sans` utility.
+
+## Type scale
+
+Seven named tokens, each carrying font-size paired with line-height and
+(where the source has one) letter-spacing via Tailwind v4's `--text-{name}`
+mechanism — applying one utility (e.g. `text-body-m`) sets all three at once.
+Consolidated from a full survey of every real (non-story/test) occurrence
+already in the codebase — not Figma's Branding-spec `Desktop/Display/*` /
+`Desktop/Body/*` ladder, which isn't linked in this repo yet — so every value
+below matches an existing, already-shipped call site exactly, no invented
+scale. Font-*weight* stays a separate `font-normal`/`font-semibold` utility
+applied alongside the size token, since e.g. `body-m` is used at both weights
+in real code.
+
+| Token | Size | Line-height | Letter-spacing | Figma name (if documented) | Consumers |
+| --- | --- | --- | --- | --- | --- |
+| `--text-body-m` | 15px | 24px | 0.05em | `Desktop/Body/M` | text-button, reactions, task-card, task-table, add-task-modal, estimate-modal, sidebar-item, label-checkbox, tag, search-bar, user-row |
+| `--text-body-l` | 18px | 32px | 0.75px | `Desktop/Body/L/bold` | project-info, task-table |
+| `--text-body-xl` | 20px | 32px | 0.05em | `Desktop/Body/XL/bold` | add-task-modal, assignee-modal, estimate-modal |
+| `--text-body-sm` | 14px | 22px | *(none)* | — code-consolidated only | datepicker-menu |
+| `--text-field-label` | 12px | 16px | 0.05em | — code-consolidated only | input, datepicker |
+| `--text-tab-label` | 13px | 20px | 0.25px | `Android/Body/S/regular` | tabs |
+| `--text-control-label` | 13px | 13px | 1px | `iOS/Subheadline/S/regular` | segmented-control |
+
+`body-sm` and `field-label` have no documented Figma name — they were
+consolidated purely from in-code usage, per an explicit decision not to spend
+this kit's limited Figma access sourcing them from the Branding spec this
+round. `tab-label`/`control-label` are kept as their own single-consumer
+tokens rather than forced into the `body-*` ladder, mirroring the existing
+`--radius-2/4/10` precedent in `theme.css` (a real value kept as its own
+token rather than inventing a blended t-shirt size).
+
+Deliberately excluded: plain `text-xs`/`text-sm` usages that already exactly
+match Tailwind's own defaults; `user-row.tsx`'s `roleTextSizes` (its own
+comment admits "scaled by eye," no spec — tokenizing an admitted guess would
+launder it as verified); single-occurrence defaults like `modal.tsx`'s
+`text-base font-bold`; and icon-sizing `text-base leading-none` on glyphs.
+
+The full `Desktop/Display/*` ladder (sizes not currently used anywhere in
+this codebase) remains a distinct, still-deferred follow-up if ever pursued.

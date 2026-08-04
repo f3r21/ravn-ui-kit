@@ -30,8 +30,20 @@ export interface ReactionsProps {
  * Typography is Desktop/Body/M/regular: SF Pro Display, 15px/24px, weight 400, letter-spacing
  * 0.75px (tracking-wider, exact at this size per the Chunk 2/3 convention) — was previously a
  * fabricated `text-xs font-semibold` (12px/700) with no spec basis. Active reaction gets a
- * primary-4 border + background tint; no active-state instance was captured in the export to
- * confirm this against, so it's preserved as-is rather than guessed at.
+ * primary-4 border + background tint; confirmed via a full-file Figma structural check (Chunk 24,
+ * fileKey `ZUAB3jXFyKFktoAzvN7h1T`) that "Reactions" has no variant set at all — a single static
+ * COMPONENT (#53:17490), and every one of its 505 instances across the entire file uses the
+ * identical no-fill/no-border template — so there's genuinely no active/pressed state anywhere in
+ * spec to confirm this against, not merely an absent sample. Kept unchanged (not contradicted, and
+ * functionally necessary for a working toggle), the same bar as Skeleton/Datepicker's native input.
+ *
+ * Also discovered in that same check: the 3 real reaction instances inside "Task Card" use named
+ * icons `remix-icons/line/editor/attachment-2`, `remix-icons/line/editor/node-tree`, and
+ * `remix-icons/line/communication/chat-3-line` — not emoji glyphs. This suggests the real row may
+ * represent task metadata badges (attachments/subtasks/comments), not user-togglable emoji
+ * reactions, which would be a mismatch with this component's `emoji`/`isActive`/`onToggle` API.
+ * Flagging as a significant, product-level follow-up decision — not resolved here, since this was
+ * a styling-verification pass, not license to redesign the API on a guess.
  */
 export function Reactions({ reactions, onToggle, className }: ReactionsProps) {
   return (
@@ -44,7 +56,7 @@ export function Reactions({ reactions, onToggle, className }: ReactionsProps) {
           onClick={() => onToggle?.(r.emoji)}
           aria-pressed={r.isActive}
           className={cn(
-            'inline-flex items-center gap-1 text-[15px] leading-6 font-normal tracking-wider font-sans transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs',
+            'inline-flex items-center gap-1 text-body-m font-normal font-sans transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs',
             r.isActive
               ? 'px-2 py-0.5 rounded-full border bg-primary-4/10 border-primary-4/50 text-neutral-1'
               : 'text-neutral-1 hover:text-primary-4'

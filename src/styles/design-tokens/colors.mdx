@@ -6,7 +6,6 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
 
 > **Verified against `UI Guidelines/Design. Colors.md`** (the ground-truth
 > Figma CSS export) — every ramp below matches its source hex value exactly.
-> No semantic aliases exist yet — see `README.md` for why.
 
 <ColorPalette>
   <ColorItem
@@ -114,6 +113,37 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
     colors={{ blue: '#2f61bf' }}
   />
 </ColorPalette>
+
+## Semantic aliases
+
+Role-based names layered over the ramps above, so components can express intent
+(e.g. "this is muted text") instead of a raw ramp position. Every alias points
+at an already-verified token — no new hex introduced. Named as bare nouns
+(not e.g. `--color-text-main`) because Tailwind v4 generates
+`{property}-{token-name}` utilities — prefixing the name with the property
+would double up (`text-text-main`) instead of the intended `text-main`.
+
+| Alias | Aliases | Utility | Role | Consumers |
+| --- | --- | --- | --- | --- |
+| `--color-main` | `neutral-1` | `text-main` | Primary readable text on the dark shell | `task-card.tsx` |
+| `--color-muted` | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, placeholders | `input.tsx` |
+| `--color-interactive` | `primary-4` | `text-interactive` | Active/interactive text & icons | `sidebar-item.tsx` |
+| `--color-danger` | `danger-5` | `text-danger` | Error/validation text | `input.tsx` |
+| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral` | Light input/card background | `card.tsx`, `input.tsx` |
+| `--color-subtle` | `neutral-2` | `border-subtle` | Default hairline border | `card.tsx`, `input.tsx`, `task-card.tsx` |
+
+`--color-muted` and `--color-subtle` both intentionally alias `neutral-2` —
+same ramp step, different role depending on which property consumes it; this
+is exactly why a role-based layer earns its keep over the raw ramp.
+
+Only `task-card.tsx`, `input.tsx`, `card.tsx`, and `sidebar-item.tsx` consume
+these aliases so far (a deliberate proof-of-concept subset, not a full sweep —
+choosing which alias fits a given raw-ramp call site is a real per-site
+judgment call, unlike the type-scale migration below). The remaining ~40
+call sites across the kit intentionally still use raw ramp tokens directly,
+pending a tracked future cleanup chunk. Dark-surface-hierarchy aliases
+(distinguishing `neutral-3`/`neutral-4`/`neutral-5` as card-bg vs. hover-bg
+vs. shell-bg) are a natural next-phase candidate, not included here.
 
 ## Border radius
 

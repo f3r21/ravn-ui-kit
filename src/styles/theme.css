@@ -67,6 +67,26 @@
      (Components/Tags00.md, Tags01.md) */
   --color-blue: #2f61bf;
 
+  /* Semantic aliases - role-based names over the raw ramps above, added so
+     components can express intent (e.g. "this is muted text") instead of a
+     ramp position. Every value aliases an already-verified token above, no
+     new hex introduced. Named as bare nouns (not e.g. `--color-text-main`)
+     because Tailwind v4 generates `{property}-{token-name}` utilities -
+     prefixing the name with the property would double up (`text-text-main`)
+     instead of the intended `text-main`. */
+  --color-main: var(--color-neutral-1); /* primary readable text on the dark shell */
+  --color-muted: var(--color-neutral-2); /* secondary/de-emphasized text, placeholders */
+  --color-interactive: var(--color-primary-4); /* active/interactive text & icons */
+  --color-danger: var(--color-danger-5); /* error/validation text */
+  --color-surface-neutral: var(--color-neutral-1); /* light input/card background */
+  --color-subtle: var(--color-neutral-2); /* default hairline border */
+  /* Note: --color-muted and --color-subtle both alias neutral-2 on purpose -
+     same ramp step, different role depending on which property consumes it.
+     Dark-surface-hierarchy aliases (card-bg vs. hover-bg vs. shell-bg across
+     neutral-3/4/5) are intentionally NOT included yet - those roles are real
+     but distinguishing them confidently needs more design judgment than this
+     initial small set; a natural next-phase candidate, not guessed here. */
+
   /* Typography Families */
   /* Re-verified directly against UI Guidelines/Branding. Desktop.md: every
      "Desktop/Display/*" and "Desktop/Body/*" layer (the real component type
@@ -119,4 +139,37 @@
   --shadow-small: 0px 0px 16px rgba(0, 0, 0, 0.04); /* Button, Switch Button00/01.md - segmented-control active pill */
   --shadow-elevation: 0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12); /* Datepicker.md dropdown */
   --shadow-nav: 0px 2px 0px #2c2f33; /* Top Navigation Bar00.md hard-edge separator */
+
+  /* Type scale - consolidated from the values already in use across
+     components (not Figma's Branding-spec Desktop/Display+Body ladder,
+     which isn't linked in this repo yet); each tuple below matches an
+     existing, already-shipped call site exactly, no invented values. Weight
+     stays a separate font-normal/font-semibold utility applied alongside the
+     size token, since e.g. body-m is used at both weights in real code. */
+  --text-body-m: 15px; /* text-button, reactions, task-card, task-table, add-task-modal, estimate-modal, sidebar-item, label-checkbox, tag, search-bar, user-row (Desktop/Body/M) */
+  --text-body-m--line-height: 1.5rem;
+  --text-body-m--letter-spacing: 0.05em;
+
+  --text-body-l: 18px; /* project-info, task-table (Desktop/Body/L/bold) */
+  --text-body-l--line-height: 2rem;
+  --text-body-l--letter-spacing: 0.75px;
+
+  --text-body-xl: 20px; /* add-task-modal, assignee-modal, estimate-modal (Desktop/Body/XL/bold) */
+  --text-body-xl--line-height: 2rem;
+  --text-body-xl--letter-spacing: 0.05em;
+
+  --text-body-sm: 14px; /* datepicker-menu - code-consolidated only, no documented Figma name */
+  --text-body-sm--line-height: 22px;
+
+  --text-field-label: 12px; /* input, datepicker uppercase field labels - code-consolidated only */
+  --text-field-label--line-height: 1rem;
+  --text-field-label--letter-spacing: 0.05em;
+
+  --text-tab-label: 13px; /* tabs (Android/Body/S/regular) */
+  --text-tab-label--line-height: 1.25rem;
+  --text-tab-label--letter-spacing: 0.25px;
+
+  --text-control-label: 13px; /* segmented-control (iOS/Subheadline/S/regular) */
+  --text-control-label--line-height: 13px;
+  --text-control-label--letter-spacing: 1px;
 }

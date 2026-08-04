@@ -68,7 +68,7 @@ export function Tag({
         // `rounded` step) -- matches Figma "Tag" component exactly (Style=Solid/Outline,
         // all Type variants, Tags00/01.md). Typography: Desktop/Body/M/bold - SF Pro
         // Display, 15px/24px, letter-spacing 0.75px (tracking-wider @ 15px), weight 600.
-        'inline-flex items-center gap-2 px-4 py-1 text-[15px] leading-6 font-semibold rounded tracking-wider font-sans select-none',
+        'inline-flex items-center gap-2 px-4 py-1 text-body-m font-semibold rounded font-sans select-none',
         outline ? styles[variant].outline : styles[variant].solid,
         className
       )}

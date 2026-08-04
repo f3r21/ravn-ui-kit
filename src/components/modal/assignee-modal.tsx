@@ -43,7 +43,7 @@ export function AssigneeModal({ assignees, onSelect, className }: AssigneeModalP
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-[20px] leading-8 font-semibold tracking-wider text-neutral-2 font-sans truncate">
+        <span className="text-body-xl font-semibold text-neutral-2 font-sans truncate">
           Assignee
         </span>
       </div>

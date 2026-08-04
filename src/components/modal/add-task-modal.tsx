@@ -139,7 +139,7 @@ export function AddTaskModal({
         onChange={e => setTitle(e.target.value)}
         placeholder="Task name"
         aria-label="Task name"
-        className="w-full bg-transparent text-[20px] leading-8 font-semibold tracking-wider text-neutral-1 placeholder:text-neutral-2 font-sans outline-none"
+        className="w-full bg-transparent text-body-xl font-semibold text-neutral-1 placeholder:text-neutral-2 font-sans outline-none"
       />
 
       <div className="flex items-center gap-4 w-full">
@@ -157,7 +157,7 @@ export function AddTaskModal({
             <button
               type="button"
               onClick={() => togglePopover('estimate')}
-              className="flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
               {points} Point{points !== 1 ? 's' : ''}
@@ -186,7 +186,7 @@ export function AddTaskModal({
             <button
               type="button"
               onClick={() => togglePopover('assignee')}
-              className="flex items-center gap-2 h-8 px-2 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-neutral-1 font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
               {assignee.name}

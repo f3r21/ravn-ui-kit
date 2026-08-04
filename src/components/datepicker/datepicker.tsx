@@ -26,7 +26,7 @@ export function Datepicker({ label, error, className, ...props }: DatepickerProp
       {label ? (
         <label
           {...labelProps}
-          className="text-xs font-semibold text-neutral-3 uppercase tracking-wider font-sans"
+          className="text-field-label font-semibold text-neutral-3 uppercase font-sans"
         >
           {label}
         </label>

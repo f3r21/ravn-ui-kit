@@ -101,14 +101,19 @@ export function TaskCard({
         // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
-        'flex flex-col gap-4 p-4 bg-neutral-4 text-neutral-1 rounded-sm border border-transparent shadow-xs hover:border-neutral-2 transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
+        'flex flex-col gap-4 p-4 bg-neutral-4 text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
         className
       )}
     >
       {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317) — same real component
-          as the standalone `ProjectInfo`, reused here rather than duplicated. Figma also shows a
-          trailing chevron/expand "Icon Placeholder" next to the title with no corresponding prop —
-          flagged rather than guessed at, not implemented. */}
+          as the standalone `ProjectInfo`, reused here rather than duplicated. Figma's "Project
+          Info" instance here does include a trailing Icon Placeholder slot — confirmed via a
+          full-file Figma check (Chunk 24) that this is the exact same slot `ProjectInfo` already
+          exposes via its own `icon` prop; TaskCard just doesn't pass one through. The glyph itself
+          remains a generic, unnamed placeholder in the export (not a real "Arrow Chevron
+          Back/Forward" icon — those exist elsewhere in the file with distinct component IDs), so
+          the earlier "chevron/expand" description was a guess and has been corrected; still not
+          wired up, since there's no real icon identity to wire in without inventing one. */}
       <ProjectInfo title={title} />
 
       {/* Timer Row: Points & Due Date (Figma "Timer" auto-layout, Cards01.md L319-437 — points is
@@ -118,7 +123,7 @@ export function TaskCard({
           {points !== undefined ? (
             // Desktop/Body/M/bold: SF Pro Display, 15px/24px, weight 600, letter-spacing 0.75px
             // (tracking-wider, exact at this size). Was previously `text-sm font-bold` (14px/700).
-            <span className="text-[15px] leading-6 font-semibold tracking-wider text-neutral-1 font-sans">
+            <span className="text-body-m font-semibold text-main font-sans">
               {points} Pts
             </span>
           ) : null}
@@ -157,9 +162,13 @@ export function TaskCard({
         </div>
 
         {/* Figma's "Frame 653" (gap 16px) also shows a leading icon-only reaction slot with no
-            count ever rendered (`display: none` on its text layer) ahead of the 2 count+icon
-            widgets below — left unimplemented since it has no legible glyph or contradiction-free
-            interpretation, consistent with not inventing unlabeled functionality. */}
+            count ever rendered ahead of the 2 count+icon widgets below. A full-file Figma check
+            (Chunk 24) confirmed this is a consistent, deliberate pattern (identical across all 505
+            "Reactions" instances in the file, not a one-off), and that the 3 real icons used here
+            are named "attachment-2", "node-tree", and "chat-3-line" — not emoji — suggesting this
+            row may represent attachment/subtask/comment badges rather than user-togglable emoji
+            reactions (see `reactions.tsx`'s doc comment). Left unimplemented pending a product
+            decision on that mismatch, not guessed at here. */}
         {reactions.length > 0 ? (
           <Reactions reactions={reactions} onToggle={onReactionToggle} />
         ) : null}

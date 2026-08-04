@@ -60,9 +60,10 @@ npm run test             # Run unit tests with Vitest
 ## Design Tokens Architecture (Tailwind v4)
 
 Design tokens are centralized in `src/styles/theme.css` via Tailwind v4's `@theme`
-directive, as raw numbered ramps (no semantic aliases yet). Every value below is
-verified against a specific ground-truth Figma export — see `colors.mdx`'s
-radius/shadow tables in Storybook for the exact source of each one.
+directive, as raw numbered ramps plus a small semantic-alias layer on top. Every
+value below is verified against a specific ground-truth Figma export, or (for the
+type-scale tokens) consolidated from values already shipped in the codebase —
+see `colors.mdx`/`typography.mdx` in Storybook for the exact source of each one.
 
 - `--color-neutral-1` … `--color-neutral-5`
 - `--color-primary-1` … `--color-primary-4`
@@ -73,10 +74,14 @@ radius/shadow tables in Storybook for the exact source of each one.
 - `--color-danger-1` … `--color-danger-6`
 - `--color-transparent-light-*` / `--color-transparent-dark-*` (overlay opacities)
 - `--color-blue` (standalone accent, used only by Tag's `blue` type)
+- `--color-main` / `--color-muted` / `--color-interactive` / `--color-danger` / `--color-surface-neutral` / `--color-subtle` (semantic aliases over the ramps above)
 - `--font-sans` (verified against real Figma component exports as `'SF Pro Display'`)
+- `--text-body-m` / `--text-body-l` / `--text-body-xl` / `--text-body-sm` / `--text-field-label` / `--text-tab-label` / `--text-control-label` (type scale: size + line-height + letter-spacing)
 - `--radius-2` / `--radius-4` / `--radius-sm` (8px) / `--radius-10` / `--radius-md` (16px) / `--radius-lg` (24px) / `--radius-full`
 - `--shadow-small` / `--shadow-elevation` / `--shadow-nav`
 
 See **Design Tokens → Colors** and **Design Tokens → Typography** in Storybook
-for a rendered reference. Semantic aliases (e.g. `text-main`, `surface-neutral`)
-are a planned follow-up, not yet part of this library.
+for a rendered reference. The semantic aliases are consumed by a small
+proof-of-concept subset of components so far — the remaining call sites
+intentionally still use raw ramp tokens directly, pending a tracked future
+cleanup — while the type scale was migrated everywhere it applies.

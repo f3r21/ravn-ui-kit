@@ -41,7 +41,7 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-[20px] leading-8 font-semibold tracking-wider text-neutral-2 font-sans truncate">
+        <span className="text-body-xl font-semibold text-neutral-2 font-sans truncate">
           Estimate
         </span>
       </div>
@@ -52,7 +52,7 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
           onClick={() => onSelect(points)}
           aria-pressed={value === points}
           className={cn(
-            'flex items-center gap-2 h-8 px-4 rounded-xs text-[15px] leading-6 font-normal tracking-wider text-neutral-1 font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+            'flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-neutral-1 font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
             value === points ? 'bg-neutral-2' : 'hover:bg-neutral-2'
           )}
         >
