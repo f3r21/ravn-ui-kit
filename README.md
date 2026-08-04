@@ -67,7 +67,7 @@ directive, as raw numbered ramps (no semantic aliases yet):
 - `--color-warning-1` … `--color-warning-6`
 - `--color-danger-1` … `--color-danger-6`
 - `--color-transparent-light-*` / `--color-transparent-dark-*` (overlay opacities)
-- `--font-sans` / `--font-display` / `--font-heading`
+- `--font-sans` (verified against real Figma component exports as `'SF Pro Display'`)
 - `--radius-sm` / `--radius-md` / `--radius-lg` / `--radius-xl` / `--radius-full`
 
 See **Design Tokens → Colors** and **Design Tokens → Typography** in Storybook

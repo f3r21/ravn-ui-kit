@@ -64,9 +64,12 @@
   --color-transparent-dark-95: rgba(20, 20, 43, 0.95);
 
   /* Typography Families */
-  --font-sans: 'Open Sans', 'SF Pro Text', system-ui, sans-serif;
-  --font-display: 'SF Pro Display', 'DM Sans', sans-serif;
-  --font-heading: 'Poppins', 'Montserrat', sans-serif;
+  /* Confirmed against real Figma component exports (not the Colors/Branding
+     documentation tables, which use Open Sans for their own table text only):
+     every real UI element inspected (button labels, tags, inputs, avatar
+     names, sidebar nav labels) renders in SF Pro Display, at varying sizes —
+     there is no separate heading/display family in the actual desktop spec. */
+  --font-sans: 'SF Pro Display', system-ui, sans-serif;
 
   /* Border Radii */
   --radius-sm: 8px;

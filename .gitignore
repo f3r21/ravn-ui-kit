@@ -17,3 +17,6 @@ storybook-static/
 
 # Playwright MCP scratch artifacts
 .playwright-mcp/
+
+# Claude Code session state
+.claude/
