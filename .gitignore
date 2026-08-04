@@ -20,3 +20,14 @@ storybook-static/
 
 # Claude Code session state
 .claude/
+
+# corvus — managed, do not edit this block
+.corvusrc
+.claude/skills/figma-to-react-components/
+.claude/skills/design-variations/
+.claude/skills/type-system-audit/
+.claude/skills/agent-init-deep/
+.claude/skills/test-case-gen/
+.claude/skills/qa-happy-path/
+.claude/skills/qa-bug-fixer/
+# end corvus

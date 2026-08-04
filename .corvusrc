@@ -1,0 +1,3 @@
+skills=figma-to-react-components:4,design-variations:11,type-system-audit:7,agent-init-deep:6,test-case-gen:2,qa-happy-path:1,qa-bug-fixer:1
+
+install_dir=.claude/skills
