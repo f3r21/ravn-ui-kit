@@ -10,66 +10,12 @@ import { useButton, useCalendar, useCalendarCell, useCalendarGrid } from 'react-
 import { useCalendarState, type CalendarState } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { Popover, type PopoverProps } from '../popover/popover';
-
-const ChevronLeftIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m15 18-6-6 6-6" />
-  </svg>
-);
-
-const ChevronRightIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
-
-const ChevronDoubleLeftIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m18 18-6-6 6-6M12 18l-6-6 6-6" />
-  </svg>
-);
-
-const ChevronDoubleRightIcon = () => (
-  <svg
-    className="w-4 h-4"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m6 18 6-6-6-6M12 18l6-6-6-6" />
-  </svg>
-);
+import {
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from '../icons/icons';
 
 function toCalendarDate(date: Date): CalendarDate {
   return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
@@ -209,7 +155,7 @@ export function DatePickerMenu({
               aria-label="Previous year"
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
             >
-              <ChevronDoubleLeftIcon />
+              <ChevronDoubleLeftIcon className="w-4 h-4" />
             </button>
             <button
               {...prevMonthProps}
@@ -217,7 +163,7 @@ export function DatePickerMenu({
               aria-label="Previous month"
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
-              <ChevronLeftIcon />
+              <ChevronLeftIcon className="w-4 h-4" />
             </button>
           </div>
 
@@ -234,7 +180,7 @@ export function DatePickerMenu({
               aria-label="Next month"
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
-              <ChevronRightIcon />
+              <ChevronRightIcon className="w-4 h-4" />
             </button>
             <button
               type="button"
@@ -242,7 +188,7 @@ export function DatePickerMenu({
               aria-label="Next year"
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
             >
-              <ChevronDoubleRightIcon />
+              <ChevronDoubleRightIcon className="w-4 h-4" />
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTextField } from 'react-aria';
 import { cn } from '../../utils/cn';
+import { SearchIcon } from '../icons/icons';
 
 export interface SearchBarProps {
   /**
@@ -62,18 +63,7 @@ export function SearchBar({
 
   return (
     <div className={cn('inline-flex items-center gap-6 min-w-0', className)}>
-      {/* Search icon */}
-      <svg
-        className="w-6 h-6 text-muted shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-        aria-hidden
-      >
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.35-4.35" strokeLinecap="round" />
-      </svg>
+      <SearchIcon className="w-6 h-6 text-muted shrink-0" />
 
       <input
         {...inputProps}

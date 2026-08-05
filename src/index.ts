@@ -4,6 +4,9 @@ import './styles/theme.css';
 // ─── Utilities ────────────────────────────────────────────────────
 export * from './utils/cn';
 
+// ─── Icons ────────────────────────────────────────────────────────
+export * from './components/icons/icons';
+
 // ─── Button family ────────────────────────────────────────────────
 export * from './components/button/button';
 export * from './components/button/text-button';

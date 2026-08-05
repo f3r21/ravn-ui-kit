@@ -10,6 +10,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **An icon set** (`src/components/icons/`), exported from the package root — 21
+  glyphs covering every icon the kit draws internally plus every icon the
+  consuming app maintained separately. Previously the kit shipped **zero** icons
+  while baking ad-hoc inline `<svg>` literals into eleven of its own components,
+  and typed every icon slot (`SidebarItemProps.icon`, `TagProps.icon`,
+  `TaskMetaBadge.icon`, ...) as `React.ReactNode` — pushing the whole glyph
+  vocabulary onto the consumer with no shared source of truth.
+
+  Each icon is a separate export rather than one `<Icon name="..." />`, so an
+  unused glyph tree-shakes out and a typo is a compile error instead of a blank
+  render. Icons are decorative by default (`aria-hidden`), and promote themselves
+  to `role="img"` when given an `aria-label`/`aria-labelledby`. Sizing is the
+  caller's job via `className` — see the module doc comment for why the artboards
+  are deliberately _not_ normalised to square viewBoxes.
+
+  Every glyph records its provenance in one of three tiers: Figma-exported
+  (verbatim path data, 15 icons), reconstructed from Figma layout metrics
+  (`ChevronLeftIcon`/`ChevronRightIcon`, derived from the recorded box, stroke
+  width and percentage insets in `Date Picker.md`), or no Figma source at all
+  (`ChevronDownIcon`, the double chevrons, `CloseIcon` — engineering additions for
+  controls the design never drew, each with its reason stated).
+
 - Prettier (`format`, `format:check`), coverage reporting (`coverage`), and a
   `gate` script composing typecheck → lint → format:check → coverage. CI now runs
   the single `gate` command so it cannot drift from what `CONTRIBUTING.md` asks a
@@ -48,6 +70,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Changed
 
+- **Eleven components now render the design's real glyphs** instead of hand-drawn
+  approximations, as a side effect of adopting the icon set above. This is a
+  visual change, not just a refactor: the kit's local `AlarmIcon` was a drawn
+  clock face where the design uses `remix-icons/line/system/alarm-line`, and the
+  "estimate" trigger in `AddTaskModal`/`EstimateModal` was a flag where the design
+  uses its points glyph. Affected: `TaskCard`, `TaskTable`, `DatePickerMenu`,
+  `AddTaskModal`, `EstimateModal`, `Modal`, `Select`, `MultiSelect`, `SearchBar`,
+  `TopNav`. The date picker's navigation chevrons also drop from a 2.5px stroke to
+  the 2px the design records.
+- `TaskTable`'s internal `CheckIcon` renamed to `CheckboxBoxIcon` — it draws a
+  rounded square and has never contained a checkmark. It stays inline rather than
+  joining the icon set, as does `LabelCheckbox`'s box: both are renderings of a
+  control's state, not glyphs from the design's vocabulary. (The duplication
+  between the two is real and remains tracked in `MIGRATION_GAPS.md` Section 3 —
+  the fix there is one shared checkbox control, not one shared icon.)
+- Coverage thresholds ratcheted 79/80/73/79 → 81/81/76/81, following the icon
+  set's own test suite. Per `CONTRIBUTING.md` these only ever move upward.
 - `README.md` and `src/styles/introduction.mdx` now document both CSS
   integration paths (`theme.css` for Tailwind consumers, `ui-kit.css` as the
   fallback) instead of only the `theme.css` step, which alone leaves a

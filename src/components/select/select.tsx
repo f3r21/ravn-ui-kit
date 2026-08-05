@@ -4,6 +4,7 @@ import { useSelectState } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
+import { ChevronDownIcon } from '../icons/icons';
 
 export interface SelectProps<T extends object> extends AriaSelectProps<T> {
   /** Shown inside the trigger when no item is selected yet. */
@@ -75,7 +76,7 @@ export function Select<T extends object>({
         <span {...valueProps} className="flex-1 text-left truncate">
           {state.selectedItem ? state.selectedItem.rendered : placeholder}
         </span>
-        <ChevronDownIcon />
+        <ChevronDownIcon className="w-3 h-3 shrink-0" />
       </button>
 
       {state.isOpen ? (
@@ -86,18 +87,3 @@ export function Select<T extends object>({
     </div>
   );
 }
-
-const ChevronDownIcon = () => (
-  <svg
-    className="w-3 h-3 shrink-0"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);

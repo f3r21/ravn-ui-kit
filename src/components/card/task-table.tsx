@@ -2,6 +2,7 @@ import { cn } from '../../utils/cn';
 import { Avatar } from '../avatar/avatar';
 import { Tag } from '../tag/tag';
 import { Skeleton } from '../skeleton/skeleton';
+import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -18,39 +19,15 @@ const COLUMN_WIDTHS = {
   dueDate: 132,
 } as const;
 
-const CaretIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);
-
-// remix-icons/line/system/arrow-right-s-line — the real icon paired with the "Details" link
-// text below, confirmed via live Figma access (Chunk 25).
-const ArrowRightIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
-
-const CheckIcon = ({ className }: { className?: string }) => (
+// The empty rounded square behind a row-select checkbox. Deliberately *not* part of the
+// kit's icon set: it is this control's own chrome rather than a glyph from the design's
+// vocabulary, it has no Figma identity of its own, and `LabelCheckbox` draws the same box
+// with a check inside it depending on state — so it is a checkbox rendering, not an icon.
+// (That duplication between the two checkbox implementations is real, and tracked in
+// `MIGRATION_GAPS.md` Section 3; sharing one control is a bigger change than an icon swap.)
+// Named for what it draws — it was previously called `CheckIcon`, which described a
+// checkmark this has never contained.
+const CheckboxBoxIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -281,7 +258,7 @@ export function TaskTableRow({
               onChange={(e) => onSelectedChange?.(e.target.checked)}
               aria-label={`Select ${title}`}
             />
-            <CheckIcon
+            <CheckboxBoxIcon
               className={cn(
                 'w-6 h-6 text-main transition-opacity',
                 isSelected
@@ -313,7 +290,7 @@ export function TaskTableRow({
               )}
             >
               <span>Details</span>
-              <ArrowRightIcon className="w-4 h-4" />
+              <ChevronRightIcon className="w-4 h-4" />
             </button>
           ) : null}
         </div>
@@ -491,7 +468,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
                 <tr>
                   <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
                     <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
-                      <CaretIcon className="w-6 h-6 shrink-0 text-muted" />
+                      <ChevronDownIcon className="w-6 h-6 shrink-0 text-muted" />
                       <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
                         {group.title}
                       </h3>

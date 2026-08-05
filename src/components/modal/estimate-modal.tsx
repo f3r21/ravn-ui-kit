@@ -1,26 +1,12 @@
 import { cn } from '../../utils/cn';
 import { Popover, type PopoverProps } from '../popover/popover';
+import { PointsIcon } from '../icons/icons';
 
 // Figma "Estimate Modal" (Task Column01.md L1800-2231) shows exactly 5 rows, all sharing the
 // literal placeholder text "0 Points" but with 5 distinct widths (57/54/56/57/57px) — read as 5
 // story-point values rather than one value repeated 5 times. Width 54 (shortest) is singular
 // ("1 Point"); the other 4 (~56-57px, all plural) match the classic Fibonacci-style scale.
 const POINT_OPTIONS = [1, 2, 3, 5, 8];
-
-const PointsIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="w-full h-full"
-    aria-hidden
-  >
-    <path d="M6 21V4a1 1 0 0 1 1-1h10.5a1 1 0 0 1 .8 1.6L15 9l3.3 4.4a1 1 0 0 1-.8 1.6H7" />
-  </svg>
-);
 
 export interface EstimateModalProps {
   /** Currently selected point value, if any — highlights the matching row. */
@@ -83,7 +69,7 @@ export function EstimateModal({
           )}
         >
           <span className="w-6 h-6 shrink-0">
-            <PointsIcon />
+            <PointsIcon className="size-6" />
           </span>
           <span className="whitespace-nowrap">
             {points} Point{points !== 1 ? 's' : ''}

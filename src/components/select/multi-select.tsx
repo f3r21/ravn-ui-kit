@@ -5,6 +5,7 @@ import { cn } from '../../utils/cn';
 import { Tag } from '../tag/tag';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
+import { ChevronDownIcon } from '../icons/icons';
 
 export interface MultiSelectProps<T extends object> extends Omit<
   ListProps<T>,
@@ -107,7 +108,7 @@ export function MultiSelect<T extends object>({
         ) : (
           <span>{placeholder}</span>
         )}
-        <ChevronDownIcon />
+        <ChevronDownIcon className="w-3 h-3 shrink-0" />
       </button>
 
       {overlayState.isOpen ? (
@@ -128,18 +129,3 @@ export function MultiSelect<T extends object>({
     </div>
   );
 }
-
-const ChevronDownIcon = () => (
-  <svg
-    className="w-3 h-3 shrink-0"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-  >
-    <path d="m6 9 6 6 6-6" />
-  </svg>
-);

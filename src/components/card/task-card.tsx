@@ -3,23 +3,7 @@ import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
 import { ProjectInfo } from './project-info';
 import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
-
-const AlarmIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="w-full h-full"
-    aria-hidden
-  >
-    <circle cx="12" cy="13" r="8" />
-    <path d="M12 9v4l3 2" />
-    <path d="M5 3 2 6M22 6l-3-3" />
-  </svg>
-);
+import { AlarmIcon } from '../icons/icons';
 
 export interface TaskCardProps {
   /** Task title, shown in the header row and truncated to a single line. */
@@ -136,7 +120,10 @@ export function TaskCard({
             // The due-date pill IS a real "Tag" instance per spec (padding 4px 16px, gap 8px,
             // radius 4px, alarm-line icon, Desktop/Body/M/bold) — reusing `Tag` directly instead
             // of a bespoke span gets typography/spacing/color right for free.
-            <Tag variant={urgencyVariantMap[dueDateUrgency]} icon={<AlarmIcon />}>
+            <Tag
+              variant={urgencyVariantMap[dueDateUrgency]}
+              icon={<AlarmIcon className="size-6" />}
+            >
               {dueDateText}
             </Tag>
           ) : null}

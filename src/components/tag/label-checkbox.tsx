@@ -82,6 +82,13 @@ export function LabelCheckbox({
       )}
     >
       <input {...inputProps} ref={ref} className="sr-only" />
+      {/* Drawn inline rather than pulled from the kit's icon set on purpose: the box, the
+          check and the indeterminate dash are three renderings of one control's state, not
+          a glyph from the design's vocabulary, and splitting them into icons would scatter
+          that state across three components. `TaskTable`'s row-select box makes the same
+          call for the same reason — the duplication between the two is real and tracked in
+          `MIGRATION_GAPS.md` Section 3, but sharing one checkbox control is the fix, not
+          sharing one icon. */}
       <svg
         className="w-6 h-6 shrink-0 text-main"
         viewBox="0 0 24 24"
