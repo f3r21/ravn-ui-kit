@@ -10,6 +10,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **`isLabelVisible` on `Input`, `Datepicker`, `Select` and `FormField`**, defaulting to
+  `false`. The design draws no field labels anywhere — not in the Add/Edit Task modal, not
+  on the search bar, nowhere across 100 export files — so a label is now `sr-only` unless
+  a consumer opts in. It still names the control for assistive tech either way, so this is
+  a visual change only. **Consumers that relied on a painted label must pass
+  `isLabelVisible`**; in practice that is a change from labels nobody asked for
+  (`BoardFiltersBar`'s filter pills grew a row of them when it adopted `Select`).
+- **`--color-muted-on-light`, `--color-muted-on-dark`, `--color-interactive-text` and
+  `--color-danger-text`** — text roles for surfaces where the existing alias is unsafe.
+  `--color-muted`, `--color-interactive` and `--color-danger` are now documented as what
+  they are good for (dark-surface text of known placement, fills, borders) rather than
+  used everywhere.
+- **A contrast guard** (`src/styles/contrast.test.ts`). Parses `tokens.css` and asserts
+  every sanctioned foreground/surface pairing against WCAG AA, so a colour change fails
+  the suite instead of shipping. It found two failures in the very fix it was written to
+  verify, plus one in a doc comment claiming a border cleared 3:1 everywhere when it does
+  so on one side only.
 - **A shared form-field surface** (`FormField`, `FieldMessages`, `RequiredIndicator`).
   Only `Input` and `Datepicker` accepted an `error` at all — `Select`, `MultiSelect` and
   `LabelCheckbox` had no way to report one, so a consuming form could reject a field it
@@ -230,6 +247,33 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   carry `aria-haspopup="dialog"` and `aria-expanded`, previously absent.
 
 ### Fixed
+
+- **Nine WCAG AA contrast failures across the form surface.** Phase 1 measured three and
+  deferred them because fixing meant choosing a colour the design does not define; a full
+  audit found nine. Measured, before → after:
+
+  |                                                | was    | now                                                   |
+  | ---------------------------------------------- | ------ | ----------------------------------------------------- |
+  | Field label (`neutral-3` on the shell)         | 1.41:1 | `sr-only` by default; `#FFFFFF` at 11.60:1 when shown |
+  | Error text and required marker                 | 3.59:1 | `danger-3`, 5.65:1 on the tightest surface            |
+  | Helper text on a modal card                    | 3.73:1 | `transparent-light-65`, 5.11:1                        |
+  | Placeholder in a light field                   | 2.94:1 | `transparent-dark-65`, 5.64:1                         |
+  | `ListBox`'s selected option                    | 2.86:1 | `primary-2`, 5.43:1                                   |
+  | `ListBox`'s focused option                     | 3.51:1 | 5.43:1                                                |
+  | `DatePickerMenu`'s "Today"                     | 4.02:1 | 7.64:1                                                |
+  | `MultiSelect`'s chips over the white trigger   | 3.39:1 | 13.6:1                                                |
+  | `Input`/`Datepicker` stories on a light canvas | —      | now dark, like every real consumer                    |
+
+  The design has no labels and no error state at all, so several of these were invented
+  rather than inherited: `#393D41` as label text appears nowhere in the exports as a
+  `color`, and at 12px — a size the design system uses exactly once, on an iOS specimen.
+  Where AA and the design conflict the colour deviates and the doc comment says so with
+  the ratio, per the repo's flag-rather-than-guess rule.
+
+  Two failures are **left open and now asserted as such**: a focus ring on a
+  `surface-overlay` measures 2.86:1, which would mean recolouring all 23 rings in the kit
+  — a visual decision, not a bug fix — and `MultiSelect`'s light trigger contradicts the
+  design's own dark chip treatment. Both are tracked in `MIGRATION_GAPS.md`.
 
 - **The last two focusable elements with no focus affordance at all.**
   `AddTaskModal`'s task-name input and `SearchBar`'s search input each carried a bare
