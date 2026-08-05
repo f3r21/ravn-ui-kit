@@ -2,7 +2,12 @@
 
 A standalone, accessible, reusable UI kit built with **React 19, TypeScript, Tailwind CSS v4, React Aria Hooks and Storybook**.
 
-See the **Introduction** page in Storybook for the full component catalog and fidelity notes, and `UI_KIT_MASTER_PLAN.md` for the ground-truth audit log this library was built against.
+**📖 [Browse the Storybook](https://f3r21.github.io/ravn-ui-kit/)** — every component, its
+props and its states, published from `main` on each green CI run.
+
+See the **Introduction** page there for the full component catalog and fidelity notes, and `UI_KIT_MASTER_PLAN.md` for the ground-truth audit log this library was built against.
+
+Built for, and consumed by, **[ravn-task-management-challenge](https://github.com/f3r21/ravn-task-management-challenge)** ([live app](https://ravn-task-management-challenge.vercel.app)).
 
 ---
 
