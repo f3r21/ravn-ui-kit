@@ -248,6 +248,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`npm run build:storybook` works from a clean checkout.** Storybook's Vite builder
+  loads the root `vite.config.ts` and inherits every plugin in it, so the Storybook build
+  was also running the two that exist purely to produce the published package. Both then
+  failed on a checkout where `npm run build` had not already run: `copy-theme-tokens`
+  wrote into a `dist/` nothing had created (`ENOENT: ./dist/theme.css`), and once that
+  was fixed, `vite:dts`'s `rollupTypes` step handed api-extractor a
+  `mainEntryPointFilePath` that did not exist either. Only the first was known; the
+  second was behind it. `.storybook/main.ts` now filters both out in `viteFinal`, which
+  also stops the Storybook build from writing into `dist/` and drops ~2.5s of declaration
+  rollup from it. CI had been passing on step ordering, not correctness.
+
 - **The `Select` and `MultiSelect` triggers are the design's chip again**, not a white
   field. Both hardcoded `bg-surface-neutral` — `#FFFFFF` — so the consuming app's dark
   board carried five near-white 40px `rounded-md` pills, and its create/edit modal four
