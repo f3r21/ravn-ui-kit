@@ -100,6 +100,27 @@ with the right arguments, the `isDisabled` state actually preventing the
 interaction, and — for anything with a controlled/uncontrolled prop pair —
 that controlled mode doesn't mutate internal state on its own.
 
+## Versioning and changelog policy
+
+This package follows [Semantic Versioning](https://semver.org/):
+
+- **Patch** (`0.2.x`) — bug fixes and visual/behavioral corrections that don't
+  change any component's public props or exported API surface.
+- **Minor** (`0.x.0`) — new components, new props, or new package exports that
+  are additive and don't break an existing consumer's code.
+- **Major** (`x.0.0`) — anything a consumer must change code for: a removed or
+  renamed export/prop, a changed prop's type or default behavior, or a raised
+  peer-dependency floor (e.g. `react`, `react-aria`, `react-stately`). Given
+  the package is pre-1.0, breaking changes may also land as a minor bump per
+  SemVer's pre-1.0 carve-out — call this out explicitly in the changelog entry
+  either way.
+
+Record every user-facing change in `CHANGELOG.md` under `[Unreleased]` as part
+of the same PR that makes the change, following [Keep a
+Changelog](https://keepachangelog.com/en/1.1.0/)'s `Added`/`Changed`/
+`Fixed`/`Removed` grouping. Move `[Unreleased]` into a dated version section
+when `package.json`'s version is bumped.
+
 ## Before committing
 
 ```bash
