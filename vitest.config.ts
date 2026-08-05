@@ -41,12 +41,13 @@ export default defineConfig({
       //
       // Ratcheted up by the palette-contrast pass, which added `badge.test.tsx`
       // (Badge was one of the 10 untested files) plus class-level guards on
-      // `Tag` and `Avatar`. 85.94 -> 86.54.
+      // `Tag` and `Avatar`, then the completeness audit added guards for the two
+      // :has()-drawn focus rings. 85.94 -> 86.56.
       thresholds: {
-        statements: 86.54,
+        statements: 86.56,
         branches: 85.21,
         functions: 80.91,
-        lines: 86.54,
+        lines: 86.56,
       },
     },
   },
