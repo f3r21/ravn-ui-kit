@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useMemo, useRef } from 'react';
+import { useTabListState, Item } from 'react-stately';
+import type { TabListState } from 'react-stately';
+import { useTabList, useTab, useTabPanel } from 'react-aria';
+import type { Node } from '@react-types/shared';
 import { cn } from '../../utils/cn';
 
 
@@ -43,89 +47,107 @@ export interface TabsProps {
  * per-tab indicator strip is real) and has been removed.
  *
  * @remarks
- * This is a hand-rolled `role="tablist"`/`role="tab"`/`role="tabpanel"`
- * implementation with click-based selection only — it does not use
- * react-aria's `useTabListState`/`useTabList`/`useTab`/`useTabPanel` hooks
- * and does not yet support the WAI-ARIA APG's arrow-key tab navigation.
- * Tracked as a follow-up accessibility improvement, not a Figma-fidelity
- * issue.
+ * Uses react-stately's `useTabListState` + react-aria's
+ * `useTabList`/`useTab`/`useTabPanel` for `role="tablist"`/`role="tab"`/
+ * `role="tabpanel"` wiring, which gets WAI-ARIA APG arrow-key navigation
+ * (Left/Right, Home/End) and roving tabindex for free — matching how
+ * `Input`/`Datepicker`/`SearchBar` already lean on react-aria hooks rather
+ * than hand-rolled ARIA. Previously this was a hand-rolled, click-only
+ * implementation with no arrow-key support.
  */
 export function Tabs({
   items,
   panels,
   defaultSelectedKey,
-  selectedKey: controlledKey,
+  selectedKey,
   onSelectionChange,
   className,
 }: TabsProps) {
-  // Build state manually: track selected key locally when uncontrolled
-  const [internalKey, setInternalKey] = React.useState(
-    defaultSelectedKey ?? items[0]?.id ?? ''
-  );
-  const isControlled = controlledKey !== undefined;
-  const selectedKey = isControlled ? controlledKey : internalKey;
+  const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
 
-  const handleSelect = (key: string) => {
-    if (!isControlled) setInternalKey(key);
-    onSelectionChange?.(key);
-  };
+  const state = useTabListState<TabItem>({
+    items,
+    selectedKey,
+    defaultSelectedKey: defaultSelectedKey ?? items[0]?.id,
+    onSelectionChange: (key) => onSelectionChange?.(String(key)),
+    children: (item) => (
+      <Item key={item.id} textValue={item.label}>
+        {item.label}
+      </Item>
+    ),
+  });
+
+  const tabListRef = useRef<HTMLDivElement>(null);
+  const { tabListProps } = useTabList<TabItem>(
+    { 'aria-label': 'Tab navigation' },
+    state,
+    tabListRef
+  );
 
   return (
     <div className={cn('flex flex-col', className)}>
       {/* Tab list — role="tablist" */}
-      <div
-        role="tablist"
-        aria-label="Tab navigation"
-        className="flex items-end"
-      >
-        {items.map((item) => {
-          const isSelected = selectedKey === item.id;
-          return (
-            <button
-              key={item.id}
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={`panel-${item.id}`}
-              id={`tab-${item.id}`}
-              type="button"
-              onClick={() => handleSelect(item.id)}
-              className={cn(
-                // Figma "Tabs" Frame 299: padding 12px 0px 8px (asymmetric
-                // vertical padding around the label) -- was symmetric py-3.5.
-                // Horizontal padding (px-5) is kept: Figma's own value there
-                // is 0px, but that's an artifact of a fixed-width (120px)
-                // demo box, not a real horizontal-padding spec for
-                // arbitrary-length labels.
-                'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
-                isSelected
-                  ? 'text-interactive'
-                  : 'text-muted hover:text-main'
-              )}
-            >
-              {item.icon ? (
-                <span className="text-base leading-none">{item.icon}</span>
-              ) : null}
-              {item.label}
-              {/* 2px bottom indicator — matching Figma */}
-              {isSelected ? (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-4" />
-              ) : null}
-            </button>
-          );
-        })}
+      <div {...tabListProps} ref={tabListRef} className="flex items-end">
+        {[...state.collection].map((item) => (
+          <Tab key={item.key} item={item} state={state} icon={itemsById.get(String(item.key))?.icon} />
+        ))}
       </div>
 
       {/* Tab panel */}
-      {panels ? (
-        <div
-          role="tabpanel"
-          id={`panel-${selectedKey}`}
-          aria-labelledby={`tab-${selectedKey}`}
-          className="flex-1"
-        >
-          {panels[selectedKey] ?? null}
-        </div>
+      {panels ? <TabPanel state={state} panels={panels} /> : null}
+    </div>
+  );
+}
+
+interface TabProps {
+  item: Node<TabItem>;
+  state: TabListState<TabItem>;
+  icon?: React.ReactNode;
+}
+
+function Tab({ item, state, icon }: TabProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const { tabProps, isSelected } = useTab({ key: item.key }, state, ref);
+
+  return (
+    <button
+      {...tabProps}
+      ref={ref}
+      type="button"
+      className={cn(
+        // Figma "Tabs" Frame 299: padding 12px 0px 8px (asymmetric
+        // vertical padding around the label) -- was symmetric py-3.5.
+        // Horizontal padding (px-5) is kept: Figma's own value there
+        // is 0px, but that's an artifact of a fixed-width (120px)
+        // demo box, not a real horizontal-padding spec for
+        // arbitrary-length labels.
+        'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        isSelected ? 'text-interactive' : 'text-muted hover:text-main'
+      )}
+    >
+      {icon ? <span className="text-base leading-none">{icon}</span> : null}
+      {item.rendered ?? item.textValue}
+      {/* 2px bottom indicator — matching Figma */}
+      {isSelected ? (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-4" />
       ) : null}
+    </button>
+  );
+}
+
+interface TabPanelProps {
+  state: TabListState<TabItem>;
+  panels: Record<string, React.ReactNode>;
+}
+
+function TabPanel({ state, panels }: TabPanelProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { tabPanelProps } = useTabPanel({}, state, ref);
+  const selectedKey = state.selectedKey != null ? String(state.selectedKey) : '';
+
+  return (
+    <div {...tabPanelProps} ref={ref} className="flex-1">
+      {panels[selectedKey] ?? null}
     </div>
   );
 }

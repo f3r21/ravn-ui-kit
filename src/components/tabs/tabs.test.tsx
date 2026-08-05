@@ -45,4 +45,28 @@ describe('Tabs Component', () => {
     await user.click(screen.getByRole('tab', { name: 'Tab B' }));
     expect(screen.getByRole('tab', { name: 'Tab A' }).getAttribute('aria-selected')).toBe('true');
   });
+
+  it('moves selection with ArrowRight/ArrowLeft, wrapping at the ends', async () => {
+    const handleChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Tabs items={ITEMS} defaultSelectedKey="a" onSelectionChange={handleChange} />
+    );
+
+    await user.click(screen.getByRole('tab', { name: 'Tab A' }));
+    await user.keyboard('{ArrowRight}');
+    expect(handleChange).toHaveBeenLastCalledWith('b');
+    expect(screen.getByRole('tab', { name: 'Tab B' }).getAttribute('aria-selected')).toBe('true');
+    expect(screen.getByRole('tab', { name: 'Tab B' })).toBe(document.activeElement);
+
+    await user.keyboard('{ArrowRight}');
+    expect(handleChange).toHaveBeenLastCalledWith('a');
+    expect(screen.getByRole('tab', { name: 'Tab A' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('only the selected tab is tabbable (roving tabindex)', () => {
+    render(<Tabs items={ITEMS} defaultSelectedKey="b" />);
+    expect(screen.getByRole('tab', { name: 'Tab A' }).getAttribute('tabindex')).toBe('-1');
+    expect(screen.getByRole('tab', { name: 'Tab B' }).getAttribute('tabindex')).toBe('0');
+  });
 });

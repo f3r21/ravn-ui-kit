@@ -18,6 +18,10 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   tree-shake unused component modules; scoped to `*.css` since the token/theme
   imports are this package's only real side effects.
 - `CHANGELOG.md` (this file).
+- `vitest.setup.ts`, wired via `vitest.config.ts`'s `test.setupFiles`, polyfills
+  `CSS.escape` — jsdom doesn't implement it, and react-aria's collection-
+  selection internals (used by `Tabs`/`useTabList`, and any future
+  collection-based component) call it to build `[data-key="..."]` selectors.
 
 ### Changed
 
@@ -50,6 +54,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   navigation (Left/Right/Up/Down/Home/End) with roving tabindex, matching the
   WAI-ARIA APG radiogroup pattern — previously each segment was an
   independent tab stop with no keyboard way to move between them.
+- `Tabs` now uses react-stately's `useTabListState` + react-aria's
+  `useTabList`/`useTab`/`useTabPanel` instead of a hand-rolled
+  `role="tablist"`/`role="tab"`/`role="tabpanel"` implementation. Gets WAI-ARIA
+  APG arrow-key navigation (Left/Right, Home/End) and roving tabindex for
+  free — previously each tab was click-only with no keyboard way to move
+  between them.
 
 ## [0.2.0] - 2026-08-04
 
