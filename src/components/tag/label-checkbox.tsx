@@ -104,7 +104,17 @@ export function LabelCheckbox({
         // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
         // `rounded` step) -- matches Figma "Label Checkbox" component exactly
         // (Property 1=Default/Selected, Tags01.md / Add Task Modal04/05.md).
-        'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-2',
+        // `has-[:focus-visible]:outline-solid` is load-bearing, not decoration. The real
+        // checkbox is `sr-only`, so the ring has to be drawn on this label via `:has()` —
+        // and under the `has-` variant, `outline-2`'s `outline-style:
+        // var(--tw-outline-style)` does not resolve to `solid` the way it does under
+        // `focus-visible:`. The width and the colour compute, and nothing paints: this
+        // control had **no visible focus indicator at all**, a 2.4.7 failure rather than a
+        // contrast one. Verified at the pixel level in a real browser — zero ring pixels
+        // before, 1604 after — and `getComputedStyle` was no help, reporting a colour for
+        // an outline that was never drawn. Same trap as the `outline-none` bug this kit
+        // already paid for once; see `button.tsx`. Do not drop `outline-solid` as redundant.
+        'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-2',
         isDisabled && 'opacity-50 cursor-not-allowed',
         className,
       )}

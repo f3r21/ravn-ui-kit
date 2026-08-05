@@ -38,4 +38,28 @@ describe('LabelCheckbox Component', () => {
     await user.click(screen.getByText('Subscribe'));
     expect(handleChange).toHaveBeenCalledWith(true);
   });
+
+  /**
+   * The focus ring, which did not paint at all until `outline-solid` was added.
+   *
+   * The real checkbox is `sr-only`, so the ring has to be drawn on the label via `:has()`
+   * — and under the `has-` variant, `outline-2`'s `outline-style: var(--tw-outline-style)`
+   * does not resolve to `solid` the way it does under `focus-visible:`. The width and the
+   * colour computed; nothing was drawn. That is 2.4.7, not a contrast failure: there was
+   * no indicator to measure.
+   *
+   * jsdom applies no CSS, so this can only assert the class — but the class is exactly
+   * what was missing, and this is the same shape of defect as the `outline-none` bug that
+   * silently suppressed 21 rings in this kit before. The rendering half is a pixel count
+   * in a real browser: zero ring pixels before, 1604 after.
+   */
+  it('carries the explicit outline-style its ring needs to paint', () => {
+    render(<LabelCheckbox>Subscribe</LabelCheckbox>);
+    const label = screen.getByText('Subscribe').closest('label')!;
+    expect(label.className).toContain('has-[:focus-visible]:outline-solid');
+    expect(label.className).toContain('has-[:focus-visible]:outline-2');
+    expect(label.className).toContain('has-[:focus-visible]:outline-interactive-text');
+    // The trap this component already paid for once — see `button.tsx`.
+    expect(label.className).not.toContain('outline-none');
+  });
 });

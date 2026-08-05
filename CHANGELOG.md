@@ -283,6 +283,20 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `Icons`' colour demo applies its tone to the icon instead of to the whole column, which
   had been tinting the caption in two colours documented as unsafe for text.
 
+- **`LabelCheckbox` and `TaskTable`'s row-select checkbox had no visible focus indicator
+  at all.** Both hide the real `<input>` with `sr-only` and draw the ring on the wrapping
+  `<label>` via `has-[:focus-visible]:`. Under that variant, `outline-2`'s
+  `outline-style: var(--tw-outline-style)` does not resolve to `solid` the way it does
+  under `focus-visible:` — so the width and the colour computed and **nothing painted**.
+  That is 2.4.7 (Focus Visible), not a contrast failure: there was no indicator to
+  measure. Both now carry an explicit `has-[:focus-visible]:outline-solid`.
+
+  Found by counting pixels in a real browser, because every DOM API lied about it:
+  `getComputedStyle` reported an `outline-color` for an outline that was never drawn —
+  the exact trap the `outline-none` bug set for this kit once already. Zero ring pixels
+  before on both; 1604 and 291 after. All 18 focusable controls sampled now paint a ring,
+  and both classes are pinned by a test.
+
 - **Every focus ring clears 3:1 on a modal.** All 39 rings across 24 files move from
   `--color-interactive` (`primary-4`) to `--color-interactive-text` (`primary-2`). A ring
   is `outline-offset-2`, so it is drawn clear of the control, on the container — it has

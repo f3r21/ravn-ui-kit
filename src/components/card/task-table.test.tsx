@@ -48,4 +48,30 @@ describe('TaskTable Component', () => {
     );
     expect(screen.queryByText('—')).toBeNull();
   });
+
+  /**
+   * The row-select checkbox's focus ring, which did not paint at all until `outline-solid`
+   * was added — see `LabelCheckbox`'s equivalent test for the full reasoning. The input is
+   * `sr-only`, so the ring is drawn on the wrapping label via `:has()`, and under that
+   * variant `outline-2` alone leaves `outline-style` unresolved. Verified by pixel count
+   * in a real browser: zero before, 291 after.
+   */
+  it('gives the row-select checkbox a ring that actually paints', () => {
+    render(
+      <TaskTable
+        groups={[
+          {
+            title: 'To Do',
+            rows: [{ index: 1, title: 'Create wireframe', onSelectedChange: vi.fn() }],
+          },
+        ]}
+      />,
+    );
+    const label = screen
+      .getByRole('checkbox', { name: 'Select Create wireframe' })
+      .closest('label')!;
+    expect(label.className).toContain('has-[:focus-visible]:outline-solid');
+    expect(label.className).toContain('has-[:focus-visible]:outline-interactive-text');
+    expect(label.className).not.toContain('outline-none');
+  });
 });

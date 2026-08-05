@@ -269,7 +269,12 @@ export function TaskTableRow({
       <td className={cn(CELL_BASE, 'pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
         <div className="flex items-center gap-2 h-full">
           <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
-          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1">
+          {/* `has-[:focus-visible]:outline-solid` is load-bearing — see `LabelCheckbox`
+              for the full reasoning. The row-select checkbox is `sr-only`, so its ring is
+              drawn on this label via `:has()`, and under that variant `outline-2` alone
+              leaves `outline-style` unresolved: the ring computed a width and a colour and
+              painted nothing. Verified by counting pixels in a real browser, 0 -> 291. */}
+          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1">
             <input
               type="checkbox"
               className="sr-only"
