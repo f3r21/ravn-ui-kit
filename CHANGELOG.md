@@ -248,6 +248,21 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The accent colour is no longer used as text.** `--color-interactive` (`primary-4`) is
+  documented as a fill and border colour precisely because it fails as text on every dark
+  surface — 2.86 / 3.51 / 4.02:1 over overlay / panel / shell — and four call sites were
+  still painting labels with it: `Tabs`' selected tab, `SidebarItem`'s active and hover
+  label, and `TaskTable`'s "overdue" due date. All now use `--color-interactive-text`
+  (`primary-2`) at 5.43 / 6.67 / 7.63:1, except the due date, which takes `primary-2`
+  as a raw ramp class because it is a status signal rather than an interactive
+  affordance — the same reasoning that kept it off the alias before, and now in step with
+  `Tag`'s red label.
+
+  `TaskTable`'s "Details" button had the same problem in its **hover** state, which no
+  static-story axe pass can see; it was found by reading. `Tabs`' 2px selection indicator
+  and `SidebarItem`'s gradient wash keep `primary-4` — non-text, and neither is the only
+  signal for its state.
+
 - **Secondary text on a popover uses `--color-muted-on-dark`.** `--color-muted`
   (`neutral-2`) clears AA on a panel (4.58:1) and on the shell (5.25:1) and measures
   **3.73:1** on `surface-overlay` — which is exactly what makes it easy to ship: a

@@ -70,9 +70,16 @@ export function SidebarItem({
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        // `-text`, not the bare `text-interactive`, on both the active and the hover
+        // label: an item's label is text, and primary-4 as text clears 4.5:1 nowhere
+        // (2.86 / 3.51 / 4.02). The sidebar is `surface-panel`, so the active item was
+        // 3.51:1. `primary-2` measures 6.67:1 there, and 6.02:1 at the far end of the
+        // gradient where the label sits on a 10% primary-4 wash — both clear. The wash
+        // itself is unchanged: it is decoration, not a boundary, and the label carries
+        // the state.
         isActive
-          ? 'text-interactive bg-gradient-to-r from-transparent to-primary-4/10'
-          : 'text-muted hover:text-interactive',
+          ? 'text-interactive-text bg-gradient-to-r from-transparent to-primary-4/10'
+          : 'text-muted hover:text-interactive-text',
         className,
       )}
     >

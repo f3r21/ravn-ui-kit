@@ -80,10 +80,18 @@ export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
   const styles: Record<DueDateUrgency, string> = {
     normal: 'text-main',
     soon: 'text-tertiary-4',
-    // text-primary-4 kept as a raw ramp class, not aliased to `text-interactive` — this is a
-    // status/urgency signal, not an interactive affordance, so the "interactive" alias would
-    // misrepresent its role even though it happens to share the same color value.
-    overdue: 'text-primary-4',
+    // `primary-2`, not the `primary-4` this was. A cell renders on `surface-panel`, where
+    // primary-4 as text measures 3.51:1 — under AA, and five of the kit's 131 contrast
+    // violations. primary-4 clears 4.5:1 on nothing in this palette, so there was no
+    // surface-side fix; primary-2 is 6.67:1 here.
+    //
+    // Still a raw ramp class rather than the `text-interactive-text` alias: this is a
+    // status/urgency signal, not an interactive affordance, and the alias would
+    // misrepresent its role even though it resolves to the same value. It stays in step
+    // with the `Tag` version of the same signal, whose red label is now primary-2 too —
+    // `DUE_DATE_URGENCY_COLOR` keeps the mapping shared, but the colours are applied to
+    // different properties so there is no class to share.
+    overdue: 'text-primary-2',
   };
   return <span className={cn(CELL_TEXT, styles[urgency])}>{date}</span>;
 }
@@ -297,7 +305,11 @@ export function TaskTableRow({
               onClick={onViewDetails}
               className={cn(
                 CELL_TEXT,
-                'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs',
+                // `hover:text-interactive-text`, not `hover:text-interactive`: this is a
+                // text label, and hovering it used to drop it to 3.51:1 on the panel it
+                // sits on. A hover state is invisible to a static-story axe pass, so this
+                // one was found by reading rather than by measuring.
+                'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs',
               )}
             >
               <span>Details</span>
