@@ -272,6 +272,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Stories render on the surfaces their components actually live on.** Fifteen of the 131
+  violations were Storybook artifacts rather than kit defects — components drawn on the
+  light default canvas when every real consumer surface is dark. `TaskListView` and
+  `TaskTable` take `withSurface('neutral-5')` (they sit on the app shell) and `SidebarItem`
+  takes `withSurface('neutral-4')` (it only ever renders inside `ApplicationSidebar`, whose
+  fill is `bg-surface-panel`) — the same fix `Input` and `Datepicker` took earlier. Three
+  more came from story bodies rather than decorators: `Card`'s sample paragraph now uses
+  `text-muted-on-light` inside the white card, `Modal`'s uses `text-muted-on-dark`, and
+  `Icons`' colour demo applies its tone to the icon instead of to the whole column, which
+  had been tinting the caption in two colours documented as unsafe for text.
+
 - **Every focus ring clears 3:1 on a modal.** All 39 rings across 24 files move from
   `--color-interactive` (`primary-4`) to `--color-interactive-text` (`primary-2`). A ring
   is `outline-offset-2`, so it is drawn clear of the control, on the container — it has

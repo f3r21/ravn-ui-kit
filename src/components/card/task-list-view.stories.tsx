@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { TaskListView } from './task-list-view';
+import { withSurface } from '../../../.storybook/decorators';
 
 const sampleTasks = [
   {
@@ -24,7 +25,12 @@ const meta: Meta<typeof TaskListView> = {
   title: 'Layout/TaskListView',
   component: TaskListView,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  // A board column lives on the app shell. Without this the column header and the empty
+  // state rendered white-on-white against Storybook's light default canvas — 1.06:1, and
+  // ten of the kit's 131 contrast violations. The component is fine; the canvas was
+  // standing in for a surface this kit does not have.
+  decorators: [withSurface('neutral-5')],
+  parameters: { layout: 'fullscreen' },
   args: {
     title: 'Working (03)',
     tasks: sampleTasks,
