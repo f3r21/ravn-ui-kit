@@ -41,7 +41,7 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-muted font-sans truncate">
+        <span className="text-body-xl font-semibold text-muted font-sans whitespace-nowrap">
           Estimate
         </span>
       </div>
@@ -59,7 +59,9 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
           <span className="w-6 h-6 shrink-0">
             <PointsIcon />
           </span>
-          {points} Point{points !== 1 ? 's' : ''}
+          <span className="whitespace-nowrap">
+            {points} Point{points !== 1 ? 's' : ''}
+          </span>
         </button>
       ))}
     </div>

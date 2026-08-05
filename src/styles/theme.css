@@ -165,7 +165,7 @@
 
   --text-body-xl: 20px; /* add-task-modal, assignee-modal, estimate-modal (Desktop/Body/XL/bold) */
   --text-body-xl--line-height: 2rem;
-  --text-body-xl--letter-spacing: 0.05em;
+  --text-body-xl--letter-spacing: 0.75px;
 
   --text-body-sm: 14px; /* datepicker-menu - code-consolidated only, no documented Figma name */
   --text-body-sm--line-height: 22px;
