@@ -81,15 +81,23 @@ export function MultiSelect<T extends object>({
         aria-haspopup="listbox"
         aria-expanded={overlayState.isOpen}
         className={cn(
+          // See Select's identical note: `bg-surface-neutral` is a light
+          // surface, so the placeholder/value text needs `Input`'s
+          // light-surface colors (`text-muted`/`text-neutral-5`), not
+          // `text-main` (invisible white-on-white once something's picked).
           'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          selectedItems.length > 0 ? 'text-main' : 'text-muted'
+          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted'
         )}
       >
         {icon}
         {selectedItems.length > 0 ? (
           <span className="flex flex-wrap items-center gap-1">
+            {/* `variant="neutral"`'s solid style is `text-main` (white) — legible
+                on the dark surfaces Tag is normally shown on, invisible on this
+                trigger's light `bg-surface-neutral`. `primary`'s tinted-red style
+                uses `text-primary-4` for its text, which stays legible on both. */}
             {selectedItems.map((item) => (
-              <Tag key={item.key} variant="neutral">
+              <Tag key={item.key} variant="primary">
                 {item.rendered}
               </Tag>
             ))}

@@ -19,7 +19,7 @@ const LABEL_OPTIONS: LabelOption[] = [
   { id: 'wontfix', label: 'Won’t fix', isDisabled: true },
 ];
 
-function MultiSelectDemo(props: Partial<MultiSelectProps<LabelOption>>) {
+function MultiSelectDemo({ onSelectionChange, ...props }: Partial<MultiSelectProps<LabelOption>>) {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
 
   return (
@@ -28,12 +28,12 @@ function MultiSelectDemo(props: Partial<MultiSelectProps<LabelOption>>) {
       placeholder="Select labels"
       items={LABEL_OPTIONS}
       disabledKeys={LABEL_OPTIONS.filter((item) => item.isDisabled).map((item) => item.id)}
+      {...props}
       selectedKeys={selectedKeys}
       onSelectionChange={(keys) => {
         setSelectedKeys(keys);
-        props.onSelectionChange?.(keys);
+        onSelectionChange?.(keys);
       }}
-      {...props}
     >
       {(item) => (
         <Item key={item.id} textValue={item.label}>
