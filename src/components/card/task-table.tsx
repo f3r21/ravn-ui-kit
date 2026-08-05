@@ -397,7 +397,13 @@ const headerCells: { key: keyof typeof COLUMN_WIDTHS; label: string }[] = [
  */
 export function TaskTable({ groups, isLoading = false, className }: TaskTableProps) {
   return (
-    <div className={cn('w-full overflow-x-auto', className)}>
+    <div
+      className={cn(
+        'w-full overflow-x-auto',
+        '[scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-3 [&::-webkit-scrollbar-thumb]:rounded-full',
+        className
+      )}
+    >
       <div className="flex flex-col gap-4 min-w-[1108px]">
         {/* Shared column header row */}
         <div className="flex">
