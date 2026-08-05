@@ -155,11 +155,17 @@ Similarly, `neutral-3`/`neutral-4`/`neutral-5` each play other real roles
 beyond the one `surface-*` alias above captures — deliberately left
 un-aliased since they don't share one coherent name: `neutral-3` as a
 hover/selected-state background (`text-button.tsx`, `datepicker-menu.tsx`,
-`sidebar-item.tsx`'s badge pill), as a border (`task-table.tsx`'s cells), and
-as label text (`input.tsx`/`datepicker.tsx`); `neutral-4` as a divider border
-and button-hover background (`modal.tsx`) and as text (`badge.tsx`);
-`neutral-5` as body text (`input.tsx`/`datepicker.tsx`) and as a border
-(`user-row.tsx`'s status-dot cutout).
+`sidebar-item.tsx`'s badge pill) and as a border (`task-table.tsx`'s cells);
+`neutral-4` as a divider border and button-hover background (`modal.tsx`) and
+as text (`badge.tsx`); `neutral-5` as body text (`input.tsx`/`datepicker.tsx`)
+and as a border (`user-row.tsx`'s status-dot cutout).
+
+This list used to include "`neutral-3` as label text". It was wrong, and it was
+the only place in the repo that sanctioned the pairing: `#393D41` on the app
+shell measures **1.41:1**, and the Figma exports use it as a background 55 times
+and a border 283 times but never once as a `color`. Field labels now use
+`--color-main` when visible, and are `sr-only` by default — see
+`form-field.tsx`. `contrast.test.ts` asserts the ratios so this cannot drift back.
 
 ## Two colour vocabularies, deliberately kept apart
 
