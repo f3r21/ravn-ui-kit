@@ -1,5 +1,6 @@
 import { cn } from '../../utils/cn';
 import { UserRow } from '../avatar/user-row';
+import { Popover, type PopoverProps } from '../popover/popover';
 
 export interface Assignee {
   /** Unique identifier, echoed back in `onSelect`. */
@@ -17,6 +18,10 @@ export interface AssigneeModalProps {
   assignees: Assignee[];
   /** Called with the assignee of the row the user clicked. */
   onSelect: (assignee: Assignee) => void;
+  /** Called when the popover should close without a selection — Escape or an outside click. */
+  onClose: () => void;
+  /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
+  triggerRef?: PopoverProps['triggerRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -27,16 +32,22 @@ export interface AssigneeModalProps {
  * Figma: "Assignee Modal" COMPONENT inside "Task Column" frame (Task Column01.md L762-1386).
  * A small anchored popover (239×432 for the full 7-row export, height scales with the list here),
  * neutral-3 bg, 1px neutral-2 border, 8px radius — not a centered dialog, so unlike the shared
- * `Modal` shell this has no backdrop/close chrome and no isOpen/onClose: the parent conditionally
- * mounts it, same convention as `DatePickerMenu`. Anatomy is a decorative header label (Figma's
- * "Input text" placeholder style, Desktop/Body/XL/bold, neutral-2) followed by one 56px-tall "User"
- * row (Avatar + name, reusing `UserRow`) per assignee, no selection checkmark and no footer —
- * clicking a row is the assign action (every real "User" row instance renders identically, with
- * no highlighted/selected variant anywhere in the export).
+ * `Modal` shell this has no backdrop/close chrome: the parent conditionally mounts it, same
+ * convention as `DatePickerMenu`. Built on the shared `Popover` primitive (see that file's doc
+ * comment) for real Escape/outside-click dismissal and focus management, previously missing
+ * entirely. Anatomy is a decorative header label (Figma's "Input text" placeholder style,
+ * Desktop/Body/XL/bold, neutral-2) followed by one 56px-tall "User" row (Avatar + name, reusing
+ * `UserRow`) per assignee, no selection checkmark and no footer — clicking a row is the assign
+ * action (every real "User" row instance renders identically, with no highlighted/selected
+ * variant anywhere in the export).
  */
-export function AssigneeModal({ assignees, onSelect, className }: AssigneeModalProps) {
+export function AssigneeModal({ assignees, onSelect, onClose, triggerRef, className }: AssigneeModalProps) {
   return (
-    <div
+    <Popover
+      isOpen
+      onClose={onClose}
+      triggerRef={triggerRef}
+      aria-label="Assignee"
       className={cn(
         'flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm',
         className
@@ -57,6 +68,6 @@ export function AssigneeModal({ assignees, onSelect, className }: AssigneeModalP
           <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />
         </button>
       ))}
-    </div>
+    </Popover>
   );
 }

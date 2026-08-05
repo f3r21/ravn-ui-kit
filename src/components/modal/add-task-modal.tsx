@@ -114,6 +114,12 @@ export function AddTaskModal({
   const [openPopover, setOpenPopover] = React.useState<'estimate' | 'assignee' | 'label' | 'date' | null>(null);
   const togglePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
     setOpenPopover(prev => (prev === name ? null : name));
+  const closePopover = () => setOpenPopover(null);
+
+  const estimateTriggerRef = React.useRef<HTMLButtonElement>(null);
+  const assigneeTriggerRef = React.useRef<HTMLButtonElement>(null);
+  const labelTriggerRef = React.useRef<HTMLButtonElement>(null);
+  const dateTriggerRef = React.useRef<HTMLButtonElement>(null);
 
   if (!isOpen) return null;
 
@@ -167,16 +173,22 @@ export function AddTaskModal({
         <div className="relative">
           {points === undefined ? (
             <button
+              ref={estimateTriggerRef}
               type="button"
               onClick={() => togglePopover('estimate')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'estimate'}
               className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PointsIcon />}>Estimate</Tag>
             </button>
           ) : (
             <button
+              ref={estimateTriggerRef}
               type="button"
               onClick={() => togglePopover('estimate')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'estimate'}
               className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
@@ -187,6 +199,8 @@ export function AddTaskModal({
             <EstimateModal
               value={points}
               onSelect={p => { setPoints(p); setOpenPopover(null); }}
+              onClose={closePopover}
+              triggerRef={estimateTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
             />
           ) : null}
@@ -196,16 +210,22 @@ export function AddTaskModal({
         <div className="relative">
           {!assignee ? (
             <button
+              ref={assigneeTriggerRef}
               type="button"
               onClick={() => togglePopover('assignee')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'assignee'}
               className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PersonIcon />}>Assignee</Tag>
             </button>
           ) : (
             <button
+              ref={assigneeTriggerRef}
               type="button"
               onClick={() => togglePopover('assignee')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'assignee'}
               className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
@@ -216,6 +236,8 @@ export function AddTaskModal({
             <AssigneeModal
               assignees={assignees}
               onSelect={a => { setAssignee(a); setOpenPopover(null); }}
+              onClose={closePopover}
+              triggerRef={assigneeTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
             />
           ) : null}
@@ -225,16 +247,22 @@ export function AddTaskModal({
         <div className="relative">
           {!label ? (
             <button
+              ref={labelTriggerRef}
               type="button"
               onClick={() => togglePopover('label')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'label'}
               className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PriceTagIcon />}>Label</Tag>
             </button>
           ) : (
             <button
+              ref={labelTriggerRef}
               type="button"
               onClick={() => togglePopover('label')}
+              aria-haspopup="dialog"
+              aria-expanded={openPopover === 'label'}
               className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag variant={label.variant ?? 'neutral'}>{label.text}</Tag>
@@ -244,6 +272,8 @@ export function AddTaskModal({
             <LabelModal
               labels={labels}
               onSelect={l => { setLabel(l); setOpenPopover(null); }}
+              onClose={closePopover}
+              triggerRef={labelTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
             />
           ) : null}
@@ -252,8 +282,11 @@ export function AddTaskModal({
         {/* Due date trigger */}
         <div className="relative">
           <button
+            ref={dateTriggerRef}
             type="button"
             onClick={() => togglePopover('date')}
+            aria-haspopup="dialog"
+            aria-expanded={openPopover === 'date'}
             className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
           >
             <Tag icon={<CalendarIcon />}>
@@ -264,6 +297,8 @@ export function AddTaskModal({
             <DatePickerMenu
               value={dueDate}
               onChange={d => { setDueDate(d); setOpenPopover(null); }}
+              onClose={closePopover}
+              triggerRef={dateTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
             />
           ) : null}

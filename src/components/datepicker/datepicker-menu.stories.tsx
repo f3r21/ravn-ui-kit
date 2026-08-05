@@ -10,6 +10,7 @@ const meta: Meta<typeof DatePickerMenu> = {
   decorators: [withSurface('neutral-5')],
   args: {
     onChange: fn(),
+    onClose: fn(),
   },
 };
 export default meta;

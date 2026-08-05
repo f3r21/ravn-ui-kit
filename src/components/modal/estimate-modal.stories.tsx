@@ -10,6 +10,7 @@ const meta: Meta<typeof EstimateModal> = {
   decorators: [withSurface('neutral-5')],
   args: {
     onSelect: fn(),
+    onClose: fn(),
   },
 };
 export default meta;

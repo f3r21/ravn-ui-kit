@@ -18,6 +18,7 @@ const meta: Meta<typeof LabelModal> = {
   args: {
     labels: LABELS,
     onSelect: fn(),
+    onClose: fn(),
   },
 };
 export default meta;

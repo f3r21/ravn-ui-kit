@@ -17,6 +17,7 @@ const meta: Meta<typeof AssigneeModal> = {
   args: {
     assignees: ASSIGNEES,
     onSelect: fn(),
+    onClose: fn(),
   },
 };
 export default meta;

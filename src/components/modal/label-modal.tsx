@@ -1,5 +1,6 @@
 import { cn } from '../../utils/cn';
 import { Tag, type TagProps } from '../tag/tag';
+import { Popover, type PopoverProps } from '../popover/popover';
 
 export interface Label {
   /** Unique identifier, echoed back in `onSelect`. */
@@ -15,6 +16,10 @@ export interface LabelModalProps {
   labels: Label[];
   /** Called with the label of the row the user clicked. */
   onSelect: (label: Label) => void;
+  /** Called when the popover should close without a selection — Escape or an outside click. */
+  onClose: () => void;
+  /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
+  triggerRef?: PopoverProps['triggerRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -33,11 +38,17 @@ export interface LabelModalProps {
  * separately captured as their own components. This popover's shell, list layout, and selection
  * behavior are therefore an engineering-only addition, modeled on the real `AssigneeModal` shell
  * for visual consistency with its siblings -- same "kept because genuinely useful and doesn't
- * contradict spec" bar as `Skeleton`/`Datepicker`'s native input.
+ * contradict spec" bar as `Skeleton`/`Datepicker`'s native input. Built on the shared `Popover`
+ * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
+ * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export function LabelModal({ labels, onSelect, className }: LabelModalProps) {
+export function LabelModal({ labels, onSelect, onClose, triggerRef, className }: LabelModalProps) {
   return (
-    <div
+    <Popover
+      isOpen
+      onClose={onClose}
+      triggerRef={triggerRef}
+      aria-label="Label"
       className={cn(
         'flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm',
         className
@@ -58,6 +69,6 @@ export function LabelModal({ labels, onSelect, className }: LabelModalProps) {
           <Tag variant={l.variant ?? 'neutral'}>{l.text}</Tag>
         </button>
       ))}
-    </div>
+    </Popover>
   );
 }

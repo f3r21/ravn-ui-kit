@@ -22,6 +22,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `CSS.escape` — jsdom doesn't implement it, and react-aria's collection-
   selection internals (used by `Tabs`/`useTabList`, and any future
   collection-based component) call it to build `[data-key="..."]` selectors.
+- `Popover`, a new shared internal floating-surface primitive (react-aria's
+  `useOverlay` + `DismissButton` + `FocusScope`, non-modal, `role="dialog"` by
+  default) — see that component's doc comment for the design decision.
+  `DatePickerMenu`, `AssigneeModal`, `EstimateModal`, and `LabelModal` are now
+  built on it instead of each being an independent plain `<div>` with no
+  Escape/outside-click dismissal, focus management, or role at all.
+- `@internationalized/date` peer dependency, alongside the existing
+  `react-aria`/`react-stately` peers — needed for `DatePickerMenu`'s new
+  `useCalendarState`-based day grid (see Fixed, below).
 
 ### Changed
 
@@ -41,6 +50,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   runtime (the real one wasn't imported), but now that `Modal` itself uses
   `useModalOverlay` — which composes react-aria's `useModal` — keeping the name
   was confusing API surface.
+- **Breaking:** `AssigneeModal`, `EstimateModal`, and `LabelModal` now require
+  a new `onClose: () => void` prop (called on Escape or an outside click) and
+  accept an optional `triggerRef` (excludes the trigger button from
+  outside-click dismissal, so re-clicking it to close doesn't immediately
+  reopen it — see `Popover`'s doc comment). `AddTaskModal`, the only consumer
+  in this repo, is already updated; any other direct consumer of these three
+  components needs to pass `onClose` too.
+- **Breaking:** `DatePickerMenu` now also requires `onClose: () => void` and
+  accepts an optional `triggerRef`, for the same reason as above. Lead/trail
+  days from adjacent months in its calendar grid are now non-interactive
+  (`isOutsideMonth` cells are disabled per react-aria's `useCalendarCell`)
+  instead of independently clickable/selectable — see the component's doc
+  comment for why this is a net accessibility improvement, not a regression
+  against verified Figma spec (only the dimmed *styling* of those cells was
+  ever spec-confirmed, never their interactivity).
+- `AddTaskModal`'s four trigger buttons (Estimate/Assignee/Label/Due date) now
+  carry `aria-haspopup="dialog"` and `aria-expanded`, previously absent.
 
 ### Fixed
 
@@ -60,6 +86,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   APG arrow-key navigation (Left/Right, Home/End) and roving tabindex for
   free — previously each tab was click-only with no keyboard way to move
   between them.
+- `DatePickerMenu`'s day grid now uses react-stately's `useCalendarState` +
+  react-aria's `useCalendar`/`useCalendarGrid`/`useCalendarCell` instead of a
+  fully hand-rolled 42-individually-tabbed-button grid. Gets `role="grid"`/
+  `role="gridcell"` and full keyboard navigation (arrow keys, Home/End,
+  PageUp/PageDown, Shift+PageUp/PageDown) for free — previously a keyboard
+  user had to Tab through up to 42 elements to reach a given date. The
+  double-chevron year-nav buttons (no react-aria equivalent) call
+  `state.focusPreviousSection(true)`/`focusNextSection(true)` directly.
+- `AssigneeModal`, `EstimateModal`, `LabelModal`, and `DatePickerMenu` all
+  gained real Escape-to-close, click-outside-to-close, and focus management
+  by moving onto the new shared `Popover` primitive (see Added, above) —
+  previously each was a plain `<div>` a parent conditionally mounted/
+  unmounted with no dismissal affordance other than re-clicking the trigger.
 
 ## [0.2.0] - 2026-08-04
 

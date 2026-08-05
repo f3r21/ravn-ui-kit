@@ -38,7 +38,7 @@ export default defineConfig({
       fileName: () => 'index.js',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'react-aria', 'react-stately'],
+      external: ['react', 'react-dom', 'react/jsx-runtime', 'react-aria', 'react-stately', '@internationalized/date'],
       output: {
         globals: {
           react: 'React',

@@ -1,4 +1,5 @@
 import { cn } from '../../utils/cn';
+import { Popover, type PopoverProps } from '../popover/popover';
 
 // Figma "Estimate Modal" (Task Column01.md L1800-2231) shows exactly 5 rows, all sharing the
 // literal placeholder text "0 Points" but with 5 distinct widths (57/54/56/57/57px) — read as 5
@@ -17,6 +18,10 @@ export interface EstimateModalProps {
   value?: number;
   /** Called with the point value of the row the user clicked. */
   onSelect: (points: number) => void;
+  /** Called when the popover should close without a selection — Escape or an outside click. */
+  onClose: () => void;
+  /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
+  triggerRef?: PopoverProps['triggerRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -26,15 +31,21 @@ export interface EstimateModalProps {
  *
  * Figma: "Estimate Modal" COMPONENT inside "Task Column" frame (Task Column01.md L1800-2231).
  * A small anchored popover (122×208, neutral-3 bg, 1px neutral-2 border, 8px radius) — not a
- * centered dialog, so unlike the shared `Modal` shell this has no backdrop/close chrome and no
- * isOpen/onClose: the parent conditionally mounts it, same convention as `DatePickerMenu`.
- * Anatomy is a decorative header label (Figma's "Input text" placeholder style, Desktop/Body/XL/bold,
- * neutral-2) followed by 5 point-value rows (icon + label, 4px/16px padding, 4px radius, no
- * background by default) with no footer — clicking a row is the confirm action.
+ * centered dialog, so unlike the shared `Modal` shell this has no backdrop/close chrome: the
+ * parent conditionally mounts it, same convention as `DatePickerMenu`. Built on the shared
+ * `Popover` primitive (see that file's doc comment) for real Escape/outside-click dismissal and
+ * focus management, previously missing entirely. Anatomy is a decorative header label (Figma's
+ * "Input text" placeholder style, Desktop/Body/XL/bold, neutral-2) followed by 5 point-value rows
+ * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
+ * clicking a row is the confirm action.
  */
-export function EstimateModal({ value, onSelect, className }: EstimateModalProps) {
+export function EstimateModal({ value, onSelect, onClose, triggerRef, className }: EstimateModalProps) {
   return (
-    <div
+    <Popover
+      isOpen
+      onClose={onClose}
+      triggerRef={triggerRef}
+      aria-label="Estimate"
       className={cn(
         'flex flex-col w-[122px] py-2 bg-surface-overlay border border-subtle rounded-sm',
         className
@@ -64,6 +75,6 @@ export function EstimateModal({ value, onSelect, className }: EstimateModalProps
           </span>
         </button>
       ))}
-    </div>
+    </Popover>
   );
 }

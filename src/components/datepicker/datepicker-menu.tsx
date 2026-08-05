@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useRef } from 'react';
+import {
+  CalendarDate,
+  createCalendar,
+  getLocalTimeZone,
+  isSameMonth,
+  today,
+} from '@internationalized/date';
+import { useButton, useCalendar, useCalendarCell, useCalendarGrid } from 'react-aria';
+import { useCalendarState, type CalendarState } from 'react-stately';
 import { cn } from '../../utils/cn';
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
+import { Popover, type PopoverProps } from '../popover/popover';
 
 const ChevronLeftIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -31,6 +35,14 @@ const ChevronDoubleRightIcon = () => (
   </svg>
 );
 
+function toCalendarDate(date: Date): CalendarDate {
+  return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+}
+
+function toNativeDate(date: CalendarDate): Date {
+  return date.toDate(getLocalTimeZone());
+}
+
 export interface DatePickerMenuProps {
   /**
    * Currently selected date. Passing this makes the component controlled;
@@ -41,6 +53,10 @@ export interface DatePickerMenuProps {
   defaultValue?: Date;
   /** Called with the newly selected date when the user clicks a day or the "Today" footer action. */
   onChange?: (date: Date) => void;
+  /** Called when the popover should close without a selection — Escape or an outside click. */
+  onClose: () => void;
+  /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
+  triggerRef?: PopoverProps['triggerRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -75,167 +91,127 @@ export interface DatePickerMenuProps {
  *   only captured the layer name "Button" and couldn't distinguish it from actual rendered
  *   text) that the button's real content is literally "Today", matching the "jump to today"
  *   behavior already implemented -- this was a correct guess, now a confirmed fact.
+ *
+ * Accessibility: built on the shared `Popover` primitive (see that file's doc comment) plus
+ * react-stately's `useCalendarState` + react-aria's `useCalendar`/`useCalendarGrid`/
+ * `useCalendarCell` for the day grid — previously a fully hand-rolled 42-individually-tabbed-
+ * button grid with no `role="grid"`/`role="gridcell"` and no arrow-key navigation. The month-nav
+ * chevrons use `useCalendar`'s `prevButtonProps`/`nextButtonProps`; the year-nav chevrons (which
+ * react-aria's calendar hooks have no built-in equivalent for) call
+ * `state.focusPreviousSection(true)`/`focusNextSection(true)` directly, the same "jump by the
+ * next larger unit" primitive `Shift+PageUp`/`Shift+PageDown` use internally.
+ *
+ * One deliberate behavior change from adopting real calendar semantics: lead/trail days from
+ * adjacent months (`isOutsideMonth`) are now non-interactive (not focusable, not selectable) —
+ * react-aria's `useCalendarCell` treats `isOutsideMonth` cells as disabled by design, matching
+ * how most calendar widgets treat context-only adjacent-month days. Previously every one of the
+ * 42 cells was independently clickable/selectable regardless of month; that was never confirmed
+ * against Figma (only the dimmed *styling* of those cells is spec'd), so trading it for
+ * correct, standard grid semantics is a net accessibility improvement, not a regression against
+ * verified spec.
  */
 export function DatePickerMenu({
   value: controlledValue,
   defaultValue,
   onChange,
+  onClose,
+  triggerRef,
   className,
 }: DatePickerMenuProps) {
-  const today = new Date();
+  const valueProps = controlledValue !== undefined
+    ? { value: toCalendarDate(controlledValue) }
+    : { defaultValue: defaultValue ? toCalendarDate(defaultValue) : null };
 
-  const [internalValue, setInternalValue] = useState<Date | undefined>(defaultValue);
-  const isControlled = controlledValue !== undefined;
-  const selected = isControlled ? controlledValue : internalValue;
+  const state = useCalendarState({
+    ...valueProps,
+    onChange: (date: CalendarDate) => onChange?.(toNativeDate(date)),
+    createCalendar,
+    // Hardcoded, matching the prior implementation's hardcoded English
+    // MONTHS/DAYS arrays — no `I18nProvider`/locale story exists in this kit
+    // yet, so introducing locale-dependent formatting here would be an
+    // unverified behavior change, not a fix.
+    locale: 'en-US',
+    firstDayOfWeek: 'sun',
+    weeksInMonth: 6,
+  });
 
-  const [viewYear, setViewYear] = useState(
-    (selected ?? today).getFullYear()
+  const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar(
+    { 'aria-label': 'Date picker' },
+    state
   );
-  const [viewMonth, setViewMonth] = useState(
-    (selected ?? today).getMonth()
-  );
 
-  const select = (date: Date) => {
-    if (!isControlled) setInternalValue(date);
-    onChange?.(date);
-  };
-
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-    else setViewMonth(m => m - 1);
-  };
-
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-    else setViewMonth(m => m + 1);
-  };
-
-  const prevYear = () => setViewYear(y => y - 1);
-  const nextYear = () => setViewYear(y => y + 1);
+  const prevMonthRef = useRef<HTMLButtonElement>(null);
+  const nextMonthRef = useRef<HTMLButtonElement>(null);
+  const { buttonProps: prevMonthProps } = useButton(prevButtonProps, prevMonthRef);
+  const { buttonProps: nextMonthProps } = useButton(nextButtonProps, nextMonthRef);
 
   const goToday = () => {
-    setViewYear(today.getFullYear());
-    setViewMonth(today.getMonth());
-    select(today);
+    const todayDate = today(getLocalTimeZone());
+    state.setFocusedDate(todayDate);
+    state.selectDate(todayDate);
   };
 
-  // Build a fixed 6-week (42-cell) day grid, matching the spec's fixed 226px Content height.
-  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
-
-  const cells: { date: Date; isCurrentMonth: boolean }[] = [];
-
-  for (let i = firstDay - 1; i >= 0; i--) {
-    cells.push({
-      date: new Date(viewYear, viewMonth - 1, daysInPrevMonth - i),
-      isCurrentMonth: false,
-    });
-  }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({ date: new Date(viewYear, viewMonth, d), isCurrentMonth: true });
-  }
-
-  let next = 1;
-  while (cells.length < 42) {
-    cells.push({ date: new Date(viewYear, viewMonth + 1, next++), isCurrentMonth: false });
-  }
-
-  const isSameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
-
   return (
-    <div
+    <Popover
+      isOpen
+      onClose={onClose}
+      triggerRef={triggerRef}
+      aria-label="Date picker"
       className={cn(
         'flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none',
         className
       )}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-2 py-[9px] h-10">
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={prevYear}
-            aria-label="Previous year"
-            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
-          >
-            <ChevronDoubleLeftIcon />
-          </button>
-          <button
-            type="button"
-            onClick={prevMonth}
-            aria-label="Previous month"
-            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
-          >
-            <ChevronLeftIcon />
-          </button>
+      <div {...calendarProps} className="flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-2 py-[9px] h-10">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => state.focusPreviousSection(true)}
+              aria-label="Previous year"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            >
+              <ChevronDoubleLeftIcon />
+            </button>
+            <button
+              {...prevMonthProps}
+              ref={prevMonthRef}
+              aria-label="Previous month"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
+            >
+              <ChevronLeftIcon />
+            </button>
+          </div>
+
+          <span className="font-sans font-semibold text-body-sm text-main">
+            {state.visibleRange.start.toDate(getLocalTimeZone()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </span>
+
+          <div className="flex items-center gap-1">
+            <button
+              {...nextMonthProps}
+              ref={nextMonthRef}
+              aria-label="Next month"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
+            >
+              <ChevronRightIcon />
+            </button>
+            <button
+              type="button"
+              onClick={() => state.focusNextSection(true)}
+              aria-label="Next year"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+            >
+              <ChevronDoubleRightIcon />
+            </button>
+          </div>
         </div>
 
-        <span className="font-sans font-semibold text-body-sm text-main">
-          {MONTHS[viewMonth]} {viewYear}
-        </span>
+        <div className="h-px w-full bg-neutral-2" />
 
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={nextMonth}
-            aria-label="Next month"
-            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
-          >
-            <ChevronRightIcon />
-          </button>
-          <button
-            type="button"
-            onClick={nextYear}
-            aria-label="Next year"
-            className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
-          >
-            <ChevronDoubleRightIcon />
-          </button>
-        </div>
-      </div>
-
-      <div className="h-px w-full bg-neutral-2" />
-
-      {/* Content */}
-      <div className="flex flex-col px-3 py-2">
-        <div className="grid grid-cols-7">
-          {DAYS.map(d => (
-            <span key={d} className="text-center text-body-sm font-normal text-main font-sans">
-              {d}
-            </span>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7">
-          {cells.map(({ date, isCurrentMonth }, idx) => {
-            const isSelected = selected ? isSameDay(date, selected) : false;
-
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => select(date)}
-                aria-label={date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                aria-pressed={isSelected}
-                className={cn(
-                  'flex items-center justify-center w-6 h-6 mx-auto my-[3px] rounded-2 text-body-sm font-normal font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
-                  isSelected
-                    ? 'border border-primary-4 text-main'
-                    : isCurrentMonth
-                    ? 'text-main hover:bg-neutral-3'
-                    : 'text-muted hover:bg-neutral-3/50'
-                )}
-              >
-                {date.getDate()}
-              </button>
-            );
-          })}
-        </div>
+        {/* Content */}
+        <CalendarGrid state={state} />
       </div>
 
       <div className="h-px w-full bg-neutral-2" />
@@ -249,6 +225,75 @@ export function DatePickerMenu({
         >
           Today
         </button>
+      </div>
+    </Popover>
+  );
+}
+
+function CalendarGrid({ state }: { state: CalendarState }) {
+  const { gridProps, headerProps, weekDays, weeksInMonth } = useCalendarGrid(
+    { weekdayStyle: 'short' },
+    state
+  );
+  const currentMonth = state.visibleRange.start;
+
+  return (
+    <div {...gridProps} className="flex flex-col px-3 py-2">
+      <div {...headerProps} className="grid grid-cols-7">
+        {weekDays.map((day, i) => (
+          <span key={i} className="text-center text-body-sm font-normal text-main font-sans">
+            {day}
+          </span>
+        ))}
+      </div>
+
+      {Array.from({ length: weeksInMonth }, (_, weekIndex) => (
+        <div key={weekIndex} role="row" className="grid grid-cols-7">
+          {state.getDatesInWeek(weekIndex).map((date, i) =>
+            date ? (
+              <CalendarCell key={date.toString()} state={state} date={date} currentMonth={currentMonth} />
+            ) : (
+              <div key={i} role="gridcell" aria-hidden="true" />
+            )
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CalendarCell({
+  state,
+  date,
+  currentMonth,
+}: {
+  state: CalendarState;
+  date: CalendarDate;
+  currentMonth: CalendarDate;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isOutsideMonth = !isSameMonth(date, currentMonth);
+  const { cellProps, buttonProps, isSelected, isDisabled, formattedDate } = useCalendarCell(
+    { date, isOutsideMonth },
+    state,
+    ref
+  );
+
+  return (
+    <div {...cellProps} className="flex items-center justify-center my-[3px]">
+      <div
+        {...buttonProps}
+        ref={ref}
+        className={cn(
+          'flex items-center justify-center w-6 h-6 rounded-2 text-body-sm font-normal font-sans transition-colors outline-none focus-visible:outline-2 focus-visible:outline-primary-4',
+          isDisabled
+            ? 'text-muted cursor-default'
+            : isSelected
+            ? 'border border-primary-4 text-main cursor-pointer'
+            : 'text-main hover:bg-neutral-3 cursor-pointer'
+        )}
+      >
+        {formattedDate}
       </div>
     </div>
   );
