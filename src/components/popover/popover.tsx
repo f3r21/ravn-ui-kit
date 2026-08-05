@@ -45,11 +45,11 @@ export interface PopoverProps {
  * caller's `className`), not a portal — so this primitive is built on
  * react-aria's `useOverlay` + `DismissButton` + `FocusScope` directly rather
  * than `usePopover` (which adds portalling via `Overlay` and floating-ui-style
- * anchored positioning neither this kit nor its current consumer needs yet;
- * see `ravn-task-management-challenge/src/ui/select/popover.tsx` for what
- * that heavier version looks like when a future headless `Select`/`ListBox`
- * family — Section 4 — needs real anchor positioning and viewport clipping
- * escape).
+ * anchored positioning these four don't need). The heavier `usePopover`-based
+ * version, for consumers that *do* need real anchor positioning and escape
+ * from a clipping ancestor, is this kit's own `FloatingPopover` — see
+ * `./floating-popover.tsx` for why the two are separate primitives rather
+ * than one component behind an `isPortalled` flag.
  *
  * Non-modal by design: `FocusScope` here moves focus in on open and restores
  * it on close, but does not `contain` — Tab can move past the popover to the
