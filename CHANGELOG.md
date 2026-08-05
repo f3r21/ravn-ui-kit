@@ -31,6 +31,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - `@internationalized/date` peer dependency, alongside the existing
   `react-aria`/`react-stately` peers — needed for `DatePickerMenu`'s new
   `useCalendarState`-based day grid (see Fixed, below).
+- `Menu`, a new dropdown/action-menu component (react-stately's
+  `useMenuTriggerState`/`useTreeState` + react-aria's
+  `useMenuTrigger`/`useMenu`/`useMenuItem`, composing the existing
+  `FloatingPopover`) — e.g. a task card's three-dot options menu. Generic
+  over item type via the same Collection/`<Item>` composition `Select`/
+  `ListBox`/`Tabs` use. See the component's doc comment for why it bakes in
+  no default trigger chrome and exposes no selection or "destructive item"
+  API.
 
 ### Changed
 
@@ -99,6 +107,11 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   by moving onto the new shared `Popover` primitive (see Added, above) —
   previously each was a plain `<div>` a parent conditionally mounted/
   unmounted with no dismissal affordance other than re-clicking the trigger.
+- `FloatingPopover` now wraps its content in `FocusScope restoreFocus`.
+  Previously, closing it (Escape, an outside click, selecting an option) left
+  focus on `<body>` instead of returning it to the trigger — found while
+  adding `Menu`'s Escape-returns-focus test, and confirmed as a pre-existing
+  gap affecting `Select`/`MultiSelect` too, not something new to `Menu`.
 
 ## [0.2.0] - 2026-08-04
 

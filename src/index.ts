@@ -38,6 +38,9 @@ export * from './components/listbox/list-box';
 export * from './components/select/select';
 export * from './components/select/multi-select';
 
+// ─── Menu ─────────────────────────────────────────────────────────
+export * from './components/menu/menu';
+
 // ─── Modals ───────────────────────────────────────────────────────
 export * from './components/modal/modal';
 export * from './components/modal/add-task-modal';

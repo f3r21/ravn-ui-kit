@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { DismissButton, Overlay, usePopover, type AriaPopoverProps } from 'react-aria';
+import { DismissButton, FocusScope, Overlay, usePopover, type AriaPopoverProps } from 'react-aria';
 import type { OverlayTriggerState } from 'react-stately';
 import { cn } from '../../utils/cn';
 
@@ -41,6 +41,15 @@ export interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef
  * assistive-tech users an explicit way to close the popover from either end
  * of its content, matching `Popover`'s reasoning.
  *
+ * Wrapped in `FocusScope restoreFocus` (no `autoFocus` here, unlike
+ * `Popover`'s — initial focus placement is left to whichever composing
+ * component renders inside, e.g. `ListBox`/`MenuList`'s own `autoFocus`)
+ * so closing returns focus to the trigger that opened it, matching
+ * `Popover`'s same restoration for the non-portalled family. Without it,
+ * closing removes the focused option/item from the DOM and the browser
+ * drops focus to `<body>` instead.
+ *
+
  * Escape is handled here in the capture phase rather than left to
  * `usePopover`'s own dismissal for two reasons found by driving this in a
  * real browser rather than trusting jsdom: `ListBox` binds Escape for its
@@ -62,24 +71,26 @@ export function FloatingPopover({ state, children, popoverRef, className, ...pro
   return (
     <Overlay>
       <div {...underlayProps} className="fixed inset-0" />
-      <div
-        {...popoverProps}
-        ref={ref}
-        onKeyDownCapture={(event) => {
-          if (event.key === 'Escape') {
-            event.stopPropagation();
-            state.close();
-          }
-        }}
-        className={cn(
-          'z-50 bg-surface-overlay rounded-sm border border-subtle shadow-xl',
-          className
-        )}
-      >
-        <DismissButton onDismiss={() => state.close()} />
-        {children}
-        <DismissButton onDismiss={() => state.close()} />
-      </div>
+      <FocusScope restoreFocus>
+        <div
+          {...popoverProps}
+          ref={ref}
+          onKeyDownCapture={(event) => {
+            if (event.key === 'Escape') {
+              event.stopPropagation();
+              state.close();
+            }
+          }}
+          className={cn(
+            'z-50 bg-surface-overlay rounded-sm border border-subtle shadow-xl',
+            className
+          )}
+        >
+          <DismissButton onDismiss={() => state.close()} />
+          {children}
+          <DismissButton onDismiss={() => state.close()} />
+        </div>
+      </FocusScope>
     </Overlay>
   );
 }
