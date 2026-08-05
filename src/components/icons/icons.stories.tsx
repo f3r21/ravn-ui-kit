@@ -161,9 +161,15 @@ export const Colour: Story = {
   render: () => (
     <div className="flex items-center gap-6">
       {(['text-main', 'text-muted', 'text-danger', 'text-primary-4'] as const).map((tone) => (
-        <div key={tone} className={`flex flex-col items-center gap-2 ${tone}`}>
-          <AlarmIcon className="size-8" />
-          <code className="text-xs font-sans">{tone}</code>
+        <div key={tone} className="flex flex-col items-center gap-2">
+          {/* The tone goes on the icon, not on the column. It used to wrap both, which
+              tinted the caption too — and two of these tones are documented as unsafe for
+              text: `text-danger` measured 3.59:1 on the shell and `text-primary-4` 4.01:1,
+              two of the kit's 131 contrast violations, both of them this story's own doing
+              rather than a defect in `Icons`. An icon is non-text and needs 3:1, which
+              both clear; a caption is text and needs 4.5:1, so it stays `text-main`. */}
+          <AlarmIcon className={`size-8 ${tone}`} />
+          <code className="text-xs font-sans text-main">{tone}</code>
         </div>
       ))}
     </div>

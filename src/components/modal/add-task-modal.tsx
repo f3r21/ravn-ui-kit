@@ -146,7 +146,12 @@ export function AddTaskModal({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Task name"
         aria-label="Task name"
-        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+        // `placeholder:text-muted-on-dark`, not `placeholder:text-muted`: this modal is
+        // `surface-overlay`, where neutral-2 is 3.73:1. axe never flagged it because the
+        // story renders the field with a value — a placeholder only exists while empty,
+        // which is a general blind spot in a static-story audit and the reason the token
+        // test carries this rather than the browser pass.
+        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
       />
 
       <div className="flex items-center gap-4 w-full">
@@ -159,7 +164,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('estimate')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'estimate'}
-              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <Tag icon={<PointsIcon className="size-6" />}>Estimate</Tag>
             </button>
@@ -170,7 +175,9 @@ export function AddTaskModal({
               onClick={() => togglePopover('estimate')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'estimate'}
-              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              // `hover:text-neutral-5` with the hover fill — white on a solid neutral-2
+              // is 2.94:1, and a static story never shows a hover for axe to catch.
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0">
                 <PointsIcon className="size-6" />
@@ -201,7 +208,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('assignee')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'assignee'}
-              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <Tag icon={<AssigneeIcon className="size-6" />}>Assignee</Tag>
             </button>
@@ -212,7 +219,8 @@ export function AddTaskModal({
               onClick={() => togglePopover('assignee')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'assignee'}
-              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              // Same as the estimate trigger above: the label moves with the hover fill.
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
               {assignee.name}
@@ -241,7 +249,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('label')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'label'}
-              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <Tag icon={<LabelIcon className="size-6" />}>Label</Tag>
             </button>
@@ -252,7 +260,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('label')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'label'}
-              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
               <Tag variant={label.variant ?? 'neutral'}>{label.text}</Tag>
             </button>
@@ -279,7 +287,7 @@ export function AddTaskModal({
             onClick={() => togglePopover('date')}
             aria-haspopup="dialog"
             aria-expanded={openPopover === 'date'}
-            className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+            className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
           >
             <Tag icon={<CalendarIcon className="size-6" />}>
               {dueDate ? dueDate.toLocaleDateString('en-US') : 'Due date'}

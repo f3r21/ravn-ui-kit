@@ -91,3 +91,46 @@ export const WithIcon: Story = {
 export const Removable: Story = {
   args: { children: 'REACT 19', variant: 'red' },
 };
+
+/**
+ * Every variant, both styles, on all three dark surfaces a tag can land on.
+ *
+ * The chip is a **blend**, so the same fill measures differently on each surface and the
+ * tightest case is `surface-overlay` — a tag inside a modal or a popover. No story
+ * rendered one there directly before this, so the only overlay coverage an axe pass got
+ * was incidental, via `Modal/Label`. This story exists to give the audit a target.
+ *
+ * Each band paints its own surface, so the meta-level `withSurface('neutral-4')` still
+ * wraps all three and does not affect what any chip is measured against. There is no way
+ * to opt out of it — Storybook *composes* story and meta decorators rather than letting
+ * the story replace them, so a `decorators: []` here would be a no-op that reads as if it
+ * did something.
+ */
+export const OnEverySurface: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div>
+      {(
+        [
+          ['bg-surface-overlay', 'surface-overlay — modal card, popover (the tightest)'],
+          ['bg-surface-panel', 'surface-panel — cards, columns, sidebar'],
+          ['bg-surface-shell', 'surface-shell — the app shell'],
+        ] as const
+      ).map(([surface, label]) => (
+        <div key={surface} className={`${surface} p-6 flex flex-col gap-3`}>
+          <p className="text-xs text-muted-on-dark font-sans">{label}</p>
+          {([false, true] as const).map((outline) => (
+            <div key={String(outline)} className="flex gap-3">
+              {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
+                <Tag key={v} {...args} variant={v} outline={outline}>
+                  {v}
+                </Tag>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  ),
+  args: { onRemove: undefined },
+};

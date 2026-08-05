@@ -62,7 +62,7 @@ export function UserRow({
         // padding: 4px 16px, gap: 8px -- matches Figma "User" component (Avatar frame, 239x56)
         'flex items-center gap-2 px-4 py-1 min-w-0',
         onClick &&
-          'cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-sm',
+          'cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-sm',
         className,
       )}
     >
@@ -77,8 +77,18 @@ export function UserRow({
       {/* Name + Role */}
       <div className="flex flex-col min-w-0">
         <span className="font-sans font-normal text-body-m text-main truncate">{name}</span>
+        {/* The role is `--color-muted-on-dark`, not `--color-muted`. A UserRow does not know
+            its own surface — `AssigneeModal` renders a list of them on `surface-overlay`,
+            where neutral-2 measures 3.73:1, and four of the kit's contrast violations were
+            exactly this role text. transparent-light-65 composites against whatever is
+            behind it and clears AA on all three dark surfaces (5.12 / 5.96 / 6.55:1). */}
         {role ? (
-          <span className={cn('font-sans text-muted truncate leading-tight', roleTextSizes[size])}>
+          <span
+            className={cn(
+              'font-sans text-muted-on-dark truncate leading-tight',
+              roleTextSizes[size],
+            )}
+          >
             {role}
           </span>
         ) : null}

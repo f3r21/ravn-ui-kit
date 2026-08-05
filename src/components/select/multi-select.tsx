@@ -134,9 +134,9 @@ export function MultiSelect<T extends object>({
           // replaces was wrong. Identical on purpose: the two sit side by side in a
           // filter row, and nothing about holding a set rather than a scalar should make
           // this control a different height or shape.
-          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           selectedItems.length > 0 ? 'text-main' : 'text-muted-on-dark',
-          error && 'ring-1 ring-danger-text focus-visible:outline-danger-5',
+          error && 'ring-1 ring-danger-text focus-visible:outline-danger-text',
         )}
       >
         {icon}

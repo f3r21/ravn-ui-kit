@@ -65,7 +65,12 @@ export function EmptyState({
         </span>
       ) : null}
       <p className="text-body-m font-semibold text-main">{title}</p>
-      {description ? <p className="text-body-m text-muted">{description}</p> : null}
+      {/* `muted-on-dark`, not `muted`: an EmptyState paints no background of its own and
+          is exported for a consumer to place anywhere. It renders on a panel inside
+          `TaskListView` and `TaskTable` today (4.58:1), but "no tasks match your filters"
+          inside a modal is an obvious use, and there `neutral-2` is 3.73:1. The icon above
+          keeps `text-muted` — it is non-text, so 1.4.11's 3:1 applies and 3.73 clears it. */}
+      {description ? <p className="text-body-m text-muted-on-dark">{description}</p> : null}
       {action}
     </div>
   );

@@ -52,8 +52,8 @@ export function Datepicker({
         ref={ref}
         type="date"
         className={cn(
-          'h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral font-sans cursor-pointer',
-          error && 'border-danger-5 focus-visible:outline-danger-5',
+          'h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral font-sans cursor-pointer',
+          error && 'border-danger-5 focus-visible:outline-danger-text',
           className,
         )}
       />

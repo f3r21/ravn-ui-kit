@@ -60,14 +60,18 @@ export function AssigneeModal({
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-muted font-sans truncate">Assignee</span>
+        {/* `--color-muted-on-dark`, not `--color-muted`: this popover is `surface-overlay`,
+            where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. */}
+        <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
+          Assignee
+        </span>
       </div>
       {assignees.map((a) => (
         <button
           key={a.id}
           type="button"
           onClick={() => onSelect(a)}
-          className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2"
+          className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2"
         >
           <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />
         </button>

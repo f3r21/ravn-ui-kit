@@ -38,11 +38,16 @@ export default defineConfig({
       // files ship no test at all (`ApplicationSidebar` and `SidebarItem` are
       // at 0%, `Skeleton` at 50%), which is `MIGRATION_GAPS.md` Section 5's
       // open item. Raise these as that closes; do not lower them.
+      //
+      // Ratcheted up by the palette-contrast pass, which added `badge.test.tsx`
+      // (Badge was one of the 10 untested files) plus class-level guards on
+      // `Tag` and `Avatar`, then the completeness audit added guards for the two
+      // :has()-drawn focus rings. 85.94 -> 86.56.
       thresholds: {
-        statements: 85.94,
-        branches: 84.92,
-        functions: 80.15,
-        lines: 85.94,
+        statements: 86.56,
+        branches: 85.21,
+        functions: 80.91,
+        lines: 86.56,
       },
     },
   },

@@ -37,10 +37,23 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
   return (
     <div
       className={cn(
-        // text-primary-4 kept raw, not aliased to `text-interactive` — this is a decorative
-        // accent-tint/accent-text color pairing (bg-primary-1 + text-primary-4), not an
-        // interactive affordance; avatars aren't inherently clickable.
-        'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-1 text-primary-4 select-none shrink-0',
+        // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
+        // they used to be. That pairing measured 2.61:1 and was the single largest
+        // accessibility defect in the kit: 46 of the 131 colour-contrast violations an
+        // axe pass over the built Storybook reported came from this one class, because
+        // an avatar renders in almost every composed story.
+        //
+        // Unlike the kit's other AA deviations there is nothing to trade away here. The
+        // design has **no** initials treatment at all — every exported Avatar frame is
+        // image-filled (see the size note below), so `bg-primary-1 text-primary-4` was an
+        // engineering invention rather than something Figma draws. `neutral-5` is the
+        // colour this kit already uses for text on a light surface (`Input`'s value,
+        // `--color-surface-neutral` at 15.40:1), and it clears **10.50:1** on the tint.
+        //
+        // The tint itself is unchanged, so an avatar still reads as the same pink circle.
+        // `text-neutral-5` stays a raw ramp class rather than `text-surface-shell`: that
+        // alias names a *background* role, and this is a foreground.
+        'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-1 text-neutral-5 select-none shrink-0',
         sizes[size],
         className,
       )}

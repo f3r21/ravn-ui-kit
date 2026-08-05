@@ -162,6 +162,30 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Changed
 
+- **`TextButton variant="primary"` is documented as a deliberate WCAG AA failure**, not
+  fixed. `text-main` on `bg-primary-4` measures **3.83:1**; `isSelected`'s `primary-3`
+  fill is 2.83:1 and the disabled/hover `primary-2` is 2.02:1. Fourteen of the 131
+  contrast violations are this button.
+
+  It is the one place in the kit where the design has a definite opinion that fails AA,
+  rather than being silent — and unlike `Tag`, `Badge` and `Avatar`, which were fixed in
+  this pass, it has nowhere to go. No label colour clears it (the darkest thing in the
+  palette, `neutral-5`, reaches 4.02:1) and no fill in the ramp clears it (`primary-4` is
+  already its darkest step). The only fix is a darker red Figma does not contain —
+  continuing the ramp's own arithmetic lands on `#D13323` at 4.99:1 — and inventing a
+  value is what CONTRIBUTING.md's first design value forbids. Changing it would also
+  leave two different reds side by side, or repaint `--color-primary-4` itself and with
+  it every brand surface in both repos.
+
+  The error-colour precedent does not transfer: the design draws no error state at all, so
+  that ramp step was a free choice constrained only by contrast. `contrast.test.ts`
+  asserts the current state so it cannot be mistaken for passing.
+
+  The **icon** `Button`'s `variant="primary"` shares the fill and is unaffected — an icon
+  is non-text, so 1.4.11's 3:1 applies and 3.83:1 clears it. Same for
+  `Button variant="secondary" isSelected`'s `primary-4` border and icon, which are
+  recorded as failing 3:1 on `surface-overlay` only (2.86:1) and likewise left as drawn.
+
 - **BREAKING — `Tag`'s colour variants are renamed to the design's own names.**
   `primary` → `red`, `secondary` → `green`, `tertiary` → `yellow`; `neutral` and
   `blue` are unchanged. Figma's "Tag" COMPONENT_SET carries a `Type` property whose
@@ -247,6 +271,225 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   carry `aria-haspopup="dialog"` and `aria-expanded`, previously absent.
 
 ### Fixed
+
+- **The `Card` story's heading was invisible.** `text-neutral-1` — pure white — on `Card`'s
+  own white surface, **1.00:1**, on the two lines whose sibling `<p>` this pass edited
+  without noticing. It survived because **axe files exact 1:1 text under `incomplete`, not
+  `violations`** (messageKey `equalRatio`: it cannot tell invisible text from deliberately
+  hidden decorative text, so it asks for a human). A `resultTypes: ['violations']` sweep is
+  therefore blind to the worst pairing there is. The audit harness now collects `incomplete`
+  too, which also surfaced `SidebarItem`'s badge above under `shortTextContent`.
+
+- **Stories render on the surfaces their components actually live on.** Fifteen of the 131
+  violations were Storybook artifacts rather than kit defects — components drawn on the
+  light default canvas when every real consumer surface is dark. `TaskListView` and
+  `TaskTable` take `withSurface('neutral-5')` (they sit on the app shell) and `SidebarItem`
+  takes `withSurface('neutral-4')` (it only ever renders inside `ApplicationSidebar`, whose
+  fill is `bg-surface-panel`) — the same fix `Input` and `Datepicker` took earlier. Three
+  more came from story bodies rather than decorators: `Card`'s sample paragraph now uses
+  `text-muted-on-light` inside the white card, `Modal`'s uses `text-muted-on-dark`, and
+  `Icons`' colour demo applies its tone to the icon instead of to the whole column, which
+  had been tinting the caption in two colours documented as unsafe for text.
+
+- **Marking a field invalid silently downgraded its focus ring.** `Input`, `Datepicker`,
+  `Select` and `MultiSelect` each write `focus-visible:outline-danger-5` on their
+  `error &&` line — and because `cn()` is tailwind-merge, that override _replaces_ the base
+  ring rather than adding to it. So an invalid field's focus ring was **2.55:1** on an
+  overlay, worse than the 5.43:1 it replaced, on exactly the surface a form is most likely
+  to sit on. All four are now `--color-danger-text` (5.65 / 6.94 / 7.95:1), which is also
+  the token `Select`'s invalid _ring_ already used two lines above.
+
+  This is why the previous entry's claim of "every focus ring" was wrong: the recolour
+  swapped `outline-primary-4`, and these four say `outline-danger-5`. `contrast.test.ts`
+  now asserts both the fixed ring and the fact that danger-5 measured worse than what it
+  replaced, and its prose no longer claims a number it cannot prove.
+
+- **`ListBox` and `Menu` had no visible keyboard focus.** The arrow-key focus indicator was
+  a `bg-neutral-4` fill drawn on a `surface-overlay` popover — **1.23:1**, and 1.00:1 for a
+  bare `ListBox` on a panel — with `outline-none` on the item removing any other
+  affordance. Both now draw an inset `--color-interactive-text` ring (5.43:1) and keep the
+  fill as a quieter secondary cue. This matters most on `Menu`, which is the sole entry
+  point to Edit/Delete in the consuming app, and which this kit has already lost a focus
+  indicator on once.
+
+- **The `danger` toast's message text was 4.29:1.** It was the only tone in the map
+  inverting the pattern — a dark fill with white text — and the only one that failed.
+  Moving the label to `neutral-5` on the same fill does not clear it either (3.59:1), so
+  the fill moved to `danger-4`: **6.01:1**, and danger now matches `success` and `warning`
+  as a saturated fill with dark text. No audit had ever measured a toast, because the kit
+  renders none without a click.
+
+- **Three more the ranked table never contained.** `LabelCheckbox`'s invalid box was
+  `danger-5` at 2.55:1 — a stroked outline with `fill="none"`, so the "white field
+  interior" argument that keeps `danger-5` on `Input`'s border does not apply to it, the
+  same reasoning that already moved `Select`. `SidebarItem`'s active count badge was white
+  on `primary-4` at 3.83:1, the CTA pairing on text the CTA's exemption does not cover, and
+  fixable outright because `badgeCount` has no ground truth in the design at all. And
+  `Tag`'s remove button dimmed its "×" with `hover:opacity-75`, which composites the glyph
+  into its own chip and put yellow at 3.39 / 3.97 / 4.43:1 — failing on all three surfaces;
+  it now darkens the background behind the glyph instead, which moves every variant the
+  right way (nothing below 5.93:1).
+
+- **`LabelCheckbox` and `TaskTable`'s row-select checkbox had no visible focus indicator
+  at all.** Both hide the real `<input>` with `sr-only` and draw the ring on the wrapping
+  `<label>` via `has-[:focus-visible]:`. Under that variant, `outline-2`'s
+  `outline-style: var(--tw-outline-style)` does not resolve to `solid` the way it does
+  under `focus-visible:` — so the width and the colour computed and **nothing painted**.
+  That is 2.4.7 (Focus Visible), not a contrast failure: there was no indicator to
+  measure. Both now carry an explicit `has-[:focus-visible]:outline-solid`.
+
+  Found by counting pixels in a real browser, because every DOM API lied about it:
+  `getComputedStyle` reported an `outline-color` for an outline that was never drawn —
+  the exact trap the `outline-none` bug set for this kit once already. Zero ring pixels
+  before on both; 1604 and 291 after. All 18 focusable controls sampled now paint a ring,
+  and both classes are pinned by a test.
+
+- **Every focus ring clears 3:1 on a modal.** All 39 rings across 24 files move from
+  `--color-interactive` (`primary-4`) to `--color-interactive-text` (`primary-2`). A ring
+  is `outline-offset-2`, so it is drawn clear of the control, on the container — it has
+  exactly one adjacent colour, and the "passes against the field's white interior"
+  argument that carries the invalid border does not apply to it. `primary-4` managed
+  4.02:1 on the shell and 3.51:1 on a panel but only **2.86:1** on `surface-overlay`,
+  which is a modal or a popover: exactly where a form is most likely to be and where
+  losing the focus indicator costs the most. `primary-2` clears all three at
+  5.43 / 6.67 / 7.63:1.
+
+  This was recorded in `contrast.test.ts` as a known failure for one release because
+  recolouring every ring is a visual change. Nothing was traded to fix it — the design
+  file draws no focus state anywhere, so the ring was an engineering addition from the
+  start and there was no Figma pairing to deviate from.
+
+  **One caveat for consumers:** `primary-2` measures 2.02:1 on white, worse than the
+  `primary-4` it replaces (3.83:1). No kit surface is light — `Input` and `Datepicker`
+  have white _interiors_, but the offset puts the ring on the dark container outside them,
+  and `Card`/`Badge` are the only light surfaces and neither is focusable — so a consumer
+  placing a kit control on a light container of its own must override the ring colour.
+  `contrast.test.ts` asserts that limit rather than leaving it to be discovered.
+
+- **White labels on a solid `neutral-2` pill are now `neutral-5`.** At full strength
+  `neutral-2` is a mid grey, and the white label the design draws on it measures
+  **2.94:1**; `neutral-5` clears **5.25:1**. The fills are unchanged — the same trade
+  `Tag` and `Badge` take.
+
+  Five sites, only **two** of which axe could see: `SegmentedControl`'s active segment and
+  `EstimateModal`'s selected row were visible, while the hover fills on `TextButton`
+  secondary, `EstimateModal`'s unselected rows and both `AddTaskModal` triggers were not —
+  a static story has no hover. `contrast.test.ts` pins the pairing so the arithmetic
+  covers what the browser pass structurally cannot.
+
+  This does cost `SegmentedControl` the spec's "identical label colour in both states,
+  selection carried by the fill alone". The fill still carries selection; the label now
+  agrees with it instead of being the one thing at 2.94:1.
+
+- **The accent colour is no longer used as text.** `--color-interactive` (`primary-4`) is
+  documented as a fill and border colour precisely because it fails as text on every dark
+  surface — 2.86 / 3.51 / 4.02:1 over overlay / panel / shell — and four call sites were
+  still painting labels with it: `Tabs`' selected tab, `SidebarItem`'s active and hover
+  label, and `TaskTable`'s "overdue" due date. All now use `--color-interactive-text`
+  (`primary-2`) at 5.43 / 6.67 / 7.63:1, except the due date, which takes `primary-2`
+  as a raw ramp class because it is a status signal rather than an interactive
+  affordance — the same reasoning that kept it off the alias before, and now in step with
+  `Tag`'s red label.
+
+  `TaskTable`'s "Details" button had the same problem in its **hover** state, which no
+  static-story axe pass can see; it was found by reading. `Tabs`' 2px selection indicator
+  and `SidebarItem`'s gradient wash keep `primary-4` — non-text, and neither is the only
+  signal for its state.
+
+- **`Tabs`, `EmptyState` and `SearchBar` take `--color-muted-on-dark` too**, on the rule
+  rather than on a measured failure: none of the three paints a background of its own, so
+  each renders on whatever a consumer puts it in, and `--color-muted` is only safe where
+  that surface is known to be a panel or the shell (4.58 / 5.25:1 — but 3.73:1 on an
+  overlay). A tab strip in a modal, or "no tasks match your filters" inside one, is an
+  ordinary thing to build. axe reported none of these because every current story renders
+  them on a panel; they were found by applying the rule the same pass had already used to
+  justify `UserRow`.
+
+  `TaskCard`, `TaskTable`, `TopNav`, `Modal` and `DatePickerMenu` are deliberately left on
+  `--color-muted`: each paints its own surface and so knows what its text sits on.
+  `SidebarItem` is left too — it has no fill either, but an item only ever renders inside
+  `ApplicationSidebar`, which is a panel. Icons are untouched throughout: non-text, so
+  1.4.11's 3:1 applies and `muted` clears it on all three surfaces (3.73 / 4.58 / 5.25:1),
+  now asserted rather than assumed.
+
+- **Secondary text on a popover uses `--color-muted-on-dark`.** `--color-muted`
+  (`neutral-2`) clears AA on a panel (4.58:1) and on the shell (5.25:1) and measures
+  **3.73:1** on `surface-overlay` — which is exactly what makes it easy to ship: a
+  component built and reviewed on a panel is fine right up until it is dropped into a
+  modal. Eight of the 131 violations were this one pairing: the `Assignee`, `Estimate` and
+  `Label` popover headers, and `UserRow`'s role text rendered in a list inside them. All
+  now measure 5.12 / 5.96 / 6.55:1.
+
+  `AddTaskModal`'s title placeholder is swapped too, and axe never reported it — the story
+  renders that field with a value, and a placeholder only exists while the field is empty.
+  That is a general blind spot in a static-story audit, and the reason `contrast.test.ts`
+  rather than the browser pass is what carries it.
+
+- **`Badge`'s status labels clear AA on their own fills.** The same defect as `Tag`, on
+  light fills instead of dark tints, and the only group the audit's ranked table missed —
+  it missed them because `Badge` renders in few stories, not because they were close.
+  `success-4` on `success-1` measured **1.69:1**, `warning-5` on `warning-1` **2.34:1**,
+  `danger-5` on `danger-1` **3.90:1**. Fills and borders are unchanged.
+
+  Warning and danger needed nothing invented: their ramps already carry a step 6 for
+  exactly this, and `tokens.css` has had both all along — `warning-6` clears **6.10:1**
+  and `danger-6` **7.04:1**. Success has no step 6, and there is no other dark green in
+  the palette (`secondary-4`, the nearest, manages 2.50:1), so its label falls back to
+  `neutral-4` — the colour the `neutral` variant already uses, at **13.09:1** — and the
+  green fill carries the status alone. That is a palette gap, not a component decision,
+  and `MIGRATION_GAPS.md` records it as one: the honest fix is a `success-6` from design.
+
+  Adds `badge.test.tsx`, pinning both the fills (the design's, and they must not move) and
+  the labels (three of four deliberate deviations, so a refactor cannot quietly restore
+  the same-hue label).
+
+- **`Tag`'s labels clear AA on their own tints.** The design paints label and fill from
+  one swatch (`bg-X/10 text-X`), which is structurally incapable of clearing 4.5:1 — a
+  10% tint of a colour is never far from that colour. Red measured 2.61 / 3.17 / 3.61:1
+  over overlay / panel / shell and green 3.66 / 4.44 / 5.08, together 27 of the 131
+  violations. **The fills are unchanged**; only the labels moved, because no choice of
+  fill rescues them: `primary-4` as text clears 4.5:1 against nothing in this palette
+  (best case 4.02:1, on the shell).
+
+  | variant   | fill             | label                         | was                    | now                     |
+  | --------- | ---------------- | ----------------------------- | ---------------------- | ----------------------- |
+  | `red`     | `primary-4/10`   | `primary-4` → `primary-2`     | 2.61 / 3.17 / 3.61:1   | 4.98 / 6.02 / 6.86:1    |
+  | `green`   | `secondary-4/10` | `secondary-4` → `secondary-2` | 3.66 / 4.44 / 5.08:1   | 5.50 / 6.67 / 7.64:1    |
+  | `blue`    | `blue/10`        | `blue` → `main`               | 1.77 / 2.14 / 2.43:1   | 10.38 / 12.53 / 14.25:1 |
+  | `yellow`  | `tertiary-4/10`  | unchanged                     | 4.73 / 5.74 / 6.58:1   | unchanged               |
+  | `neutral` | `neutral-2/10`   | unchanged                     | 9.52 / 11.54 / 13.20:1 | unchanged               |
+
+  `blue` is the one the palette cannot serve on its own terms: `--color-blue` is a
+  standalone accent with no ramp, so there is no lighter step to reach for, and
+  CONTRIBUTING.md's first design value rules out inventing one. Its tint alone now carries
+  the variant. The outline style takes the same colour for border and label, except blue,
+  whose border stays `--color-blue` — a white border would make it indistinguishable from
+  the neutral outline tag. That border does not clear 1.4.11's 3:1 on any surface
+  (1.87 / 2.29 / 2.63) and `contrast.test.ts` records it as the known limit.
+
+  Visually, chips keep their hue and their exact Figma fill; red and green labels read a
+  shade paler, and blue's label is white. **Consumers with committed screenshots of a
+  board will need to retake them.**
+
+- **`Avatar`'s initials are readable.** `bg-primary-1 text-primary-4` measured **2.61:1**,
+  and was the largest single accessibility defect in the kit — 46 of the 131
+  colour-contrast violations an axe pass over the built Storybook reports came from that
+  one class, because an avatar renders in nearly every composed story. The initials are
+  now `text-neutral-5` on the unchanged tint: **10.50:1**. Nothing was traded away for it
+  — the design draws no initials state at all (every exported `Avatar` frame is
+  image-filled), so the old pairing was invented rather than transcribed, and `neutral-5`
+  is already this kit's text colour on a light surface.
+
+- **`npm run build:storybook` works from a clean checkout.** Storybook's Vite builder
+  loads the root `vite.config.ts` and inherits every plugin in it, so the Storybook build
+  was also running the two that exist purely to produce the published package. Both then
+  failed on a checkout where `npm run build` had not already run: `copy-theme-tokens`
+  wrote into a `dist/` nothing had created (`ENOENT: ./dist/theme.css`), and once that
+  was fixed, `vite:dts`'s `rollupTypes` step handed api-extractor a
+  `mainEntryPointFilePath` that did not exist either. Only the first was known; the
+  second was behind it. `.storybook/main.ts` now filters both out in `viteFinal`, which
+  also stops the Storybook build from writing into `dist/` and drops ~2.5s of declaration
+  rollup from it. CI had been passing on step ordering, not correctness.
 
 - **The `Select` and `MultiSelect` triggers are the design's chip again**, not a white
   field. Both hardcoded `bg-surface-neutral` — `#FFFFFF` — so the consuming app's dark

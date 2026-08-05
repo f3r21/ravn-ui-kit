@@ -1,12 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { TaskTable } from './task-table';
+import { withSurface } from '../../../.storybook/decorators';
 
 const meta: Meta<typeof TaskTable> = {
   title: 'Layout/TaskTable',
   component: TaskTable,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  // The table sits on the app shell; its cells carry their own panel fill, but the empty
+  // state and the group headers do not, and on Storybook's light default canvas they
+  // rendered white-on-white. Same fix as `Input`/`Datepicker` took earlier.
+  decorators: [withSurface('neutral-5')],
+  parameters: { layout: 'fullscreen' },
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -69,10 +69,17 @@ export function SidebarItem({
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',
+        // `-text`, not the bare `text-interactive`, on both the active and the hover
+        // label: an item's label is text, and primary-4 as text clears 4.5:1 nowhere
+        // (2.86 / 3.51 / 4.02). The sidebar is `surface-panel`, so the active item was
+        // 3.51:1. `primary-2` measures 6.67:1 there, and 6.02:1 at the far end of the
+        // gradient where the label sits on a 10% primary-4 wash — both clear. The wash
+        // itself is unchanged: it is decoration, not a boundary, and the label carries
+        // the state.
         isActive
-          ? 'text-interactive bg-gradient-to-r from-transparent to-primary-4/10'
-          : 'text-muted hover:text-interactive',
+          ? 'text-interactive-text bg-gradient-to-r from-transparent to-primary-4/10'
+          : 'text-muted hover:text-interactive-text',
         className,
       )}
     >
@@ -86,7 +93,19 @@ export function SidebarItem({
         <span
           className={cn(
             'px-2 py-0.5 text-xs font-bold rounded-full shrink-0',
-            isActive ? 'bg-primary-4 text-main' : 'bg-neutral-3 text-main',
+            // The active badge was `bg-primary-4 text-main` — white on the brand red at
+            // **3.83:1**, the same failing pairing as the primary CTA but on text the
+            // CTA's documented exemption does not cover. axe files it under `incomplete`
+            // rather than `violations` (messageKey `shortTextContent`: a two-digit count
+            // might be decorative), which is why a violations-only sweep never saw it.
+            //
+            // Unlike the CTA there is nothing to preserve: `badgeCount` has no
+            // ground-truth basis at all — no export shows a count on this component, as
+            // the doc comment above says — so it is an opt-in addition rather than
+            // something Figma draws. And no label colour rescues `primary-4`; the fill had
+            // to move. `interactive-text` with `neutral-5` clears **7.63:1** and keeps the
+            // badge in the same accent family as the active label beside it.
+            isActive ? 'bg-interactive-text text-neutral-5' : 'bg-neutral-3 text-main',
           )}
         >
           {badgeCount}

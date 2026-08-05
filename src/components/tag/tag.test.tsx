@@ -23,6 +23,26 @@ const EXPECTED_SOLID: Record<AccentColor, string> = {
   blue: 'bg-blue/10',
 };
 
+/**
+ * The label colour, pinned for the opposite reason to the fills above.
+ *
+ * These are *not* all Figma's. The design draws label and fill from one swatch, which
+ * cannot clear AA — red measured 2.61:1 on its own tint, green 3.66:1, blue 1.77:1 —
+ * so red and green step up their ramps and blue, which has no ramp at all, goes white.
+ * Yellow and neutral are unchanged because they already cleared it.
+ *
+ * The ratios themselves live in `src/styles/contrast.test.ts`, which computes them from
+ * `tokens.css`. This pins only that the component reaches for the right token, so a
+ * refactor cannot quietly put the design's swatch back and re-fail the audit.
+ */
+const EXPECTED_LABEL: Record<AccentColor, string> = {
+  neutral: 'text-main',
+  red: 'text-primary-2',
+  green: 'text-secondary-2',
+  yellow: 'text-tertiary-4',
+  blue: 'text-main',
+};
+
 describe('Tag', () => {
   describe.each(Object.entries(EXPECTED_SOLID) as [AccentColor, string][])(
     'variant="%s"',
@@ -41,6 +61,18 @@ describe('Tag', () => {
         const cls = screen.getByText('Label').className;
         expect(cls).toContain('border');
         expect(cls).not.toContain(expectedFill);
+      });
+
+      it('labels in the contrast-checked colour, in both styles', () => {
+        const { rerender } = render(<Tag variant={variant}>Label</Tag>);
+        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[variant]);
+
+        rerender(
+          <Tag variant={variant} outline>
+            Label
+          </Tag>,
+        );
+        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[variant]);
       });
     },
   );

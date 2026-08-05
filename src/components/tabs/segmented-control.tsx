@@ -126,8 +126,18 @@ export function SegmentedControl({
             onClick={() => handleSelect(opt.id)}
             onKeyDown={handleKeyDown}
             className={cn(
-              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
-              isSelected ? 'bg-neutral-2 shadow-small' : '',
+              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2',
+              // The active label is `neutral-5`, not the white Figma draws. That is the
+              // one deviation in this component and the ratio is why: white on the
+              // `neutral-2` pill measures 2.94:1. The pill's fill is untouched — this is
+              // the same trade `Tag` and `Badge` take, keeping the design's fill and
+              // moving the label, and `neutral-5` on `neutral-2` clears 5.25:1.
+              //
+              // It does cost the spec's "identical label colour in both states,
+              // selection carried by the fill alone" (see the doc comment above). The
+              // fill still carries it; the label now agrees with it rather than being
+              // the only thing at 2.94:1.
+              isSelected ? 'bg-neutral-2 text-neutral-5 shadow-small' : '',
             )}
           >
             {opt.icon ? <span className="text-base leading-none">{opt.icon}</span> : null}

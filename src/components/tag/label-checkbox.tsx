@@ -104,7 +104,17 @@ export function LabelCheckbox({
         // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
         // `rounded` step) -- matches Figma "Label Checkbox" component exactly
         // (Property 1=Default/Selected, Tags01.md / Add Task Modal04/05.md).
-        'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-2',
+        // `has-[:focus-visible]:outline-solid` is load-bearing, not decoration. The real
+        // checkbox is `sr-only`, so the ring has to be drawn on this label via `:has()` —
+        // and under the `has-` variant, `outline-2`'s `outline-style:
+        // var(--tw-outline-style)` does not resolve to `solid` the way it does under
+        // `focus-visible:`. The width and the colour compute, and nothing paints: this
+        // control had **no visible focus indicator at all**, a 2.4.7 failure rather than a
+        // contrast one. Verified at the pixel level in a real browser — zero ring pixels
+        // before, 1604 after — and `getComputedStyle` was no help, reporting a colour for
+        // an outline that was never drawn. Same trap as the `outline-none` bug this kit
+        // already paid for once; see `button.tsx`. Do not drop `outline-solid` as redundant.
+        'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-2',
         isDisabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
@@ -123,7 +133,15 @@ export function LabelCheckbox({
           `MIGRATION_GAPS.md` Section 3, but sharing one checkbox control is the fix, not
           sharing one icon. */}
       <svg
-        className={cn('w-6 h-6 shrink-0', error ? 'text-danger' : 'text-main')}
+        // `text-danger-text` in the invalid state, not the `text-danger` this was.
+        // `FIELD_ERROR_CLASS` justifies keeping `danger-5` as an invalid *border* on the
+        // strength of the white field interior it separates from the container — and this
+        // box has no interior at all. It is a stroked outline with `fill="none"` over a
+        // dark surface, so both of its adjacent colours are that surface, and `danger-5`
+        // measures 2.55:1 on an overlay against 1.4.11's 3:1. Exactly the argument that
+        // moved `Select` and `MultiSelect` to `danger-text`; this control was missed.
+        // `danger-3` clears 5.65 / 6.94 / 7.95:1.
+        className={cn('w-6 h-6 shrink-0', error ? 'text-danger-text' : 'text-main')}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
