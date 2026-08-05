@@ -146,7 +146,12 @@ export function AddTaskModal({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Task name"
         aria-label="Task name"
-        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+        // `placeholder:text-muted-on-dark`, not `placeholder:text-muted`: this modal is
+        // `surface-overlay`, where neutral-2 is 3.73:1. axe never flagged it because the
+        // story renders the field with a value — a placeholder only exists while empty,
+        // which is a general blind spot in a static-story audit and the reason the token
+        // test carries this rather than the browser pass.
+        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
       />
 
       <div className="flex items-center gap-4 w-full">

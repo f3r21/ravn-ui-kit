@@ -248,6 +248,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Secondary text on a popover uses `--color-muted-on-dark`.** `--color-muted`
+  (`neutral-2`) clears AA on a panel (4.58:1) and on the shell (5.25:1) and measures
+  **3.73:1** on `surface-overlay` — which is exactly what makes it easy to ship: a
+  component built and reviewed on a panel is fine right up until it is dropped into a
+  modal. Eight of the 131 violations were this one pairing: the `Assignee`, `Estimate` and
+  `Label` popover headers, and `UserRow`'s role text rendered in a list inside them. All
+  now measure 5.12 / 5.96 / 6.55:1.
+
+  `AddTaskModal`'s title placeholder is swapped too, and axe never reported it — the story
+  renders that field with a value, and a placeholder only exists while the field is empty.
+  That is a general blind spot in a static-story audit, and the reason `contrast.test.ts`
+  rather than the browser pass is what carries it.
+
 - **`Badge`'s status labels clear AA on their own fills.** The same defect as `Tag`, on
   light fills instead of dark tints, and the only group the audit's ranked table missed —
   it missed them because `Badge` renders in few stories, not because they were close.

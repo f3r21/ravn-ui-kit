@@ -55,7 +55,11 @@ export function LabelModal({ labels, onSelect, onClose, triggerRef, className }:
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-muted font-sans truncate">Label</span>
+        {/* `--color-muted-on-dark`, not `--color-muted`: this popover is `surface-overlay`,
+            where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. */}
+        <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
+          Label
+        </span>
       </div>
       {labels.map((l) => (
         <button

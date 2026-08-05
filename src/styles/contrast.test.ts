@@ -462,6 +462,23 @@ describe('token contrast', () => {
       expect(contrastRatio('--color-muted', '--color-surface-neutral')).toBeLessThan(AA_TEXT);
     });
 
+    /**
+     * The reason `--color-muted-on-dark` exists, asserted rather than only described in
+     * `tokens.css`. It is the pairing that took eight more of the 131: the Assignee,
+     * Estimate and Label popovers' headers, and `UserRow`'s role text inside them. Note it
+     * *passes* on the other two surfaces, which is what makes it easy to ship — a
+     * component built and reviewed on a panel is fine until it is dropped into a modal.
+     */
+    it('muted is fine on a panel and the shell, and fails on an overlay — 3.73:1', () => {
+      expect(contrastRatio('--color-muted', '--color-surface-panel')).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+      expect(contrastRatio('--color-muted', '--color-surface-shell')).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+      expect(contrastRatio('--color-muted', '--color-surface-overlay')).toBeCloseTo(3.73, 2);
+    });
+
     it('primary-4 on primary-1 was the kit’s biggest single defect — 2.61:1, 46 renders', () => {
       expect(contrastRatio('--color-interactive', '--color-primary-1')).toBeCloseTo(2.61, 2);
     });
