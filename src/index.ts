@@ -19,6 +19,7 @@ export * from './components/button/text-button';
 
 // ─── Inputs ───────────────────────────────────────────────────────
 export * from './components/input/input';
+export * from './components/form-field/form-field';
 
 // ─── Top Navigation ───────────────────────────────────────────────
 export * from './components/top-nav/search-bar';

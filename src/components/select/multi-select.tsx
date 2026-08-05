@@ -1,11 +1,12 @@
 import { useRef } from 'react';
-import { useButton } from 'react-aria';
+import { useButton, useField } from 'react-aria';
 import { useListState, useOverlayTriggerState, type ListProps } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { Tag } from '../tag/tag';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
 import { ChevronDownIcon } from '../icons/icons';
+import { FieldMessages } from '../form-field/form-field';
 
 export interface MultiSelectProps<T extends object> extends Omit<
   ListProps<T>,
@@ -19,6 +20,20 @@ export interface MultiSelectProps<T extends object> extends Omit<
   icon?: React.ReactNode;
   /** Disables the whole control, preventing the popover from opening. */
   isDisabled?: boolean;
+  /**
+   * Error message rendered below the trigger. When set, also switches the trigger to its
+   * error visual state and marks it invalid to assistive tech.
+   */
+  error?: string;
+  /** Helper text rendered below the trigger. Hidden while `error` is set. */
+  description?: string;
+  // No `isRequired` here, deliberately. This control's trigger is a real <button>, and
+  // `aria-required` is not a supported state of role="button" (ARIA 1.2) — emitting it
+  // anyway would be invalid ARIA rather than an accessibility win. Unlike `Select` there
+  // is no `HiddenSelect` to carry it either (a native <select multiple> looks nothing
+  // like this design; see the component doc comment). A form that needs machine-readable
+  // required-ness should validate on submit and pass the result back as `error`, which
+  // this control does support and does associate.
   /** Additional class names applied to the trigger's wrapping container, merged last via `cn()`. */
   className?: string;
 }
@@ -51,6 +66,8 @@ export function MultiSelect<T extends object>({
   placeholder,
   icon,
   isDisabled,
+  error,
+  description,
   className,
   ...props
 }: MultiSelectProps<T>) {
@@ -66,6 +83,16 @@ export function MultiSelect<T extends object>({
     selectionBehavior: 'toggle',
   });
 
+  // Unlike Select there is no field hook underneath this control (it is assembled from
+  // useListState + a plain button), so useField is what produces the ids and the
+  // aria-describedby that ties the trigger to its description/error.
+  const { fieldProps, descriptionProps, errorMessageProps } = useField({
+    label,
+    description,
+    errorMessage: error,
+    isInvalid: !!error,
+  });
+
   const { buttonProps } = useButton(
     { onPress: () => overlayState.toggle(), isDisabled, 'aria-label': label },
     triggerRef,
@@ -76,13 +103,23 @@ export function MultiSelect<T extends object>({
   );
 
   return (
-    <div className={cn('inline-block', className)}>
+    <div className={cn('inline-flex flex-col gap-1.5', className)}>
       <button
         {...buttonProps}
         ref={triggerRef}
         type="button"
         aria-haspopup="listbox"
         aria-expanded={overlayState.isOpen}
+        aria-describedby={fieldProps['aria-describedby']}
+        // No aria-invalid/aria-required here on purpose. Neither is a supported state of
+        // role="button" (ARIA 1.2), and emitting unsupported ARIA is its own defect —
+        // the same class of bug this kit already fixed on SegmentedControl. What a
+        // screen-reader user does get is aria-describedby pointing at the error text,
+        // which IS global and supported, plus the visual state below.
+        // Unlike Select there is no HiddenSelect here either (see the note above on why),
+        // so this control's invalid state is carried by the associated message and the
+        // border alone. Wrap it in a native <fieldset>/form control if a form needs
+        // machine-readable validity.
         className={cn(
           // See Select's identical note: `bg-surface-neutral` is a light
           // surface, so the placeholder/value text needs `Input`'s
@@ -90,6 +127,7 @@ export function MultiSelect<T extends object>({
           // `text-main` (invisible white-on-white once something's picked).
           'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted',
+          error && 'border-danger-5 focus-visible:outline-danger-5',
         )}
       >
         {icon}
@@ -110,6 +148,13 @@ export function MultiSelect<T extends object>({
         )}
         <ChevronDownIcon className="w-3 h-3 shrink-0" />
       </button>
+
+      <FieldMessages
+        description={description}
+        error={error}
+        descriptionProps={descriptionProps}
+        errorMessageProps={errorMessageProps}
+      />
 
       {overlayState.isOpen ? (
         <FloatingPopover state={overlayState} triggerRef={triggerRef} placement="bottom start">

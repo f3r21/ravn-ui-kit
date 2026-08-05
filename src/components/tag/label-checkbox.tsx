@@ -1,7 +1,8 @@
 import { useRef } from 'react';
-import { useCheckbox } from 'react-aria';
+import { useCheckbox, useField } from 'react-aria';
 import { useToggleState } from 'react-stately';
 import { cn } from '../../utils/cn';
+import { FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface LabelCheckboxProps {
   /** Label content rendered next to the checkbox. */
@@ -26,6 +27,20 @@ export interface LabelCheckboxProps {
    * @default false
    */
   isIndeterminate?: boolean;
+  /**
+   * Error message rendered below the checkbox. When set, also marks the control invalid
+   * to assistive tech and tints the box — previously this control had no way to report a
+   * validation failure at all, so a form could reject it without being able to say so.
+   */
+  error?: string;
+  /** Helper text rendered below the checkbox. Hidden while `error` is set. */
+  description?: string;
+  /**
+   * Marks the checkbox required — renders the shared indicator after the label and sets
+   * `aria-required`.
+   * @default false
+   */
+  isRequired?: boolean;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -50,6 +65,9 @@ export function LabelCheckbox({
   onChange,
   isDisabled = false,
   isIndeterminate = false,
+  error,
+  description,
+  isRequired = false,
   className,
 }: LabelCheckboxProps) {
   const state = useToggleState({
@@ -58,18 +76,28 @@ export function LabelCheckbox({
     onChange,
   });
   const ref = useRef<HTMLInputElement>(null);
+  // useCheckbox has no description/error association of its own, so useField supplies
+  // the ids and the aria-describedby that ties the input to the messages below.
+  const { fieldProps, descriptionProps, errorMessageProps } = useField({
+    description,
+    errorMessage: error,
+    isInvalid: !!error,
+  });
+
   const { inputProps, labelProps } = useCheckbox(
     {
       isSelected: state.isSelected,
       isIndeterminate,
       isDisabled,
+      isRequired,
+      isInvalid: !!error,
       'aria-label': typeof children === 'string' ? children : 'Checkbox',
     },
     state,
     ref,
   );
 
-  return (
+  const control = (
     <label
       {...labelProps}
       className={cn(
@@ -81,7 +109,12 @@ export function LabelCheckbox({
         className,
       )}
     >
-      <input {...inputProps} ref={ref} className="sr-only" />
+      <input
+        {...inputProps}
+        ref={ref}
+        aria-describedby={fieldProps['aria-describedby']}
+        className="sr-only"
+      />
       {/* Drawn inline rather than pulled from the kit's icon set on purpose: the box, the
           check and the indeterminate dash are three renderings of one control's state, not
           a glyph from the design's vocabulary, and splitting them into icons would scatter
@@ -90,7 +123,7 @@ export function LabelCheckbox({
           `MIGRATION_GAPS.md` Section 3, but sharing one checkbox control is the fix, not
           sharing one icon. */}
       <svg
-        className="w-6 h-6 shrink-0 text-main"
+        className={cn('w-6 h-6 shrink-0', error ? 'text-danger' : 'text-main')}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -110,7 +143,29 @@ export function LabelCheckbox({
         ) : null}
       </svg>
       {/* Desktop/Body/M/regular -- SF Pro Display, 15px/24px, letter-spacing 0.75px (tracking-wider) */}
-      <span className="text-body-m font-normal font-sans text-main">{children}</span>
+      <span className="text-body-m font-normal font-sans text-main">
+        {children}
+        {isRequired ? <RequiredIndicator /> : null}
+      </span>
     </label>
+  );
+
+  // The messages sit outside the <label> on purpose: anything inside it becomes part of
+  // the checkbox's own accessible name, so an error message nested there would be read
+  // as though it were the label.
+  if (!error && !description) return control;
+
+  return (
+    <div className="inline-flex flex-col gap-1">
+      {control}
+      <span className="px-4">
+        <FieldMessages
+          description={description}
+          error={error}
+          descriptionProps={descriptionProps}
+          errorMessageProps={errorMessageProps}
+        />
+      </span>
+    </div>
   );
 }

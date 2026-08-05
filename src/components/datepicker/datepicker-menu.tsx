@@ -46,6 +46,15 @@ export interface DatePickerMenuProps {
 /**
  * DatePickerMenu
  *
+ * Deliberately has **no `error`/`description`/`isRequired` surface**, unlike `Input`,
+ * `Datepicker`, `Select`, `MultiSelect` and `LabelCheckbox`. It is a floating calendar
+ * panel with no label and no trigger of its own — the consumer owns the trigger and
+ * passes a `triggerRef`. A validation message rendered inside this popover would sit in a
+ * surface that disappears the moment the user dismisses it, and would be announced from a
+ * `role="dialog"` rather than from the field it belongs to. The error belongs on whatever
+ * field owns the trigger; wrap that in `FormField` (or use `Datepicker`, which is the
+ * text-input variant and takes `error` directly).
+ *
  * Figma: "DatePicker / Menu" component (Components/Datepicker.md), confirmed as the real desktop
  * component via 3 real in-context instances (Mockups/Task Add Task/Add Task Modal05.md,
  * Mockups/Dashboard Add Task/Add Task Modal05.md, Mockups/Dashboard Edit Task/Add Task Modal06.md)

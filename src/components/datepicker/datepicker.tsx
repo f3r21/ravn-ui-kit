@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useTextField, type AriaTextFieldProps } from 'react-aria';
 import { cn } from '../../utils/cn';
+import { FIELD_LABEL_CLASS, FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface DatepickerProps extends AriaTextFieldProps {
   /** Label text rendered above the input. When omitted, no label is shown. */
@@ -10,25 +11,25 @@ export interface DatepickerProps extends AriaTextFieldProps {
    * input to its error visual state (danger border/outline).
    */
   error?: string;
+  /** Helper text rendered below the input. Hidden while `error` is set. */
+  description?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
-export function Datepicker({ label, error, className, ...props }: DatepickerProps) {
+export function Datepicker({ label, error, description, className, ...props }: DatepickerProps) {
   const ref = useRef<HTMLInputElement>(null);
-  const { labelProps, inputProps, errorMessageProps } = useTextField(
-    { ...props, label, type: 'date', isInvalid: !!error, errorMessage: error },
+  const { labelProps, inputProps, descriptionProps, errorMessageProps } = useTextField(
+    { ...props, label, description, type: 'date', isInvalid: !!error, errorMessage: error },
     ref,
   );
 
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label ? (
-        <label
-          {...labelProps}
-          className="text-field-label font-semibold text-neutral-3 uppercase font-sans"
-        >
+        <label {...labelProps} className={FIELD_LABEL_CLASS}>
           {label}
+          {props.isRequired ? <RequiredIndicator /> : null}
         </label>
       ) : null}
       <input
@@ -41,11 +42,12 @@ export function Datepicker({ label, error, className, ...props }: DatepickerProp
           className,
         )}
       />
-      {error ? (
-        <span {...errorMessageProps} className="text-xs text-danger font-sans">
-          {error}
-        </span>
-      ) : null}
+      <FieldMessages
+        description={description}
+        error={error}
+        descriptionProps={descriptionProps}
+        errorMessageProps={errorMessageProps}
+      />
     </div>
   );
 }

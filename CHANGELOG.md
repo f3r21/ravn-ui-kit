@@ -10,6 +10,26 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **A shared form-field surface** (`FormField`, `FieldMessages`, `RequiredIndicator`).
+  Only `Input` and `Datepicker` accepted an `error` at all — `Select`, `MultiSelect` and
+  `LabelCheckbox` had no way to report one, so a consuming form could reject a field it
+  then could not mark. All five now take `error` and `description`, rendering the same
+  markup with the same `aria-describedby` association, built on react-aria's `useField`
+  rather than a parallel hand-rolled one. `Input`, `Datepicker`, `Select` and
+  `LabelCheckbox` also take `isRequired` and render a shared `*` indicator, which is
+  `aria-hidden` because react-aria already carries required-ness in the accessibility
+  tree. `FormField` wraps controls the kit does not own.
+
+  Three things this pass deliberately did _not_ do, each verified rather than assumed:
+  `Select`/`MultiSelect` triggers get **no** `aria-invalid`/`aria-required`, because
+  neither is a supported state of `role="button"` and emitting them would be invalid
+  ARIA (the same class of bug this kit already fixed on `SegmentedControl`);
+  `MultiSelect` therefore exposes no `isRequired` at all; and `DatePickerMenu` gets no
+  error surface, because it is a floating calendar with no label or trigger of its own —
+  a message rendered inside it would vanish on dismiss. `Select`'s `isRequired` is
+  visual-only in this react-aria version (`HiddenSelectProps` has no `isRequired`), which
+  is documented at the call site and pinned by a test that will fail on upgrade.
+
 - **A toast/notification system** — `ToastProvider` plus a `useToast()` hook, built on
   react-aria's `useToastState`/`useToastRegion`/`useToast` and portalled via
   `createPortal`. Tones come from the shared `StatusTone` vocabulary; `duration`,
