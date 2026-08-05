@@ -45,13 +45,14 @@ jobs:
       - name: Build Storybook
         run: npm run build:storybook
 
-      - name: Upload Storybook artifact
-        uses: actions/upload-artifact@v4
+      # Uploaded in the shape `actions/deploy-pages` consumes, rather than as a
+      # plain artifact. The build already happened above; publishing it is the
+      # only step that was missing, and without it the README's opening line —
+      # go and look at the Storybook — pointed at nothing a reader could open.
+      - name: Package Storybook for Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: storybook-static
           path: storybook-static
-          retention-days: 7
-          if-no-files-found: error
 
       # audit-level=high: repo has one known, accepted moderate vuln (uuid via
       # @storybook/addon-essentials -> @storybook/addon-actions). Fixing it
@@ -60,3 +61,41 @@ jobs:
       # still fails CI on any new high/critical vulnerability.
       - name: Audit dependencies
         run: npm audit --audit-level=high
+
+  # Publishing is its own job so the gate stays the thing that decides whether
+  # anything ships: `needs: ci` means a red typecheck, lint, test or audit run
+  # leaves the published Storybook at its last good state rather than replacing
+  # it with a broken one.
+  deploy-storybook:
+    name: Publish Storybook
+    needs: ci
+    # Pull requests build the Storybook and stop there. Only `main` publishes —
+    # there is one Pages site per repository, so deploying from a branch would
+    # mean every open PR overwriting the documented URL in turn.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Narrower than the default and wider than the workflow's `contents: read`:
+    # `pages: write` to publish, and `id-token: write` because `deploy-pages`
+    # authenticates to the Pages service with an OIDC token rather than a
+    # long-lived secret.
+    permissions:
+      pages: write
+      id-token: write
+
+    # Two concurrent publishes would race to be the live version, so these queue
+    # instead of cancelling — unlike the CI runs above, where a superseded run
+    # has nothing worth finishing.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
