@@ -34,6 +34,9 @@ export * from './components/popover/floating-popover';
 // ─── ListBox (headless option list) ───────────────────────────────
 export * from './components/listbox/list-box';
 
+// ─── Select ────────────────────────────────────────────────────────
+export * from './components/select/select';
+
 // ─── Modals ───────────────────────────────────────────────────────
 export * from './components/modal/modal';
 export * from './components/modal/add-task-modal';
