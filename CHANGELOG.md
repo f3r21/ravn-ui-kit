@@ -248,6 +248,24 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`Badge`'s status labels clear AA on their own fills.** The same defect as `Tag`, on
+  light fills instead of dark tints, and the only group the audit's ranked table missed —
+  it missed them because `Badge` renders in few stories, not because they were close.
+  `success-4` on `success-1` measured **1.69:1**, `warning-5` on `warning-1` **2.34:1**,
+  `danger-5` on `danger-1` **3.90:1**. Fills and borders are unchanged.
+
+  Warning and danger needed nothing invented: their ramps already carry a step 6 for
+  exactly this, and `tokens.css` has had both all along — `warning-6` clears **6.10:1**
+  and `danger-6` **7.04:1**. Success has no step 6, and there is no other dark green in
+  the palette (`secondary-4`, the nearest, manages 2.50:1), so its label falls back to
+  `neutral-4` — the colour the `neutral` variant already uses, at **13.09:1** — and the
+  green fill carries the status alone. That is a palette gap, not a component decision,
+  and `MIGRATION_GAPS.md` records it as one: the honest fix is a `success-6` from design.
+
+  Adds `badge.test.tsx`, pinning both the fills (the design's, and they must not move) and
+  the labels (three of four deliberate deviations, so a refactor cannot quietly restore
+  the same-hue label).
+
 - **`Tag`'s labels clear AA on their own tints.** The design paints label and fill from
   one swatch (`bg-X/10 text-X`), which is structurally incapable of clearing 4.5:1 — a
   10% tint of a colour is never far from that colour. Red measured 2.61 / 3.17 / 3.61:1

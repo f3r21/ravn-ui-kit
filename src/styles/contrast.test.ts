@@ -315,6 +315,57 @@ describe('token contrast', () => {
   });
 
   /**
+   * `Badge`'s four status pills — the same defect as `Tag`, on light fills instead of
+   * dark tints, and the only group the audit's ranked table missed. It missed them
+   * because `Badge` renders in few stories, not because they were close: `success-4` on
+   * `success-1` measured 1.69:1, the worst pairing in the kit after `Tag`'s blue.
+   *
+   * Warning and danger needed nothing invented — their ramps already carry a step 6 for
+   * exactly this. Success does not, and there is no other dark green in the palette, so
+   * it borrows the `neutral` variant's label and lets its fill carry the status.
+   */
+  describe('Badge', () => {
+    const VARIANTS = [
+      ['neutral', '--color-surface-neutral', '--color-neutral-4'],
+      ['success', '--color-success-1', '--color-neutral-4'],
+      ['warning', '--color-warning-1', '--color-warning-6'],
+      ['danger', '--color-danger-1', '--color-danger-6'],
+    ] as const;
+
+    for (const [variant, fill, label] of VARIANTS) {
+      it(`${variant}'s label clears AA on its own fill`, () => {
+        expect(contrastRatio(label, fill)).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+    }
+
+    /**
+     * The step-2 borders are **not** asserted at 3:1, and that is deliberate rather than
+     * an omission. `success-2` measures 1.14:1 against the fill it encloses and 1.17:1
+     * against a white page; warning and danger are the same story. 1.4.11 asks for 3:1 on
+     * boundaries *required to identify* a control, and a badge is identified by its own
+     * text — the hairline is decoration. Raising it would repaint four components to fix
+     * nothing a user relies on.
+     */
+    it('the step-2 borders are decoration, not an identifying boundary — recorded, not fixed', () => {
+      for (const [border, fill] of [
+        ['--color-success-2', '--color-success-1'],
+        ['--color-warning-2', '--color-warning-1'],
+        ['--color-danger-2', '--color-danger-1'],
+      ] as const) {
+        expect(contrastRatio(border, fill)).toBeLessThan(AA_NON_TEXT);
+      }
+    });
+
+    it('the success ramp has no dark step, which is why success borrows neutral’s label', () => {
+      // If a `success-5`/`success-6` ever lands, this fails and the fallback can go.
+      expect(TOKENS.has('--color-success-5')).toBe(false);
+      expect(TOKENS.has('--color-success-6')).toBe(false);
+      // The nearest green in the whole palette, and it is nowhere near.
+      expect(contrastRatio('--color-secondary-4', '--color-success-1')).toBeLessThan(AA_TEXT);
+    });
+  });
+
+  /**
    * 1.4.11 asks for 3:1 against *adjacent* colours. A field's border has two — the white
    * interior and the dark container — and is perceivable if it clears 3:1 against either.
    * Neither border clears it against both, and they fail on opposite sides: `subtle`
@@ -438,6 +489,12 @@ describe('token contrast', () => {
           tint('--color-secondary-4', 0.1, '--color-surface-panel'),
         ),
       ).toBeCloseTo(4.44, 2);
+    });
+
+    it('the status ramps’ own step-4/5 labels on their step-1 fills — 1.69 / 2.34 / 3.90:1', () => {
+      expect(contrastRatio('--color-success-4', '--color-success-1')).toBeCloseTo(1.69, 2);
+      expect(contrastRatio('--color-warning-5', '--color-warning-1')).toBeCloseTo(2.34, 2);
+      expect(contrastRatio('--color-danger', '--color-danger-1')).toBeCloseTo(3.9, 2);
     });
 
     it('no fill rescues a primary-4 label — it clears 4.5:1 against nothing here', () => {
