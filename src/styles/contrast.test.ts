@@ -174,6 +174,26 @@ describe('token contrast', () => {
   });
 
   /**
+   * `Avatar`'s initials, on the `primary-1` tint.
+   *
+   * This is the only light surface in the kit that is not white, and it was the single
+   * largest defect in the palette: 46 of the 131 contrast violations an axe pass over the
+   * built Storybook reported came from one `bg-primary-1 text-primary-4` class, at
+   * 2.61:1, because an avatar appears in nearly every composed story.
+   *
+   * It also had no defence. The design draws no initials state at all — every exported
+   * Avatar frame is image-filled — so unlike the primary button below, there was no Figma
+   * pairing to deviate from. `neutral-5` is what the kit already puts on a light surface.
+   */
+  describe('text on the accent tint', () => {
+    it('--color-neutral-5 (the initials) clears AA on --color-primary-1', () => {
+      expect(contrastRatio('--color-neutral-5', '--color-primary-1')).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+    });
+  });
+
+  /**
    * The chip surface: `bg-neutral-2/10`, the design's own `rgba(148, 151, 154, 0.1)`.
    *
    * `Tag` has always been this, and `Select`/`MultiSelect`'s triggers now are too. It is
@@ -321,6 +341,10 @@ describe('token contrast', () => {
 
     it('muted as a placeholder is unreadable inside a light field — 2.94:1', () => {
       expect(contrastRatio('--color-muted', '--color-surface-neutral')).toBeLessThan(AA_TEXT);
+    });
+
+    it('primary-4 on primary-1 was the kit’s biggest single defect — 2.61:1, 46 renders', () => {
+      expect(contrastRatio('--color-interactive', '--color-primary-1')).toBeCloseTo(2.61, 2);
     });
 
     /**

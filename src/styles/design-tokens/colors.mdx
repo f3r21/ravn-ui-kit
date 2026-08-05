@@ -147,9 +147,16 @@ Every `text-main`/`text-muted`/`text-interactive`/`text-danger`/
 `bg-surface-neutral`/`border-subtle` call site across the kit now uses these
 aliases — a small number of genuinely different-role usages of the same raw
 color are deliberately left as raw ramp classes rather than force-fit:
-`text-primary-4` on `Tag`'s own `red` accent colour and on `Avatar`'s
-decorative initials tint (categorical/decorative, not interactive), and on
-`TaskTable`'s "overdue" due-date text (a status signal, not interactivity).
+`text-primary-4` on `Tag`'s own `red` accent colour, and on `TaskTable`'s
+"overdue" due-date text (a status signal, not interactivity).
+
+`Avatar` used to be a third such case — `bg-primary-1 text-primary-4` for its
+initials fallback — and is no longer. That pairing measured **2.61:1** and was
+the largest single accessibility defect in the kit, 46 of 131 axe violations
+from one class. Its initials are now `text-neutral-5` on the same tint
+(**10.50:1**), the colour this kit already uses for text on a light surface.
+There was nothing to weigh against the fix: the design has no initials state
+at all, so the pairing was invented rather than transcribed.
 
 `neutral-2` has one more un-aliased role, as a **10%-alpha fill** rather than a
 colour in its own right: `bg-neutral-2/10` is the design's chip surface —

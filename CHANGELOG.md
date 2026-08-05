@@ -248,6 +248,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`Avatar`'s initials are readable.** `bg-primary-1 text-primary-4` measured **2.61:1**,
+  and was the largest single accessibility defect in the kit — 46 of the 131
+  colour-contrast violations an axe pass over the built Storybook reports came from that
+  one class, because an avatar renders in nearly every composed story. The initials are
+  now `text-neutral-5` on the unchanged tint: **10.50:1**. Nothing was traded away for it
+  — the design draws no initials state at all (every exported `Avatar` frame is
+  image-filled), so the old pairing was invented rather than transcribed, and `neutral-5`
+  is already this kit's text colour on a light surface.
+
 - **`npm run build:storybook` works from a clean checkout.** Storybook's Vite builder
   loads the root `vite.config.ts` and inherits every plugin in it, so the Storybook build
   was also running the two that exist purely to produce the published package. Both then
