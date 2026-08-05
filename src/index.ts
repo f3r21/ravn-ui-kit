@@ -36,6 +36,7 @@ export * from './components/listbox/list-box';
 
 // ─── Select ────────────────────────────────────────────────────────
 export * from './components/select/select';
+export * from './components/select/multi-select';
 
 // ─── Modals ───────────────────────────────────────────────────────
 export * from './components/modal/modal';
