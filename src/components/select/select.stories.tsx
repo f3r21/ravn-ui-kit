@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { Item } from 'react-stately';
 import { withSurface } from '../../../.storybook/decorators';
 import { Select, type SelectProps } from './select';
+import { Modal } from '../modal/modal';
+import { TextButton } from '../button/text-button';
 
 interface StatusOption {
   id: string;
@@ -70,4 +73,33 @@ export const InsideOverflowHiddenContainer: Story = {
       <Select {...(args as SelectProps<StatusOption>)} />
     </div>
   ),
+};
+
+/**
+ * Proves the popover paints *above* the modal that opened it.
+ *
+ * This used to be a coin flip. `Modal`'s backdrop and `FloatingPopover` both hardcoded a
+ * bare `z-50` with no documented relationship between them, so which one won came down to
+ * DOM order — and a portalled popover is a sibling of the modal rather than a descendant,
+ * so nothing reliably put it on top. Both now sit on the documented `--z-index-*` scale in
+ * `tokens.css`, where `popover` (200) deliberately outranks `overlay` (100), because a
+ * surface has to clear whatever opened it.
+ */
+export const InsideAModal: Story = {
+  render: (args) => {
+    function Inner() {
+      const [isOpen, setIsOpen] = useState(true);
+      return (
+        <>
+          <TextButton variant="primary" onPress={() => setIsOpen(true)}>
+            Open modal
+          </TextButton>
+          <Modal title="Edit task" isOpen={isOpen} onClose={() => setIsOpen(false)}>
+            <Select {...(args as SelectProps<StatusOption>)} />
+          </Modal>
+        </>
+      );
+    }
+    return <Inner />;
+  },
 };

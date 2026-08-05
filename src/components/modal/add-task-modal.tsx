@@ -187,7 +187,7 @@ export function AddTaskModal({
               }}
               onClose={closePopover}
               triggerRef={estimateTriggerRef}
-              className="absolute top-full left-0 mt-1 z-10"
+              className="absolute top-full left-0 mt-1 z-nested"
             />
           ) : null}
         </div>
@@ -227,7 +227,7 @@ export function AddTaskModal({
               }}
               onClose={closePopover}
               triggerRef={assigneeTriggerRef}
-              className="absolute top-full left-0 mt-1 z-10"
+              className="absolute top-full left-0 mt-1 z-nested"
             />
           ) : null}
         </div>
@@ -266,7 +266,7 @@ export function AddTaskModal({
               }}
               onClose={closePopover}
               triggerRef={labelTriggerRef}
-              className="absolute top-full left-0 mt-1 z-10"
+              className="absolute top-full left-0 mt-1 z-nested"
             />
           ) : null}
         </div>
@@ -294,7 +294,7 @@ export function AddTaskModal({
               }}
               onClose={closePopover}
               triggerRef={dateTriggerRef}
-              className="absolute top-full left-0 mt-1 z-10"
+              className="absolute top-full left-0 mt-1 z-nested"
             />
           ) : null}
         </div>

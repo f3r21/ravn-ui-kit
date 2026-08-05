@@ -10,6 +10,22 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **A z-index scale** in `tokens.css` — `--z-index-nested` (10), `--z-index-overlay`
+  (100), `--z-index-popover` (200), `--z-index-toast` (300), yielding `z-nested`,
+  `z-overlay`, `z-popover` and `z-toast`. `Modal`'s backdrop and `FloatingPopover` both
+  hardcoded a bare `z-50` with no documented relationship, so a `Select` or `Menu` opened
+  from inside a `Modal` tied with it and resolved on DOM order — which is to say, on
+  luck. `AddTaskModal`'s four raw `z-10`s are on the scale too.
+
+  `popover` deliberately outranks `overlay`: a surface has to clear whatever opened it,
+  and a portalled popover is a _sibling_ of the modal rather than a descendant, so
+  nothing else would put it on top. Gaps are 100 wide so a consumer can slot a layer
+  between two kit layers without renumbering.
+
+  Namespaced `--z-index-*` rather than `--z-*` because Tailwind v4 derives `z-<name>`
+  utilities from that namespace specifically — a `--z-*` name compiles to no class and
+  no error, which was caught by grepping the built `ui-kit.css` rather than assumed.
+
 - **`EmptyState`** — a labelled `role="group"` with title/description/icon/action slots.
   The kit previously shipped two hardcoded English strings for exactly this ("No tasks in
   this view." in `TaskListView`, "No tasks yet." in `TaskTable`), which a consumer could

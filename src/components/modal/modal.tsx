@@ -70,7 +70,7 @@ export function Modal({
   return (
     <div
       {...underlayProps}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-overlay flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
     >
       {/* eslint-disable-next-line jsx-a11y/no-autofocus -- react-aria's FocusScope
           `autoFocus` is the WAI-ARIA dialog focus-management pattern (move focus

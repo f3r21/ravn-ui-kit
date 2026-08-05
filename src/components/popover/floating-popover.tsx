@@ -88,7 +88,7 @@ export function FloatingPopover({
             }
           }}
           className={cn(
-            'z-50 bg-surface-overlay rounded-sm border border-subtle shadow-xl',
+            'z-popover bg-surface-overlay rounded-sm border border-subtle shadow-xl',
             className,
           )}
         >
