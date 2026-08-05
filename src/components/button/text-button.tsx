@@ -50,7 +50,10 @@ export function TextButton({
       ? 'bg-transparent text-muted'
       : isSelected
         ? 'bg-neutral-3 text-main'
-        : 'bg-transparent text-main hover:bg-neutral-2',
+        : // `hover:text-neutral-5` alongside the hover fill: white on a solid `neutral-2`
+          // is 2.94:1, so the label has to move with the background. Invisible to a
+          // static-story axe pass, which is why it went unrecorded.
+          'bg-transparent text-main hover:bg-neutral-2 hover:text-neutral-5',
   };
 
   return (

@@ -175,7 +175,9 @@ export function AddTaskModal({
               onClick={() => togglePopover('estimate')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'estimate'}
-              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              // `hover:text-neutral-5` with the hover fill — white on a solid neutral-2
+              // is 2.94:1, and a static story never shows a hover for axe to catch.
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0">
                 <PointsIcon className="size-6" />
@@ -217,7 +219,8 @@ export function AddTaskModal({
               onClick={() => togglePopover('assignee')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'assignee'}
-              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              // Same as the estimate trigger above: the label moves with the hover fill.
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
               {assignee.name}

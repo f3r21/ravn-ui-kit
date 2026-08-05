@@ -366,6 +366,29 @@ describe('token contrast', () => {
   });
 
   /**
+   * The solid `neutral-2` pill — `SegmentedControl`'s active segment, `EstimateModal`'s
+   * selected row, and the hover fill on `TextButton` secondary and both `AddTaskModal`
+   * triggers.
+   *
+   * Note this is `bg-neutral-2`, **not** the `bg-neutral-2/10` chip measured above. Full
+   * strength, it is a mid grey, and the white label the design specifies sits on it at
+   * 2.94:1. Only two of the five sites were ever visible to axe: the other three are
+   * hover states, and a static story has no hover. Arithmetic catches what pixels cannot,
+   * which is the same division of labour as the placeholder case.
+   */
+  describe('the solid neutral-2 pill', () => {
+    it('--color-neutral-5 (the label) clears AA on it', () => {
+      expect(contrastRatio('--color-neutral-5', '--color-neutral-2')).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+    });
+
+    it('--color-main does not — 2.94:1, which is what the design drew', () => {
+      expect(contrastRatio('--color-main', '--color-neutral-2')).toBeCloseTo(2.94, 2);
+    });
+  });
+
+  /**
    * 1.4.11 asks for 3:1 against *adjacent* colours. A field's border has two — the white
    * interior and the dark container — and is perceivable if it clears 3:1 against either.
    * Neither border clears it against both, and they fail on opposite sides: `subtle`

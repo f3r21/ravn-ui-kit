@@ -248,6 +248,21 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **White labels on a solid `neutral-2` pill are now `neutral-5`.** At full strength
+  `neutral-2` is a mid grey, and the white label the design draws on it measures
+  **2.94:1**; `neutral-5` clears **5.25:1**. The fills are unchanged — the same trade
+  `Tag` and `Badge` take.
+
+  Five sites, only **two** of which axe could see: `SegmentedControl`'s active segment and
+  `EstimateModal`'s selected row were visible, while the hover fills on `TextButton`
+  secondary, `EstimateModal`'s unselected rows and both `AddTaskModal` triggers were not —
+  a static story has no hover. `contrast.test.ts` pins the pairing so the arithmetic
+  covers what the browser pass structurally cannot.
+
+  This does cost `SegmentedControl` the spec's "identical label colour in both states,
+  selection carried by the fill alone". The fill still carries selection; the label now
+  agrees with it instead of being the one thing at 2.94:1.
+
 - **The accent colour is no longer used as text.** `--color-interactive` (`primary-4`) is
   documented as a fill and border colour precisely because it fails as text on every dark
   surface — 2.86 / 3.51 / 4.02:1 over overlay / panel / shell — and four call sites were
