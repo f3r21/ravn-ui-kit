@@ -71,7 +71,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   (`isOutsideMonth` cells are disabled per react-aria's `useCalendarCell`)
   instead of independently clickable/selectable — see the component's doc
   comment for why this is a net accessibility improvement, not a regression
-  against verified Figma spec (only the dimmed *styling* of those cells was
+  against verified Figma spec (only the dimmed _styling_ of those cells was
   ever spec-confirmed, never their interactivity).
 - `AddTaskModal`'s four trigger buttons (Estimate/Assignee/Label/Due date) now
   carry `aria-haspopup="dialog"` and `aria-expanded`, previously absent.

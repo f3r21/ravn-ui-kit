@@ -19,7 +19,16 @@ const COLUMN_WIDTHS = {
 } as const;
 
 const CaretIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m6 9 6 6 6-6" />
   </svg>
 );
@@ -27,13 +36,29 @@ const CaretIcon = ({ className }: { className?: string }) => (
 // remix-icons/line/system/arrow-right-s-line — the real icon paired with the "Details" link
 // text below, confirmed via live Figma access (Chunk 25).
 const ArrowRightIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
 const CheckIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    aria-hidden
+  >
     <rect x="4" y="4" width="16" height="16" rx="3" />
   </svg>
 );
@@ -128,7 +153,9 @@ export function TagCell({ labels }: TagCellProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {labels.map((t, i) => (
-        <Tag key={i} variant={t.variant ?? 'neutral'}>{t.label}</Tag>
+        <Tag key={i} variant={t.variant ?? 'neutral'}>
+          {t.label}
+        </Tag>
       ))}
     </div>
   );
@@ -257,14 +284,21 @@ export function TaskTableRow({
             <CheckIcon
               className={cn(
                 'w-6 h-6 text-main transition-opacity',
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'
+                isSelected
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
               )}
             />
           </label>
-          <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>{String(index).padStart(2, '0')}</span>
+          <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>
+            {String(index).padStart(2, '0')}
+          </span>
           <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
           {reactions.map((r) => (
-            <span key={r.emoji} className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}>
+            <span
+              key={r.emoji}
+              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}
+            >
               <span className="tabular-nums">{r.count}</span>
               <span>{r.emoji}</span>
             </span>
@@ -273,7 +307,10 @@ export function TaskTableRow({
             <button
               type="button"
               onClick={onViewDetails}
-              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
+              className={cn(
+                CELL_TEXT,
+                'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs',
+              )}
             >
               <span>Details</span>
               <ArrowRightIcon className="w-4 h-4" />
@@ -299,7 +336,9 @@ export function TaskTableRow({
       {/* Task Assign Name Cell */}
       <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
         <div className="flex items-center gap-2 h-full">
-          {assigneeName ? <AssigneeNameCell name={assigneeName} avatarSrc={assigneeAvatar} /> : null}
+          {assigneeName ? (
+            <AssigneeNameCell name={assigneeName} avatarSrc={assigneeAvatar} />
+          ) : null}
         </div>
       </td>
 
@@ -401,7 +440,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
       className={cn(
         'w-full overflow-x-auto',
         '[scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-3 [&::-webkit-scrollbar-thumb]:rounded-full',
-        className
+        className,
       )}
     >
       <div className="flex flex-col gap-4 min-w-[1108px]">
@@ -414,7 +453,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
                 CELL_BASE,
                 'px-4',
                 i === 0 && 'border-l rounded-l-4',
-                i === headerCells.length - 1 && 'rounded-r-4'
+                i === headerCells.length - 1 && 'rounded-r-4',
               )}
               style={{ width: COLUMN_WIDTHS[key] }}
             >

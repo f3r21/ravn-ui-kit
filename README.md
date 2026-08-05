@@ -9,6 +9,7 @@ See the **Introduction** page in Storybook for the full component catalog and fi
 ## 🚀 Installation and usage
 
 ### 1. Install the package
+
 ```bash
 npm install @ravn/ui-kit
 ```
@@ -34,8 +35,8 @@ generated (see `ravn-task-management-challenge`'s `src/styles/base.css` for a wo
 example):
 
 ```css
-@import "tailwindcss";
-@import "@ravn/ui-kit/theme.css";
+@import 'tailwindcss';
+@import '@ravn/ui-kit/theme.css';
 @source "../node_modules/@ravn/ui-kit/dist";
 ```
 

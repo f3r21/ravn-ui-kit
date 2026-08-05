@@ -4,7 +4,16 @@ import { Tag } from './tag';
 import { withSurface } from '../../../.storybook/decorators';
 
 const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <path d="M20 6 9 17l-5-5" />
   </svg>
 );

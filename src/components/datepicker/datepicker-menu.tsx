@@ -12,25 +12,61 @@ import { cn } from '../../utils/cn';
 import { Popover, type PopoverProps } from '../popover/popover';
 
 const ChevronLeftIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className="w-4 h-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m15 18-6-6 6-6" />
   </svg>
 );
 
 const ChevronRightIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className="w-4 h-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
 const ChevronDoubleLeftIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className="w-4 h-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m18 18-6-6 6-6M12 18l-6-6 6-6" />
   </svg>
 );
 
 const ChevronDoubleRightIcon = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    className="w-4 h-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="m6 18 6-6-6-6M12 18l6-6-6-6" />
   </svg>
 );
@@ -118,9 +154,10 @@ export function DatePickerMenu({
   triggerRef,
   className,
 }: DatePickerMenuProps) {
-  const valueProps = controlledValue !== undefined
-    ? { value: toCalendarDate(controlledValue) }
-    : { defaultValue: defaultValue ? toCalendarDate(defaultValue) : null };
+  const valueProps =
+    controlledValue !== undefined
+      ? { value: toCalendarDate(controlledValue) }
+      : { defaultValue: defaultValue ? toCalendarDate(defaultValue) : null };
 
   const state = useCalendarState({
     ...valueProps,
@@ -137,7 +174,7 @@ export function DatePickerMenu({
 
   const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar(
     { 'aria-label': 'Date picker' },
-    state
+    state,
   );
 
   const prevMonthRef = useRef<HTMLButtonElement>(null);
@@ -159,7 +196,7 @@ export function DatePickerMenu({
       aria-label="Date picker"
       className={cn(
         'flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none',
-        className
+        className,
       )}
     >
       <div {...calendarProps} className="flex flex-col">
@@ -185,7 +222,9 @@ export function DatePickerMenu({
           </div>
 
           <span className="font-sans font-semibold text-body-sm text-main">
-            {state.visibleRange.start.toDate(getLocalTimeZone()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            {state.visibleRange.start
+              .toDate(getLocalTimeZone())
+              .toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </span>
 
           <div className="flex items-center gap-1">
@@ -233,7 +272,7 @@ export function DatePickerMenu({
 function CalendarGrid({ state }: { state: CalendarState }) {
   const { gridProps, headerProps, weekDays, weeksInMonth } = useCalendarGrid(
     { weekdayStyle: 'short' },
-    state
+    state,
   );
   const currentMonth = state.visibleRange.start;
 
@@ -249,13 +288,20 @@ function CalendarGrid({ state }: { state: CalendarState }) {
 
       {Array.from({ length: weeksInMonth }, (_, weekIndex) => (
         <div key={weekIndex} role="row" className="grid grid-cols-7">
-          {state.getDatesInWeek(weekIndex).map((date, i) =>
-            date ? (
-              <CalendarCell key={date.toString()} state={state} date={date} currentMonth={currentMonth} />
-            ) : (
-              <div key={i} role="gridcell" aria-hidden="true" />
-            )
-          )}
+          {state
+            .getDatesInWeek(weekIndex)
+            .map((date, i) =>
+              date ? (
+                <CalendarCell
+                  key={date.toString()}
+                  state={state}
+                  date={date}
+                  currentMonth={currentMonth}
+                />
+              ) : (
+                <div key={i} role="gridcell" aria-hidden="true" />
+              ),
+            )}
         </div>
       ))}
     </div>
@@ -276,7 +322,7 @@ function CalendarCell({
   const { cellProps, buttonProps, isSelected, isDisabled, formattedDate } = useCalendarCell(
     { date, isOutsideMonth },
     state,
-    ref
+    ref,
   );
 
   return (
@@ -289,8 +335,8 @@ function CalendarCell({
           isDisabled
             ? 'text-muted cursor-default'
             : isSelected
-            ? 'border border-primary-4 text-main cursor-pointer'
-            : 'text-main hover:bg-neutral-3 cursor-pointer'
+              ? 'border border-primary-4 text-main cursor-pointer'
+              : 'text-main hover:bg-neutral-3 cursor-pointer',
         )}
       >
         {formattedDate}

@@ -51,15 +51,13 @@ export function LabelModal({ labels, onSelect, onClose, triggerRef, className }:
       aria-label="Label"
       className={cn(
         'flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm',
-        className
+        className,
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-muted font-sans truncate">
-          Label
-        </span>
+        <span className="text-body-xl font-semibold text-muted font-sans truncate">Label</span>
       </div>
-      {labels.map(l => (
+      {labels.map((l) => (
         <button
           key={l.id}
           type="button"

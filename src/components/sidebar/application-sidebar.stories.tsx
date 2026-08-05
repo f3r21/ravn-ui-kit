@@ -28,11 +28,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    logo: (
-      <span className="font-bold text-xl text-neutral-1 font-sans tracking-tight">
-        RAVN
-      </span>
-    ),
+    logo: <span className="font-bold text-xl text-neutral-1 font-sans tracking-tight">RAVN</span>,
     items: navItems,
   },
   render: (args) => (

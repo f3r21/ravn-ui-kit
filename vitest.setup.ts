@@ -9,8 +9,6 @@ if (typeof globalThis.CSS === 'undefined') {
   globalThis.CSS = {};
 }
 if (typeof globalThis.CSS.escape !== 'function') {
-  globalThis.CSS.escape = (value: string): string => String(value).replace(
-    /[^a-zA-Z0-9_-]/g,
-    (char) => `\\${char}`
-  );
+  globalThis.CSS.escape = (value: string): string =>
+    String(value).replace(/[^a-zA-Z0-9_-]/g, (char) => `\\${char}`);
 }

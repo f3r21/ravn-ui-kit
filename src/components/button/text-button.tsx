@@ -44,7 +44,7 @@ export function TextButton({
   const variants = {
     primary: cn(
       'text-main',
-      isDisabled ? 'bg-primary-2' : isSelected ? 'bg-primary-3' : 'bg-primary-4 hover:bg-primary-2'
+      isDisabled ? 'bg-primary-2' : isSelected ? 'bg-primary-3' : 'bg-primary-4 hover:bg-primary-2',
     ),
     secondary: isDisabled
       ? 'bg-transparent text-muted'
@@ -60,7 +60,7 @@ export function TextButton({
       className={cn(
         'inline-flex items-center justify-center p-2 text-body-m font-normal rounded-sm transition-colors cursor-pointer font-sans select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:pointer-events-none',
         variants[variant],
-        className
+        className,
       )}
     >
       {props.children}

@@ -20,7 +20,13 @@ describe('DatePickerMenu Component', () => {
   it('selects a day and reports the correct date via onChange', async () => {
     const handleChange = vi.fn();
     const user = userEvent.setup();
-    render(<DatePickerMenu defaultValue={new Date(2026, 7, 1)} onChange={handleChange} onClose={vi.fn()} />);
+    render(
+      <DatePickerMenu
+        defaultValue={new Date(2026, 7, 1)}
+        onChange={handleChange}
+        onClose={vi.fn()}
+      />,
+    );
 
     await user.click(getDayButton('15'));
 
@@ -73,7 +79,9 @@ describe('DatePickerMenu Component', () => {
   it('does not change the displayed selection internally when controlled', async () => {
     const handleChange = vi.fn();
     const user = userEvent.setup();
-    render(<DatePickerMenu value={new Date(2026, 7, 15)} onChange={handleChange} onClose={vi.fn()} />);
+    render(
+      <DatePickerMenu value={new Date(2026, 7, 15)} onChange={handleChange} onClose={vi.fn()} />,
+    );
 
     const day20 = getDayButton('20');
     await user.click(day20);
@@ -87,7 +95,13 @@ describe('DatePickerMenu Component', () => {
   it('jumps to today and reports it via onChange when the footer action is clicked', async () => {
     const handleChange = vi.fn();
     const user = userEvent.setup();
-    render(<DatePickerMenu defaultValue={new Date(2020, 0, 1)} onChange={handleChange} onClose={vi.fn()} />);
+    render(
+      <DatePickerMenu
+        defaultValue={new Date(2020, 0, 1)}
+        onChange={handleChange}
+        onClose={vi.fn()}
+      />,
+    );
 
     expect(screen.getByText('January 2020', { selector: 'span' })).toBeDefined();
 

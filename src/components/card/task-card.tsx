@@ -5,7 +5,16 @@ import { ProjectInfo } from './project-info';
 import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
 
 const AlarmIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <circle cx="12" cy="13" r="8" />
     <path d="M12 9v4l3 2" />
     <path d="M5 3 2 6M22 6l-3-3" />
@@ -100,7 +109,7 @@ export function TaskCard({
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
         'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
-        className
+        className,
       )}
     >
       {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317) — same real component
@@ -121,9 +130,7 @@ export function TaskCard({
           {points !== undefined ? (
             // Desktop/Body/M/bold: SF Pro Display, 15px/24px, weight 600, letter-spacing 0.75px
             // (tracking-wider, exact at this size). Was previously `text-sm font-bold` (14px/700).
-            <span className="text-body-m font-semibold text-main font-sans">
-              {points} Pts
-            </span>
+            <span className="text-body-m font-semibold text-main font-sans">{points} Pts</span>
           ) : null}
           {dueDateText ? (
             // The due-date pill IS a real "Tag" instance per spec (padding 4px 16px, gap 8px,
@@ -163,9 +170,7 @@ export function TaskCard({
             count+icon widgets — resolved in Chunk 26 by redesigning `Reactions` into the
             read-only `TaskMetaBadges` (see its doc comment): `count` is optional, so the
             icon-only leading slot is just a badge with `count` omitted, not a special case. */}
-        {metaBadges.length > 0 ? (
-          <TaskMetaBadges badges={metaBadges} />
-        ) : null}
+        {metaBadges.length > 0 ? <TaskMetaBadges badges={metaBadges} /> : null}
       </div>
     </div>
   );

@@ -7,7 +7,11 @@ const Icon = () => <svg aria-hidden />;
 
 describe('Button Component', () => {
   it('renders with its accessible name', () => {
-    render(<Button aria-label="Add"><Icon /></Button>);
+    render(
+      <Button aria-label="Add">
+        <Icon />
+      </Button>,
+    );
     expect(screen.getByRole('button', { name: 'Add' })).toBeDefined();
   });
 
@@ -18,7 +22,7 @@ describe('Button Component', () => {
     render(
       <Button aria-label="Submit" onPress={handlePress}>
         <Icon />
-      </Button>
+      </Button>,
     );
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -29,7 +33,7 @@ describe('Button Component', () => {
     render(
       <Button aria-label="Disabled" isDisabled>
         <Icon />
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole('button', { name: 'Disabled' });
     expect((button as HTMLButtonElement).disabled).toBe(true);

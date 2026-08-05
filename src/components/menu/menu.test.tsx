@@ -28,7 +28,7 @@ function renderMenu(props: Partial<React.ComponentProps<typeof Menu<DemoItem>>> 
       {...props}
     >
       {(item) => <Item key={item.id}>{item.label}</Item>}
-    </Menu>
+    </Menu>,
   );
   return screen.getByRole('button', { name: 'Task options' });
 }

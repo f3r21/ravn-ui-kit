@@ -6,7 +6,15 @@ import { TaskListView } from '../card/task-list-view';
 import { TaskTable } from '../card/task-table';
 
 const GridIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <rect x="3" y="3" width="7" height="7" rx="1" />
     <rect x="14" y="3" width="7" height="7" rx="1" />
     <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -15,13 +23,29 @@ const GridIcon = () => (
 );
 
 const ListIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
   </svg>
 );
 
 const PlusIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="M12 5v14M5 12h14" />
   </svg>
 );
@@ -147,7 +171,12 @@ export const TaskDefaultView: Story = {
           {
             title: 'In Progress',
             rows: [
-              { index: 1, title: 'Dashboard Design', assigneeName: 'Amelia Nellson', dueDate: '6 July, 2020' },
+              {
+                index: 1,
+                title: 'Dashboard Design',
+                assigneeName: 'Amelia Nellson',
+                dueDate: '6 July, 2020',
+              },
             ],
           },
         ]}

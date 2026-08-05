@@ -29,12 +29,12 @@
 Every new component's story `title` must go in exactly one of these four
 buckets:
 
-| Bucket | Use for |
-| --- | --- |
-| `Design Tokens/*` | Colors, Typography, and any future raw token reference pages (MDX) |
-| `Primitives/*` | Small, single-purpose controls with no internal component dependencies (Button, Input, Badge, Tag, Tabs, SegmentedControl, ...) |
-| `Components/*` | Composed, self-contained widgets (Avatar, UserRow, Card, TaskCard, DatePicker, Modal, ...) |
-| `Layout/*` | App-shell / composition-heavy pieces that arrange other components (ApplicationSidebar, TopNav, TaskListView, TaskTable, AppShell, ...) |
+| Bucket            | Use for                                                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `Design Tokens/*` | Colors, Typography, and any future raw token reference pages (MDX)                                                                      |
+| `Primitives/*`    | Small, single-purpose controls with no internal component dependencies (Button, Input, Badge, Tag, Tabs, SegmentedControl, ...)         |
+| `Components/*`    | Composed, self-contained widgets (Avatar, UserRow, Card, TaskCard, DatePicker, Modal, ...)                                              |
+| `Layout/*`        | App-shell / composition-heavy pieces that arrange other components (ApplicationSidebar, TopNav, TaskListView, TaskTable, AppShell, ...) |
 
 If a component is really several facets of one Figma Component Set split into
 separate files for tooling reasons (e.g. `DatePicker/Field` + `DatePicker/Menu`,
@@ -51,7 +51,7 @@ Every `*.stories.tsx` file should follow this shape (see
 ```tsx
 const meta: Meta<typeof MyComponent> = {
   title: 'Primitives/MyComponent', // per the table above
-  component: MyComponent,          // required — autodocs needs this to introspect props
+  component: MyComponent, // required — autodocs needs this to introspect props
   tags: ['autodocs'],
   argTypes: {
     // { control: 'select', options: [...] } for every string-union prop

@@ -5,7 +5,6 @@ import { useTabList, useTab, useTabPanel } from 'react-aria';
 import type { Node } from '@react-types/shared';
 import { cn } from '../../utils/cn';
 
-
 export interface TabItem {
   /** Unique identifier for the tab; used to key the tab button, its panel, and their ARIA relationships. */
   id: string;
@@ -81,7 +80,7 @@ export function Tabs({
   const { tabListProps } = useTabList<TabItem>(
     { 'aria-label': 'Tab navigation' },
     state,
-    tabListRef
+    tabListRef,
   );
 
   return (
@@ -89,7 +88,12 @@ export function Tabs({
       {/* Tab list — role="tablist" */}
       <div {...tabListProps} ref={tabListRef} className="flex items-end">
         {[...state.collection].map((item) => (
-          <Tab key={item.key} item={item} state={state} icon={itemsById.get(String(item.key))?.icon} />
+          <Tab
+            key={item.key}
+            item={item}
+            state={state}
+            icon={itemsById.get(String(item.key))?.icon}
+          />
         ))}
       </div>
 
@@ -122,15 +126,13 @@ function Tab({ item, state, icon }: TabProps) {
         // demo box, not a real horizontal-padding spec for
         // arbitrary-length labels.
         'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
-        isSelected ? 'text-interactive' : 'text-muted hover:text-main'
+        isSelected ? 'text-interactive' : 'text-muted hover:text-main',
       )}
     >
       {icon ? <span className="text-base leading-none">{icon}</span> : null}
       {item.rendered ?? item.textValue}
       {/* 2px bottom indicator — matching Figma */}
-      {isSelected ? (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-4" />
-      ) : null}
+      {isSelected ? <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-4" /> : null}
     </button>
   );
 }

@@ -36,7 +36,14 @@ export interface ModalProps {
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', role = 'dialog' }: ModalProps) {
+export function Modal({
+  title,
+  isOpen,
+  onClose,
+  children,
+  width = 'max-w-md',
+  role = 'dialog',
+}: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +60,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', ro
   const { modalProps, underlayProps } = useModalOverlay(
     { isDismissable: true },
     triggerState,
-    overlayRef
+    overlayRef,
   );
   const { dialogProps, titleProps } = useDialog({ role }, dialogRef);
 
@@ -69,11 +76,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', ro
           into the dialog on open, restore it on close), not the raw DOM
           autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
-        <div
-          {...modalProps}
-          ref={overlayRef}
-          className={cn('w-full', width)}
-        >
+        <div {...modalProps} ref={overlayRef} className={cn('w-full', width)}>
           <div
             {...dialogProps}
             ref={dialogRef}
@@ -81,10 +84,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', ro
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-4">
-              <h2
-                {...titleProps}
-                className="font-sans font-bold text-base text-main"
-              >
+              <h2 {...titleProps} className="font-sans font-bold text-base text-main">
                 {title}
               </h2>
               <button
@@ -93,16 +93,22 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', ro
                 aria-label="Close modal"
                 className="flex items-center justify-center w-8 h-8 rounded-md text-muted hover:bg-neutral-4 hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  aria-hidden
+                >
                   <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Body */}
-            <div className="px-4 py-4">
-              {children}
-            </div>
+            <div className="px-4 py-4">{children}</div>
           </div>
         </div>
       </FocusScope>

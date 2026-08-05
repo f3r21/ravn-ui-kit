@@ -62,7 +62,13 @@ export interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef
  * stopping propagation after closing, makes Escape dismiss exactly the
  * topmost layer.
  */
-export function FloatingPopover({ state, children, popoverRef, className, ...props }: FloatingPopoverProps) {
+export function FloatingPopover({
+  state,
+  children,
+  popoverRef,
+  className,
+  ...props
+}: FloatingPopoverProps) {
   const fallbackRef = useRef<HTMLDivElement>(null);
   const ref = popoverRef ?? fallbackRef;
 
@@ -83,7 +89,7 @@ export function FloatingPopover({ state, children, popoverRef, className, ...pro
           }}
           className={cn(
             'z-50 bg-surface-overlay rounded-sm border border-subtle shadow-xl',
-            className
+            className,
           )}
         >
           <DismissButton onDismiss={() => state.close()} />

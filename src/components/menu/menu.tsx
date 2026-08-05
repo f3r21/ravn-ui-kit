@@ -11,21 +11,25 @@ import { useMenuTriggerState, useTreeState, type Node, type TreeState } from 're
 import { cn } from '../../utils/cn';
 import { FloatingPopover } from '../popover/floating-popover';
 
-export interface MenuProps<T extends object>
-  extends Omit<
-    AriaMenuProps<T>,
-    // A `Menu` fires actions, it does not track a selection — `onAction` is
-    // the one callback this component exposes. Exposing the full
-    // `MultipleSelection` surface (`selectionMode`, `selectedKeys`, ...)
-    // would mean rendering selection affordances (checkmarks, `aria-checked`
-    // items) this component doesn't implement, the same reasoning `Select`
-    // and `MultiSelect` split apart rather than folding into one component
-    // behind a mode flag. `onClose` is also omitted: it exists in
-    // `AriaMenuProps` for composition layers that don't own their own
-    // trigger state, but `Menu` does (via `useMenuTriggerState` below), so a
-    // public `onClose` would just be a second, redundant way to close it.
-    'selectionMode' | 'selectedKeys' | 'defaultSelectedKeys' | 'onSelectionChange' | 'disallowEmptySelection' | 'onClose'
-  > {
+export interface MenuProps<T extends object> extends Omit<
+  AriaMenuProps<T>,
+  // A `Menu` fires actions, it does not track a selection — `onAction` is
+  // the one callback this component exposes. Exposing the full
+  // `MultipleSelection` surface (`selectionMode`, `selectedKeys`, ...)
+  // would mean rendering selection affordances (checkmarks, `aria-checked`
+  // items) this component doesn't implement, the same reasoning `Select`
+  // and `MultiSelect` split apart rather than folding into one component
+  // behind a mode flag. `onClose` is also omitted: it exists in
+  // `AriaMenuProps` for composition layers that don't own their own
+  // trigger state, but `Menu` does (via `useMenuTriggerState` below), so a
+  // public `onClose` would just be a second, redundant way to close it.
+  | 'selectionMode'
+  | 'selectedKeys'
+  | 'defaultSelectedKeys'
+  | 'onSelectionChange'
+  | 'disallowEmptySelection'
+  | 'onClose'
+> {
   /** Accessible name for the trigger button. Required — an icon-only trigger has no name without it. */
   label: string;
   /** Content rendered inside the trigger button — an icon for the common icon-only case, but any content is accepted. */
@@ -82,11 +86,11 @@ export function Menu<T extends object>({
   const { menuTriggerProps, menuProps: triggerMenuProps } = useMenuTrigger<T>(
     { isDisabled },
     state,
-    triggerRef
+    triggerRef,
   );
   const { buttonProps } = useButton(
     { ...menuTriggerProps, isDisabled, 'aria-label': label },
-    triggerRef
+    triggerRef,
   );
 
   return (
@@ -97,7 +101,7 @@ export function Menu<T extends object>({
         type="button"
         className={cn(
           'cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          triggerClassName
+          triggerClassName,
         )}
       >
         {triggerContent}
@@ -161,7 +165,7 @@ function MenuItem<T extends object>({ item, state, onClose }: MenuItemProps<T>) 
   const { menuItemProps, isFocused, isDisabled } = useMenuItem<T>(
     { key: item.key, onClose },
     state,
-    ref
+    ref,
   );
 
   return (
@@ -171,7 +175,7 @@ function MenuItem<T extends object>({ item, state, onClose }: MenuItemProps<T>) 
       className={cn(
         'text-body-m font-sans cursor-pointer px-4 py-1.5 outline-none text-main',
         isFocused && 'bg-neutral-4',
-        isDisabled && 'cursor-not-allowed opacity-50'
+        isDisabled && 'cursor-not-allowed opacity-50',
       )}
     >
       {item.rendered}

@@ -10,15 +10,9 @@ const items = [
 ];
 
 const panels = {
-  board: (
-    <div className="p-6 text-neutral-2 font-sans text-sm">
-      Board view (Kanban)
-    </div>
-  ),
+  board: <div className="p-6 text-neutral-2 font-sans text-sm">Board view (Kanban)</div>,
   list: <div className="p-6 text-neutral-2 font-sans text-sm">List view</div>,
-  table: (
-    <div className="p-6 text-neutral-2 font-sans text-sm">Table view</div>
-  ),
+  table: <div className="p-6 text-neutral-2 font-sans text-sm">Table view</div>,
 };
 
 const meta: Meta<typeof Tabs> = {

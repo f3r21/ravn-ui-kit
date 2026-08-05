@@ -8,7 +8,16 @@ import { Popover, type PopoverProps } from '../popover/popover';
 const POINT_OPTIONS = [1, 2, 3, 5, 8];
 
 const PointsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <path d="M6 21V4a1 1 0 0 1 1-1h10.5a1 1 0 0 1 .8 1.6L15 9l3.3 4.4a1 1 0 0 1-.8 1.6H7" />
   </svg>
 );
@@ -39,7 +48,13 @@ export interface EstimateModalProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export function EstimateModal({ value, onSelect, onClose, triggerRef, className }: EstimateModalProps) {
+export function EstimateModal({
+  value,
+  onSelect,
+  onClose,
+  triggerRef,
+  className,
+}: EstimateModalProps) {
   return (
     <Popover
       isOpen
@@ -48,7 +63,7 @@ export function EstimateModal({ value, onSelect, onClose, triggerRef, className 
       aria-label="Estimate"
       className={cn(
         'flex flex-col w-[122px] py-2 bg-surface-overlay border border-subtle rounded-sm',
-        className
+        className,
       )}
     >
       <div className="flex items-center h-8 px-4">
@@ -56,7 +71,7 @@ export function EstimateModal({ value, onSelect, onClose, triggerRef, className 
           Estimate
         </span>
       </div>
-      {POINT_OPTIONS.map(points => (
+      {POINT_OPTIONS.map((points) => (
         <button
           key={points}
           type="button"
@@ -64,7 +79,7 @@ export function EstimateModal({ value, onSelect, onClose, triggerRef, className 
           aria-pressed={value === points}
           className={cn(
             'flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
-            value === points ? 'bg-neutral-2' : 'hover:bg-neutral-2'
+            value === points ? 'bg-neutral-2' : 'hover:bg-neutral-2',
           )}
         >
           <span className="w-6 h-6 shrink-0">

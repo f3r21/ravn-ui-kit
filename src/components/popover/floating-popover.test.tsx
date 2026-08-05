@@ -77,7 +77,7 @@ describe('FloatingPopover Component', () => {
     expect(screen.getByRole('button', { name: 'Option' })).toBeDefined();
   });
 
-  it('is portalled outside the trigger\'s DOM subtree', async () => {
+  it("is portalled outside the trigger's DOM subtree", async () => {
     const user = userEvent.setup();
     const { container } = render(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Trigger' }));

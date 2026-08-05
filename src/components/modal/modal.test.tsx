@@ -8,7 +8,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Test" isOpen={false} onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -17,7 +17,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Add Task" isOpen onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(screen.getByRole('dialog', { name: 'Add Task' })).toBeDefined();
   });
@@ -26,7 +26,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Test" isOpen onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(screen.getByRole('dialog')).toBeDefined();
   });
@@ -35,7 +35,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Delete task" isOpen onClose={vi.fn()} role="alertdialog">
         <p>This can’t be undone.</p>
-      </Modal>
+      </Modal>,
     );
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('alertdialog', { name: 'Delete task' })).toBeDefined();
@@ -45,7 +45,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Test" isOpen onClose={vi.fn()}>
         <button>Inside</button>
-      </Modal>
+      </Modal>,
     );
     const dialog = screen.getByRole('dialog');
     expect(dialog.contains(document.activeElement)).toBe(true);
@@ -57,7 +57,7 @@ describe('Modal Component', () => {
     render(
       <Modal title="Test" isOpen onClose={handleClose}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     await user.keyboard('{Escape}');
     expect(handleClose).toHaveBeenCalledTimes(1);
@@ -69,7 +69,7 @@ describe('Modal Component', () => {
     const { container } = render(
       <Modal title="Test" isOpen onClose={handleClose}>
         <button>Inside</button>
-      </Modal>
+      </Modal>,
     );
 
     await user.click(screen.getByRole('button', { name: 'Inside' }));
@@ -86,7 +86,7 @@ describe('Modal Component', () => {
       <Modal title="Test" isOpen onClose={vi.fn()}>
         <button>First</button>
         <button>Second</button>
-      </Modal>
+      </Modal>,
     );
     const dialog = screen.getByRole('dialog');
     await user.tab();
@@ -102,7 +102,7 @@ describe('Modal Component', () => {
         <Modal title="Test" isOpen onClose={vi.fn()}>
           <p>Content</p>
         </Modal>
-      </>
+      </>,
     );
     const outside = screen.getByText('Outside');
     expect(outside.getAttribute('aria-hidden')).toBe('true');
@@ -113,21 +113,21 @@ describe('Modal Component', () => {
     const { rerender } = render(
       <Modal title="Test" isOpen={false} onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(document.documentElement.style.overflow).not.toBe('hidden');
 
     rerender(
       <Modal title="Test" isOpen onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(document.documentElement.style.overflow).toBe('hidden');
 
     rerender(
       <Modal title="Test" isOpen={false} onClose={vi.fn()}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(document.documentElement.style.overflow).not.toBe('hidden');
   });

@@ -30,8 +30,14 @@ export const Default: Story = {
             index: 2,
             title: 'Slack Logo Design',
             indicatorColor: 'secondary',
-            reactions: [{ emoji: '💬', count: 3 }, { emoji: '🔗', count: 5 }],
-            tags: [{ label: 'IOS APP', variant: 'secondary' }, { label: '+2', variant: 'neutral' }],
+            reactions: [
+              { emoji: '💬', count: 3 },
+              { emoji: '🔗', count: 5 },
+            ],
+            tags: [
+              { label: 'IOS APP', variant: 'secondary' },
+              { label: '+2', variant: 'neutral' },
+            ],
             estimationPoints: 2,
             assigneeName: 'Jonah Doe',
             dueDate: 'Today',
@@ -68,8 +74,18 @@ export const Default: Story = {
       {
         title: 'In Progress',
         rows: [
-          { index: 1, title: 'Dashboard Design', assigneeName: 'Amelia Nellson', dueDate: '6 July, 2020' },
-          { index: 2, title: 'Extramark Logo Design', assigneeName: 'Jonah Doe', dueDate: '6 July, 2020' },
+          {
+            index: 1,
+            title: 'Dashboard Design',
+            assigneeName: 'Amelia Nellson',
+            dueDate: '6 July, 2020',
+          },
+          {
+            index: 2,
+            title: 'Extramark Logo Design',
+            assigneeName: 'Jonah Doe',
+            dueDate: '6 July, 2020',
+          },
         ],
       },
     ],

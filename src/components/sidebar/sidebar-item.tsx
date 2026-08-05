@@ -73,7 +73,7 @@ export function SidebarItem({
         isActive
           ? 'text-interactive bg-gradient-to-r from-transparent to-primary-4/10'
           : 'text-muted hover:text-interactive',
-        className
+        className,
       )}
     >
       {icon ? (
@@ -86,9 +86,7 @@ export function SidebarItem({
         <span
           className={cn(
             'px-2 py-0.5 text-xs font-bold rounded-full shrink-0',
-            isActive
-              ? 'bg-primary-4 text-main'
-              : 'bg-neutral-3 text-main'
+            isActive ? 'bg-primary-4 text-main' : 'bg-neutral-3 text-main',
           )}
         >
           {badgeCount}
@@ -98,7 +96,7 @@ export function SidebarItem({
       <span
         className={cn(
           'w-1 h-full shrink-0 bg-primary-4 transition-opacity',
-          isActive ? 'opacity-100' : 'opacity-0'
+          isActive ? 'opacity-100' : 'opacity-0',
         )}
       />
     </button>

@@ -11,7 +11,11 @@ const ITEMS = [
 describe('Tabs Component', () => {
   it('renders tablist/tab/tabpanel roles with correct aria wiring', () => {
     render(
-      <Tabs items={ITEMS} defaultSelectedKey="a" panels={{ a: <p>Panel A</p>, b: <p>Panel B</p> }} />
+      <Tabs
+        items={ITEMS}
+        defaultSelectedKey="a"
+        panels={{ a: <p>Panel A</p>, b: <p>Panel B</p> }}
+      />,
     );
     expect(screen.getByRole('tablist')).toBeDefined();
     const tabA = screen.getByRole('tab', { name: 'Tab A' });
@@ -23,7 +27,11 @@ describe('Tabs Component', () => {
   it('switches the selected tab and panel content on click (uncontrolled)', async () => {
     const user = userEvent.setup();
     render(
-      <Tabs items={ITEMS} defaultSelectedKey="a" panels={{ a: <p>Panel A</p>, b: <p>Panel B</p> }} />
+      <Tabs
+        items={ITEMS}
+        defaultSelectedKey="a"
+        panels={{ a: <p>Panel A</p>, b: <p>Panel B</p> }}
+      />,
     );
     await user.click(screen.getByRole('tab', { name: 'Tab B' }));
     expect(screen.getByRole('tab', { name: 'Tab B' }).getAttribute('aria-selected')).toBe('true');
@@ -49,9 +57,7 @@ describe('Tabs Component', () => {
   it('moves selection with ArrowRight/ArrowLeft, wrapping at the ends', async () => {
     const handleChange = vi.fn();
     const user = userEvent.setup();
-    render(
-      <Tabs items={ITEMS} defaultSelectedKey="a" onSelectionChange={handleChange} />
-    );
+    render(<Tabs items={ITEMS} defaultSelectedKey="a" onSelectionChange={handleChange} />);
 
     await user.click(screen.getByRole('tab', { name: 'Tab A' }));
     await user.keyboard('{ArrowRight}');

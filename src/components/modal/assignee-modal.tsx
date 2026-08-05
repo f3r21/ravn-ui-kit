@@ -41,7 +41,13 @@ export interface AssigneeModalProps {
  * action (every real "User" row instance renders identically, with no highlighted/selected
  * variant anywhere in the export).
  */
-export function AssigneeModal({ assignees, onSelect, onClose, triggerRef, className }: AssigneeModalProps) {
+export function AssigneeModal({
+  assignees,
+  onSelect,
+  onClose,
+  triggerRef,
+  className,
+}: AssigneeModalProps) {
   return (
     <Popover
       isOpen
@@ -50,15 +56,13 @@ export function AssigneeModal({ assignees, onSelect, onClose, triggerRef, classN
       aria-label="Assignee"
       className={cn(
         'flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm',
-        className
+        className,
       )}
     >
       <div className="flex items-center h-8 px-4">
-        <span className="text-body-xl font-semibold text-muted font-sans truncate">
-          Assignee
-        </span>
+        <span className="text-body-xl font-semibold text-muted font-sans truncate">Assignee</span>
       </div>
-      {assignees.map(a => (
+      {assignees.map((a) => (
         <button
           key={a.id}
           type="button"

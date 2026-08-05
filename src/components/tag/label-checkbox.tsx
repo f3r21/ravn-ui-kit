@@ -66,7 +66,7 @@ export function LabelCheckbox({
       'aria-label': typeof children === 'string' ? children : 'Checkbox',
     },
     state,
-    ref
+    ref,
   );
 
   return (
@@ -78,7 +78,7 @@ export function LabelCheckbox({
         // (Property 1=Default/Selected, Tags01.md / Add Task Modal04/05.md).
         'inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-2',
         isDisabled && 'opacity-50 cursor-not-allowed',
-        className
+        className,
       )}
     >
       <input {...inputProps} ref={ref} className="sr-only" />
@@ -92,15 +92,18 @@ export function LabelCheckbox({
       >
         <rect x="4" y="4" width="16" height="16" rx="3" />
         {state.isSelected && !isIndeterminate ? (
-          <path d="M8 12.5 11 15.5 16 9.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M8 12.5 11 15.5 16 9.5"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         ) : isIndeterminate ? (
           <path d="M8 12h8" strokeWidth={2} strokeLinecap="round" />
         ) : null}
       </svg>
       {/* Desktop/Body/M/regular -- SF Pro Display, 15px/24px, letter-spacing 0.75px (tracking-wider) */}
-      <span className="text-body-m font-normal font-sans text-main">
-        {children}
-      </span>
+      <span className="text-body-m font-normal font-sans text-main">{children}</span>
     </label>
   );
 }

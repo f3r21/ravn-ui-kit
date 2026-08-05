@@ -79,7 +79,7 @@ export function Button({
       className={cn(
         'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
-        className
+        className,
       )}
     >
       <span className="w-6 h-6 shrink-0 [&>svg]:w-full [&>svg]:h-full">{children}</span>

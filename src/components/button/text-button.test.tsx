@@ -32,7 +32,7 @@ describe('TextButton Component', () => {
     render(
       <TextButton isDisabled onPress={handlePress}>
         Save
-      </TextButton>
+      </TextButton>,
     );
     await user.click(screen.getByRole('button', { name: 'Save' }));
 

@@ -63,7 +63,7 @@ export function UserRow({
         'flex items-center gap-2 px-4 py-1 min-w-0',
         onClick &&
           'cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-sm',
-        className
+        className,
       )}
     >
       {/* Avatar with optional online indicator */}
@@ -76,16 +76,9 @@ export function UserRow({
 
       {/* Name + Role */}
       <div className="flex flex-col min-w-0">
-        <span className="font-sans font-normal text-body-m text-main truncate">
-          {name}
-        </span>
+        <span className="font-sans font-normal text-body-m text-main truncate">{name}</span>
         {role ? (
-          <span
-            className={cn(
-              'font-sans text-muted truncate leading-tight',
-              roleTextSizes[size]
-            )}
-          >
+          <span className={cn('font-sans text-muted truncate leading-tight', roleTextSizes[size])}>
             {role}
           </span>
         ) : null}

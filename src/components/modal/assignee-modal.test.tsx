@@ -39,7 +39,7 @@ describe('AssigneeModal Component', () => {
       <div>
         <button type="button">Outside</button>
         <AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={handleClose} />
-      </div>
+      </div>,
     );
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);

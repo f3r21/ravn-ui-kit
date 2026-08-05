@@ -32,7 +32,12 @@ export interface SelectProps<T extends object> extends AriaSelectProps<T> {
  * native picker UI, and lets autofill/password managers see a field they
  * recognize. The visible pill-shaped trigger below is purely presentational.
  */
-export function Select<T extends object>({ placeholder, icon, className, ...props }: SelectProps<T>) {
+export function Select<T extends object>({
+  placeholder,
+  icon,
+  className,
+  ...props
+}: SelectProps<T>) {
   const state = useSelectState(props);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -63,7 +68,7 @@ export function Select<T extends object>({ placeholder, icon, className, ...prop
           // background and would render invisible white-on-white here once
           // something is selected.
           'inline-flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          state.selectedItem ? 'text-neutral-5' : 'text-muted'
+          state.selectedItem ? 'text-neutral-5' : 'text-muted',
         )}
       >
         {icon}

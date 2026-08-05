@@ -30,8 +30,8 @@ export const Default: Story = {
           onClose={close}
         >
           <p className="text-sm text-neutral-2 font-sans">
-            This is the shared dialog shell — every other modal in the library
-            (AddTask, Assignee, Estimate) composes this component.
+            This is the shared dialog shell — every other modal in the library (AddTask, Assignee,
+            Estimate) composes this component.
           </p>
         </Modal>
       </div>
@@ -59,9 +59,8 @@ export const AlertDialog: Story = {
         <TextButton onPress={open}>Delete task</TextButton>
         <Modal title="Delete task" isOpen={isOpen} onClose={close} role="alertdialog">
           <p className="text-sm text-neutral-2 font-sans">
-            This can’t be undone. `role=&quot;alertdialog&quot;` tells assistive
-            tech this dialog demands an immediate response, unlike an ordinary
-            `role=&quot;dialog&quot;`.
+            This can’t be undone. `role=&quot;alertdialog&quot;` tells assistive tech this dialog
+            demands an immediate response, unlike an ordinary `role=&quot;dialog&quot;`.
           </p>
         </Modal>
       </div>

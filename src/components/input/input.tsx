@@ -18,7 +18,7 @@ export function Input({ label, error, className, ...props }: InputProps) {
   const ref = useRef<HTMLInputElement>(null);
   const { labelProps, inputProps, errorMessageProps } = useTextField(
     { ...props, label, isInvalid: !!error, errorMessage: error },
-    ref
+    ref,
   );
 
   return (
@@ -37,7 +37,7 @@ export function Input({ label, error, className, ...props }: InputProps) {
         className={cn(
           'h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md placeholder:text-muted transition-colors focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral',
           error && 'border-danger-5 focus-visible:outline-danger-5',
-          className
+          className,
         )}
       />
       {error ? (

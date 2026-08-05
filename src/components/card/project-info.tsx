@@ -32,9 +32,7 @@ export function ProjectInfo({ title, icon, className }: ProjectInfoProps) {
         {title}
       </h3>
       {icon ? (
-        <span className="flex items-center justify-center w-6 h-6 shrink-0 text-muted">
-          {icon}
-        </span>
+        <span className="flex items-center justify-center w-6 h-6 shrink-0 text-muted">{icon}</span>
       ) : null}
     </div>
   );

@@ -8,10 +8,16 @@ describe('TaskTable Component', () => {
     render(
       <TaskTable
         groups={[
-          { title: 'To Do (02)', rows: [{ index: 1, title: 'Create wireframe' }, { index: 2, title: 'Slack Logo Design' }] },
+          {
+            title: 'To Do (02)',
+            rows: [
+              { index: 1, title: 'Create wireframe' },
+              { index: 2, title: 'Slack Logo Design' },
+            ],
+          },
           { title: 'In Progress', rows: [{ index: 1, title: 'Dashboard Design' }] },
         ]}
-      />
+      />,
     );
     expect(screen.getByText('To Do (02)')).toBeDefined();
     expect(screen.getByText('In Progress')).toBeDefined();
@@ -27,15 +33,19 @@ describe('TaskTable Component', () => {
     const onSelectedChange = vi.fn();
     render(
       <TaskTable
-        groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe', onSelectedChange }] }]}
-      />
+        groups={[
+          { title: 'To Do', rows: [{ index: 1, title: 'Create wireframe', onSelectedChange }] },
+        ]}
+      />,
     );
     await user.click(screen.getByRole('checkbox', { name: 'Select Create wireframe' }));
     expect(onSelectedChange).toHaveBeenCalledWith(true);
   });
 
   it('omits empty columns instead of rendering a placeholder dash', () => {
-    render(<TaskTable groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe' }] }]} />);
+    render(
+      <TaskTable groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe' }] }]} />,
+    );
     expect(screen.queryByText('—')).toBeNull();
   });
 });

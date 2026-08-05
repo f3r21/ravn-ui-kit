@@ -48,9 +48,13 @@ export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
           aria-label={b.label}
         >
           {b.count !== undefined ? (
-            <span className="tabular-nums" aria-hidden>{b.count}</span>
+            <span className="tabular-nums" aria-hidden>
+              {b.count}
+            </span>
           ) : null}
-          <span className="w-6 h-6 shrink-0" aria-hidden>{b.icon}</span>
+          <span className="w-6 h-6 shrink-0" aria-hidden>
+            {b.icon}
+          </span>
         </span>
       ))}
     </div>

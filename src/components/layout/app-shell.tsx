@@ -49,18 +49,25 @@ export interface AppShellProps {
  * the same "canvas-fit noise, not a real constraint" judgment call Chunk 7
  * made for Tabs' `px-5`.
  */
-export function AppShell({ logo, sidebarItems, topNavProps, topBar, children, className }: AppShellProps) {
+export function AppShell({
+  logo,
+  sidebarItems,
+  topNavProps,
+  topBar,
+  children,
+  className,
+}: AppShellProps) {
   return (
-    <div className={cn('flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8', className)}>
+    <div
+      className={cn('flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8', className)}
+    >
       <ApplicationSidebar logo={logo} items={sidebarItems} className="self-stretch" />
 
       <div className="flex flex-col gap-8 flex-1 min-w-0">
         <TopNav {...topNavProps} />
 
         <div className="flex flex-col gap-4">
-          {topBar ? (
-            <div className="flex items-start justify-between gap-6">{topBar}</div>
-          ) : null}
+          {topBar ? <div className="flex items-start justify-between gap-6">{topBar}</div> : null}
           {children}
         </div>
       </div>

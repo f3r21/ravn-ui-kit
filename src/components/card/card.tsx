@@ -13,7 +13,7 @@ export function Card({ children, className, ...props }: CardProps) {
       {...props}
       className={cn(
         'p-5 bg-surface-neutral border border-subtle rounded-lg shadow-xs transition-shadow hover:shadow-sm',
-        className
+        className,
       )}
     >
       {children}

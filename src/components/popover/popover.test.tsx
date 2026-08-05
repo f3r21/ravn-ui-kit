@@ -23,7 +23,7 @@ describe('Popover Component', () => {
     render(
       <Popover isOpen={false} onClose={vi.fn()} aria-label="Options">
         <button type="button">Option</button>
-      </Popover>
+      </Popover>,
     );
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -32,7 +32,7 @@ describe('Popover Component', () => {
     render(
       <Popover isOpen onClose={vi.fn()} aria-label="Options">
         <button type="button">Option</button>
-      </Popover>
+      </Popover>,
     );
     const dialog = screen.getByRole('dialog', { name: 'Options' });
     expect(dialog.contains(document.activeElement)).toBe(true);
@@ -44,7 +44,7 @@ describe('Popover Component', () => {
     render(
       <Popover isOpen onClose={handleClose} aria-label="Options">
         <button type="button">Option</button>
-      </Popover>
+      </Popover>,
     );
     await user.keyboard('{Escape}');
     expect(handleClose).toHaveBeenCalledTimes(1);
@@ -59,7 +59,7 @@ describe('Popover Component', () => {
         <Popover isOpen onClose={handleClose} aria-label="Options">
           <button type="button">Option</button>
         </Popover>
-      </div>
+      </div>,
     );
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);
@@ -71,7 +71,7 @@ describe('Popover Component', () => {
     render(
       <Popover isOpen onClose={handleClose} aria-label="Options">
         <button type="button">Option</button>
-      </Popover>
+      </Popover>,
     );
     await user.click(screen.getByRole('button', { name: 'Option' }));
     expect(handleClose).not.toHaveBeenCalled();
@@ -93,7 +93,7 @@ describe('Popover Component', () => {
           <button type="button">Option</button>
         </Popover>
         <button type="button">After</button>
-      </div>
+      </div>,
     );
     // Focus starts inside the popover (autoFocus lands on "Option"); the
     // DismissButton bookends are tabIndex={-1} (screen-reader virtual-cursor

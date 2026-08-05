@@ -52,7 +52,13 @@ function TaskCardSkeleton() {
  * badge, or "add task" affordance on the frame itself in any real instance
  * across the isolated doc export or the in-context dashboard mockup.
  */
-export function TaskListView({ title, icon, tasks, isLoading = false, className }: TaskListViewProps) {
+export function TaskListView({
+  title,
+  icon,
+  tasks,
+  isLoading = false,
+  className,
+}: TaskListViewProps) {
   return (
     <div className={cn('flex flex-col gap-4 w-full', className)}>
       <ProjectInfo title={title} icon={icon} />

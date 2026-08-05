@@ -20,10 +20,5 @@ export interface SkeletonProps {
  * placeholders (pulsing muted block, no skeleton-specific token needed).
  */
 export function Skeleton({ className }: SkeletonProps) {
-  return (
-    <div
-      aria-hidden
-      className={cn('animate-pulse rounded-sm bg-neutral-3', className)}
-    />
-  );
+  return <div aria-hidden className={cn('animate-pulse rounded-sm bg-neutral-3', className)} />;
 }

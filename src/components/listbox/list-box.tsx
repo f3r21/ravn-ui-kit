@@ -68,7 +68,7 @@ function Option<T>({ item, state }: OptionProps<T>) {
   const { optionProps, isSelected, isFocused, isDisabled } = useOption(
     { key: item.key },
     state,
-    ref
+    ref,
   );
 
   return (
@@ -82,7 +82,7 @@ function Option<T>({ item, state }: OptionProps<T>) {
         // to tell which option their arrow keys are actually on.
         isFocused && 'bg-neutral-4',
         isSelected ? 'text-interactive font-semibold' : 'text-main',
-        isDisabled && 'cursor-not-allowed opacity-50'
+        isDisabled && 'cursor-not-allowed opacity-50',
       )}
     >
       <span>{item.rendered}</span>

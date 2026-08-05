@@ -13,7 +13,7 @@ describe('SearchBar Component', () => {
   it('respects a custom placeholder', () => {
     render(<SearchBar placeholder="Find a task..." />);
     expect(screen.getByRole('textbox', { name: 'Search' }).getAttribute('placeholder')).toBe(
-      'Find a task...'
+      'Find a task...',
     );
   });
 

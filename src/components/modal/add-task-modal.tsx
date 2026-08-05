@@ -9,20 +9,47 @@ import { AssigneeModal, type Assignee } from './assignee-modal';
 import { LabelModal, type Label } from './label-modal';
 
 const PointsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <path d="M6 21V4a1 1 0 0 1 1-1h10.5a1 1 0 0 1 .8 1.6L15 9l3.3 4.4a1 1 0 0 1-.8 1.6H7" />
   </svg>
 );
 
 const PersonIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <circle cx="12" cy="8" r="4" />
     <path d="M4 20c0-4 3.5-6 8-6s8 2 8 6" />
   </svg>
 );
 
 const CalendarIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <rect x="3" y="5" width="18" height="16" rx="2" />
     <path d="M3 10h18M8 3v4M16 3v4" />
   </svg>
@@ -30,7 +57,16 @@ const CalendarIcon = () => (
 
 // remix-icons/fill/finance/price-tag-3-fill — the real icon for the Label trigger below.
 const PriceTagIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
     <path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l9 9a2 2 0 0 0 2.82 0l7.17-7.17a2 2 0 0 0 0-2.82z" />
     <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
   </svg>
@@ -46,7 +82,13 @@ export interface AddTaskModalProps {
   /** Labels selectable in the label trigger's popover — see `LabelModal`. */
   labels?: Label[];
   /** Called with the form values when the user submits a valid (non-empty title) task. */
-  onSubmit?: (data: { title: string; dueDate?: Date; points?: number; assignee?: Assignee; label?: Label }) => void;
+  onSubmit?: (data: {
+    title: string;
+    dueDate?: Date;
+    points?: number;
+    assignee?: Assignee;
+    label?: Label;
+  }) => void;
   /** Pre-fills the title field (edit flow — reopening on an existing task). */
   initialTitle?: string;
   /** Pre-fills the due-date trigger (edit flow). */
@@ -111,9 +153,11 @@ export function AddTaskModal({
   const [assignee, setAssignee] = React.useState<Assignee | undefined>(initialAssignee);
   const [label, setLabel] = React.useState<Label | undefined>(initialLabel);
 
-  const [openPopover, setOpenPopover] = React.useState<'estimate' | 'assignee' | 'label' | 'date' | null>(null);
+  const [openPopover, setOpenPopover] = React.useState<
+    'estimate' | 'assignee' | 'label' | 'date' | null
+  >(null);
   const togglePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
-    setOpenPopover(prev => (prev === name ? null : name));
+    setOpenPopover((prev) => (prev === name ? null : name));
   const closePopover = () => setOpenPopover(null);
 
   const estimateTriggerRef = React.useRef<HTMLButtonElement>(null);
@@ -150,7 +194,7 @@ export function AddTaskModal({
       onSubmit={handleSubmit}
       className={cn(
         'flex flex-col items-end gap-6 w-[578px] p-4 bg-surface-overlay rounded-sm',
-        className
+        className,
       )}
     >
       <input
@@ -162,7 +206,7 @@ export function AddTaskModal({
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         placeholder="Task name"
         aria-label="Task name"
         className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted font-sans outline-none"
@@ -191,14 +235,19 @@ export function AddTaskModal({
               aria-expanded={openPopover === 'estimate'}
               className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
-              <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
+              <span className="w-6 h-6 shrink-0">
+                <PointsIcon />
+              </span>
               {points} Point{points !== 1 ? 's' : ''}
             </button>
           )}
           {openPopover === 'estimate' ? (
             <EstimateModal
               value={points}
-              onSelect={p => { setPoints(p); setOpenPopover(null); }}
+              onSelect={(p) => {
+                setPoints(p);
+                setOpenPopover(null);
+              }}
               onClose={closePopover}
               triggerRef={estimateTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
@@ -235,7 +284,10 @@ export function AddTaskModal({
           {openPopover === 'assignee' ? (
             <AssigneeModal
               assignees={assignees}
-              onSelect={a => { setAssignee(a); setOpenPopover(null); }}
+              onSelect={(a) => {
+                setAssignee(a);
+                setOpenPopover(null);
+              }}
               onClose={closePopover}
               triggerRef={assigneeTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
@@ -271,7 +323,10 @@ export function AddTaskModal({
           {openPopover === 'label' ? (
             <LabelModal
               labels={labels}
-              onSelect={l => { setLabel(l); setOpenPopover(null); }}
+              onSelect={(l) => {
+                setLabel(l);
+                setOpenPopover(null);
+              }}
               onClose={closePopover}
               triggerRef={labelTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
@@ -296,7 +351,10 @@ export function AddTaskModal({
           {openPopover === 'date' ? (
             <DatePickerMenu
               value={dueDate}
-              onChange={d => { setDueDate(d); setOpenPopover(null); }}
+              onChange={(d) => {
+                setDueDate(d);
+                setOpenPopover(null);
+              }}
               onClose={closePopover}
               triggerRef={dateTriggerRef}
               className="absolute top-full left-0 mt-1 z-10"
@@ -306,7 +364,9 @@ export function AddTaskModal({
       </div>
 
       <div className="flex items-center gap-6">
-        <TextButton variant="secondary" onPress={handleCancel}>Cancel</TextButton>
+        <TextButton variant="secondary" onPress={handleCancel}>
+          Cancel
+        </TextButton>
         <TextButton variant="primary" type="submit" isDisabled={!title.trim()}>
           Create Task
         </TextButton>

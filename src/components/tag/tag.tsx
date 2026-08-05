@@ -74,7 +74,7 @@ export function Tag({
         // Display, 15px/24px, letter-spacing 0.75px (tracking-wider @ 15px), weight 600.
         'inline-flex items-center gap-2 px-4 py-1 text-body-m font-semibold rounded font-sans select-none',
         outline ? styles[variant].outline : styles[variant].solid,
-        className
+        className,
       )}
     >
       {icon ? (

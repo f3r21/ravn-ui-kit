@@ -123,17 +123,17 @@ at an already-verified token — no new hex introduced. Named as bare nouns
 `{property}-{token-name}` utilities — prefixing the name with the property
 would double up (`text-text-main`) instead of the intended `text-main`.
 
-| Alias | Aliases | Utility | Role |
-| --- | --- | --- | --- |
-| `--color-main` | `neutral-1` | `text-main` | Primary readable text on the dark shell, and icon tint via `currentColor` |
-| `--color-muted` | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, dim icons, placeholders |
-| `--color-interactive` | `primary-4` | `text-interactive` | Active/interactive/hover-clickable text & icons |
-| `--color-danger` | `danger-5` | `text-danger` | Error/validation/status-danger text |
-| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral` | Light input/card background |
-| `--color-subtle` | `neutral-2` | `border-subtle` | Default hairline border |
-| `--color-surface-overlay` | `neutral-3` | `bg-surface-overlay` | Floating popover/dialog/modal backgrounds |
-| `--color-surface-panel` | `neutral-4` | `bg-surface-panel` | Card/container/panel backgrounds |
-| `--color-surface-shell` | `neutral-5` | `bg-surface-shell` | Outermost app-shell / deepest dropdown backgrounds |
+| Alias                     | Aliases     | Utility                                 | Role                                                                      |
+| ------------------------- | ----------- | --------------------------------------- | ------------------------------------------------------------------------- |
+| `--color-main`            | `neutral-1` | `text-main`                             | Primary readable text on the dark shell, and icon tint via `currentColor` |
+| `--color-muted`           | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, dim icons, placeholders                     |
+| `--color-interactive`     | `primary-4` | `text-interactive`                      | Active/interactive/hover-clickable text & icons                           |
+| `--color-danger`          | `danger-5`  | `text-danger`                           | Error/validation/status-danger text                                       |
+| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral`                    | Light input/card background                                               |
+| `--color-subtle`          | `neutral-2` | `border-subtle`                         | Default hairline border                                                   |
+| `--color-surface-overlay` | `neutral-3` | `bg-surface-overlay`                    | Floating popover/dialog/modal backgrounds                                 |
+| `--color-surface-panel`   | `neutral-4` | `bg-surface-panel`                      | Card/container/panel backgrounds                                          |
+| `--color-surface-shell`   | `neutral-5` | `bg-surface-shell`                      | Outermost app-shell / deepest dropdown backgrounds                        |
 
 `--color-muted` and `--color-subtle` both intentionally alias `neutral-2` —
 same ramp step, different role depending on which property consumes it; this
@@ -163,15 +163,15 @@ and button-hover background (`modal.tsx`) and as text (`badge.tsx`);
 
 ## Border radius
 
-| Token | Value | Verified against |
-| --- | --- | --- |
-| `--radius-2` | 2px | `Datepicker.md` day-grid cell |
-| `--radius-4` | 4px | `Tags00/01.md` chips/pills (most common radius in the kit) |
-| `--radius-sm` | 8px | `Button, Switch Button00/01.md` icon buttons |
-| `--radius-10` | 10px | `Button, Switch Button00/01.md` segmented-control track |
-| `--radius-md` | 16px | `Top Navigation Bar00/01.md` search bar |
-| `--radius-lg` | 24px | `ApplicationSidebar00/01.md` inner sidebar |
-| `--radius-full` | 9999px | circles/pills |
+| Token           | Value  | Verified against                                           |
+| --------------- | ------ | ---------------------------------------------------------- |
+| `--radius-2`    | 2px    | `Datepicker.md` day-grid cell                              |
+| `--radius-4`    | 4px    | `Tags00/01.md` chips/pills (most common radius in the kit) |
+| `--radius-sm`   | 8px    | `Button, Switch Button00/01.md` icon buttons               |
+| `--radius-10`   | 10px   | `Button, Switch Button00/01.md` segmented-control track    |
+| `--radius-md`   | 16px   | `Top Navigation Bar00/01.md` search bar                    |
+| `--radius-lg`   | 24px   | `ApplicationSidebar00/01.md` inner sidebar                 |
+| `--radius-full` | 9999px | circles/pills                                              |
 
 `--radius-xl` (40px) was removed in Chunk 15: it was unverified from the start (its only ground-truth occurrence is a 40×40px circular button, i.e. `rounded-full`, not a distinct token) and its last flagged consumer (`task-table.tsx`) no longer needs it after this chunk's rebuild.
 
@@ -179,8 +179,8 @@ and button-hover background (`modal.tsx`) and as text (`badge.tsx`);
 
 Only shadows confirmed present on a real shipped component are tokenized. "Drop Shadow Large" (`0 0 72px`) only appears on the Branding guideline documentation page frame itself, never on a product component, so it's intentionally not included.
 
-| Token | Value | Verified against |
-| --- | --- | --- |
-| `--shadow-small` | `0px 0px 16px rgba(0,0,0,0.04)` | `Button, Switch Button00/01.md` segmented-control active pill |
-| `--shadow-elevation` | `0px 9px 28px 8px rgba(0,0,0,0.05), 0px 6px 16px rgba(0,0,0,0.08), 0px 3px 6px -4px rgba(0,0,0,0.12)` | `Datepicker.md` dropdown |
-| `--shadow-nav` | `0px 2px 0px #2c2f33` | `Top Navigation Bar00.md` hard-edge separator |
+| Token                | Value                                                                                                 | Verified against                                              |
+| -------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `--shadow-small`     | `0px 0px 16px rgba(0,0,0,0.04)`                                                                       | `Button, Switch Button00/01.md` segmented-control active pill |
+| `--shadow-elevation` | `0px 9px 28px 8px rgba(0,0,0,0.05), 0px 6px 16px rgba(0,0,0,0.08), 0px 3px 6px -4px rgba(0,0,0,0.12)` | `Datepicker.md` dropdown                                      |
+| `--shadow-nav`       | `0px 2px 0px #2c2f33`                                                                                 | `Top Navigation Bar00.md` hard-edge separator                 |

@@ -57,7 +57,7 @@ export function SearchBar({
       'aria-label': 'Search',
       placeholder,
     },
-    ref
+    ref,
   );
 
   return (

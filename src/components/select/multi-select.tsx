@@ -6,8 +6,10 @@ import { Tag } from '../tag/tag';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
 
-export interface MultiSelectProps<T extends object>
-  extends Omit<ListProps<T>, 'selectionMode' | 'selectionBehavior'> {
+export interface MultiSelectProps<T extends object> extends Omit<
+  ListProps<T>,
+  'selectionMode' | 'selectionBehavior'
+> {
   /** Accessible name for the control, announced on the trigger and the option list. */
   label: string;
   /** Shown inside the trigger when no item is selected yet. */
@@ -65,11 +67,11 @@ export function MultiSelect<T extends object>({
 
   const { buttonProps } = useButton(
     { onPress: () => overlayState.toggle(), isDisabled, 'aria-label': label },
-    triggerRef
+    triggerRef,
   );
 
   const selectedItems = [...listState.collection].filter((item) =>
-    listState.selectionManager.isSelected(item.key)
+    listState.selectionManager.isSelected(item.key),
   );
 
   return (
@@ -86,7 +88,7 @@ export function MultiSelect<T extends object>({
           // light-surface colors (`text-muted`/`text-neutral-5`), not
           // `text-main` (invisible white-on-white once something's picked).
           'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted'
+          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted',
         )}
       >
         {icon}

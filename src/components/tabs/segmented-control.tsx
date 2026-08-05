@@ -65,9 +65,7 @@ export function SegmentedControl({
   onChange,
   className,
 }: SegmentedControlProps) {
-  const [internalValue, setInternalValue] = React.useState(
-    defaultValue ?? options[0]?.id ?? ''
-  );
+  const [internalValue, setInternalValue] = React.useState(defaultValue ?? options[0]?.id ?? '');
   const isControlled = controlledValue !== undefined;
   const selected = isControlled ? controlledValue : internalValue;
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -111,10 +109,7 @@ export function SegmentedControl({
     <div
       role="radiogroup"
       aria-label="View"
-      className={cn(
-        'inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10',
-        className
-      )}
+      className={cn('inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10', className)}
     >
       {options.map((opt, index) => {
         const isSelected = selected === opt.id;
@@ -132,12 +127,10 @@ export function SegmentedControl({
             onKeyDown={handleKeyDown}
             className={cn(
               'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
-              isSelected ? 'bg-neutral-2 shadow-small' : ''
+              isSelected ? 'bg-neutral-2 shadow-small' : '',
             )}
           >
-            {opt.icon ? (
-              <span className="text-base leading-none">{opt.icon}</span>
-            ) : null}
+            {opt.icon ? <span className="text-base leading-none">{opt.icon}</span> : null}
             {opt.label}
           </button>
         );

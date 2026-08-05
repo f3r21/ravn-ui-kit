@@ -14,8 +14,12 @@ describe('EstimateModal Component', () => {
 
   it('marks the row matching `value` as pressed', () => {
     render(<EstimateModal value={3} onSelect={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByRole('button', { name: '3 Points' }).getAttribute('aria-pressed')).toBe('true');
-    expect(screen.getByRole('button', { name: '1 Point' }).getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByRole('button', { name: '3 Points' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+    expect(screen.getByRole('button', { name: '1 Point' }).getAttribute('aria-pressed')).toBe(
+      'false',
+    );
   });
 
   it('calls onSelect with the clicked point value', async () => {
@@ -41,7 +45,7 @@ describe('EstimateModal Component', () => {
       <div>
         <button type="button">Outside</button>
         <EstimateModal onSelect={vi.fn()} onClose={handleClose} />
-      </div>
+      </div>,
     );
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);

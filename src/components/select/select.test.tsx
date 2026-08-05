@@ -31,7 +31,7 @@ function renderSelect(props: Partial<React.ComponentProps<typeof Select<DemoItem
           {item.label}
         </Item>
       )}
-    </Select>
+    </Select>,
   );
   // The trigger is the only `<button>` on the page (options render as
   // `role="option"`), and its accessible name is composed from the value

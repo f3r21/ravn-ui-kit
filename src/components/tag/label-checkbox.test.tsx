@@ -25,7 +25,7 @@ describe('LabelCheckbox Component', () => {
     render(
       <LabelCheckbox isDisabled onChange={handleChange}>
         Locked
-      </LabelCheckbox>
+      </LabelCheckbox>,
     );
     await user.click(screen.getByText('Locked'));
     expect(handleChange).not.toHaveBeenCalled();

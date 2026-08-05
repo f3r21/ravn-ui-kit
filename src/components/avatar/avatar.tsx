@@ -42,15 +42,11 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
         // interactive affordance; avatars aren't inherently clickable.
         'relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-1 text-primary-4 select-none shrink-0',
         sizes[size],
-        className
+        className,
       )}
     >
       {src ? (
-        <img
-          src={src}
-          alt={name || 'User avatar'}
-          className="w-full h-full object-cover"
-        />
+        <img src={src} alt={name || 'User avatar'} className="w-full h-full object-cover" />
       ) : (
         <span>{getInitials(name)}</span>
       )}

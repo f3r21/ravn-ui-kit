@@ -77,7 +77,7 @@ export function Popover({
       isDismissable: true,
       shouldCloseOnInteractOutside: (element) => !triggerRef?.current?.contains(element),
     },
-    overlayRef
+    overlayRef,
   );
 
   if (!isOpen) return null;
@@ -89,13 +89,7 @@ export function Popover({
   return (
     // eslint-disable-next-line jsx-a11y/no-autofocus
     <FocusScope restoreFocus autoFocus>
-      <div
-        {...overlayProps}
-        {...ariaProps}
-        ref={overlayRef}
-        role={role}
-        className={className}
-      >
+      <div {...overlayProps} {...ariaProps} ref={overlayRef} role={role} className={className}>
         <DismissButton onDismiss={onClose} />
         {children}
         <DismissButton onDismiss={onClose} />

@@ -10,7 +10,7 @@ function PopoverDemo() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const { buttonProps } = useButton(
     { onPress: () => state.toggle(), 'aria-label': 'Open menu' },
-    triggerRef
+    triggerRef,
   );
 
   return (

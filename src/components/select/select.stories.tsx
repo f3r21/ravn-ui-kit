@@ -32,7 +32,11 @@ const meta: Meta<typeof Select<StatusOption>> = {
     placeholder: 'Select status',
     items: STATUS_OPTIONS,
     disabledKeys: STATUS_OPTIONS.filter((item) => item.isDisabled).map((item) => item.id),
-    children: (item: StatusOption) => <Item key={item.id} textValue={item.label}>{item.label}</Item>,
+    children: (item: StatusOption) => (
+      <Item key={item.id} textValue={item.label}>
+        {item.label}
+      </Item>
+    ),
     onSelectionChange: fn(),
   },
 };

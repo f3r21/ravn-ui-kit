@@ -39,9 +39,15 @@ export const StateMatrix: Story = {
     <div className="flex flex-col gap-4">
       {(['primary', 'secondary'] as const).map((variant) => (
         <div key={variant} className="flex items-center gap-3">
-          <TextButton {...args} variant={variant}>Default</TextButton>
-          <TextButton {...args} variant={variant} isSelected>Selected</TextButton>
-          <TextButton {...args} variant={variant} isDisabled>Disable</TextButton>
+          <TextButton {...args} variant={variant}>
+            Default
+          </TextButton>
+          <TextButton {...args} variant={variant} isSelected>
+            Selected
+          </TextButton>
+          <TextButton {...args} variant={variant} isDisabled>
+            Disable
+          </TextButton>
         </div>
       ))}
     </div>
