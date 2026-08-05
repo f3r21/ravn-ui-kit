@@ -465,6 +465,71 @@ describe('token contrast', () => {
   });
 
   /**
+   * The design's own primary button, which fails AA and is kept anyway.
+   *
+   * Asserted as the *current state* — the same treatment the focus ring had for one
+   * release — so it cannot be mistaken for passing. This is the one place in the kit
+   * where the design has a definite opinion that fails, rather than being silent: white
+   * on `primary-4` is what Figma draws for `TextButton variant="primary"`, 14 of the 131
+   * violations.
+   *
+   * Everything else in this pass had somewhere to go. This does not. No label colour
+   * fixes it (the darkest thing in the palette, `neutral-5`, reaches 4.02:1), and no fill
+   * in the ramp fixes it (`primary-4` is already its darkest step). The only fix is a
+   * darker red the design does not contain, and inventing one is what CONTRIBUTING.md's
+   * first design value forbids.
+   *
+   * The icon `Button`'s `variant="primary"` shares the fill and is fine: an icon is
+   * non-text, so 1.4.11's 3:1 applies and 3.83:1 clears it. That distinction is the whole
+   * reason this is scoped to `TextButton`.
+   */
+  describe('the primary CTA — known, deliberate, not fixed', () => {
+    it('white on primary-4 does NOT clear AA as text — 3.83:1', () => {
+      expect(contrastRatio('--color-main', '--color-primary-4')).toBeCloseTo(3.83, 2);
+      expect(contrastRatio('--color-main', '--color-primary-4')).toBeLessThan(AA_TEXT);
+    });
+
+    it('but it does clear 3:1, which is what the icon Button needs', () => {
+      expect(contrastRatio('--color-main', '--color-primary-4')).toBeGreaterThanOrEqual(
+        AA_NON_TEXT,
+      );
+    });
+
+    it('the selected and disabled fills are worse, not better — 2.83 / 2.02:1', () => {
+      expect(contrastRatio('--color-main', '--color-primary-3')).toBeCloseTo(2.83, 2);
+      expect(contrastRatio('--color-main', '--color-primary-2')).toBeCloseTo(2.02, 2);
+    });
+
+    it('no colour in the palette rescues the label either — neutral-5 is the darkest, at 4.02:1', () => {
+      for (const label of ['--color-neutral-5', '--color-neutral-4', '--color-neutral-3']) {
+        expect(contrastRatio(label, '--color-primary-4')).toBeLessThan(AA_TEXT);
+      }
+      expect(contrastRatio('--color-neutral-5', '--color-primary-4')).toBeCloseTo(4.02, 2);
+    });
+
+    /**
+     * `Button variant="secondary" isSelected` is the same shape of call at 1.4.11's
+     * threshold: Figma specifies a `primary-4` border and a `primary-4` icon, both
+     * non-text, and both measure 2.86:1 on `surface-overlay` — an icon button inside a
+     * modal. It passes on the other two surfaces (3.51 / 4.02:1).
+     *
+     * Left as drawn for the same reason as the button above, and recorded here rather
+     * than fixed. It is *not* the same as the focus ring, which moved in this pass: the
+     * ring has no Figma source at all, so recolouring it cost nothing. This state is
+     * specified.
+     */
+    it('Button’s selected secondary border and icon fail 3:1 on an overlay only — 2.86:1', () => {
+      expect(contrastRatio('--color-interactive', '--color-surface-overlay')).toBeCloseTo(2.86, 2);
+      expect(contrastRatio('--color-interactive', '--color-surface-panel')).toBeGreaterThanOrEqual(
+        AA_NON_TEXT,
+      );
+      expect(contrastRatio('--color-interactive', '--color-surface-shell')).toBeGreaterThanOrEqual(
+        AA_NON_TEXT,
+      );
+    });
+  });
+
+  /**
    * The nine failures this file was written for, plus the two the chip surface added,
    * pinned as the *reason* each role exists rather than as bare numbers. If one of these
    * starts passing, the palette changed and the role it justifies may no longer be

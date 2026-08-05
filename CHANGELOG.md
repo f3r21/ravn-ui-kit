@@ -162,6 +162,30 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Changed
 
+- **`TextButton variant="primary"` is documented as a deliberate WCAG AA failure**, not
+  fixed. `text-main` on `bg-primary-4` measures **3.83:1**; `isSelected`'s `primary-3`
+  fill is 2.83:1 and the disabled/hover `primary-2` is 2.02:1. Fourteen of the 131
+  contrast violations are this button.
+
+  It is the one place in the kit where the design has a definite opinion that fails AA,
+  rather than being silent — and unlike `Tag`, `Badge` and `Avatar`, which were fixed in
+  this pass, it has nowhere to go. No label colour clears it (the darkest thing in the
+  palette, `neutral-5`, reaches 4.02:1) and no fill in the ramp clears it (`primary-4` is
+  already its darkest step). The only fix is a darker red Figma does not contain —
+  continuing the ramp's own arithmetic lands on `#D13323` at 4.99:1 — and inventing a
+  value is what CONTRIBUTING.md's first design value forbids. Changing it would also
+  leave two different reds side by side, or repaint `--color-primary-4` itself and with
+  it every brand surface in both repos.
+
+  The error-colour precedent does not transfer: the design draws no error state at all, so
+  that ramp step was a free choice constrained only by contrast. `contrast.test.ts`
+  asserts the current state so it cannot be mistaken for passing.
+
+  The **icon** `Button`'s `variant="primary"` shares the fill and is unaffected — an icon
+  is non-text, so 1.4.11's 3:1 applies and 3.83:1 clears it. Same for
+  `Button variant="secondary" isSelected`'s `primary-4` border and icon, which are
+  recorded as failing 3:1 on `surface-overlay` only (2.86:1) and likewise left as drawn.
+
 - **BREAKING — `Tag`'s colour variants are renamed to the design's own names.**
   `primary` → `red`, `secondary` → `green`, `tertiary` → `yellow`; `neutral` and
   `blue` are unchanged. Figma's "Tag" COMPONENT_SET carries a `Type` property whose

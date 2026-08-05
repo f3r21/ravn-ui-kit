@@ -30,6 +30,38 @@ export interface TextButtonProps extends AriaButtonProps {
  * Note: the spec's Type=Primary "Disable" state (bg primary-2) is literally
  * identical to its "Hover" state — not a transcription error, both frames
  * use the same #EBA59E swatch.
+ *
+ * ## The primary variant does not meet WCAG AA, deliberately
+ *
+ * `text-main` on `bg-primary-4` measures **3.83:1**, under 1.4.3's 4.5:1 for normal text.
+ * `isSelected`'s `bg-primary-3` is worse at **2.83:1**, and the disabled/hover
+ * `bg-primary-2` worse again at 2.02:1. Fourteen of the 131 contrast violations an axe
+ * pass over the built Storybook reports are this button.
+ *
+ * It is left as drawn, and that is a different call from the ones `Tag`, `Badge` and
+ * `Avatar` took in the same pass. Those all had somewhere to go. This does not:
+ *
+ * - **No label colour fixes it.** The best dark option in the whole palette is
+ *   `neutral-5` at 4.02:1, still short. Only near-black would clear it, and the palette
+ *   has no black — `neutral-5` (#222528) is the darkest thing in it.
+ * - **No fill in the ramp fixes it either.** `primary-4` is the ramp's darkest step;
+ *   1, 2 and 3 are all lighter and measure worse against white.
+ * - So the only fix is a **new, darker red that Figma does not contain**. Continuing the
+ *   ramp's own arithmetic (-9/-39/-42 per step) lands on `#D13323`, which would clear
+ *   4.99:1 — and CONTRIBUTING.md's first design value is that no value is invented or
+ *   approximated. Changing it would also either leave two different reds side by side
+ *   (this button next to an icon `Button`, a focus ring, `Tag`'s red) or repaint
+ *   `--color-primary-4` itself, which is every brand surface in both repos.
+ *
+ * This is the one case in this kit where the design has a definite opinion that fails AA,
+ * as opposed to being silent. The error-colour precedent does not transfer: the design
+ * draws no error state at all, so that ramp step was a free choice constrained only by
+ * contrast. Here it is the brand's own CTA.
+ *
+ * `contrast.test.ts` asserts the current state so it cannot be mistaken for passing, and
+ * `MIGRATION_GAPS.md` tracks it as the open item it is. The **icon** `Button`'s
+ * `variant="primary"` uses the same fill and is *not* affected: an icon is non-text, so
+ * 1.4.11's 3:1 applies to it and 3.83:1 clears that.
  */
 export function TextButton({
   variant = 'primary',
