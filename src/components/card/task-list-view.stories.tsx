@@ -6,8 +6,8 @@ const sampleTasks = [
     title: 'Set up project',
     points: 3,
     dueDateText: '2 DAYS',
-    dueDateUrgency: 'warning' as const,
-    tags: [{ label: 'FRONTEND', variant: 'secondary' as const }],
+    dueDateUrgency: 'soon' as const,
+    tags: [{ label: 'FRONTEND', variant: 'green' as const }],
     assigneeName: 'Jerome Bell',
   },
   {
@@ -15,7 +15,7 @@ const sampleTasks = [
     points: 8,
     dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue' as const,
-    tags: [{ label: 'BUG', variant: 'primary' as const }],
+    tags: [{ label: 'BUG', variant: 'red' as const }],
     assigneeName: 'Jane Doe',
   },
 ];

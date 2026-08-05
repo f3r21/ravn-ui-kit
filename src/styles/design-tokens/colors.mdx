@@ -147,7 +147,7 @@ Every `text-main`/`text-muted`/`text-interactive`/`text-danger`/
 `bg-surface-neutral`/`border-subtle` call site across the kit now uses these
 aliases — a small number of genuinely different-role usages of the same raw
 color are deliberately left as raw ramp classes rather than force-fit:
-`text-primary-4` on `Tag`'s own `primary` color variant and on `Avatar`'s
+`text-primary-4` on `Tag`'s own `red` accent colour and on `Avatar`'s
 decorative initials tint (categorical/decorative, not interactive), and on
 `TaskTable`'s "overdue" due-date text (a status signal, not interactivity).
 
@@ -160,6 +160,22 @@ as label text (`input.tsx`/`datepicker.tsx`); `neutral-4` as a divider border
 and button-hover background (`modal.tsx`) and as text (`badge.tsx`);
 `neutral-5` as body text (`input.tsx`/`datepicker.tsx`) and as a border
 (`user-row.tsx`'s status-dot cutout).
+
+## Two colour vocabularies, deliberately kept apart
+
+Categorical accent colours and semantic status tones are different systems and
+must not be merged — `AccentColor` (`neutral`/`red`/`green`/`yellow`/`blue`)
+names _which hue_, on the `Primary`/`Secondary`/`Tertiary` brand ramps and
+matching Figma's own `Type` property on the "Tag" component set; `StatusTone`
+(`neutral`/`success`/`warning`/`danger`) names _what a state means_, on the
+palette's separate `Success`/`Warning`/`Danger` ramps. The two look adjacent
+but are not the same values: `success-4` (`#80DA5B`) is not `secondary-4`
+(`#70B252`), and `danger-5` (`#E82F39`) is not `primary-4` (`#DA584B`). Use
+`Tag` for a category, `Badge` for a status.
+
+`Button`/`TextButton`'s `variant` (`primary`/`secondary`) belongs to neither —
+it is Figma's own "Property 1" action-hierarchy axis, where colour is a
+consequence rather than the choice. See `src/types/color-variants.ts`.
 
 ## Border radius
 

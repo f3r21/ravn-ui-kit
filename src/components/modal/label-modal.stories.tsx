@@ -4,9 +4,9 @@ import { withSurface } from '../../../.storybook/decorators';
 import { LabelModal } from './label-modal';
 
 const LABELS = [
-  { id: '1', text: 'Bug', variant: 'primary' as const },
-  { id: '2', text: 'Feature', variant: 'secondary' as const },
-  { id: '3', text: 'Urgent', variant: 'tertiary' as const },
+  { id: '1', text: 'Bug', variant: 'red' as const },
+  { id: '2', text: 'Feature', variant: 'green' as const },
+  { id: '3', text: 'Urgent', variant: 'yellow' as const },
   { id: '4', text: 'Docs', variant: 'neutral' as const },
 ];
 

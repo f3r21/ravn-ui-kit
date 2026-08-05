@@ -39,7 +39,7 @@ const meta: Meta<typeof TaskCard> = {
   argTypes: {
     dueDateUrgency: {
       control: 'select',
-      options: ['normal', 'warning', 'overdue'],
+      options: ['normal', 'soon', 'overdue'],
     },
   },
   args: {
@@ -56,10 +56,10 @@ export const Default: Story = {
     title: 'Working (03) - RAVN Challenge',
     points: 3,
     dueDateText: '3 DAYS',
-    dueDateUrgency: 'warning',
+    dueDateUrgency: 'soon',
     tags: [
-      { label: 'BACKEND', variant: 'secondary' },
-      { label: 'HIGH', variant: 'tertiary' },
+      { label: 'BACKEND', variant: 'green' },
+      { label: 'HIGH', variant: 'yellow' },
     ],
     assigneeName: 'Jerome Bell',
     metaBadges: [
@@ -74,7 +74,7 @@ export const Playground: Story = {
     title: 'Working (03) - RAVN Challenge',
     points: 3,
     dueDateText: '3 DAYS',
-    dueDateUrgency: 'warning',
+    dueDateUrgency: 'soon',
   },
 };
 
@@ -84,7 +84,7 @@ export const Overdue: Story = {
     points: 5,
     dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue',
-    tags: [{ label: 'BUG', variant: 'primary' }],
+    tags: [{ label: 'BUG', variant: 'red' }],
     assigneeName: 'Fernando Ramirez',
     metaBadges: [{ icon: <CommentIcon />, count: 12, label: '12 comments' }],
   },

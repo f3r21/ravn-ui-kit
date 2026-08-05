@@ -4,6 +4,12 @@ import './styles/theme.css';
 // ─── Utilities ────────────────────────────────────────────────────
 export * from './utils/cn';
 
+// ─── Shared colour vocabularies ───────────────────────────────────
+// One named type per axis (categorical accent / semantic status / due-date
+// urgency), so a consumer can tell which system a prop belongs to. See the
+// module doc comment for why `Button`'s `variant` is deliberately not here.
+export * from './types/color-variants';
+
 // ─── Icons ────────────────────────────────────────────────────────
 export * from './components/icons/icons';
 

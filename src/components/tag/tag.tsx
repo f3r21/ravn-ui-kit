@@ -1,11 +1,14 @@
 import { cn } from '../../utils/cn';
+import type { AccentColor } from '../../types/color-variants';
 
 export interface TagProps {
   /**
-   * Color type of the tag.
+   * Which accent colour the chip is painted in — Figma's `Type` property
+   * (General/Green/Blue/Yellow/Red) by its own names. Carries no meaning of its own;
+   * for a chip that says what a state *means*, use `Badge` and its `StatusTone`.
    * @default 'neutral'
    */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral' | 'blue';
+  variant?: AccentColor;
   /**
    * Renders the "Style=Outline" variant (border, transparent fill) instead of
    * the default "Style=Solid" (10%-alpha fill, no border).
@@ -38,24 +41,25 @@ export function Tag({
   // fill. "general" (neutral) is the only type where the fill tint (neutral.2)
   // and the foreground (neutral.1/white) diverge from the same swatch - matches
   // Tags00/01.md exactly.
-  const styles = {
+  // Keyed by AccentColor. The token each colour resolves to is Figma's, verified in
+  // Tags01.md — note `red` is primary-4 (#DA584B), not the danger ramp's #E82F39.
+  const styles: Record<AccentColor, { solid: string; outline: string }> = {
     neutral: {
       solid: 'bg-neutral-2/10 text-main',
       outline: 'border border-neutral-1 text-main',
     },
     // text-primary-4 kept raw here, not aliased to `text-interactive` — this is Tag's own
-    // categorical "primary" color variant (parallel to secondary/tertiary/blue), not an
-    // interactive affordance; aliasing it would wrongly imply every primary-colored tag is
-    // interactive.
-    primary: {
+    // categorical red, not an interactive affordance; aliasing it would wrongly imply
+    // every red tag is interactive.
+    red: {
       solid: 'bg-primary-4/10 text-primary-4',
       outline: 'border border-primary-4 text-primary-4',
     },
-    secondary: {
+    green: {
       solid: 'bg-secondary-4/10 text-secondary-4',
       outline: 'border border-secondary-4 text-secondary-4',
     },
-    tertiary: {
+    yellow: {
       solid: 'bg-tertiary-4/10 text-tertiary-4',
       outline: 'border border-tertiary-4 text-tertiary-4',
     },

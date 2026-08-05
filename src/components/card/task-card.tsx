@@ -4,6 +4,11 @@ import { Avatar } from '../avatar/avatar';
 import { ProjectInfo } from './project-info';
 import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
 import { AlarmIcon } from '../icons/icons';
+import {
+  DUE_DATE_URGENCY_COLOR,
+  type AccentColor,
+  type DueDateUrgency,
+} from '../../types/color-variants';
 
 export interface TaskCardProps {
   /** Task title, shown in the header row and truncated to a single line. */
@@ -17,18 +22,17 @@ export interface TaskCardProps {
   /** Due date label rendered inside the due-date Tag (e.g. `'3 DAYS'`). The Tag is hidden when not provided. */
   dueDateText?: string;
   /**
-   * Color treatment applied to the due date Tag, reflecting how urgent the due date is.
-   * Maps onto the real `Tag` variant palette (Chunk 3) rather than one-off warning/danger
-   * classes — no warning/overdue instance of this due-date "Tag" appears anywhere in
-   * Cards00.md/Cards01.md, so this mapping isn't spec-verified, only spec-consistent.
+   * How urgent the due date is, driving the due-date Tag's colour via the shared
+   * `DUE_DATE_URGENCY_COLOR` map so the card, the table cell and the table row cannot
+   * disagree about what "overdue" looks like.
    * @default 'normal'
    */
-  dueDateUrgency?: 'normal' | 'warning' | 'overdue';
+  dueDateUrgency?: DueDateUrgency;
   /**
    * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to `'neutral'` when omitted.
    * @default []
    */
-  tags?: { label: string; variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral' }[];
+  tags?: { label: string; variant?: AccentColor }[];
   /** Name of the assignee, shown next to the avatar and used by `Avatar` as the initials fallback. */
   assigneeName?: string;
   /** Avatar image URL for the assignee, forwarded to `Avatar`. */
@@ -45,12 +49,6 @@ export interface TaskCardProps {
   /** Called when the card is clicked. */
   onClick?: () => void;
 }
-
-const urgencyVariantMap = {
-  normal: 'neutral',
-  warning: 'tertiary',
-  overdue: 'primary',
-} as const;
 
 /**
  * Kanban-style task summary card showing title, points, due date, tags, assignee, and reactions.
@@ -121,7 +119,7 @@ export function TaskCard({
             // radius 4px, alarm-line icon, Desktop/Body/M/bold) — reusing `Tag` directly instead
             // of a bespoke span gets typography/spacing/color right for free.
             <Tag
-              variant={urgencyVariantMap[dueDateUrgency]}
+              variant={DUE_DATE_URGENCY_COLOR[dueDateUrgency]}
               icon={<AlarmIcon className="size-6" />}
             >
               {dueDateText}

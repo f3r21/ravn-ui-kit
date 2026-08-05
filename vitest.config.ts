@@ -34,15 +34,15 @@ export default defineConfig({
       // 85% would have failed on day one and made the honest move — writing the
       // missing tests — look like a config problem.
       //
-      // What is holding them down is known and specific: 12 of 36 components
-      // ship no test at all (`ApplicationSidebar` and `SidebarItem` are at 0%,
-      // `Skeleton` at 50%), which is `MIGRATION_GAPS.md` Section 5's open item.
-      // Raise these as that closes; do not lower them.
+      // What is holding them down is known and specific: 11 of 37 component
+      // files ship no test at all (`ApplicationSidebar` and `SidebarItem` are
+      // at 0%, `Skeleton` at 50%), which is `MIGRATION_GAPS.md` Section 5's
+      // open item. Raise these as that closes; do not lower them.
       thresholds: {
-        statements: 81,
-        branches: 81,
+        statements: 81.9,
+        branches: 81.7,
         functions: 76,
-        lines: 81,
+        lines: 81.9,
       },
     },
   },

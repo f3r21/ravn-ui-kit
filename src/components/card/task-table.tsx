@@ -3,6 +3,7 @@ import { Avatar } from '../avatar/avatar';
 import { Tag } from '../tag/tag';
 import { Skeleton } from '../skeleton/skeleton';
 import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
+import type { AccentColor, DueDateUrgency } from '../../types/color-variants';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -65,14 +66,19 @@ export interface DueDateCellProps {
    * Color treatment conveying how urgent the due date is.
    * @default 'normal'
    */
-  urgency?: 'normal' | 'warning' | 'overdue';
+  urgency?: DueDateUrgency;
 }
 
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
 export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
-  const styles = {
+  // Same three urgency levels as the due-date Tag, expressed as text colour instead of a
+  // chip. Kept in step with DUE_DATE_URGENCY_COLOR by hand rather than derived from it —
+  // the Tag maps to a fill+text pair, this is text alone, so there is no shared class to
+  // share. `Record<DueDateUrgency, string>` is what makes adding a fourth level a compile
+  // error here rather than a silently unstyled cell.
+  const styles: Record<DueDateUrgency, string> = {
     normal: 'text-main',
-    warning: 'text-tertiary-4',
+    soon: 'text-tertiary-4',
     // text-primary-4 kept as a raw ramp class, not aliased to `text-interactive` — this is a
     // status/urgency signal, not an interactive affordance, so the "interactive" alias would
     // misrepresent its role even though it happens to share the same color value.
@@ -122,7 +128,7 @@ export function EstimationCell({ points }: EstimationCellProps) {
 
 export interface TagCellProps {
   /** Tags to render, each with its own label text and optional color variant (defaults to `'neutral'` per tag). */
-  labels: { label: string; variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral' | 'blue' }[];
+  labels: { label: string; variant?: AccentColor }[];
 }
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
@@ -157,13 +163,14 @@ export interface TaskTableRowProps {
   /** Task title shown in the Task Name column, truncated to a single line. */
   title: string;
   /**
-   * Color of the "Line 1" status/priority stripe flush against the row's left edge. Reuses the
-   * same 3 hues already verified for `Tag` (`primary`/`secondary`/`tertiary`) -- the only 3 that
-   * appear across the row samples in the real "Task Default View" mockup. No spec evidence ties
-   * this color to due-date urgency or any other field, so it's a plain, independent prop.
-   * @default 'secondary'
+   * Color of the "Line 1" status/priority stripe flush against the row's left edge. Takes the
+   * shared `AccentColor` vocabulary, though only `red`/`green`/`yellow` actually appear across
+   * the row samples in the real "Task Default View" mockup -- `neutral` and `blue` are
+   * available for consistency with `Tag`, not because the spec shows them. No spec evidence
+   * ties this color to due-date urgency or any other field, so it's a plain, independent prop.
+   * @default 'green'
    */
-  indicatorColor?: 'primary' | 'secondary' | 'tertiary';
+  indicatorColor?: AccentColor;
   /**
    * Reaction counters (e.g. comment count, subtask count) rendered after the title, via a plain
    * `count`+`emoji` pair -- read-only, not the clickable/toggleable footer reactions `Reactions`
@@ -194,7 +201,7 @@ export interface TaskTableRowProps {
    * Tags rendered in the Task Tags column.
    * @default []
    */
-  tags?: { label: string; variant?: 'primary' | 'secondary' | 'tertiary' | 'neutral' | 'blue' }[];
+  tags?: { label: string; variant?: AccentColor }[];
   /** Estimation points. Column renders empty when omitted. */
   estimationPoints?: number;
   /** Assignee's full name. Column renders empty when omitted. */
@@ -207,16 +214,19 @@ export interface TaskTableRowProps {
    * Color treatment conveying how urgent `dueDate` is.
    * @default 'normal'
    */
-  dueDateUrgency?: 'normal' | 'warning' | 'overdue';
+  dueDateUrgency?: DueDateUrgency;
   /** Called when the row is clicked. */
   onClick?: () => void;
 }
 
-const indicatorColorMap = {
-  primary: 'bg-primary-4',
-  secondary: 'bg-secondary-4',
-  tertiary: 'bg-tertiary-4',
-} as const;
+// Fill-only counterpart to `Tag`'s fill+text pairs, on the same tokens.
+const indicatorColorMap: Record<AccentColor, string> = {
+  neutral: 'bg-neutral-2',
+  red: 'bg-primary-4',
+  green: 'bg-secondary-4',
+  yellow: 'bg-tertiary-4',
+  blue: 'bg-blue',
+};
 
 /**
  * TaskTableRow
@@ -230,7 +240,7 @@ const indicatorColorMap = {
 export function TaskTableRow({
   index,
   title,
-  indicatorColor = 'secondary',
+  indicatorColor = 'green',
   reactions = [],
   isSelected = false,
   onSelectedChange,

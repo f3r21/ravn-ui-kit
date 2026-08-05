@@ -20,7 +20,7 @@ export const Default: Story = {
           {
             index: 1,
             title: 'Create wireframe',
-            indicatorColor: 'primary',
+            indicatorColor: 'red',
             estimationPoints: 4,
             assigneeName: 'Amelia Nellson',
             dueDate: 'Yesterday',
@@ -29,25 +29,25 @@ export const Default: Story = {
           {
             index: 2,
             title: 'Slack Logo Design',
-            indicatorColor: 'secondary',
+            indicatorColor: 'green',
             reactions: [
               { emoji: '💬', count: 3 },
               { emoji: '🔗', count: 5 },
             ],
             tags: [
-              { label: 'IOS APP', variant: 'secondary' },
+              { label: 'IOS APP', variant: 'green' },
               { label: '+2', variant: 'neutral' },
             ],
             estimationPoints: 2,
             assigneeName: 'Jonah Doe',
             dueDate: 'Today',
-            dueDateUrgency: 'warning',
+            dueDateUrgency: 'soon',
             onViewDetails: fn(),
           },
           {
             index: 3,
             title: 'Dashboard Design',
-            indicatorColor: 'tertiary',
+            indicatorColor: 'yellow',
             reactions: [{ emoji: '🔗', count: 5 }],
             estimationPoints: 8,
             assigneeName: 'Jason Joe',
@@ -56,7 +56,7 @@ export const Default: Story = {
           {
             index: 4,
             title: 'Create wireframe',
-            indicatorColor: 'secondary',
+            indicatorColor: 'green',
             estimationPoints: 4,
             assigneeName: 'Martina Strand',
             dueDate: '6 July, 2020',
@@ -64,7 +64,7 @@ export const Default: Story = {
           {
             index: 5,
             title: 'Micromax Logo Design',
-            indicatorColor: 'primary',
+            indicatorColor: 'red',
             estimationPoints: 4,
             assigneeName: 'Macky Nielsen',
             dueDate: '6 July, 2020',

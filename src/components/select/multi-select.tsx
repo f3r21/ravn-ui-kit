@@ -97,10 +97,10 @@ export function MultiSelect<T extends object>({
           <span className="flex flex-wrap items-center gap-1">
             {/* `variant="neutral"`'s solid style is `text-main` (white) — legible
                 on the dark surfaces Tag is normally shown on, invisible on this
-                trigger's light `bg-surface-neutral`. `primary`'s tinted-red style
-                uses `text-primary-4` for its text, which stays legible on both. */}
+                trigger's light `bg-surface-neutral`. `red`'s tinted style uses
+                `text-primary-4` for its text, which stays legible on both. */}
             {selectedItems.map((item) => (
-              <Tag key={item.key} variant="primary">
+              <Tag key={item.key} variant="red">
                 {item.rendered}
               </Tag>
             ))}

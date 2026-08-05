@@ -26,7 +26,7 @@ const meta: Meta<typeof Tag> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['neutral', 'primary', 'secondary', 'tertiary', 'blue'],
+      options: ['neutral', 'red', 'green', 'yellow', 'blue'],
     },
   },
   args: {
@@ -50,7 +50,7 @@ export const Playground: Story = {
 export const SolidVariants: Story = {
   render: (args) => (
     <div className="flex gap-3">
-      {(['neutral', 'secondary', 'blue', 'tertiary', 'primary'] as const).map((v) => (
+      {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
         <Tag key={v} {...args} variant={v}>
           {v}
         </Tag>
@@ -64,7 +64,7 @@ export const SolidVariants: Story = {
 export const OutlineVariants: Story = {
   render: (args) => (
     <div className="flex gap-3">
-      {(['neutral', 'secondary', 'blue', 'tertiary', 'primary'] as const).map((v) => (
+      {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
         <Tag key={v} {...args} variant={v} outline>
           {v}
         </Tag>
@@ -78,7 +78,7 @@ export const OutlineVariants: Story = {
 export const WithIcon: Story = {
   render: (args) => (
     <div className="flex gap-3">
-      {(['neutral', 'secondary', 'blue', 'tertiary', 'primary'] as const).map((v) => (
+      {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
         <Tag key={v} {...args} variant={v} icon={<CheckIcon />}>
           {v}
         </Tag>
@@ -89,5 +89,5 @@ export const WithIcon: Story = {
 };
 
 export const Removable: Story = {
-  args: { children: 'REACT 19', variant: 'primary' },
+  args: { children: 'REACT 19', variant: 'red' },
 };

@@ -10,6 +10,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **One named type per colour axis** (`src/types/color-variants.ts`, exported from the
+  package root): `AccentColor`, `StatusTone`, `DueDateUrgency`, plus the shared
+  `DUE_DATE_URGENCY_COLOR` map. Four small colour unions had grown up independently and
+  two of them reused the same words for different things — `variant="primary"` meant
+  "this is the primary action" on a `Button` and "this chip is red" on a `Tag`, and
+  `warning` meant one thing on a `Badge` and another on a due date. Nothing in either
+  name said which system you were in.
+
 - **An icon set** (`src/components/icons/`), exported from the package root — 21
   glyphs covering every icon the kit draws internally plus every icon the
   consuming app maintained separately. Previously the kit shipped **zero** icons
@@ -70,6 +78,37 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Changed
 
+- **BREAKING — `Tag`'s colour variants are renamed to the design's own names.**
+  `primary` → `red`, `secondary` → `green`, `tertiary` → `yellow`; `neutral` and
+  `blue` are unchanged. Figma's "Tag" COMPONENT_SET carries a `Type` property whose
+  values are literally `General`/`Green`/`Blue`/`Yellow`/`Red` (Tags00.md, Tags01.md);
+  the kit had renamed those to ramp positions, which both obscured the source and
+  collided with `Button`'s hierarchy words. **No colour values changed** — `red` is
+  still `primary-4` (`#DA584B`), not the `danger` ramp. Affects `Tag.variant`,
+  `TaskCard.tags[].variant`, `TaskTableRow.tags[].variant`, `TagCell.labels[].variant`,
+  `LabelModal`'s `Label.variant`, and `TaskTableRow.indicatorColor` (whose default
+  moves from `'secondary'` to the identical `'green'`).
+
+  Landing this now rather than after the consuming app migrates is deliberate: the app
+  does not yet use the kit's `Tag`, so today this touches call sites once instead of
+  twice. Per `CONTRIBUTING.md`'s pre-1.0 carve-out this ships as a **minor** bump
+  (0.2.0 → 0.3.0), called out explicitly here as required.
+
+- **BREAKING — due-date urgency `'warning'` is renamed `'soon'.`** Affects
+  `TaskCard.dueDateUrgency`, `TaskTableRow.dueDateUrgency` and `DueDateCell.urgency`.
+  `warning` collided with `StatusTone`'s `warning` while meaning something unrelated
+  and resolving to a different ramp; `soon` also matches the consuming app's existing
+  `DueDateTone`, so the two sides no longer need a translation table for this concept.
+  All three components now read the shared `DUE_DATE_URGENCY_COLOR` map instead of
+  each keeping a private copy.
+
+- `TaskCard.tags[].variant` gains `'blue'`, which `TaskTableRow.tags[].variant` already
+  accepted — the two lists had silently diverged.
+- `Badge.variant` is now the exported `StatusTone` and `Button`/`TextButton`'s `variant`
+  is unchanged, both deliberately: status tones resolve to the palette's separate
+  `Success`/`Warning`/`Danger` ramps (not the brand ramps), and a button's variant is
+  an action-hierarchy axis where colour is a consequence. Merging either into
+  `AccentColor` would have recreated the collision this change removes.
 - **Eleven components now render the design's real glyphs** instead of hand-drawn
   approximations, as a side effect of adopting the icon set above. This is a
   visual change, not just a refactor: the kit's local `AlarmIcon` was a drawn
