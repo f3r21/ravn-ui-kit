@@ -74,4 +74,19 @@ describe('AddTaskModal Component', () => {
     expect(screen.queryByRole('dialog', { name: 'Estimate' })).toBeNull();
     expect(screen.getByRole('dialog', { name: 'Assignee' })).toBeDefined();
   });
+
+  it('paints a focus ring on the task-name input rather than suppressing one', () => {
+    // Regression pin for the outline-none bug class: in Tailwind v4 `outline-none`
+    // compiles to `outline-style: none`, cancelling any `focus-visible:outline-*` beside
+    // it and suppressing a consuming app's own base :focus-visible rule too. This input
+    // carried `outline-none` alone, so it had no focus affordance whatsoever. jsdom
+    // cannot evaluate :focus-visible, so the ring itself was confirmed by browser
+    // screenshot; what is pinned here is the class pairing. See button.tsx's doc comment.
+    render(<AddTaskModal isOpen onClose={vi.fn()} />);
+    const input = screen.getByPlaceholderText('Task name');
+
+    expect(input.className).not.toContain('outline-none');
+    expect(input.className).toContain('focus-visible:outline-2');
+    expect(input.className).toContain('focus-visible:outline-primary-4');
+  });
 });

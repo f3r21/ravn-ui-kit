@@ -231,6 +231,18 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The last two focusable elements with no focus affordance at all.**
+  `AddTaskModal`'s task-name input and `SearchBar`'s search input each carried a bare
+  `outline-none` and nothing else, so a keyboard user had no way to tell where they were.
+  Both now use the kit's standard `focus-visible:outline-2 outline-primary-4
+outline-offset-2` with no `outline-none` in front of it.
+
+  This closes the sweep begun with the 32-site focus-ring fix. The four remaining
+  standalone `outline-none` uses — the `<ul>`/`<li>` in `ListBox` and `Menu` — stay, and
+  are correct: those show focus via `bg-neutral-4` instead. Verified by browser
+  screenshot, since jsdom cannot evaluate `:focus-visible`; the tests pin the class
+  pairing that broke.
+
 - **Focus rings now actually render.** Every focusable component paired
   `outline-none` with `focus-visible:outline-*`, which in Tailwind v4 resolves
   to `outline-style: none` — the ring computed a width and a colour and painted

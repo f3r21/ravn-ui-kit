@@ -146,7 +146,7 @@ export function AddTaskModal({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Task name"
         aria-label="Task name"
-        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted font-sans outline-none"
+        className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
       />
 
       <div className="flex items-center gap-4 w-full">

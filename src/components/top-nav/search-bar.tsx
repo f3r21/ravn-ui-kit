@@ -68,7 +68,7 @@ export function SearchBar({
       <input
         {...inputProps}
         ref={ref}
-        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted outline-none font-sans min-w-0"
+        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
       />
     </div>
   );

@@ -52,4 +52,20 @@ describe('SearchBar Component', () => {
     expect(handleChange).toHaveBeenCalledWith('abcd');
     expect(input.value).toBe('abc');
   });
+
+  it('paints a focus ring rather than suppressing one', () => {
+    // Regression pin for the outline-none bug class. jsdom cannot evaluate
+    // :focus-visible, so the real proof is a browser screenshot — what is asserted here
+    // is the pairing that broke before: in Tailwind v4 `outline-none` compiles to
+    // `outline-style: none`, which cancels `focus-visible:outline-2` entirely (and also
+    // suppresses a consuming app's own `@layer base :focus-visible` rule). This input
+    // previously had `outline-none` and no focus affordance at all. See button.tsx's doc
+    // comment for the full mechanics.
+    render(<SearchBar />);
+    const input = screen.getByRole('textbox', { name: 'Search' });
+
+    expect(input.className).not.toContain('outline-none');
+    expect(input.className).toContain('focus-visible:outline-2');
+    expect(input.className).toContain('focus-visible:outline-primary-4');
+  });
 });
