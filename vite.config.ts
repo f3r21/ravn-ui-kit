@@ -27,7 +27,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    dts({ insertTypesEntry: true, include: ['src'] }),
+    dts({ include: ['src'], rollupTypes: true }),
     copyThemeTokens(),
   ],
   build: {

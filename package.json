@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "dev": "storybook dev -p 6006",
-    "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+    "build": "vite build",
     "build:storybook": "storybook build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
