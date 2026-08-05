@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useDialog, useOverlay, FocusScope } from 'react-aria';
+import { useDialog, useModalOverlay, FocusScope } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 import { cn } from '../../utils/cn';
 
@@ -23,14 +23,28 @@ export interface ModalProps {
 
 /**
  * Modal shell used by all modal variants.
- * Uses react-aria useDialog + useOverlay for accessibility.
+ * Uses react-aria's useModalOverlay (composed of useOverlay + usePreventScroll +
+ * aria-hide) so that, while open, body scroll is locked and everything outside
+ * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
+ * obscured behind the backdrop.
  */
 export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  const { overlayProps, underlayProps } = useOverlay(
-    { isOpen, onClose, isDismissable: true },
+  // useModalOverlay takes a react-stately OverlayTriggerState rather than a
+  // bare isOpen/onClose pair; this mirrors this (controlled) Modal's props
+  // into that shape instead of changing Modal's public API.
+  const triggerState = useOverlayTriggerState({
+    isOpen,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  });
+
+  const { modalProps, underlayProps } = useModalOverlay(
+    { isDismissable: true },
+    triggerState,
     overlayRef
   );
   const { dialogProps, titleProps } = useDialog({}, dialogRef);
@@ -48,7 +62,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
           autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
         <div
-          {...overlayProps}
+          {...modalProps}
           ref={overlayRef}
           className={cn('w-full', width)}
         >
@@ -88,10 +102,14 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
   );
 }
 
-// ─── useModal hook ────────────────────────────────────────────────
+// ─── useModalState hook ───────────────────────────────────────────
 
-/** Convenience hook for uncontrolled modal open/close state */
-export function useModal(defaultOpen = false) {
+/**
+ * Convenience hook for uncontrolled modal open/close state.
+ * Named `useModalState` (not `useModal`) to avoid shadowing react-aria's own
+ * `useModal` hook now that `useModalOverlay` (which composes it) is used above.
+ */
+export function useModalState(defaultOpen = false) {
   const state = useOverlayTriggerState({ defaultOpen });
   return {
     isOpen: state.isOpen,

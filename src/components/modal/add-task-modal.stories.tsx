@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { withSurface } from '../../../.storybook/decorators';
-import { useModal } from './modal';
+import { useModalState } from './modal';
 import { AddTaskModal } from './add-task-modal';
 import { TextButton } from '../button/text-button';
 
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => {
-    const { isOpen, open, close } = useModal(true);
+    const { isOpen, open, close } = useModalState(true);
     return (
       <div className="flex flex-col items-start gap-4">
         <TextButton onPress={open}>Open Add Task widget</TextButton>
@@ -57,7 +57,7 @@ export const Default: Story = {
  */
 export const Edit: Story = {
   render: (args) => {
-    const { isOpen, open, close } = useModal(true);
+    const { isOpen, open, close } = useModalState(true);
     return (
       <div className="flex flex-col items-start gap-4">
         <TextButton onPress={open}>Reopen for editing</TextButton>

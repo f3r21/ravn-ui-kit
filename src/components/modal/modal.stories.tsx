@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import { Modal, useModal } from './modal';
+import { Modal, useModalState } from './modal';
 import { TextButton } from '../button/text-button';
 
 const meta: Meta<typeof Modal> = {
@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => {
-    const { isOpen, open, close } = useModal();
+    const { isOpen, open, close } = useModalState();
     return (
       <div className="bg-neutral-5 p-8 min-h-48 flex items-center justify-center">
         <TextButton onPress={open}>Open modal</TextButton>

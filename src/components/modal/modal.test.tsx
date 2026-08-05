@@ -75,4 +75,41 @@ describe('Modal Component', () => {
     await user.tab();
     expect(dialog.contains(document.activeElement)).toBe(true);
   });
+
+  it('hides background content from assistive tech while open', () => {
+    render(
+      <>
+        <button>Outside</button>
+        <Modal title="Test" isOpen onClose={vi.fn()}>
+          <p>Content</p>
+        </Modal>
+      </>
+    );
+    const outside = screen.getByText('Outside');
+    expect(outside.getAttribute('aria-hidden')).toBe('true');
+    expect(screen.getByRole('dialog').getAttribute('aria-hidden')).toBeNull();
+  });
+
+  it('locks body scroll while open and restores it on close', () => {
+    const { rerender } = render(
+      <Modal title="Test" isOpen={false} onClose={vi.fn()}>
+        <p>Content</p>
+      </Modal>
+    );
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
+
+    rerender(
+      <Modal title="Test" isOpen onClose={vi.fn()}>
+        <p>Content</p>
+      </Modal>
+    );
+    expect(document.documentElement.style.overflow).toBe('hidden');
+
+    rerender(
+      <Modal title="Test" isOpen={false} onClose={vi.fn()}>
+        <p>Content</p>
+      </Modal>
+    );
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
+  });
 });

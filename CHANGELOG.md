@@ -32,6 +32,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   tree into `dist/src/**/*.d.ts` (including `.stories.d.ts`/`.test.d.ts` files
   and a leaked `dist/.storybook/decorators.d.ts`), inflating the published
   package to 82 files / 260.9 kB. The published package now ships 6 files.
+- **Breaking:** renamed the `Modal` module's `useModal` convenience hook to
+  `useModalState`. It never conflicted with react-aria's own `useModal` hook at
+  runtime (the real one wasn't imported), but now that `Modal` itself uses
+  `useModalOverlay` — which composes react-aria's `useModal` — keeping the name
+  was confusing API surface.
+
+### Fixed
+
+- `Modal` now uses react-aria's `useModalOverlay` instead of composing
+  `useOverlay` + `useDialog` directly. Background page content is now
+  `inert`/`aria-hidden` to assistive tech while a modal is open, and body
+  scroll is locked — neither happened before, so a screen reader or keyboard
+  user could still reach content behind an open dialog.
 
 ## [0.2.0] - 2026-08-04
 
