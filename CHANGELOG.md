@@ -78,6 +78,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Focus rings now actually render.** Every focusable component paired
+  `outline-none` with `focus-visible:outline-*`, which in Tailwind v4 resolves
+  to `outline-style: none` — the ring computed a width and a colour and painted
+  nothing (32 sites across 21 components). Removing the redundant `outline-none`
+  restores it, since `--tw-outline-style` has an initial value of `solid`. Note
+  for consumers: because the offending class sat in the `utilities` layer, it
+  also suppressed a consuming app's own `@layer base { :focus-visible { … } }`
+  rule, so this could remove a focus indicator an app was otherwise providing
+  for itself.
+- `Popover`'s doc comment pointed at a file in the consuming app that has since
+  been deleted; it now points at this kit's own `FloatingPopover`.
 - `Modal` now uses react-aria's `useModalOverlay` instead of composing
   `useOverlay` + `useDialog` directly. Background page content is now
   `inert`/`aria-hidden` to assistive tech while a modal is open, and body
