@@ -85,7 +85,7 @@ export function MultiSelect<T extends object>({
           // surface, so the placeholder/value text needs `Input`'s
           // light-surface colors (`text-muted`/`text-neutral-5`), not
           // `text-main` (invisible white-on-white once something's picked).
-          'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted'
         )}
       >

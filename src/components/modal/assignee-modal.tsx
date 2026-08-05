@@ -63,7 +63,7 @@ export function AssigneeModal({ assignees, onSelect, onClose, triggerRef, classN
           key={a.id}
           type="button"
           onClick={() => onSelect(a)}
-          className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2"
+          className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2"
         >
           <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />
         </button>

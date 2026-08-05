@@ -86,7 +86,7 @@ export function Tag({
           type="button"
           onClick={onRemove}
           aria-label="Remove tag"
-          className="hover:opacity-75 cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+          className="hover:opacity-75 cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
         >
           ×
         </button>

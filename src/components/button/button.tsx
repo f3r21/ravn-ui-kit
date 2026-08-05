@@ -34,6 +34,25 @@ export interface ButtonProps extends AriaButtonProps {
  *   border, primary-4 icon.
  * - Property 1=Secondary, State=Unselected: transparent bg, no border,
  *   white icon.
+ *
+ * The focus ring below is `focus-visible:outline-2 focus-visible:outline-primary-4
+ * focus-visible:outline-offset-2` with **no `outline-none`** in front of it, and
+ * that omission is deliberate — every focusable component in this kit follows the
+ * same rule. In Tailwind v4 `outline-none` compiles to
+ * `--tw-outline-style: none; outline-style: none`, and `outline-2` compiles to
+ * `outline-style: var(--tw-outline-style); outline-width: 2px`. So pairing them
+ * makes the ring resolve to `outline-style: none` and never paint — the width and
+ * colour are computed but draw nothing. (This is a v3→v4 behaviour change:
+ * v3's `outline-none` meant "transparent 2px ring", which is now `outline-hidden`
+ * and sets the same variable, so it is not the fix either.) Left off, the
+ * `@property --tw-outline-style` initial value of `solid` applies and the ring
+ * renders. Do not "tidy up" by adding `outline-none` back.
+ *
+ * This was shipped broken across 21 components and found only when the consuming
+ * app migrated its task-card menu onto this kit's `Menu` and lost the visible
+ * focus indicator on the sole entry point to Edit/Delete — a utility-layer
+ * `outline-none` also outranks a consumer's own `@layer base :focus-visible`
+ * rule, so it suppressed the app's global ring too.
  */
 export function Button({
   variant = 'secondary',
@@ -58,7 +77,7 @@ export function Button({
       {...buttonProps}
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
         className
       )}

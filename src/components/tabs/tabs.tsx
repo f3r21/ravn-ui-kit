@@ -121,7 +121,7 @@ function Tab({ item, state, icon }: TabProps) {
         // is 0px, but that's an artifact of a fixed-width (120px)
         // demo box, not a real horizontal-padding spec for
         // arbitrary-length labels.
-        'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
         isSelected ? 'text-interactive' : 'text-muted hover:text-main'
       )}
     >

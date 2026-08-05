@@ -99,7 +99,7 @@ export function TaskCard({
         // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
-        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
+        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
         className
       )}
     >

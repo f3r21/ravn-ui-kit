@@ -62,7 +62,7 @@ export function Select<T extends object>({ placeholder, icon, className, ...prop
           // rather than `text-main`/`text-muted`, which assume a dark shell
           // background and would render invisible white-on-white here once
           // something is selected.
-          'inline-flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans whitespace-nowrap transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           state.selectedItem ? 'text-neutral-5' : 'text-muted'
         )}
       >

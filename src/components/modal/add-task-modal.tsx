@@ -178,7 +178,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('estimate')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'estimate'}
-              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PointsIcon />}>Estimate</Tag>
             </button>
@@ -189,7 +189,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('estimate')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'estimate'}
-              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <span className="w-6 h-6 shrink-0"><PointsIcon /></span>
               {points} Point{points !== 1 ? 's' : ''}
@@ -215,7 +215,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('assignee')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'assignee'}
-              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PersonIcon />}>Assignee</Tag>
             </button>
@@ -226,7 +226,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('assignee')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'assignee'}
-              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Avatar src={assignee.avatarSrc} name={assignee.name} size="sm" />
               {assignee.name}
@@ -252,7 +252,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('label')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'label'}
-              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag icon={<PriceTagIcon />}>Label</Tag>
             </button>
@@ -263,7 +263,7 @@ export function AddTaskModal({
               onClick={() => togglePopover('label')}
               aria-haspopup="dialog"
               aria-expanded={openPopover === 'label'}
-              className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+              className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
             >
               <Tag variant={label.variant ?? 'neutral'}>{label.text}</Tag>
             </button>
@@ -287,7 +287,7 @@ export function AddTaskModal({
             onClick={() => togglePopover('date')}
             aria-haspopup="dialog"
             aria-expanded={openPopover === 'date'}
-            className="cursor-pointer rounded outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
+            className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2"
           >
             <Tag icon={<CalendarIcon />}>
               {dueDate ? dueDate.toLocaleDateString('en-US') : 'Due date'}

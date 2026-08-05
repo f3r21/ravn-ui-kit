@@ -273,7 +273,7 @@ export function TaskTableRow({
             <button
               type="button"
               onClick={onViewDetails}
-              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
+              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0 hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs')}
             >
               <span>Details</span>
               <ArrowRightIcon className="w-4 h-4" />

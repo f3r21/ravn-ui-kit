@@ -64,7 +64,7 @@ export function LabelModal({ labels, onSelect, onClose, triggerRef, className }:
           key={l.id}
           type="button"
           onClick={() => onSelect(l)}
-          className="flex items-center w-full px-4 py-1.5 hover:bg-neutral-2/10 transition-colors cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2"
+          className="flex items-center w-full px-4 py-1.5 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2"
         >
           <Tag variant={l.variant ?? 'neutral'}>{l.text}</Tag>
         </button>

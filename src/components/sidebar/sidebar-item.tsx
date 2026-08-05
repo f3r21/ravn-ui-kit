@@ -69,7 +69,7 @@ export function SidebarItem({
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none outline-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
         isActive
           ? 'text-interactive bg-gradient-to-r from-transparent to-primary-4/10'
           : 'text-muted hover:text-interactive',

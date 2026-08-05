@@ -96,7 +96,7 @@ export function Menu<T extends object>({
         ref={triggerRef}
         type="button"
         className={cn(
-          'outline-none cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           triggerClassName
         )}
       >
