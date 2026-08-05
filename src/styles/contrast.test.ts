@@ -102,12 +102,30 @@ function relativeLuminance({ r, g, b }: Rgb): number {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
 
-/** WCAG contrast ratio, compositing the foreground onto the background first. */
-export function contrastRatio(fgToken: string, bgToken: string): number {
-  const bg = parseColor(resolve(bgToken));
-  const fg = composite(parseColor(resolve(fgToken)), bg);
-  const [light, dark] = [relativeLuminance(fg), relativeLuminance(bg)].sort((a, b) => b - a);
+/**
+ * WCAG contrast ratio, compositing the foreground onto the background first.
+ *
+ * The background may be a token name or an already-composited colour from `tint()`.
+ * The kit's chips are a 10%-alpha fill, so what their text actually sits on is a blend
+ * rather than a token — measuring against the bare token underneath would report a
+ * ratio nothing on screen has.
+ */
+export function contrastRatio(fgToken: string, bg: string | Rgb): number {
+  const bgRgb = typeof bg === 'string' ? parseColor(resolve(bg)) : bg;
+  const fg = composite(parseColor(resolve(fgToken)), bgRgb);
+  const [light, dark] = [relativeLuminance(fg), relativeLuminance(bgRgb)].sort((a, b) => b - a);
   return (light + 0.05) / (dark + 0.05);
+}
+
+/**
+ * The colour a `bg-<token>/<alpha>` fill actually paints over `bg`.
+ *
+ * Nests, because the kit does: a `MultiSelect` trigger is a 10% tint and the `Tag` chips
+ * inside it are another 10% tint over that.
+ */
+export function tint(fgToken: string, alpha: number, bg: string | Rgb): Rgb {
+  const bgRgb = typeof bg === 'string' ? parseColor(resolve(bg)) : bg;
+  return composite({ ...parseColor(resolve(fgToken)), a: alpha }, bgRgb);
 }
 
 /** The three dark surfaces a form can sit on. Any text role must clear all three. */
@@ -139,7 +157,9 @@ describe('token contrast', () => {
   });
 
   describe('text on the light field surface', () => {
-    // `--color-surface-neutral` is white — the inside of Input/Datepicker/Select.
+    // `--color-surface-neutral` is white — the inside of Input, Datepicker, Card and
+    // Badge's neutral variant. Not Select or MultiSelect any more: their triggers are
+    // the design's dark chip, measured in the block below.
     it('--color-neutral-5 (the value) clears AA', () => {
       expect(contrastRatio('--color-neutral-5', '--color-surface-neutral')).toBeGreaterThanOrEqual(
         AA_TEXT,
@@ -154,12 +174,71 @@ describe('token contrast', () => {
   });
 
   /**
+   * The chip surface: `bg-neutral-2/10`, the design's own `rgba(148, 151, 154, 0.1)`.
+   *
+   * `Tag` has always been this, and `Select`/`MultiSelect`'s triggers now are too. It is
+   * the one surface in the kit that no token names, because it is a *blend* — the same
+   * fill measures differently on each of the three dark surfaces it can land on, so
+   * every ratio here has to be computed against the composite rather than looked up.
+   * That is what `tint()` exists for, and it is exactly the case the jsdom half of this
+   * file was previously blind to.
+   */
+  describe('text on the chip surface', () => {
+    const chipOn = (surface: string) => tint('--color-neutral-2', 0.1, surface);
+
+    for (const surface of DARK_SURFACES) {
+      it(`--color-main (the value) clears AA on a chip over ${surface}`, () => {
+        expect(contrastRatio('--color-main', chipOn(surface))).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+
+      it(`--color-muted-on-dark (the placeholder) clears AA on a chip over ${surface}`, () => {
+        expect(contrastRatio('--color-muted-on-dark', chipOn(surface))).toBeGreaterThanOrEqual(
+          AA_TEXT,
+        );
+      });
+
+      // MultiSelect renders its selection as `Tag` chips *inside* the trigger chip, so
+      // its labels sit on a 10% tint of a 10% tint. Two composites deep is still the
+      // shallowest thing on screen that a bare-token assertion would get wrong.
+      it(`--color-main clears AA on a Tag nested in a trigger over ${surface}`, () => {
+        const nested = tint('--color-neutral-2', 0.1, chipOn(surface));
+        expect(contrastRatio('--color-main', nested)).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+    }
+
+    /**
+     * The invalid ring, which is `--color-danger-text` on these two controls and
+     * `--color-danger` everywhere else — the one place the kit deliberately disagrees
+     * with itself, so it is pinned rather than left to a comment.
+     *
+     * `FIELD_ERROR_CLASS` justifies `danger-5` as an invalid *border* on the strength of
+     * the white field interior it separates from the container. A chip has no white
+     * interior, so that argument does not transfer, and both of the ring's adjacent
+     * colours are dark. `danger-3` is the step that clears 3:1 on both of them.
+     */
+    for (const surface of DARK_SURFACES) {
+      it(`--color-danger-text as the invalid ring clears 3:1 on both sides over ${surface}`, () => {
+        expect(contrastRatio('--color-danger-text', chipOn(surface))).toBeGreaterThanOrEqual(
+          AA_NON_TEXT,
+        );
+        expect(contrastRatio('--color-danger-text', surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+  });
+
+  /**
    * 1.4.11 asks for 3:1 against *adjacent* colours. A field's border has two — the white
    * interior and the dark container — and is perceivable if it clears 3:1 against either.
    * Neither border clears it against both, and they fail on opposite sides: `subtle`
    * (2.94:1 on white) is carried by the container, `danger` (2.55:1 on an overlay) is
    * carried by the interior. So the assertion is "at least one side", which is what the
    * success criterion actually requires — not "every side", which nothing here meets.
+   *
+   * This covers `Input`, `Datepicker`, `Card`, `Badge` and `FloatingPopover` — every
+   * bordered surface left. `Select` and `MultiSelect` are no longer among them: their
+   * triggers are the design's chip, which has no border at all, and their invalid ring
+   * is measured in "text on the chip surface" above precisely because the
+   * white-interior half of the argument below is not available to it.
    */
   describe('field borders are perceivable against at least one adjacent surface', () => {
     for (const border of ['--color-subtle', '--color-danger']) {
@@ -210,9 +289,10 @@ describe('token contrast', () => {
   });
 
   /**
-   * The nine failures this file exists to prevent, pinned as the *reason* each role
-   * exists rather than as bare numbers. If one of these starts passing, the palette
-   * changed and the role it justifies may no longer be needed.
+   * The nine failures this file was written for, plus the two the chip surface added,
+   * pinned as the *reason* each role exists rather than as bare numbers. If one of these
+   * starts passing, the palette changed and the role it justifies may no longer be
+   * needed.
    */
   describe('the pairings that were wrong, and still would be', () => {
     it('neutral-3 as label text is invisible on the shell — 1.41:1', () => {
@@ -241,6 +321,29 @@ describe('token contrast', () => {
 
     it('muted as a placeholder is unreadable inside a light field — 2.94:1', () => {
       expect(contrastRatio('--color-muted', '--color-surface-neutral')).toBeLessThan(AA_TEXT);
+    });
+
+    /**
+     * Two more the chip surface adds. Both look safe and are not, and both are the
+     * obvious first guess — which is how the white trigger got here in the first place.
+     */
+    it('muted as a chip placeholder fails on every dark surface — 3.24 / 3.93 / 4.49:1', () => {
+      for (const surface of DARK_SURFACES) {
+        expect(
+          contrastRatio('--color-muted', tint('--color-neutral-2', 0.1, surface)),
+        ).toBeLessThan(AA_TEXT);
+      }
+      // The shell case misses by 0.01, which is the whole argument for computing these
+      // rather than eyeballing them.
+      expect(
+        contrastRatio('--color-muted', tint('--color-neutral-2', 0.1, '--color-surface-shell')),
+      ).toBeCloseTo(4.49, 2);
+    });
+
+    it('danger-5 as the invalid ring on a chip fails on BOTH sides over an overlay', () => {
+      const chip = tint('--color-neutral-2', 0.1, '--color-surface-overlay');
+      expect(contrastRatio('--color-danger', chip)).toBeLessThan(AA_NON_TEXT);
+      expect(contrastRatio('--color-danger', '--color-surface-overlay')).toBeLessThan(AA_NON_TEXT);
     });
   });
 
