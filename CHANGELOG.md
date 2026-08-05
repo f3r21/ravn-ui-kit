@@ -272,6 +272,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The `Card` story's heading was invisible.** `text-neutral-1` — pure white — on `Card`'s
+  own white surface, **1.00:1**, on the two lines whose sibling `<p>` this pass edited
+  without noticing. It survived because **axe files exact 1:1 text under `incomplete`, not
+  `violations`** (messageKey `equalRatio`: it cannot tell invisible text from deliberately
+  hidden decorative text, so it asks for a human). A `resultTypes: ['violations']` sweep is
+  therefore blind to the worst pairing there is. The audit harness now collects `incomplete`
+  too, which also surfaced `SidebarItem`'s badge above under `shortTextContent`.
+
 - **Stories render on the surfaces their components actually live on.** Fifteen of the 131
   violations were Storybook artifacts rather than kit defects — components drawn on the
   light default canvas when every real consumer surface is dark. `TaskListView` and
@@ -282,6 +290,45 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `text-muted-on-light` inside the white card, `Modal`'s uses `text-muted-on-dark`, and
   `Icons`' colour demo applies its tone to the icon instead of to the whole column, which
   had been tinting the caption in two colours documented as unsafe for text.
+
+- **Marking a field invalid silently downgraded its focus ring.** `Input`, `Datepicker`,
+  `Select` and `MultiSelect` each write `focus-visible:outline-danger-5` on their
+  `error &&` line — and because `cn()` is tailwind-merge, that override _replaces_ the base
+  ring rather than adding to it. So an invalid field's focus ring was **2.55:1** on an
+  overlay, worse than the 5.43:1 it replaced, on exactly the surface a form is most likely
+  to sit on. All four are now `--color-danger-text` (5.65 / 6.94 / 7.95:1), which is also
+  the token `Select`'s invalid _ring_ already used two lines above.
+
+  This is why the previous entry's claim of "every focus ring" was wrong: the recolour
+  swapped `outline-primary-4`, and these four say `outline-danger-5`. `contrast.test.ts`
+  now asserts both the fixed ring and the fact that danger-5 measured worse than what it
+  replaced, and its prose no longer claims a number it cannot prove.
+
+- **`ListBox` and `Menu` had no visible keyboard focus.** The arrow-key focus indicator was
+  a `bg-neutral-4` fill drawn on a `surface-overlay` popover — **1.23:1**, and 1.00:1 for a
+  bare `ListBox` on a panel — with `outline-none` on the item removing any other
+  affordance. Both now draw an inset `--color-interactive-text` ring (5.43:1) and keep the
+  fill as a quieter secondary cue. This matters most on `Menu`, which is the sole entry
+  point to Edit/Delete in the consuming app, and which this kit has already lost a focus
+  indicator on once.
+
+- **The `danger` toast's message text was 4.29:1.** It was the only tone in the map
+  inverting the pattern — a dark fill with white text — and the only one that failed.
+  Moving the label to `neutral-5` on the same fill does not clear it either (3.59:1), so
+  the fill moved to `danger-4`: **6.01:1**, and danger now matches `success` and `warning`
+  as a saturated fill with dark text. No audit had ever measured a toast, because the kit
+  renders none without a click.
+
+- **Three more the ranked table never contained.** `LabelCheckbox`'s invalid box was
+  `danger-5` at 2.55:1 — a stroked outline with `fill="none"`, so the "white field
+  interior" argument that keeps `danger-5` on `Input`'s border does not apply to it, the
+  same reasoning that already moved `Select`. `SidebarItem`'s active count badge was white
+  on `primary-4` at 3.83:1, the CTA pairing on text the CTA's exemption does not cover, and
+  fixable outright because `badgeCount` has no ground truth in the design at all. And
+  `Tag`'s remove button dimmed its "×" with `hover:opacity-75`, which composites the glyph
+  into its own chip and put yellow at 3.39 / 3.97 / 4.43:1 — failing on all three surfaces;
+  it now darkens the background behind the glyph instead, which moves every variant the
+  right way (nothing below 5.93:1).
 
 - **`LabelCheckbox` and `TaskTable`'s row-select checkbox had no visible focus indicator
   at all.** Both hide the real `<input>` with `sr-only` and draw the ring on the wrapping

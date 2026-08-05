@@ -123,17 +123,30 @@ at an already-verified token — no new hex introduced. Named as bare nouns
 `{property}-{token-name}` utilities — prefixing the name with the property
 would double up (`text-text-main`) instead of the intended `text-main`.
 
-| Alias                     | Aliases     | Utility                                 | Role                                                                      |
-| ------------------------- | ----------- | --------------------------------------- | ------------------------------------------------------------------------- |
-| `--color-main`            | `neutral-1` | `text-main`                             | Primary readable text on the dark shell, and icon tint via `currentColor` |
-| `--color-muted`           | `neutral-2` | `text-muted` / `placeholder:text-muted` | Secondary/de-emphasized text, dim icons, placeholders                     |
-| `--color-interactive`     | `primary-4` | `text-interactive`                      | Active/interactive/hover-clickable text & icons                           |
-| `--color-danger`          | `danger-5`  | `text-danger`                           | Error/validation/status-danger text                                       |
-| `--color-surface-neutral` | `neutral-1` | `bg-surface-neutral`                    | Light input/card background                                               |
-| `--color-subtle`          | `neutral-2` | `border-subtle`                         | Default hairline border                                                   |
-| `--color-surface-overlay` | `neutral-3` | `bg-surface-overlay`                    | Floating popover/dialog/modal backgrounds                                 |
-| `--color-surface-panel`   | `neutral-4` | `bg-surface-panel`                      | Card/container/panel backgrounds                                          |
-| `--color-surface-shell`   | `neutral-5` | `bg-surface-shell`                      | Outermost app-shell / deepest dropdown backgrounds                        |
+| Alias                      | Aliases                | Utility                                 | Role                                                                      |
+| -------------------------- | ---------------------- | --------------------------------------- | ------------------------------------------------------------------------- |
+| `--color-main`             | `neutral-1`            | `text-main`                             | Primary readable text on the dark shell, and icon tint via `currentColor` |
+| `--color-muted`            | `neutral-2`            | `text-muted`                            | Secondary text **on a panel or the shell only**, and dim icons anywhere   |
+| `--color-interactive`      | `primary-4`            | `bg-interactive` / `border-interactive` | Interactive **fills and borders. Never text** — see below                 |
+| `--color-danger`           | `danger-5`             | `border-danger`                         | Validation **borders against a light field interior. Never text**         |
+| `--color-muted-on-dark`    | `transparent-light-65` | `text-muted-on-dark`                    | Secondary text whose surface is not knowable, or is an overlay            |
+| `--color-muted-on-light`   | `transparent-dark-65`  | `text-muted-on-light`                   | Secondary text inside a white field or card                               |
+| `--color-interactive-text` | `primary-2`            | `text-interactive-text` / `outline-…`   | Accent **as text**, and every focus ring in the kit                       |
+| `--color-danger-text`      | `danger-3`             | `text-danger-text` / `ring-…`           | Error **text**, and any invalid boundary with no light interior           |
+| `--color-surface-neutral`  | `neutral-1`            | `bg-surface-neutral`                    | Light input/card background                                               |
+| `--color-subtle`           | `neutral-2`            | `border-subtle`                         | Default hairline border                                                   |
+| `--color-surface-overlay`  | `neutral-3`            | `bg-surface-overlay`                    | Floating popover/dialog/modal backgrounds                                 |
+| `--color-surface-panel`    | `neutral-4`            | `bg-surface-panel`                      | Card/container/panel backgrounds                                          |
+| `--color-surface-shell`    | `neutral-5`            | `bg-surface-shell`                      | Outermost app-shell / deepest dropdown backgrounds                        |
+
+The last four rows exist because the three above them are safe for _some_ properties and
+not others, which is what produced a set of AA failures across the kit. As **text**,
+`--color-interactive` measures 2.86 / 3.51 / 4.02:1 over overlay / panel / shell and
+`--color-danger` 2.55 / 3.14 / 3.59:1 — both under the 4.5:1 bar on every surface, with no
+surface that rescues either. `--color-muted` is the subtler case: it clears AA on a panel
+(4.58:1) and the shell (5.25:1) and fails on an overlay (3.73:1), so it is correct only
+where a component knows it is not on one. Reach for the `-text` roles rather than
+remembering the caveat.
 
 `--color-muted` and `--color-subtle` both intentionally alias `neutral-2` —
 same ramp step, different role depending on which property consumes it; this

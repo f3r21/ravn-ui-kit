@@ -46,8 +46,9 @@ export function RequiredIndicator() {
  * is `#94979A` (`neutral-2`), but it sits on `#2C2F33`, where it measures 4.58:1. On the
  * `#393D41` modal card — where a task form actually lives — the same pairing is
  * **3.73:1**, under AA. `#FFFFFF` is the only other colour the design ever puts on a dark
- * surface, and it clears AA on all three: 11.60:1 on overlay, 13.45:1 on panel, 15.40:1
- * on shell.
+ * surface, and it clears AA on all three: 10.95:1 on overlay, 13.45:1 on panel, 15.40:1
+ * on shell. (The overlay figure read 11.60:1 here until it was recomputed; the conclusion
+ * is unchanged, but a contrast comment carrying a wrong number is worth less than none.)
  *
  * This was `text-field-label font-semibold text-neutral-3 uppercase`, which was invented
  * twice over: `#393D41` measured **1.41:1** on the shell — the design uses it as a
