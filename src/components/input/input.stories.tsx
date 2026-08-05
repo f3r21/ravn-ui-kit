@@ -1,11 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { withSurface } from '../../../.storybook/decorators';
 import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
   title: 'Primitives/Input',
   component: Input,
   tags: ['autodocs'],
+  // On the app shell, like every real consumer. This story previously used
+  // Storybook's default light canvas, which is how a set of contrast failures went
+  // unseen: the label and description colours were picked for a white background
+  // that no consumer has, and only `Select`'s dark story ever showed the problem.
+  decorators: [withSurface('neutral-5')],
   argTypes: {
     isDisabled: { control: 'boolean' },
   },

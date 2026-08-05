@@ -5,9 +5,17 @@ import { cn } from '../../utils/cn';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
 import { ChevronDownIcon } from '../icons/icons';
-import { FIELD_LABEL_CLASS, FieldMessages, RequiredIndicator } from '../form-field/form-field';
+import { fieldLabelClass, FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface SelectProps<T extends object> extends AriaSelectProps<T> {
+  /**
+   * Renders `label` visibly above the trigger instead of `sr-only`.
+   *
+   * Defaults to `false` — the design draws no field labels; see `FIELD_LABEL_CLASS`.
+   * `label` still names the trigger for assistive tech either way.
+   * @default false
+   */
+  isLabelVisible?: boolean;
   /** Shown inside the trigger when no item is selected yet. */
   placeholder?: string;
   /** Optional leading icon rendered in the trigger, ahead of the value. */
@@ -47,6 +55,7 @@ export interface SelectProps<T extends object> extends AriaSelectProps<T> {
  * recognize. The visible pill-shaped trigger below is purely presentational.
  */
 export function Select<T extends object>({
+  isLabelVisible = false,
   placeholder,
   icon,
   error,
@@ -71,7 +80,7 @@ export function Select<T extends object>({
   return (
     <div className={cn('inline-flex flex-col gap-1.5', className)}>
       {props.label ? (
-        <span {...labelProps} className={FIELD_LABEL_CLASS}>
+        <span {...labelProps} className={fieldLabelClass(isLabelVisible)}>
           {props.label}
           {props.isRequired ? <RequiredIndicator /> : null}
         </span>
@@ -102,7 +111,7 @@ export function Select<T extends object>({
           // background and would render invisible white-on-white here once
           // something is selected.
           'inline-flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          state.selectedItem ? 'text-neutral-5' : 'text-muted',
+          state.selectedItem ? 'text-neutral-5' : 'text-muted-on-light',
           error && 'border-danger-5 focus-visible:outline-danger-5',
         )}
       >

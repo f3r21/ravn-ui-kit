@@ -1,11 +1,19 @@
 import { useRef } from 'react';
 import { useTextField, type AriaTextFieldProps } from 'react-aria';
 import { cn } from '../../utils/cn';
-import { FIELD_LABEL_CLASS, FieldMessages, RequiredIndicator } from '../form-field/form-field';
+import { fieldLabelClass, FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface DatepickerProps extends AriaTextFieldProps {
-  /** Label text rendered above the input. When omitted, no label is shown. */
+  /** Label text. Rendered `sr-only` unless `isLabelVisible`. When omitted, no label. */
   label?: string;
+  /**
+   * Renders the label visibly above the input instead of `sr-only`.
+   *
+   * Defaults to `false` — the design draws no field labels; see `FIELD_LABEL_CLASS`.
+   * The label still names the input for assistive tech either way.
+   * @default false
+   */
+  isLabelVisible?: boolean;
   /**
    * Error message rendered below the input. When set, also switches the
    * input to its error visual state (danger border/outline).
@@ -17,7 +25,14 @@ export interface DatepickerProps extends AriaTextFieldProps {
   className?: string;
 }
 
-export function Datepicker({ label, error, description, className, ...props }: DatepickerProps) {
+export function Datepicker({
+  label,
+  isLabelVisible = false,
+  error,
+  description,
+  className,
+  ...props
+}: DatepickerProps) {
   const ref = useRef<HTMLInputElement>(null);
   const { labelProps, inputProps, descriptionProps, errorMessageProps } = useTextField(
     { ...props, label, description, type: 'date', isInvalid: !!error, errorMessage: error },
@@ -27,7 +42,7 @@ export function Datepicker({ label, error, description, className, ...props }: D
   return (
     <div className="flex flex-col gap-1.5 w-full">
       {label ? (
-        <label {...labelProps} className={FIELD_LABEL_CLASS}>
+        <label {...labelProps} className={fieldLabelClass(isLabelVisible)}>
           {label}
           {props.isRequired ? <RequiredIndicator /> : null}
         </label>
