@@ -99,9 +99,14 @@ export const Removable: Story = {
  * tightest case is `surface-overlay` — a tag inside a modal or a popover. No story
  * rendered one there directly before this, so the only overlay coverage an axe pass got
  * was incidental, via `Modal/Label`. This story exists to give the audit a target.
+ *
+ * Each band paints its own surface, so the meta-level `withSurface('neutral-4')` still
+ * wraps all three and does not affect what any chip is measured against. There is no way
+ * to opt out of it — Storybook *composes* story and meta decorators rather than letting
+ * the story replace them, so a `decorators: []` here would be a no-op that reads as if it
+ * did something.
  */
 export const OnEverySurface: Story = {
-  decorators: [],
   parameters: { layout: 'fullscreen' },
   render: (args) => (
     <div>

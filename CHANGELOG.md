@@ -335,6 +335,22 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   and `SidebarItem`'s gradient wash keep `primary-4` — non-text, and neither is the only
   signal for its state.
 
+- **`Tabs`, `EmptyState` and `SearchBar` take `--color-muted-on-dark` too**, on the rule
+  rather than on a measured failure: none of the three paints a background of its own, so
+  each renders on whatever a consumer puts it in, and `--color-muted` is only safe where
+  that surface is known to be a panel or the shell (4.58 / 5.25:1 — but 3.73:1 on an
+  overlay). A tab strip in a modal, or "no tasks match your filters" inside one, is an
+  ordinary thing to build. axe reported none of these because every current story renders
+  them on a panel; they were found by applying the rule the same pass had already used to
+  justify `UserRow`.
+
+  `TaskCard`, `TaskTable`, `TopNav`, `Modal` and `DatePickerMenu` are deliberately left on
+  `--color-muted`: each paints its own surface and so knows what its text sits on.
+  `SidebarItem` is left too — it has no fill either, but an item only ever renders inside
+  `ApplicationSidebar`, which is a panel. Icons are untouched throughout: non-text, so
+  1.4.11's 3:1 applies and `muted` clears it on all three surfaces (3.73 / 4.58 / 5.25:1),
+  now asserted rather than assumed.
+
 - **Secondary text on a popover uses `--color-muted-on-dark`.** `--color-muted`
   (`neutral-2`) clears AA on a panel (4.58:1) and on the shell (5.25:1) and measures
   **3.73:1** on `surface-overlay` — which is exactly what makes it easy to ship: a

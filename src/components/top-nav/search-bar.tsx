@@ -68,7 +68,12 @@ export function SearchBar({
       <input
         {...inputProps}
         ref={ref}
-        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+        // `placeholder:text-muted-on-dark`, not `placeholder:text-muted`. The input is
+        // `bg-transparent` and the wrapper paints nothing either, so a SearchBar sits on
+        // whatever contains it. Inside `TopNav` that is `surface-panel` (4.58:1), but the
+        // component is exported on its own and `neutral-2` is 3.73:1 on an overlay. The
+        // leading icon keeps `text-muted` — non-text, so 3:1 applies and 3.73 clears it.
+        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted-on-dark font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
       />
     </div>
   );

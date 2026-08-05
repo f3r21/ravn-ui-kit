@@ -570,6 +570,20 @@ describe('token contrast', () => {
      * Estimate and Label popovers' headers, and `UserRow`'s role text inside them. Note it
      * *passes* on the other two surfaces, which is what makes it easy to ship — a
      * component built and reviewed on a panel is fine until it is dropped into a modal.
+     *
+     * The rule this settles, stated once here and applied throughout: **`--color-muted` is
+     * only for text whose surface is known to be a panel or the shell.** Anything that
+     * paints no background of its own, and so renders on whatever a consumer puts it in,
+     * takes `--color-muted-on-dark` instead. By that test `Tabs`, `EmptyState`,
+     * `SearchBar` and `UserRow` all qualify — none of them has a fill — while `TaskCard`,
+     * `TaskTable`, `TopNav`, `Modal` and `DatePickerMenu` do not, because each paints its
+     * own surface and knows what its text sits on. `SidebarItem` is the one judgement
+     * call: it has no fill either, but an item renders only inside `ApplicationSidebar`,
+     * which is a panel.
+     *
+     * Icons are unaffected — non-text, so 1.4.11's 3:1 applies and `muted` clears it on
+     * all three surfaces. That is why `EmptyState` and `SearchBar` keep `text-muted` on
+     * their glyphs while their text moved.
      */
     it('muted is fine on a panel and the shell, and fails on an overlay — 3.73:1', () => {
       expect(contrastRatio('--color-muted', '--color-surface-panel')).toBeGreaterThanOrEqual(
@@ -579,6 +593,16 @@ describe('token contrast', () => {
         AA_TEXT,
       );
       expect(contrastRatio('--color-muted', '--color-surface-overlay')).toBeCloseTo(3.73, 2);
+    });
+
+    it('muted is still fine as an ICON everywhere — 1.4.11 asks 3:1, not 4.5:1', () => {
+      // This is what keeps `EmptyState`'s and `SearchBar`'s glyphs on `text-muted` while
+      // their text moved to `muted-on-dark`, and `Modal`'s close button and
+      // `ProjectInfo`'s icon on it outright. Asserted so the split is a measurement
+      // rather than an assumption about which uses are text.
+      for (const surface of DARK_SURFACES) {
+        expect(contrastRatio('--color-muted', surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      }
     });
 
     it('primary-4 on primary-1 was the kit’s biggest single defect — 2.61:1, 46 renders', () => {

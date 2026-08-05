@@ -131,7 +131,13 @@ function Tab({ item, state, icon }: TabProps) {
         // overlay / panel / shell). `primary-2` clears all three at 5.43 / 6.67 / 7.63.
         // The 2px indicator below stays primary-4 — that is a non-text boundary at 3:1,
         // and it is no longer the only selection signal anyway.
-        isSelected ? 'text-interactive-text' : 'text-muted hover:text-main',
+        // The unselected label is `muted-on-dark`, not `muted`. `Tabs` paints no
+        // background of its own, so it has no way to know what it sits on — and
+        // `neutral-2` clears AA on a panel (4.58:1) and the shell (5.25:1) but manages
+        // only 3.73:1 on `surface-overlay`. A tab strip inside a modal is an ordinary
+        // thing for a consumer to build. Same rule as FIELD_DESCRIPTION_CLASS and
+        // `UserRow`: `--color-muted` only where the surface is known.
+        isSelected ? 'text-interactive-text' : 'text-muted-on-dark hover:text-main',
       )}
     >
       {icon ? <span className="text-base leading-none">{icon}</span> : null}
