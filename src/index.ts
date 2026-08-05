@@ -30,6 +30,9 @@ export * from './components/card/project-info';
 // ─── Popover (shared floating-surface shell) ──────────────────────
 export * from './components/popover/popover';
 
+// ─── ListBox (headless option list) ───────────────────────────────
+export * from './components/listbox/list-box';
+
 // ─── Modals ───────────────────────────────────────────────────────
 export * from './components/modal/modal';
 export * from './components/modal/add-task-modal';
