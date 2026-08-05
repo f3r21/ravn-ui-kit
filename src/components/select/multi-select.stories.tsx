@@ -19,8 +19,12 @@ const LABEL_OPTIONS: LabelOption[] = [
   { id: 'wontfix', label: 'Won’t fix', isDisabled: true },
 ];
 
-function MultiSelectDemo({ onSelectionChange, ...props }: Partial<MultiSelectProps<LabelOption>>) {
-  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
+function MultiSelectDemo({
+  onSelectionChange,
+  initialSelection,
+  ...props
+}: Partial<MultiSelectProps<LabelOption>> & { initialSelection?: string[] }) {
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(initialSelection));
 
   return (
     <MultiSelect<LabelOption>
@@ -63,6 +67,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => <MultiSelectDemo {...args} />,
+};
+
+/**
+ * The filled state, and the reason it has a story: the selection renders as the
+ * trigger's own comma-separated value rather than as nested `Tag` chips. Chips were
+ * what this used to do, and a browser is what showed they were wrong — a `Tag` is
+ * exactly as tall as the trigger, so two of them filled it edge to edge and the control
+ * read as two loose tags next to a stray chevron. jsdom could not have told anyone that.
+ */
+export const WithSelection: Story = {
+  render: (args) => <MultiSelectDemo {...args} initialSelection={['bug', 'feature']} />,
 };
 
 export const Disabled: Story = {

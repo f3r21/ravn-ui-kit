@@ -151,6 +151,14 @@ color are deliberately left as raw ramp classes rather than force-fit:
 decorative initials tint (categorical/decorative, not interactive), and on
 `TaskTable`'s "overdue" due-date text (a status signal, not interactivity).
 
+`neutral-2` has one more un-aliased role, as a **10%-alpha fill** rather than a
+colour in its own right: `bg-neutral-2/10` is the design's chip surface —
+`rgba(148, 151, 154, 0.1)` — on `Tag` and on the `Select`/`MultiSelect` triggers
+that adopt `Tag`'s treatment. Neither `--color-muted` (text) nor
+`--color-subtle` (a border) describes a fill, and `--color-surface-neutral` is
+the light one, so this stays on the raw ramp step until the design gives the
+tint a name of its own.
+
 Similarly, `neutral-3`/`neutral-4`/`neutral-5` each play other real roles
 beyond the one `surface-*` alias above captures — deliberately left
 un-aliased since they don't share one coherent name: `neutral-3` as a
