@@ -247,6 +247,74 @@ describe('token contrast', () => {
   });
 
   /**
+   * `Tag`'s five accent chips.
+   *
+   * Figma paints label and fill from one swatch — `bg-X/10 text-X` — which is
+   * structurally incapable of clearing AA, because a 10% tint of a colour is never far
+   * from that colour. Red and green were 27 of the 131 violations an axe pass reported.
+   *
+   * What settles the shape of the fix is that no *fill* rescues them: `primary-4` as text
+   * clears 4.5:1 against nothing in this palette (best case 4.02:1, on the shell). So the
+   * fills stay exactly as drawn and the labels step up their own ramps.
+   *
+   * Each chip is measured on its own composite, not against the bare surface — that is
+   * what `tint()` is for, and it is the whole reason the jsdom half of this file could
+   * not see these before.
+   */
+  describe('Tag', () => {
+    const VARIANTS = [
+      // variant, Figma's fill, the label/border colour after this pass
+      ['neutral', '--color-neutral-2', '--color-main'],
+      ['red', '--color-primary-4', '--color-primary-2'],
+      ['green', '--color-secondary-4', '--color-secondary-2'],
+      ['yellow', '--color-tertiary-4', '--color-tertiary-4'],
+      ['blue', '--color-blue', '--color-main'],
+    ] as const;
+
+    for (const [variant, fill, label] of VARIANTS) {
+      for (const surface of DARK_SURFACES) {
+        it(`${variant} solid: the label clears AA on its own tint over ${surface}`, () => {
+          expect(contrastRatio(label, tint(fill, 0.1, surface))).toBeGreaterThanOrEqual(AA_TEXT);
+        });
+
+        // Outline has a transparent fill, so its label sits on the surface directly.
+        it(`${variant} outline: the label clears AA on ${surface}`, () => {
+          expect(contrastRatio(label, surface)).toBeGreaterThanOrEqual(AA_TEXT);
+        });
+      }
+    }
+
+    /**
+     * The outline border is a non-text boundary — 3:1 under 1.4.11 — and unlike a field's
+     * border it has only one adjacent colour, because the fill it encloses is transparent.
+     */
+    for (const [variant, , border] of VARIANTS.filter(([v]) => v !== 'blue')) {
+      for (const surface of DARK_SURFACES) {
+        it(`${variant} outline: the border clears 3:1 on ${surface}`, () => {
+          expect(contrastRatio(border, surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+        });
+      }
+    }
+
+    /**
+     * Blue's border is the one thing this pass could not fix, recorded here as the
+     * current state so it cannot be mistaken for passing.
+     *
+     * `--color-blue` is a standalone accent with no ramp — `tokens.css` says so, and it
+     * exists for `Tag`'s Blue type alone — so there is no lighter step to move a border
+     * to, and CONTRIBUTING.md's first design value rules out inventing one. A white
+     * border would clear it, but would make the outline blue tag indistinguishable from
+     * the neutral one, which trades a boundary nobody can see for a variant nobody can
+     * tell apart. The *label* is white and does clear AA; only the border is short.
+     */
+    for (const surface of DARK_SURFACES) {
+      it(`blue outline: the border does NOT clear 3:1 on ${surface} — known, no lighter blue exists`, () => {
+        expect(contrastRatio('--color-blue', surface)).toBeLessThan(AA_NON_TEXT);
+      });
+    }
+  });
+
+  /**
    * 1.4.11 asks for 3:1 against *adjacent* colours. A field's border has two — the white
    * interior and the dark container — and is perceivable if it clears 3:1 against either.
    * Neither border clears it against both, and they fail on opposite sides: `subtle`
@@ -345,6 +413,43 @@ describe('token contrast', () => {
 
     it('primary-4 on primary-1 was the kit’s biggest single defect — 2.61:1, 46 renders', () => {
       expect(contrastRatio('--color-interactive', '--color-primary-1')).toBeCloseTo(2.61, 2);
+    });
+
+    /**
+     * Figma's own `bg-X/10 text-X` for `Tag`. Kept as an assertion because it is the
+     * argument for the deviation above: if one of these ever starts passing, the palette
+     * moved and the label should move back to the swatch the design draws.
+     */
+    it('a 10% tint is never far enough from its own colour to be text on', () => {
+      for (const [fill, surfaces] of [
+        ['--color-primary-4', DARK_SURFACES],
+        ['--color-secondary-4', ['--color-surface-overlay', '--color-surface-panel']],
+        ['--color-blue', DARK_SURFACES],
+      ] as const) {
+        for (const surface of surfaces) {
+          expect(contrastRatio(fill, tint(fill, 0.1, surface))).toBeLessThan(AA_TEXT);
+        }
+      }
+      // Green is the near miss that makes the case for computing rather than eyeballing:
+      // on a panel it is 4.44:1, short of AA by 0.06.
+      expect(
+        contrastRatio(
+          '--color-secondary-4',
+          tint('--color-secondary-4', 0.1, '--color-surface-panel'),
+        ),
+      ).toBeCloseTo(4.44, 2);
+    });
+
+    it('no fill rescues a primary-4 label — it clears 4.5:1 against nothing here', () => {
+      const everySurface = [
+        ...DARK_SURFACES,
+        '--color-surface-neutral',
+        '--color-primary-1',
+        '--color-neutral-3',
+      ];
+      for (const surface of everySurface) {
+        expect(contrastRatio('--color-interactive', surface)).toBeLessThan(AA_TEXT);
+      }
     });
 
     /**

@@ -248,6 +248,34 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`Tag`'s labels clear AA on their own tints.** The design paints label and fill from
+  one swatch (`bg-X/10 text-X`), which is structurally incapable of clearing 4.5:1 — a
+  10% tint of a colour is never far from that colour. Red measured 2.61 / 3.17 / 3.61:1
+  over overlay / panel / shell and green 3.66 / 4.44 / 5.08, together 27 of the 131
+  violations. **The fills are unchanged**; only the labels moved, because no choice of
+  fill rescues them: `primary-4` as text clears 4.5:1 against nothing in this palette
+  (best case 4.02:1, on the shell).
+
+  | variant   | fill             | label                         | was                    | now                     |
+  | --------- | ---------------- | ----------------------------- | ---------------------- | ----------------------- |
+  | `red`     | `primary-4/10`   | `primary-4` → `primary-2`     | 2.61 / 3.17 / 3.61:1   | 4.98 / 6.02 / 6.86:1    |
+  | `green`   | `secondary-4/10` | `secondary-4` → `secondary-2` | 3.66 / 4.44 / 5.08:1   | 5.50 / 6.67 / 7.64:1    |
+  | `blue`    | `blue/10`        | `blue` → `main`               | 1.77 / 2.14 / 2.43:1   | 10.38 / 12.53 / 14.25:1 |
+  | `yellow`  | `tertiary-4/10`  | unchanged                     | 4.73 / 5.74 / 6.58:1   | unchanged               |
+  | `neutral` | `neutral-2/10`   | unchanged                     | 9.52 / 11.54 / 13.20:1 | unchanged               |
+
+  `blue` is the one the palette cannot serve on its own terms: `--color-blue` is a
+  standalone accent with no ramp, so there is no lighter step to reach for, and
+  CONTRIBUTING.md's first design value rules out inventing one. Its tint alone now carries
+  the variant. The outline style takes the same colour for border and label, except blue,
+  whose border stays `--color-blue` — a white border would make it indistinguishable from
+  the neutral outline tag. That border does not clear 1.4.11's 3:1 on any surface
+  (1.87 / 2.29 / 2.63) and `contrast.test.ts` records it as the known limit.
+
+  Visually, chips keep their hue and their exact Figma fill; red and green labels read a
+  shade paler, and blue's label is white. **Consumers with committed screenshots of a
+  board will need to retake them.**
+
 - **`Avatar`'s initials are readable.** `bg-primary-1 text-primary-4` measured **2.61:1**,
   and was the largest single accessibility defect in the kit — 46 of the 131
   colour-contrast violations an axe pass over the built Storybook reports came from that

@@ -147,8 +147,19 @@ Every `text-main`/`text-muted`/`text-interactive`/`text-danger`/
 `bg-surface-neutral`/`border-subtle` call site across the kit now uses these
 aliases — a small number of genuinely different-role usages of the same raw
 color are deliberately left as raw ramp classes rather than force-fit:
-`text-primary-4` on `Tag`'s own `red` accent colour, and on `TaskTable`'s
-"overdue" due-date text (a status signal, not interactivity).
+`text-primary-2` on `Tag`'s own `red` accent colour, and `text-primary-4` on
+`TaskTable`'s "overdue" due-date text (a status signal, not interactivity).
+
+`Tag`'s label is a step lighter than its fill, and that is a deliberate
+deviation. The design paints label and fill from one swatch — `bg-X/10 text-X`
+— which cannot clear AA, because a 10% tint of a colour is never far from that
+colour: red measured **2.61:1** on its own tint and green **3.66:1**. No choice
+of fill rescues them either, since `primary-4` as text clears 4.5:1 against
+nothing in this palette. So the fills stay exactly as drawn and the labels step
+up their own ramps to the first rung that clears AA on all three dark surfaces
+— `primary-2` (4.98:1) and `secondary-2` (5.50:1). `yellow` is untouched
+because `tertiary-4` already cleared it, and `blue` labels in `text-main`
+because `--color-blue` is a standalone accent with no lighter step to reach for.
 
 `Avatar` used to be a third such case — `bg-primary-1 text-primary-4` for its
 initials fallback — and is no longer. That pairing measured **2.61:1** and was
