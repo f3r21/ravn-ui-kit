@@ -52,7 +52,7 @@ export interface SelectProps<T extends object> extends AriaSelectProps<T> {
  * same state. That isn't redundant with the visible trigger — it's what
  * makes the control work inside a `<form>`, gives mobile browsers their
  * native picker UI, and lets autofill/password managers see a field they
- * recognize. The visible pill-shaped trigger below is purely presentational.
+ * recognize. The visible chip-shaped trigger below is purely presentational.
  */
 export function Select<T extends object>({
   isLabelVisible = false,
@@ -105,14 +105,51 @@ export function Select<T extends object>({
         // screen-reader user does get is aria-describedby pointing at the error text,
         // which IS global and supported, plus the visual state below.
         className={cn(
-          // `bg-surface-neutral` is a light (near-white) surface, matching
-          // `Input`'s value/placeholder colors (`text-neutral-5`/`text-muted`)
-          // rather than `text-main`/`text-muted`, which assume a dark shell
-          // background and would render invisible white-on-white here once
-          // something is selected.
-          'inline-flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          state.selectedItem ? 'text-neutral-5' : 'text-muted-on-light',
-          error && 'border-danger-5 focus-visible:outline-danger-5',
+          // The design's chip, not a light field. Figma draws every dropdown trigger in
+          // this system as the same "Tag" atom — `rgba(148,151,154,0.1)` (neutral-2 at
+          // 10%), 4px radius, 32px tall, 4px/16px padding, white 15px/600 label — over a
+          // dark surface (`Dashboard Add Task/Add Task Modal00.md:78-140`: the four
+          // pickers on the `#393D41` card, and the same chip again in the Edit Task
+          // modal). These are `Tag`'s own `variant="neutral"` values, so a trigger and
+          // the chips beside it line up at exactly 32px.
+          //
+          // This was `bg-surface-neutral` — white — which put five near-white pills on
+          // the consuming app's dark board. It came from `1afb406`, which correctly
+          // fixed invisible white-on-white *value* text by moving the trigger's interior
+          // to `Input`'s light-surface colours; the surface underneath that fix was
+          // borrowed from `Input` rather than checked against the design. `Input` is
+          // genuinely a light field. A dropdown trigger is not.
+          //
+          // Contrast recomputed for this surface — the 10% fill composites, so every
+          // ratio is against the composited chip, not the bare token, on
+          // overlay/panel/shell. `styles/contrast.test.ts` pins all of it:
+          //   value       `text-main`           9.52 / 11.54 / 13.20:1
+          //   placeholder `text-muted-on-dark`  4.61 /  5.33 /  5.88:1
+          // `text-muted` is the obvious choice for a dimmed placeholder and is what the
+          // consuming app used pre-migration; it measures 3.24 / 3.93 / 4.49:1 here and
+          // fails AA on all three. `muted-on-dark` composites against whatever it lands
+          // on, so it carries the empty state instead.
+          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          state.selectedItem ? 'text-main' : 'text-muted-on-dark',
+          // A `ring`, not a `border`: the design gives this chip no boundary at all, so
+          // an invalid one has to appear out of nothing. A border would add 2px to a
+          // control whose height the design fixes at 32px, nudging the whole filter row
+          // at the moment a form is reporting an error. `ring-1` is a box-shadow and
+          // costs no layout.
+          //
+          // `danger-text` (danger-3), not the `danger-5` `Input` and `Datepicker` use.
+          // Their invalid border survives 1.4.11 on the strength of the white field
+          // interior it separates from the container (4.29:1) — see `FIELD_ERROR_CLASS`,
+          // which says so explicitly. This trigger has no white interior any more, and
+          // danger-5 measures 2.55:1 on `surface-overlay`, the modal card a task form
+          // actually sits on. danger-3 clears 3:1 on both adjacent colours everywhere:
+          // 4.91:1 against the chip and 5.65:1 against the surface, at the tightest.
+          //
+          // The focus ring stays `primary-4`, deliberately untouched. It measures 2.86:1
+          // on `surface-overlay` and always has; recolouring it means all 23 rings in the
+          // kit at once. Tracked in `MIGRATION_GAPS.md` and asserted as the current state
+          // in `contrast.test.ts`.
+          error && 'ring-1 ring-danger-text focus-visible:outline-danger-5',
         )}
       >
         {icon}

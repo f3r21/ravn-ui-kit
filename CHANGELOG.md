@@ -248,6 +248,47 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The `Select` and `MultiSelect` triggers are the design's chip again**, not a white
+  field. Both hardcoded `bg-surface-neutral` — `#FFFFFF` — so the consuming app's dark
+  board carried five near-white 40px `rounded-md` pills, and its create/edit modal four
+  more. Figma draws every dropdown trigger in this system as the same `Tag` atom:
+  `rgba(148, 151, 154, 0.1)` over the dark surface, 4px radius, 32px tall, 4px/16px
+  padding, white 15px/600 label (`Dashboard Add Task/Add Task Modal00.md:78-140`, and the
+  same chip again filled in the Edit Task modal). The triggers now use `Tag`'s own
+  `variant="neutral"` values, so a trigger and the chips beside it line up at 32px.
+
+  The white surface came from the contrast fix above, which correctly repaired invisible
+  white-on-white _value_ text by moving the trigger's interior to `Input`'s light-surface
+  colours — but took `Input`'s **surface** along with its text colours without checking it
+  against the design. `Input` is genuinely a light field; a dropdown trigger is not.
+
+  Measured on the composited chip (overlay / panel / shell), all of it now pinned by
+  `contrast.test.ts`:
+
+  |                     | was               | now                                                                              |
+  | ------------------- | ----------------- | -------------------------------------------------------------------------------- |
+  | Trigger value       | `neutral-5`       | `text-main`, 9.52 / 11.54 / 13.20:1                                              |
+  | Trigger placeholder | `muted-on-light`  | `text-muted-on-dark`, 4.61 / 5.33 / 5.88:1                                       |
+  | Invalid boundary    | `danger-5` border | `danger-text` ring, 4.91:1 on the chip and 5.65:1 on the surface at the tightest |
+
+  Two things fell out of the surface change rather than being chosen freely.
+  `--color-muted` is the obvious placeholder colour and is what the app used before it
+  migrated; on the chip it measures 3.24 / 3.93 / 4.49:1 and fails AA on all three
+  surfaces, so `--color-muted-on-dark` carries the empty state. And the invalid boundary
+  is a `ring-1` in `--color-danger-text`, not the `border-danger-5` `Input` and
+  `Datepicker` use: their border clears 1.4.11 on the strength of the white field
+  interior it separates from the container, an argument a chip has no interior to make,
+  and `danger-5` measures 2.55:1 on `surface-overlay`. A `ring` also costs no layout,
+  which a border on a control the design fixes at 32px would.
+
+- **`MultiSelect` renders its selection as the trigger's value**, comma-separated, the
+  way `Select` renders its single one — not as nested `Tag` chips. The chips were fine on
+  a 40px field and incoherent on the chip that replaced it: a `Tag` is itself exactly
+  32px, so two of them filled the trigger edge to edge and the control read as two loose
+  tags beside a stray chevron. Only a browser could show that; the arithmetic and the
+  jsdom suite were both happy. The design agrees — every filled picker in the Edit Task
+  modal is one chip with plain white value text, never a chip inside a chip.
+
 - **Nine WCAG AA contrast failures across the form surface.** Phase 1 measured three and
   deferred them because fixing meant choosing a colour the design does not define; a full
   audit found nine. Measured, before → after:
@@ -270,10 +311,11 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Where AA and the design conflict the colour deviates and the doc comment says so with
   the ratio, per the repo's flag-rather-than-guess rule.
 
-  Two failures are **left open and now asserted as such**: a focus ring on a
+  Two failures were **left open and asserted as such**: a focus ring on a
   `surface-overlay` measures 2.86:1, which would mean recolouring all 23 rings in the kit
   — a visual decision, not a bug fix — and `MultiSelect`'s light trigger contradicts the
-  design's own dark chip treatment. Both are tracked in `MIGRATION_GAPS.md`.
+  design's own dark chip treatment. The second is closed by the chip entry above. The
+  focus ring is still open, still asserted, and still tracked in `MIGRATION_GAPS.md`.
 
 - **The last two focusable elements with no focus affordance at all.**
   `AddTaskModal`'s task-name input and `SearchBar`'s search input each carried a bare

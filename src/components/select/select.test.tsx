@@ -116,4 +116,38 @@ describe('Select Component', () => {
     await user.click(archived);
     expect(handleChange).not.toHaveBeenCalled();
   });
+
+  /**
+   * `label` is optional on `AriaSelectProps`, so the unlabelled shape is reachable and
+   * has to not throw. It is still a bad idea, and this pins who says so: react-aria
+   * warns about it itself, which is a better guard than anything this file could add.
+   * The spy is also what keeps that warning out of the suite's output.
+   */
+  it('renders no label element when none is given, and react-aria warns about it', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const trigger = renderSelect({ label: undefined });
+
+    expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
+    expect(screen.queryByText('Status')).toBeNull();
+    expect(warn.mock.calls.flat().join(' ')).toContain('aria-label');
+    warn.mockRestore();
+  });
+
+  /**
+   * The trigger's surface is a decision, not incidental styling, and it regressed
+   * silently once already: `Select` shipped on `bg-surface-neutral` — white — which put
+   * five near-white pills on the consuming app's dark board. Nothing in this suite
+   * noticed, and nothing here could have: jsdom applies no CSS, so the DOM was identical,
+   * and axe passed because dark-on-white text is perfectly legible. What was wrong was
+   * the surface, not the pairing on it.
+   *
+   * So the class is pinned, in the same spirit as `Tag`'s variant test.
+   * `contrast.test.ts` proves the ratios *on* that surface; this proves the trigger is
+   * the thing asking for it.
+   */
+  it('paints the trigger on the design chip rather than a light field', () => {
+    const trigger = renderSelect();
+    expect(trigger.className).toContain('bg-neutral-2/10');
+    expect(trigger.className).not.toContain('bg-surface-neutral');
+  });
 });

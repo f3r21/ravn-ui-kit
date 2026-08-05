@@ -1,8 +1,7 @@
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import { useButton, useField } from 'react-aria';
 import { useListState, useOverlayTriggerState, type ListProps } from 'react-stately';
 import { cn } from '../../utils/cn';
-import { Tag } from '../tag/tag';
 import { ListBox } from '../listbox/list-box';
 import { FloatingPopover } from '../popover/floating-popover';
 import { ChevronDownIcon } from '../icons/icons';
@@ -55,11 +54,20 @@ export interface MultiSelectProps<T extends object> extends Omit<
  * design, and the control is never submitted as a form field directly — a
  * consuming form reads the selection from `onSelectionChange`.
  *
- * Selected items render as `Tag` chips in the trigger — visual only, no
- * `onRemove`, so the trigger stays a single real `<button>` rather than a
- * button nesting more buttons (invalid and a screen-reader trap). Removal
- * happens the same way selection does: reopen the list and toggle the item
- * off, where its checkmark already shows which items are selected.
+ * The selection renders as the trigger's own comma-separated value, the same
+ * way `Select` renders its single one. It used to render as `Tag` chips
+ * instead, which stopped making sense the moment the trigger became the
+ * design's chip: a `Tag` is exactly 32px, so two of them filled a 32px
+ * trigger edge to edge and the control read as two loose tags with a stray
+ * chevron rather than as one field. The design agrees — every filled picker
+ * in the Edit Task modal (`Dashboard Edit Task/Add  Task Modal00.md:78-217`)
+ * is one chip with plain white value text, never a chip inside a chip.
+ *
+ * There is still no `onRemove` on anything here, so the trigger stays a
+ * single real `<button>` rather than a button nesting more buttons (invalid,
+ * and a screen-reader trap). Removal happens the way selection does: reopen
+ * the list and toggle the item off, where its checkmark already shows what is
+ * selected.
  */
 export function MultiSelect<T extends object>({
   label,
@@ -118,43 +126,34 @@ export function MultiSelect<T extends object>({
         // which IS global and supported, plus the visual state below.
         // Unlike Select there is no HiddenSelect here either (see the note above on why),
         // so this control's invalid state is carried by the associated message and the
-        // border alone. Wrap it in a native <fieldset>/form control if a form needs
+        // ring alone. Wrap it in a native <fieldset>/form control if a form needs
         // machine-readable validity.
         className={cn(
-          // See Select's identical note: `bg-surface-neutral` is a light
-          // surface, so the placeholder/value text needs `Input`'s
-          // light-surface colors (`text-muted`/`text-neutral-5`), not
-          // `text-main` (invisible white-on-white once something's picked).
-          'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted-on-light',
-          error && 'border-danger-5 focus-visible:outline-danger-5',
+          // The design's chip, identical to `Select`'s trigger — see that component for
+          // the full derivation, the measured ratios, and why the white surface this
+          // replaces was wrong. Identical on purpose: the two sit side by side in a
+          // filter row, and nothing about holding a set rather than a scalar should make
+          // this control a different height or shape.
+          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          selectedItems.length > 0 ? 'text-main' : 'text-muted-on-dark',
+          error && 'ring-1 ring-danger-text focus-visible:outline-danger-5',
         )}
       >
         {icon}
-        {selectedItems.length > 0 ? (
-          <span className="flex flex-wrap items-center gap-1">
-            {/* `Tag` is built for the dark surfaces it normally sits on, and none of
-                its variants survive this trigger's light `bg-surface-neutral`:
-                `neutral`'s solid style is white-on-white, and every tinted variant
-                puts its own accent on a 10%-tint of itself, which over white lands
-                at 2.3-3.4:1. `red` measured 3.39:1 — an earlier comment here claimed
-                it "stays legible on both", which measurement did not support.
-
-                So the tint carries the colour coding and the text takes the same
-                `text-neutral-5` the trigger already uses for its value: 13.6:1 on
-                the composited chip, and consistent with everything else on this
-                surface. The deeper fix is the light trigger itself — the design's
-                own chips are a neutral tint on a dark card — but that is a visual
-                redesign, tracked in `MIGRATION_GAPS.md`, not a contrast fix. */}
-            {selectedItems.map((item) => (
-              <Tag key={item.key} variant="red" className="text-neutral-5">
-                {item.rendered}
-              </Tag>
-            ))}
-          </span>
-        ) : (
-          <span>{placeholder}</span>
-        )}
+        {/* `truncate` rather than a width: the chip sizes to its content like every
+            other chip in the design, and a consumer that needs it bounded says so with
+            `className`. Same span shape `Select` uses, so a long value degrades the
+            same way in both. */}
+        <span className="flex-1 text-left truncate">
+          {selectedItems.length > 0
+            ? selectedItems.map((item, index) => (
+                <Fragment key={item.key}>
+                  {index > 0 ? ', ' : null}
+                  {item.rendered}
+                </Fragment>
+              ))
+            : placeholder}
+        </span>
         <ChevronDownIcon className="w-3 h-3 shrink-0" />
       </button>
 

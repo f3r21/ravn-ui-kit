@@ -81,7 +81,7 @@ describe('MultiSelect Component', () => {
     expect(new Set(lastCall)).toEqual(new Set(['bug', 'feature']));
   });
 
-  it('renders selected items as Tag chips in the trigger', async () => {
+  it('renders the selection as the trigger value, comma-separated', async () => {
     const user = userEvent.setup();
     render(<Harness />);
     await user.click(screen.getByRole('button', { name: 'Labels' }));
@@ -93,6 +93,22 @@ describe('MultiSelect Component', () => {
     // intentionally absent from the default accessible-only query.
     const trigger = screen.getByRole('button', { name: 'Labels', hidden: true });
     expect(trigger.textContent).toContain('Bug');
+
+    await user.click(screen.getByRole('option', { name: 'Feature' }));
+    // One value, comma-separated, the way `Select` shows its single one — not nested
+    // `Tag` chips, which is what this rendered before the trigger became the design's
+    // own 32px chip and a chip inside a chip stopped making sense.
+    expect(screen.getByRole('button', { name: 'Labels', hidden: true }).textContent).toContain(
+      'Bug, Feature',
+    );
+  });
+
+  /** Same pin, and the same reasoning, as `Select`'s. */
+  it('paints the trigger on the design chip rather than a light field', () => {
+    render(<Harness />);
+    const trigger = screen.getByRole('button', { name: 'Labels' });
+    expect(trigger.className).toContain('bg-neutral-2/10');
+    expect(trigger.className).not.toContain('bg-surface-neutral');
   });
 
   it('toggling a selected item again removes it', async () => {
