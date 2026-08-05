@@ -93,7 +93,19 @@ export function SidebarItem({
         <span
           className={cn(
             'px-2 py-0.5 text-xs font-bold rounded-full shrink-0',
-            isActive ? 'bg-primary-4 text-main' : 'bg-neutral-3 text-main',
+            // The active badge was `bg-primary-4 text-main` — white on the brand red at
+            // **3.83:1**, the same failing pairing as the primary CTA but on text the
+            // CTA's documented exemption does not cover. axe files it under `incomplete`
+            // rather than `violations` (messageKey `shortTextContent`: a two-digit count
+            // might be decorative), which is why a violations-only sweep never saw it.
+            //
+            // Unlike the CTA there is nothing to preserve: `badgeCount` has no
+            // ground-truth basis at all — no export shows a count on this component, as
+            // the doc comment above says — so it is an opt-in addition rather than
+            // something Figma draws. And no label colour rescues `primary-4`; the fill had
+            // to move. `interactive-text` with `neutral-5` clears **7.63:1** and keeps the
+            // badge in the same accent family as the active label beside it.
+            isActive ? 'bg-interactive-text text-neutral-5' : 'bg-neutral-3 text-main',
           )}
         >
           {badgeCount}

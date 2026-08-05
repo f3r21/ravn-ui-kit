@@ -14,7 +14,7 @@ export const Default: Story = {
   args: {
     children: (
       <div className="flex flex-col gap-2">
-        <h4 className="font-bold text-neutral-1 text-base">Card title</h4>
+        <h4 className="font-bold text-neutral-5 text-base">Card title</h4>
         <p className="text-xs text-muted-on-light">
           Explanatory card content within the interface.
         </p>
@@ -27,7 +27,7 @@ export const Playground: Story = {
   args: {
     children: (
       <div className="flex flex-col gap-2">
-        <h4 className="font-bold text-neutral-1 text-base">Card title</h4>
+        <h4 className="font-bold text-neutral-5 text-base">Card title</h4>
         <p className="text-xs text-muted-on-light">
           Explanatory card content within the interface.
         </p>

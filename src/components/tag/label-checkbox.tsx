@@ -133,7 +133,15 @@ export function LabelCheckbox({
           `MIGRATION_GAPS.md` Section 3, but sharing one checkbox control is the fix, not
           sharing one icon. */}
       <svg
-        className={cn('w-6 h-6 shrink-0', error ? 'text-danger' : 'text-main')}
+        // `text-danger-text` in the invalid state, not the `text-danger` this was.
+        // `FIELD_ERROR_CLASS` justifies keeping `danger-5` as an invalid *border* on the
+        // strength of the white field interior it separates from the container — and this
+        // box has no interior at all. It is a stroked outline with `fill="none"` over a
+        // dark surface, so both of its adjacent colours are that surface, and `danger-5`
+        // measures 2.55:1 on an overlay against 1.4.11's 3:1. Exactly the argument that
+        // moved `Select` and `MultiSelect` to `danger-text`; this control was missed.
+        // `danger-3` clears 5.65 / 6.94 / 7.95:1.
+        className={cn('w-6 h-6 shrink-0', error ? 'text-danger-text' : 'text-main')}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

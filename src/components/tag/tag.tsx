@@ -126,7 +126,16 @@ export function Tag({
           type="button"
           onClick={onRemove}
           aria-label="Remove tag"
-          className="hover:opacity-75 cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
+          // The hover cue darkens the glyph's background instead of dimming the glyph.
+          // `hover:opacity-75` composited the "×" at 75% over its own chip and pushed it
+          // under AA — yellow measured 3.39 / 3.97 / 4.43:1 over overlay / panel / shell,
+          // failing on all three, and red and green failed on the tighter ones. The Tag
+          // pass measured every label at full strength and never composited the hover.
+          //
+          // Every variant's label is now light-on-dark, so a darkening wash moves all five
+          // the right way rather than the wrong one: 5.93 / 6.63 / 7.17:1 for yellow, and
+          // no variant below 5.93 on any surface.
+          className="hover:bg-neutral-5/40 cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
         >
           ×
         </button>

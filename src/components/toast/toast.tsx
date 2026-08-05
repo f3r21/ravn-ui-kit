@@ -56,7 +56,16 @@ const TONE_STYLES: Record<ToastTone, string> = {
   neutral: 'bg-surface-overlay text-main border border-subtle/10',
   success: 'bg-success-4 text-neutral-5',
   warning: 'bg-warning-5 text-neutral-5',
-  danger: 'bg-danger text-main',
+  // `bg-danger-4 text-neutral-5`, not the `bg-danger text-main` this was. Danger was the
+  // odd one out in this map — the only tone inverting the pattern, a dark fill with white
+  // text — and it was the only one that failed: white on `danger-5` is **4.29:1**, under
+  // AA. It also never appeared in any audit, because no story renders a toast without a
+  // click and the sweep only ever saw static stories.
+  //
+  // Moving the label to `neutral-5` on the same fill does not help (3.59:1); the fill has
+  // to move. `danger-4` (#FF7875) clears **6.01:1** with `neutral-5` and puts danger on
+  // the same footing as its neighbours: a saturated fill with dark text.
+  danger: 'bg-danger-4 text-neutral-5',
 };
 
 function Toast({
