@@ -126,19 +126,28 @@ export function MultiSelect<T extends object>({
           // light-surface colors (`text-muted`/`text-neutral-5`), not
           // `text-main` (invisible white-on-white once something's picked).
           'inline-flex items-center gap-2 min-h-10 px-3 py-1.5 rounded-md bg-surface-neutral border border-subtle text-body-m font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted',
+          selectedItems.length > 0 ? 'text-neutral-5' : 'text-muted-on-light',
           error && 'border-danger-5 focus-visible:outline-danger-5',
         )}
       >
         {icon}
         {selectedItems.length > 0 ? (
           <span className="flex flex-wrap items-center gap-1">
-            {/* `variant="neutral"`'s solid style is `text-main` (white) — legible
-                on the dark surfaces Tag is normally shown on, invisible on this
-                trigger's light `bg-surface-neutral`. `red`'s tinted style uses
-                `text-primary-4` for its text, which stays legible on both. */}
+            {/* `Tag` is built for the dark surfaces it normally sits on, and none of
+                its variants survive this trigger's light `bg-surface-neutral`:
+                `neutral`'s solid style is white-on-white, and every tinted variant
+                puts its own accent on a 10%-tint of itself, which over white lands
+                at 2.3-3.4:1. `red` measured 3.39:1 — an earlier comment here claimed
+                it "stays legible on both", which measurement did not support.
+
+                So the tint carries the colour coding and the text takes the same
+                `text-neutral-5` the trigger already uses for its value: 13.6:1 on
+                the composited chip, and consistent with everything else on this
+                surface. The deeper fix is the light trigger itself — the design's
+                own chips are a neutral tint on a dark card — but that is a visual
+                redesign, tracked in `MIGRATION_GAPS.md`, not a contrast fix. */}
             {selectedItems.map((item) => (
-              <Tag key={item.key} variant="red">
+              <Tag key={item.key} variant="red" className="text-neutral-5">
                 {item.rendered}
               </Tag>
             ))}

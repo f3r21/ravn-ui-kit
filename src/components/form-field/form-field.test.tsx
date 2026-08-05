@@ -196,4 +196,29 @@ describe('FormField', () => {
     expect(star.getAttribute('aria-hidden')).toBe('true');
     expect(screen.getByRole('textbox').getAttribute('aria-required')).toBe('true');
   });
+
+  describe('label visibility', () => {
+    // The design draws no field labels, so the default is sr-only — but the label has to
+    // keep naming the control either way. That distinction is the whole point of using
+    // `sr-only` rather than `hidden`, and it is what these two pin.
+    it('hides the label visually by default while keeping it as the accessible name', () => {
+      render(<FormField label="Sprint">{(fieldProps) => <input {...fieldProps} />}</FormField>);
+
+      // Named for assistive tech...
+      expect(screen.getByRole('textbox', { name: /Sprint/ })).not.toBeNull();
+      // ...but not painted.
+      expect(screen.getByText('Sprint').className).toContain('sr-only');
+    });
+
+    it('paints the label when a consumer opts in', () => {
+      render(
+        <FormField label="Sprint" isLabelVisible>
+          {(fieldProps) => <input {...fieldProps} />}
+        </FormField>,
+      );
+
+      expect(screen.getByText('Sprint').className).not.toContain('sr-only');
+      expect(screen.getByRole('textbox', { name: /Sprint/ })).not.toBeNull();
+    });
+  });
 });

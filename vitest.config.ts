@@ -39,10 +39,10 @@ export default defineConfig({
       // at 0%, `Skeleton` at 50%), which is `MIGRATION_GAPS.md` Section 5's
       // open item. Raise these as that closes; do not lower them.
       thresholds: {
-        statements: 85.7,
-        branches: 84.3,
-        functions: 80,
-        lines: 85.7,
+        statements: 85.9,
+        branches: 84.5,
+        functions: 80.1,
+        lines: 85.9,
       },
     },
   },

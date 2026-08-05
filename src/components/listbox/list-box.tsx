@@ -81,7 +81,10 @@ function Option<T>({ item, state }: OptionProps<T>) {
         // styling — merging them would leave a keyboard user with no way
         // to tell which option their arrow keys are actually on.
         isFocused && 'bg-neutral-4',
-        isSelected ? 'text-interactive font-semibold' : 'text-main',
+        // `-text`, not the bare `text-interactive`: this is the one place the accent is
+        // used as *text* on a dark surface, and primary-4 measures 2.86:1 on the
+        // popover's `surface-overlay`. See `tokens.css`'s contrast-safe roles.
+        isSelected ? 'text-interactive-text font-semibold' : 'text-main',
         isDisabled && 'cursor-not-allowed opacity-50',
       )}
     >

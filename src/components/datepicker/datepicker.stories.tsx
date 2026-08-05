@@ -1,11 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { withSurface } from '../../../.storybook/decorators';
 import { Datepicker } from './datepicker';
 
 const meta: Meta<typeof Datepicker> = {
   title: 'Components/DatePicker/Field',
   component: Datepicker,
   tags: ['autodocs'],
+  // Dark, like every real consumer — see the note in `input.stories.tsx`.
+  decorators: [withSurface('neutral-5')],
   argTypes: {
     isDisabled: { control: 'boolean' },
   },
