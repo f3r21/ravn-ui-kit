@@ -60,6 +60,7 @@ export * from './components/modal/label-modal';
 // ─── Feedback ─────────────────────────────────────────────────────
 export * from './components/badge/badge';
 export * from './components/skeleton/skeleton';
+export * from './components/empty-state/empty-state';
 
 // ─── Data display ─────────────────────────────────────────────────
 export * from './components/avatar/avatar';

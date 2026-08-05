@@ -10,6 +10,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **`EmptyState`** — a labelled `role="group"` with title/description/icon/action slots.
+  The kit previously shipped two hardcoded English strings for exactly this ("No tasks in
+  this view." in `TaskListView`, "No tasks yet." in `TaskTable`), which a consumer could
+  neither translate, restyle, nor attach a "create the first task" action to. Both call
+  sites now render an `EmptyState`, and both components gained `emptyTitle`,
+  `emptyDescription` and `emptyAction` props.
+
+  Ported from the consuming app's own `EmptyState`, including the reasoning that keeps it
+  from being a live region: it used to carry `role="status"`, but a live region announces
+  _changes_ to its contents and this mounts with its text already inside, so it announced
+  nothing. That is pinned by a test now, not just a comment. No Figma source — the design
+  file draws no empty state anywhere; the doc comment says so.
+
 - **One named type per colour axis** (`src/types/color-variants.ts`, exported from the
   package root): `AccentColor`, `StatusTone`, `DueDateUrgency`, plus the shared
   `DUE_DATE_URGENCY_COLOR` map. Four small colour unions had grown up independently and
@@ -43,9 +56,9 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - Prettier (`format`, `format:check`), coverage reporting (`coverage`), and a
   `gate` script composing typecheck → lint → format:check → coverage. CI now runs
   the single `gate` command so it cannot drift from what `CONTRIBUTING.md` asks a
-  developer to run. Coverage thresholds start as a ratchet at the suite's actual
-  numbers (79/80/73/79) rather than an aspirational figure; 12 of 36 components
-  still ship no test, which is what holds them there.
+  developer to run. Coverage thresholds were seeded at the suite's actual numbers
+  (79/80/73/79) rather than an aspirational figure, and have only moved upward
+  since — see Changed for where they stand now.
 - `"./ui-kit.css"` package export (`dist/ui-kit.css`), documented as the fallback
   integration path for consumers not running their own Tailwind CSS v4 build.
   Previously the file was built but had no `exports` map entry, so
@@ -124,8 +137,9 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   control's state, not glyphs from the design's vocabulary. (The duplication
   between the two is real and remains tracked in `MIGRATION_GAPS.md` Section 3 —
   the fix there is one shared checkbox control, not one shared icon.)
-- Coverage thresholds ratcheted 79/80/73/79 → 81/81/76/81, following the icon
-  set's own test suite. Per `CONTRIBUTING.md` these only ever move upward.
+- Coverage thresholds ratcheted 79/80/73/79 → 84.2/83.2/78.6/84.2, following the new
+  test suites for the icon set, `Tag` (previously untested — a `MIGRATION_GAPS.md`
+  Section 5 gap) and `EmptyState`. Per `CONTRIBUTING.md` these only ever move upward.
 - `README.md` and `src/styles/introduction.mdx` now document both CSS
   integration paths (`theme.css` for Tailwind consumers, `ui-kit.css` as the
   fallback) instead of only the `theme.css` step, which alone leaves a

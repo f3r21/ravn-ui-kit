@@ -2,14 +2,25 @@ import { cn } from '../../utils/cn';
 import { ProjectInfo } from './project-info';
 import { TaskCard, type TaskCardProps } from './task-card';
 import { Skeleton } from '../skeleton/skeleton';
+import { EmptyState } from '../empty-state/empty-state';
 
 export interface TaskListViewProps {
   /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
   title: string;
   /** Optional trailing 24×24 icon forwarded to `ProjectInfo`. */
   icon?: React.ReactNode;
-  /** Tasks rendered as a vertical stack below the header, each spread onto a `TaskCard`. Renders an empty-state message when the array is empty. */
+  /** Tasks rendered as a vertical stack below the header, each spread onto a `TaskCard`. Renders an `EmptyState` when the array is empty. */
   tasks: TaskCardProps[];
+  /**
+   * Headline shown when `tasks` is empty. Overridable because the kit cannot know the
+   * consumer's language or domain — it previously hardcoded this English string.
+   * @default 'No tasks in this view'
+   */
+  emptyTitle?: string;
+  /** Optional second line on the empty state, explaining why the view is empty. */
+  emptyDescription?: string;
+  /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
+  emptyAction?: React.ReactNode;
   /**
    * Renders 3 skeleton task-card placeholders instead of `tasks` while data is in flight.
    * No ground-truth basis (static exports have no loading state) — an engineering-only
@@ -57,6 +68,9 @@ export function TaskListView({
   icon,
   tasks,
   isLoading = false,
+  emptyTitle = 'No tasks in this view',
+  emptyDescription,
+  emptyAction,
   className,
 }: TaskListViewProps) {
   return (
@@ -69,9 +83,7 @@ export function TaskListView({
           <TaskCardSkeleton />
         </>
       ) : tasks.length === 0 ? (
-        <div className="flex items-center justify-center py-16 text-muted font-sans text-sm">
-          No tasks in this view.
-        </div>
+        <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
       ) : (
         tasks.map((task, idx) => <TaskCard key={idx} {...task} className="w-full" />)
       )}

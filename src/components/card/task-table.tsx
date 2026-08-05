@@ -4,6 +4,7 @@ import { Tag } from '../tag/tag';
 import { Skeleton } from '../skeleton/skeleton';
 import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
 import type { AccentColor, DueDateUrgency } from '../../types/color-variants';
+import { EmptyState } from '../empty-state/empty-state';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -365,6 +366,16 @@ export interface TaskTableProps {
    * @default false
    */
   isLoading?: boolean;
+  /**
+   * Headline shown when `groups` is empty. Overridable because the kit cannot know the
+   * consumer's language or domain — it previously hardcoded this English string.
+   * @default 'No tasks yet'
+   */
+  emptyTitle?: string;
+  /** Optional second line on the empty state, explaining why the table is empty. */
+  emptyDescription?: string;
+  /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
+  emptyAction?: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -421,7 +432,14 @@ const headerCells: { key: keyof typeof COLUMN_WIDTHS; label: string }[] = [
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export function TaskTable({ groups, isLoading = false, className }: TaskTableProps) {
+export function TaskTable({
+  groups,
+  isLoading = false,
+  emptyTitle = 'No tasks yet',
+  emptyDescription,
+  emptyAction,
+  className,
+}: TaskTableProps) {
   return (
     <div
       className={cn(
@@ -463,9 +481,7 @@ export function TaskTable({ groups, isLoading = false, className }: TaskTablePro
             </tbody>
           </table>
         ) : groups.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-muted font-sans text-sm">
-            No tasks yet.
-          </div>
+          <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
         ) : (
           groups.map((group, gi) => (
             <table key={gi} className="border-collapse table-fixed">
