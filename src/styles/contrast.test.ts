@@ -118,6 +118,19 @@ export function contrastRatio(fgToken: string, bg: string | Rgb): number {
 }
 
 /**
+ * The WCAG ratio between two already-composited colours.
+ *
+ * `contrastRatio` takes a *token* as its foreground, which covers almost everything —
+ * but not a foreground that is itself a blend. A `Tag`'s remove glyph dimmed by
+ * `hover:opacity-75` is one: both the glyph and the chip beneath it are composites, and
+ * measuring the token against the chip would report the un-hovered state.
+ */
+export function ratioBetween(fg: Rgb, bg: Rgb): number {
+  const [light, dark] = [relativeLuminance(fg), relativeLuminance(bg)].sort((a, b) => b - a);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+/**
  * The colour a `bg-<token>/<alpha>` fill actually paints over `bg`.
  *
  * Nests, because the kit does: a `MultiSelect` trigger is a 10% tint and the `Tag` chips
@@ -312,6 +325,38 @@ describe('token contrast', () => {
         expect(contrastRatio('--color-blue', surface)).toBeLessThan(AA_NON_TEXT);
       });
     }
+
+    /**
+     * The remove button's hover, which the first pass measured at full strength and never
+     * composited. `hover:opacity-75` flattens the "×" *into its own chip*, and that put
+     * yellow at 3.39 / 3.97 / 4.43:1 — failing on all three — with red and green failing
+     * on the tighter surfaces. A dimming hover is simply not affordable on a label that is
+     * already only ~1.3× the bar.
+     *
+     * Every variant's label is light-on-dark, so the hover darkens its background instead.
+     * That moves all five the right way.
+     */
+    describe('the remove button’s hover', () => {
+      const hovered = (fill: string, surface: string) =>
+        tint('--color-neutral-5', 0.4, tint(fill, 0.1, surface));
+
+      for (const [variant, fill, label] of VARIANTS) {
+        for (const surface of DARK_SURFACES) {
+          it(`${variant}: the × stays AA while hovered over ${surface}`, () => {
+            expect(contrastRatio(label, hovered(fill, surface))).toBeGreaterThanOrEqual(AA_TEXT);
+          });
+        }
+      }
+
+      it('dimming it to 75% instead would fail — yellow at 3.39:1 on an overlay', () => {
+        const chip = tint('--color-tertiary-4', 0.1, '--color-surface-overlay');
+        // The glyph at 75% opacity, flattened onto the chip it sits on. Both sides are
+        // blends rather than tokens, which is exactly the case `ratioBetween` exists for.
+        const dimmed = tint('--color-tertiary-4', 0.75, chip);
+        expect(ratioBetween(dimmed, chip)).toBeLessThan(AA_TEXT);
+        expect(ratioBetween(dimmed, chip)).toBeCloseTo(3.39, 1);
+      });
+    });
   });
 
   /**
@@ -423,7 +468,18 @@ describe('token contrast', () => {
    * only one adjacent colour, and the "passes against the interior" argument above does
    * not apply to it.
    *
-   * All 39 rings are `--color-interactive-text` (`primary-2`) as of this pass. They were
+   * Every ring in the kit is `--color-interactive-text` (`primary-2`) *except* the four
+   * invalid-state overrides, which are `--color-danger-text` — both asserted below.
+   *
+   * An earlier draft of this comment said "all 39", and that was false in a way worth
+   * recording: the recolour swapped `outline-primary-4`, and `Input`, `Datepicker`,
+   * `Select` and `MultiSelect` write `focus-visible:outline-danger-5` on their `error &&`
+   * line instead. Because `cn()` is tailwind-merge, that override *replaces* the base
+   * ring rather than adding to it — so marking a field invalid silently downgraded its
+   * focus ring from 5.43:1 to 2.55:1, on the exact surface a form is most likely to be.
+   * A claim like "all 39" is the kind a guard should be made to prove.
+   *
+   * The rings were `--color-interactive` (`primary-4`). They were
    * `--color-interactive` (`primary-4`), which clears 3:1 on the shell (4.02:1) and on a
    * panel (3.51:1) but measures **2.86:1 on `surface-overlay`** — a modal or a popover,
    * which is exactly where a form is most likely to be and where losing the indicator
@@ -461,6 +517,118 @@ describe('token contrast', () => {
       expect(contrastRatio('--color-interactive-text', '--color-surface-neutral')).toBeLessThan(
         AA_NON_TEXT,
       );
+    });
+
+    /**
+     * The invalid-state ring, which `Input`, `Datepicker`, `Select` and `MultiSelect`
+     * override on their `error &&` line. `cn()` is tailwind-merge, so that override
+     * *replaces* the base ring rather than stacking with it — whatever it names is the
+     * whole indicator, and it was `danger-5` at 2.55:1.
+     */
+    for (const surface of DARK_SURFACES) {
+      it(`the invalid-state ring (--color-danger-text) clears 3:1 on ${surface}`, () => {
+        expect(contrastRatio('--color-danger-text', surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+
+    it('danger-5 as that ring did not — 2.55:1 on an overlay, worse than the ring it replaced', () => {
+      expect(contrastRatio('--color-danger', '--color-surface-overlay')).toBeLessThan(AA_NON_TEXT);
+      expect(contrastRatio('--color-danger', '--color-surface-overlay')).toBeLessThan(
+        contrastRatio('--color-interactive-text', '--color-surface-overlay'),
+      );
+    });
+
+    /**
+     * A focus indicator built from a *fill* rather than a ring, which is what `ListBox`
+     * and `Menu` used for their arrow-key focus: `bg-neutral-4` on a `surface-overlay`
+     * popover. Nothing about it was visible, and the items carried `outline-none` so
+     * there was no other affordance. Both now draw an inset `interactive-text` ring and
+     * keep the fill as a quiet secondary cue.
+     */
+    it('a neutral-4 fill cannot be a focus indicator on a popover — 1.23:1', () => {
+      expect(contrastRatio('--color-neutral-4', '--color-surface-overlay')).toBeLessThan(
+        AA_NON_TEXT,
+      );
+      expect(contrastRatio('--color-neutral-4', '--color-surface-overlay')).toBeCloseTo(1.23, 2);
+      // The ring that now carries it.
+      expect(
+        contrastRatio('--color-interactive-text', '--color-surface-overlay'),
+      ).toBeGreaterThanOrEqual(AA_NON_TEXT);
+    });
+  });
+
+  /**
+   * `Toast`, which no audit had ever measured — the kit renders no toast without a click,
+   * so a static-story sweep saw none of these four surfaces at all.
+   *
+   * `danger` was the odd one out in the tone map, the only tone inverting the pattern with
+   * a dark fill and white text, and the only one that failed: white on `danger-5` is
+   * 4.29:1. Moving the label to `neutral-5` on the same fill does not fix it (3.59:1), so
+   * the fill moved to `danger-4` and danger now matches its neighbours.
+   */
+  describe('Toast tones', () => {
+    const TONES = [
+      ['neutral', '--color-surface-overlay', '--color-main'],
+      ['success', '--color-success-4', '--color-neutral-5'],
+      ['warning', '--color-warning-5', '--color-neutral-5'],
+      ['danger', '--color-danger-4', '--color-neutral-5'],
+    ] as const;
+
+    for (const [tone, fill, label] of TONES) {
+      it(`${tone}'s message text clears AA on its own fill`, () => {
+        expect(contrastRatio(label, fill)).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+    }
+
+    it('the old danger toast did not — white on danger-5 is 4.29:1', () => {
+      expect(contrastRatio('--color-main', '--color-danger')).toBeCloseTo(4.29, 2);
+      expect(contrastRatio('--color-main', '--color-danger')).toBeLessThan(AA_TEXT);
+      // and swapping only the label would not have been enough
+      expect(contrastRatio('--color-neutral-5', '--color-danger')).toBeLessThan(AA_TEXT);
+    });
+  });
+
+  /**
+   * `SidebarItem`'s active count badge — white on `primary-4`, the same 3.83:1 as the
+   * primary CTA but on text the CTA's documented exemption does not cover.
+   *
+   * axe files it under `incomplete` rather than `violations` (messageKey
+   * `shortTextContent`: a two-digit count might be decorative), which is why a
+   * violations-only sweep never reported it. Unlike the CTA there was nothing to protect —
+   * `badgeCount` has no ground truth in the design at all — so the fill moved.
+   */
+  /**
+   * `LabelCheckbox`'s invalid box. `FIELD_ERROR_CLASS` keeps `danger-5` as an invalid
+   * border on the strength of the white field interior it separates from the container —
+   * and this box has no interior: it is a stroked outline with `fill="none"` over a dark
+   * surface, so both adjacent colours are that surface. The same argument that moved
+   * `Select` and `MultiSelect` to `danger-text`, applied to the control that was missed.
+   */
+  describe('the invalid checkbox box', () => {
+    for (const surface of DARK_SURFACES) {
+      it(`--color-danger-text clears 3:1 on ${surface}`, () => {
+        expect(contrastRatio('--color-danger-text', surface)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+
+    it('danger-5 did not, and had no interior to lean on — 2.55:1 on an overlay', () => {
+      expect(contrastRatio('--color-danger', '--color-surface-overlay')).toBeLessThan(AA_NON_TEXT);
+    });
+  });
+
+  describe('the sidebar count badge', () => {
+    it('the active badge clears AA', () => {
+      expect(contrastRatio('--color-neutral-5', '--color-interactive-text')).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+    });
+
+    it('the inactive badge clears AA', () => {
+      expect(contrastRatio('--color-main', '--color-neutral-3')).toBeGreaterThanOrEqual(AA_TEXT);
+    });
+
+    it('white on primary-4 did not — 3.83:1, the CTA pairing outside the CTA', () => {
+      expect(contrastRatio('--color-main', '--color-primary-4')).toBeLessThan(AA_TEXT);
     });
   });
 

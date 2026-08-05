@@ -145,11 +145,14 @@ export function Select<T extends object>({
           // actually sits on. danger-3 clears 3:1 on both adjacent colours everywhere:
           // 4.91:1 against the chip and 5.65:1 against the surface, at the tightest.
           //
-          // The focus ring stays `primary-4`, deliberately untouched. It measures 2.86:1
-          // on `surface-overlay` and always has; recolouring it means all 23 rings in the
-          // kit at once. Tracked in `MIGRATION_GAPS.md` and asserted as the current state
-          // in `contrast.test.ts`.
-          error && 'ring-1 ring-danger-text focus-visible:outline-danger-5',
+          // The invalid *focus ring* is `danger-text` too, and used to be `danger-5` on
+          // this very line — the same 2.55:1 the paragraph above rejects, one line later.
+          // It hid because `cn()` is tailwind-merge: `focus-visible:outline-danger-5` here
+          // silently drops the `focus-visible:outline-interactive-text` set in the base
+          // string, so the error state quietly *downgraded* the ring from 5.43:1 to
+          // 2.55:1. Four controls had it — this one, `MultiSelect`, `Input`, `Datepicker`
+          // — and all four are `danger-text` now, 5.65 / 6.94 / 7.95:1.
+          error && 'ring-1 ring-danger-text focus-visible:outline-danger-text',
         )}
       >
         {icon}
