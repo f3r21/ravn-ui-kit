@@ -19,6 +19,14 @@ export interface ModalProps {
    * @default 'max-w-md'
    */
   width?: string;
+  /**
+   * ARIA role for the dialog. Use `'alertdialog'` for a destructive-action
+   * confirmation (e.g. a delete confirmation) — it tells assistive tech
+   * this dialog demands an immediate response, distinct from an ordinary
+   * `'dialog'`.
+   * @default 'dialog'
+   */
+  role?: 'dialog' | 'alertdialog';
 }
 
 /**
@@ -28,7 +36,7 @@ export interface ModalProps {
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: ModalProps) {
+export function Modal({ title, isOpen, onClose, children, width = 'max-w-md', role = 'dialog' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +55,7 @@ export function Modal({ title, isOpen, onClose, children, width = 'max-w-md' }: 
     triggerState,
     overlayRef
   );
-  const { dialogProps, titleProps } = useDialog({}, dialogRef);
+  const { dialogProps, titleProps } = useDialog({ role }, dialogRef);
 
   if (!isOpen) return null;
 

@@ -22,6 +22,25 @@ describe('Modal Component', () => {
     expect(screen.getByRole('dialog', { name: 'Add Task' })).toBeDefined();
   });
 
+  it('defaults to role="dialog"', () => {
+    render(
+      <Modal title="Test" isOpen onClose={vi.fn()}>
+        <p>Content</p>
+      </Modal>
+    );
+    expect(screen.getByRole('dialog')).toBeDefined();
+  });
+
+  it('renders role="alertdialog" when requested, for destructive confirmations', () => {
+    render(
+      <Modal title="Delete task" isOpen onClose={vi.fn()} role="alertdialog">
+        <p>This can’t be undone.</p>
+      </Modal>
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('alertdialog', { name: 'Delete task' })).toBeDefined();
+  });
+
   it('moves focus inside the dialog when opened', () => {
     render(
       <Modal title="Test" isOpen onClose={vi.fn()}>
