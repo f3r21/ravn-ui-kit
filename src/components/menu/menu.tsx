@@ -173,8 +173,14 @@ function MenuItem<T extends object>({ item, state, onClose }: MenuItemProps<T>) 
       {...menuItemProps}
       ref={ref}
       className={cn(
-        'text-body-m font-sans cursor-pointer px-4 py-1.5 outline-none text-main',
-        isFocused && 'bg-neutral-4',
+        'text-body-m font-sans cursor-pointer px-4 py-1.5 text-main',
+        // Same defect and same fix as `ListBox` — see its comment for the reasoning.
+        // `bg-neutral-4` on the menu's `surface-overlay` is 1.23:1, so the highlight was
+        // effectively invisible, and `outline-none` left nothing else. This matters more
+        // here than anywhere: the app's task-card menu is the sole entry point to
+        // Edit/Delete, and this kit has already lost that focus indicator once.
+        isFocused &&
+          'bg-neutral-4 outline-solid outline-2 -outline-offset-2 outline-interactive-text',
         isDisabled && 'cursor-not-allowed opacity-50',
       )}
     >
