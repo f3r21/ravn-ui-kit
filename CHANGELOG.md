@@ -45,6 +45,11 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `inert`/`aria-hidden` to assistive tech while a modal is open, and body
   scroll is locked — neither happened before, so a screen reader or keyboard
   user could still reach content behind an open dialog.
+- `SegmentedControl`'s wrapper role is now `role="radiogroup"` instead of the
+  invalid `role="group"` around `role="radio"` children. Also added arrow-key
+  navigation (Left/Right/Up/Down/Home/End) with roving tabindex, matching the
+  WAI-ARIA APG radiogroup pattern — previously each segment was an
+  independent tab stop with no keyboard way to move between them.
 
 ## [0.2.0] - 2026-08-04
 
