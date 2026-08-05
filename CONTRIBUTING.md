@@ -124,9 +124,14 @@ when `package.json`'s version is bumped.
 ## Before committing
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
+npm run gate            # typecheck -> lint -> format:check -> coverage
 npm run build
 npm run build:storybook
 ```
+
+`gate` is the bar, and it is the same command CI runs. It fails on a coverage
+regression as well as on a broken test — the thresholds in `vitest.config.ts` are
+a ratchet, so a change that drops coverage below where it already was will not
+pass. Raise them when you add tests; never lower them to get green.
+
+`npm run format` rewrites in place if `format:check` fails.

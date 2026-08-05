@@ -10,6 +10,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- Prettier (`format`, `format:check`), coverage reporting (`coverage`), and a
+  `gate` script composing typecheck → lint → format:check → coverage. CI now runs
+  the single `gate` command so it cannot drift from what `CONTRIBUTING.md` asks a
+  developer to run. Coverage thresholds start as a ratchet at the suite's actual
+  numbers (79/80/73/79) rather than an aspirational figure; 12 of 36 components
+  still ship no test, which is what holds them there.
 - `"./ui-kit.css"` package export (`dist/ui-kit.css`), documented as the fallback
   integration path for consumers not running their own Tailwind CSS v4 build.
   Previously the file was built but had no `exports` map entry, so
