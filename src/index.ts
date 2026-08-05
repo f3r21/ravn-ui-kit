@@ -61,6 +61,7 @@ export * from './components/modal/label-modal';
 export * from './components/badge/badge';
 export * from './components/skeleton/skeleton';
 export * from './components/empty-state/empty-state';
+export * from './components/toast/toast';
 
 // ─── Data display ─────────────────────────────────────────────────
 export * from './components/avatar/avatar';

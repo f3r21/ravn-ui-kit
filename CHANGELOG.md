@@ -10,6 +10,24 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **A toast/notification system** — `ToastProvider` plus a `useToast()` hook, built on
+  react-aria's `useToastState`/`useToastRegion`/`useToast` and portalled via
+  `createPortal`. Tones come from the shared `StatusTone` vocabulary; `duration`,
+  `maxVisibleToasts`, `label` and `closeLabel` are all configurable, and an individual
+  toast can pass `{ timeout: null }` to stay until dismissed — right for an error the
+  user must acknowledge, wrong for anything else.
+
+  Ported from the consuming app, carrying across the correctness the app had already
+  paid for: **a toast has to survive an open modal**. React Aria hides everything
+  outside a modal from the accessibility tree, walking out from `document.body`, and
+  notifications sit outside the modal by necessity. Two things together fix it and
+  neither alone is enough — the region is marked as a top layer by `useToastRegion`,
+  _and_ portalled to the body so it is a sibling of the modal rather than a descendant
+  of the page being hidden. The `ToastRegion` doc comment spells this out; do not
+  "simplify" it by keeping one half.
+
+  No Figma source: the design file draws no notification surface anywhere.
+
 - **A z-index scale** in `tokens.css` — `--z-index-nested` (10), `--z-index-overlay`
   (100), `--z-index-popover` (200), `--z-index-toast` (300), yielding `z-nested`,
   `z-overlay`, `z-popover` and `z-toast`. `Modal`'s backdrop and `FloatingPopover` both
@@ -153,9 +171,10 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   control's state, not glyphs from the design's vocabulary. (The duplication
   between the two is real and remains tracked in `MIGRATION_GAPS.md` Section 3 —
   the fix there is one shared checkbox control, not one shared icon.)
-- Coverage thresholds ratcheted 79/80/73/79 → 84.2/83.2/78.6/84.2, following the new
+- Coverage thresholds ratcheted 79/80/73/79 → 85/83.8/79.5/85, following the new
   test suites for the icon set, `Tag` (previously untested — a `MIGRATION_GAPS.md`
-  Section 5 gap) and `EmptyState`. Per `CONTRIBUTING.md` these only ever move upward.
+  Section 5 gap), `EmptyState` and the toast system. Statements now match the consuming
+  app's own 85% bar. Per `CONTRIBUTING.md` these only ever move upward.
 - `README.md` and `src/styles/introduction.mdx` now document both CSS
   integration paths (`theme.css` for Tailwind consumers, `ui-kit.css` as the
   fallback) instead of only the `theme.css` step, which alone leaves a
