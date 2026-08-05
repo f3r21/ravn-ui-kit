@@ -29,6 +29,7 @@ export * from './components/card/project-info';
 
 // ─── Popover (shared floating-surface shell) ──────────────────────
 export * from './components/popover/popover';
+export * from './components/popover/floating-popover';
 
 // ─── ListBox (headless option list) ───────────────────────────────
 export * from './components/listbox/list-box';
