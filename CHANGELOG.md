@@ -248,6 +248,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Every focus ring clears 3:1 on a modal.** All 39 rings across 24 files move from
+  `--color-interactive` (`primary-4`) to `--color-interactive-text` (`primary-2`). A ring
+  is `outline-offset-2`, so it is drawn clear of the control, on the container — it has
+  exactly one adjacent colour, and the "passes against the field's white interior"
+  argument that carries the invalid border does not apply to it. `primary-4` managed
+  4.02:1 on the shell and 3.51:1 on a panel but only **2.86:1** on `surface-overlay`,
+  which is a modal or a popover: exactly where a form is most likely to be and where
+  losing the focus indicator costs the most. `primary-2` clears all three at
+  5.43 / 6.67 / 7.63:1.
+
+  This was recorded in `contrast.test.ts` as a known failure for one release because
+  recolouring every ring is a visual change. Nothing was traded to fix it — the design
+  file draws no focus state anywhere, so the ring was an engineering addition from the
+  start and there was no Figma pairing to deviate from.
+
+  **One caveat for consumers:** `primary-2` measures 2.02:1 on white, worse than the
+  `primary-4` it replaces (3.83:1). No kit surface is light — `Input` and `Datepicker`
+  have white _interiors_, but the offset puts the ring on the dark container outside them,
+  and `Card`/`Badge` are the only light surfaces and neither is focusable — so a consumer
+  placing a kit control on a light container of its own must override the ring colour.
+  `contrast.test.ts` asserts that limit rather than leaving it to be discovered.
+
 - **White labels on a solid `neutral-2` pill are now `neutral-5`.** At full strength
   `neutral-2` is a mid grey, and the white label the design draws on it measures
   **2.94:1**; `neutral-5` clears **5.25:1**. The fills are unchanged — the same trade

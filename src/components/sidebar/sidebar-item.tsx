@@ -69,7 +69,7 @@ export function SidebarItem({
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',
         // `-text`, not the bare `text-interactive`, on both the active and the hover
         // label: an item's label is text, and primary-4 as text clears 4.5:1 nowhere
         // (2.86 / 3.51 / 4.02). The sidebar is `surface-panel`, so the active item was

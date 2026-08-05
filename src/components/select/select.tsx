@@ -129,7 +129,7 @@ export function Select<T extends object>({
           // consuming app used pre-migration; it measures 3.24 / 3.93 / 4.49:1 here and
           // fails AA on all three. `muted-on-dark` composites against whatever it lands
           // on, so it carries the empty state instead.
-          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           state.selectedItem ? 'text-main' : 'text-muted-on-dark',
           // A `ring`, not a `border`: the design gives this chip no boundary at all, so
           // an invalid one has to appear out of nothing. A border would add 2px to a

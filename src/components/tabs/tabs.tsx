@@ -125,7 +125,7 @@ function Tab({ item, state, icon }: TabProps) {
         // is 0px, but that's an artifact of a fixed-width (120px)
         // demo box, not a real horizontal-padding spec for
         // arbitrary-length labels.
-        'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+        'relative flex items-center justify-center gap-2 px-5 pt-3 pb-2 text-tab-label font-normal text-center font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',
         // `-text`, not the bare `text-interactive`: a tab label is text, and primary-4 as
         // text clears 4.5:1 on no surface in this palette (2.86 / 3.51 / 4.02 over
         // overlay / panel / shell). `primary-2` clears all three at 5.43 / 6.67 / 7.63.

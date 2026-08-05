@@ -269,7 +269,7 @@ export function TaskTableRow({
       <td className={cn(CELL_BASE, 'pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
         <div className="flex items-center gap-2 h-full">
           <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
-          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary-4 has-[:focus-visible]:outline-offset-1">
+          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1">
             <input
               type="checkbox"
               className="sr-only"
@@ -309,7 +309,7 @@ export function TaskTableRow({
                 // text label, and hovering it used to drop it to 3.51:1 on the panel it
                 // sits on. A hover state is invisible to a static-story axe pass, so this
                 // one was found by reading rather than by measuring.
-                'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs',
+                'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs',
               )}
             >
               <span>Details</span>

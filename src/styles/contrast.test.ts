@@ -417,36 +417,50 @@ describe('token contrast', () => {
   });
 
   /**
-   * A focus ring is different, and this is where the arithmetic disagreed with the
-   * comment I had written. Every ring in the kit is `outline-offset-2`, so it is drawn
-   * *clear of* the field, on the container — it has only one adjacent colour, and the
-   * "passes against the interior" argument above does not apply to it.
+   * A focus ring is different from a field border, and this is where the arithmetic
+   * disagreed with a comment written before it. Every ring in the kit is
+   * `outline-offset-2`, so it is drawn *clear of* the control, on the container — it has
+   * only one adjacent colour, and the "passes against the interior" argument above does
+   * not apply to it.
    *
-   * `--color-interactive` (primary-4) clears 3:1 on the shell and on a panel but
-   * measures **2.86:1 on `surface-overlay`** — a form inside a modal or a popover. That
-   * is a real, previously unrecorded failure; it is asserted here as the current state
-   * rather than silently expected to pass, because fixing it means recolouring every
-   * focus ring in the kit (23 sites) and that is a visual decision, not a bug fix.
-   * Tracked in `MIGRATION_GAPS.md`.
+   * All 39 rings are `--color-interactive-text` (`primary-2`) as of this pass. They were
+   * `--color-interactive` (`primary-4`), which clears 3:1 on the shell (4.02:1) and on a
+   * panel (3.51:1) but measures **2.86:1 on `surface-overlay`** — a modal or a popover,
+   * which is exactly where a form is most likely to be and where losing the indicator
+   * costs the most. That failure was recorded here as the current state for one release
+   * because recolouring every ring is a visual change; it is now fixed, and nothing was
+   * traded for it, because the design file draws no focus state anywhere. The ring was an
+   * engineering addition from the start.
    */
   describe('focus rings', () => {
-    it('clear 3:1 on the shell and on panels', () => {
-      expect(contrastRatio('--color-interactive', '--color-surface-shell')).toBeGreaterThanOrEqual(
-        AA_NON_TEXT,
-      );
-      expect(contrastRatio('--color-interactive', '--color-surface-panel')).toBeGreaterThanOrEqual(
+    for (const surface of DARK_SURFACES) {
+      it(`--color-interactive-text clears 3:1 on ${surface}`, () => {
+        expect(contrastRatio('--color-interactive-text', surface)).toBeGreaterThanOrEqual(
+          AA_NON_TEXT,
+        );
+      });
+    }
+
+    it('primary-4, the colour they used to be, still fails on an overlay — 2.86:1', () => {
+      expect(contrastRatio('--color-interactive', '--color-surface-overlay')).toBeLessThan(
         AA_NON_TEXT,
       );
     });
 
-    it('do NOT clear 3:1 on an overlay — known, tracked, not yet fixed', () => {
-      expect(contrastRatio('--color-interactive', '--color-surface-overlay')).toBeLessThan(
+    /**
+     * The cost of the swap, recorded rather than discovered later. `primary-2` on white is
+     * **2.02:1** — worse than the `primary-4` it replaced (3.83:1) — so a consumer placing
+     * a kit control on a light container has to override the ring.
+     *
+     * No kit surface is light, which is what makes the trade correct here: `Input` and
+     * `Datepicker` have white *interiors*, but `outline-offset-2` draws the ring clear of
+     * the field, on the dark container outside it. `Card` and `Badge` are the kit's only
+     * light surfaces and neither is focusable nor contains a focusable of its own.
+     */
+    it('are specified for the kit’s dark containers — a consumer on white must override', () => {
+      expect(contrastRatio('--color-interactive-text', '--color-surface-neutral')).toBeLessThan(
         AA_NON_TEXT,
       );
-      // The colour that would fix it, when someone decides to take the visual change.
-      expect(
-        contrastRatio('--color-interactive-text', '--color-surface-overlay'),
-      ).toBeGreaterThanOrEqual(AA_NON_TEXT);
     });
   });
 

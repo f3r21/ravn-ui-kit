@@ -35,7 +35,23 @@ export interface ButtonProps extends AriaButtonProps {
  * - Property 1=Secondary, State=Unselected: transparent bg, no border,
  *   white icon.
  *
- * The focus ring below is `focus-visible:outline-2 focus-visible:outline-primary-4
+ * **The ring's colour is `--color-interactive-text` (`primary-2`), not the brand
+ * `primary-4`, and this is the one place in the kit where that swap is not about text.**
+ * Every ring here is `outline-offset-2`, so it is drawn *clear of* the control, on the
+ * container — it has exactly one adjacent colour, and 1.4.11 wants 3:1 against it.
+ * `primary-4` manages 4.02:1 on the shell and 3.51:1 on a panel but only **2.86:1** on
+ * `surface-overlay`, which is a modal or a popover: precisely where a form is most likely
+ * to be, and where losing the focus indicator costs the most. `primary-2` clears all
+ * three at 5.43 / 6.67 / 7.63:1.
+ *
+ * Nothing was traded for it. The design file draws **no focus state anywhere** — the ring
+ * is an engineering addition to begin with, so unlike the primary fill below there was no
+ * Figma pairing to deviate from. The caveat worth knowing: `primary-2` measures 2.02:1 on
+ * white, so a consumer placing a kit control on a light container must override it. No
+ * kit surface is light — `Input` and `Datepicker`'s white interiors are *inside* the
+ * field, and `outline-offset-2` puts the ring on the dark container outside them.
+ *
+ * The focus ring below is `focus-visible:outline-2 focus-visible:outline-interactive-text
  * focus-visible:outline-offset-2` with **no `outline-none`** in front of it, and
  * that omission is deliberate — every focusable component in this kit follows the
  * same rule. In Tailwind v4 `outline-none` compiles to
@@ -77,7 +93,7 @@ export function Button({
       {...buttonProps}
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
         variants[variant],
         className,
       )}

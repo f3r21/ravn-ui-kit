@@ -66,7 +66,7 @@ export function EstimateModal({
           onClick={() => onSelect(points)}
           aria-pressed={value === points}
           className={cn(
-            'flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:-outline-offset-2',
+            'flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',
             // `text-neutral-5` wherever the row's fill is a solid `neutral-2`: white on
             // that fill is 2.94:1, and it applies to the hover state as much as the
             // selected one. Only the selected case was visible to axe — a static story

@@ -162,7 +162,7 @@ export function DatePickerMenu({
               type="button"
               onClick={() => state.focusPreviousSection(true)}
               aria-label="Previous year"
-              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
             >
               <ChevronDoubleLeftIcon className="w-4 h-4" />
             </button>
@@ -170,7 +170,7 @@ export function DatePickerMenu({
               {...prevMonthProps}
               ref={prevMonthRef}
               aria-label="Previous month"
-              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
               <ChevronLeftIcon className="w-4 h-4" />
             </button>
@@ -187,7 +187,7 @@ export function DatePickerMenu({
               {...nextMonthProps}
               ref={nextMonthRef}
               aria-label="Next month"
-              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
               <ChevronRightIcon className="w-4 h-4" />
             </button>
@@ -195,7 +195,7 @@ export function DatePickerMenu({
               type="button"
               onClick={() => state.focusNextSection(true)}
               aria-label="Next year"
-              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-1 rounded-xs"
+              className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
             >
               <ChevronDoubleRightIcon className="w-4 h-4" />
             </button>
@@ -215,7 +215,7 @@ export function DatePickerMenu({
         <button
           type="button"
           onClick={goToday}
-          className="text-body-sm font-normal font-sans text-interactive-text hover:opacity-80 transition-opacity cursor-pointer focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2 rounded-xs"
+          className="text-body-sm font-normal font-sans text-interactive-text hover:opacity-80 transition-opacity cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs"
         >
           Today
         </button>
@@ -286,7 +286,7 @@ function CalendarCell({
         {...buttonProps}
         ref={ref}
         className={cn(
-          'flex items-center justify-center w-6 h-6 rounded-2 text-body-sm font-normal font-sans transition-colors focus-visible:outline-2 focus-visible:outline-primary-4',
+          'flex items-center justify-center w-6 h-6 rounded-2 text-body-sm font-normal font-sans transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text',
           isDisabled
             ? 'text-muted cursor-default'
             : isSelected

@@ -126,7 +126,7 @@ export function SegmentedControl({
             onClick={() => handleSelect(opt.id)}
             onKeyDown={handleKeyDown}
             className={cn(
-              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-primary-4 focus-visible:outline-offset-2',
+              'inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2',
               // The active label is `neutral-5`, not the white Figma draws. That is the
               // one deviation in this component and the ratio is why: white on the
               // `neutral-2` pill measures 2.94:1. The pill's fill is untouched — this is

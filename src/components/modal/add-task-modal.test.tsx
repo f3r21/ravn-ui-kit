@@ -87,6 +87,6 @@ describe('AddTaskModal Component', () => {
 
     expect(input.className).not.toContain('outline-none');
     expect(input.className).toContain('focus-visible:outline-2');
-    expect(input.className).toContain('focus-visible:outline-primary-4');
+    expect(input.className).toContain('focus-visible:outline-interactive-text');
   });
 });
