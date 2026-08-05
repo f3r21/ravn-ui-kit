@@ -34,11 +34,34 @@ left unbuilt (no legible spec), and why.
 npm install @ravn/ui-kit
 ```
 
-Import the token stylesheet once at your app's entry point:
+Styles come from one of two paths, depending on whether your app runs its own
+Tailwind CSS v4 build:
 
-```tsx
-import '@ravn/ui-kit/theme.css';
-```
+- **Your app already uses Tailwind CSS v4 (recommended).** Import the raw token
+  stylesheet once at your app's entry point, and add a `@source` directive to your
+  own Tailwind entry CSS so it scans this package's compiled output for the utility
+  classes components use (`node_modules` is excluded from automatic scanning by
+  default):
+
+  ```tsx
+  import '@ravn/ui-kit/theme.css';
+  ```
+
+  ```css
+  @import "tailwindcss";
+  @import "@ravn/ui-kit/theme.css";
+  @source "../node_modules/@ravn/ui-kit/dist";
+  ```
+
+- **Your app does not run Tailwind CSS.** Import the fully-compiled stylesheet
+  instead — it contains every utility class the components actually use, pre-generated:
+
+  ```tsx
+  import '@ravn/ui-kit/ui-kit.css';
+  ```
+
+  Don't import both — `ui-kit.css` already includes the token layer that `theme.css`
+  exposes on its own for the first path.
 
 Then use any component:
 

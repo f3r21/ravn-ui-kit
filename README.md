@@ -13,12 +13,43 @@ See the **Introduction** page in Storybook for the full component catalog and fi
 npm install @ravn/ui-kit
 ```
 
-### 2. Import the design tokens
-At your frontend app's entry point (e.g. `src/main.tsx` or `src/index.css`), import the theme stylesheet:
+### 2. Wire up styles
+
+There are two supported paths, depending on whether your app runs its own Tailwind CSS v4 build.
+
+**Path A — your app already uses Tailwind CSS v4 (recommended).** Import the raw
+design-token stylesheet and let your own Tailwind build generate the utility classes
+components need. This keeps the generated CSS deduplicated against the rest of your
+app and lets Tailwind tree-shake unused utilities.
 
 ```tsx
 import '@ravn/ui-kit/theme.css';
 ```
+
+Your Tailwind entry CSS also needs a `@source` directive so Tailwind scans this
+package's compiled output for the utility classes it references — `node_modules` is
+excluded from Tailwind's automatic scanning by default, so without this line, classes
+baked into `dist/index.js` as class-name string literals would silently never be
+generated (see `ravn-task-management-challenge`'s `src/styles/base.css` for a working
+example):
+
+```css
+@import "tailwindcss";
+@import "@ravn/ui-kit/theme.css";
+@source "../node_modules/@ravn/ui-kit/dist";
+```
+
+**Path B — your app does not run Tailwind CSS.** Import the fully-compiled stylesheet
+instead. It contains every utility class the components actually use, pre-generated —
+no Tailwind build step required on your side:
+
+```tsx
+import '@ravn/ui-kit/ui-kit.css';
+```
+
+Do **not** import both — `ui-kit.css` already includes the token layer, and Path A's
+`@source` scanning already includes every utility class you'd get from `ui-kit.css`.
+Pick one path based on whether your app has its own Tailwind build.
 
 ### 3. Use the components
 
