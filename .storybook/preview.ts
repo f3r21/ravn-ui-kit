@@ -19,8 +19,13 @@ const preview: Preview = {
     },
     options: {
       storySort: {
+        // Prose pages first, then tokens, then components bottom-up. Titles listed here
+        // are top-level and deliberate — see CONTRIBUTING.md's "Standalone documentation
+        // pages". An unlisted title sorts below `Layout`, which is not where a reader
+        // looks for prose, so a new page has to be added here as well as written.
         order: [
           'Introduction',
+          'Decisions',
           'Design Tokens',
           ['Colors', 'Typography'],
           'Primitives',

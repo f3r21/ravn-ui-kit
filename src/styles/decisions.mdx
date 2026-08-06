@@ -1,0 +1,155 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Decisions" />
+
+# Decisions
+
+Four calls shape this kit more than any component in it does. Each one looks like a bug
+from the outside — a missing breakpoint, a colour that fails contrast, a form with no
+visible labels — and each one is a decision with a measurement behind it.
+
+This page is for the reader who has not cloned the repository. Every number below names
+the file it comes from, so nothing here has to be taken on trust; if a figure has no
+such source, it is not stated at all.
+
+---
+
+## 1. The kit is desktop-only
+
+**No component here has a mobile layout, and none is coming.**
+
+Nothing in `src/` carries a Tailwind responsive variant (`sm:`, `md:`, `lg:`) or a
+`@media` query. The layout pieces are built to fixed widths lifted from the 1440px Figma
+canvas:
+
+| Piece                | Constraint           | Source                       |
+| -------------------- | -------------------- | ---------------------------- |
+| `ApplicationSidebar` | `w-[232px] shrink-0` | `application-sidebar.tsx:48` |
+| `TaskTable`'s grid   | `min-w-[1108px]`     | `task-table.tsx:515`         |
+| `AddTaskModal`       | `w-[578px]`          | `add-task-modal.tsx:163`     |
+| `DatepickerMenu`     | `w-[280px]`          | `datepicker-menu.tsx:153`    |
+
+`AppShell` then spends a further fixed budget before content gets a pixel: `p-8` on both
+sides plus a `gap-8` between sidebar and content, so 32 + 232 + 32 + 32 = **328px** of
+any viewport is chrome (`app-shell.tsx:62-66`). Add the table's own minimum to that and
+the table view stops fitting a viewport at 328 + 1108 = **1436px**; below that, its
+`overflow-x-auto` wrapper scrolls the grid rather than reflowing it, which is the
+intended behaviour and not a fallback.
+
+**There is no measured floor below which the kit "breaks", and this page will not invent
+one.** The arithmetic above is derived from class names you can read; a breakpoint is
+not, because nobody ever measured one. What is certain is the shape of the constraint: a
+rigid sidebar and a table with a hard minimum, inside a shell with no breakpoints at
+all.
+
+**What this means for a consumer.** The app that uses this kit keeps its own `AppLayout`
+and `AppSidebar` permanently rather than adopting `AppShell` — that is the decision, not
+an unfinished migration. And a breakpoint added to one component in isolation is worse
+than either answer: it makes that component responsive inside a shell that is not.
+
+---
+
+## 2. WCAG AA wins over Figma fidelity
+
+The kit's first rule is that no design value is ever invented or approximated —
+every colour, radius and shadow comes from a verified Figma export. Where that
+collides with accessibility, **accessibility wins, and the deviation is written down at
+the call site with the ratio that forced it.**
+
+Three worked examples, all from one pass:
+
+- **`Tag`.** Figma paints label and fill from the same swatch (`bg-X/10 text-X`). A 10%
+  tint of a colour is never far from that colour, so the pattern is structurally
+  incapable of clearing AA — red measured 2.61 / 3.17 / 3.61:1 across the three dark
+  surfaces, green 3.66 / 4.44 / 5.08. The fill stays exactly as drawn; only the label
+  moves, up its own ramp to the first rung that clears AA everywhere (`tag.tsx:47`).
+- **`Badge`.** A status ramp's own step painted on its step-1 fill measures 1.69:1 for
+  success, 2.34:1 for warning, 3.90:1 for danger. Warning and danger step to the dark
+  rung their ramps already carry; success has none, so it borrows the neutral label and
+  lets the fill carry the status (`badge.test.tsx:9`).
+- **`FormField`'s visible label.** The design's own small-label colour measures 4.58:1
+  on the panel it was drawn on, but only **3.73:1** on the modal card where a task form
+  actually lives. White is the only other colour the design puts on a dark surface and
+  clears AA on all three (10.95 / 13.45 / 15.40:1), so it is used
+  (`form-field.tsx:45`).
+
+The ratios are not comments alone. `src/styles/contrast.test.ts` recomputes every one of
+them from `tokens.css` at test time, so changing a hex fails the suite rather than
+shipping and being discovered by someone running axe months later. **Design Tokens →
+Colors** carries the same list for readers of these docs.
+
+The rule cuts both ways, and that half matters as much: it is AA that wins, not
+"whatever contrasts better". A pairing that happens to measure well is never on its own
+a reason to redraw something the design has an opinion about.
+
+---
+
+## 3. The remaining contrast failures are a decision, not a backlog
+
+CI runs axe over every story in a real browser and fails on any finding not recorded in
+`.storybook/a11y-allowlist.ts`. That file is keyed to **story id × rule id** — a rule
+firing on a story that does not list it fails the build, and a rule listed for a story
+that no longer reports it _also_ fails, so the list can only be paid down, never
+quietly padded. It is the only authoritative answer to "what does this kit still fail",
+and it is worth reading over any count written in prose, including this one.
+
+**`color-contrast` is accepted on 14 stories.** Twelve of them render `TextButton
+variant="primary"`; the other two render a trigger that
+`floating-popover.stories.tsx` hand-rolls with the same `bg-primary-4 text-main`
+pairing on markup the kit does not ship.
+
+The button is the real case, and it has nowhere to go:
+
+- `text-main` on `bg-primary-4` measures **3.83:1** against 1.4.3's 4.5:1, and
+  `isSelected`'s `bg-primary-3` **2.83:1**.
+- **No label colour fixes it.** The darkest thing in the entire palette, `neutral-5`
+  (#222528), reaches 4.02:1 on `primary-4` — still short. Only near-black would clear
+  it, and the palette has no black.
+- **No fill in the ramp fixes it either.** `primary-4` is the ramp's darkest step; 1, 2
+  and 3 are all lighter and measure worse against white.
+- So the only fix is a **new, darker red that Figma does not contain** — and inventing a
+  design value is precisely what the kit's first rule forbids. Repainting
+  `--color-primary-4` instead would change every brand surface in two repositories.
+
+This is the one place where the design has a definite opinion that fails AA, as opposed
+to being silent. `text-button.tsx:36` carries the full argument, and
+`src/styles/contrast.test.ts` asserts the failing ratios explicitly so the failure can
+never be mistaken for a pass.
+
+**Not everything in that allowlist is accepted.** `aria-prohibited-attr` on four stories
+is a real defect with an issue number attached (`TaskMetaBadges` labels its badges with
+`aria-label` on a role-less `<span>`, where the attribute is prohibited and therefore
+dropped). Five `incomplete` entries cover `SidebarItem`'s active label on a gradient,
+which axe cannot compute a ratio against at all — that one has been measured by hand at
+6.67:1 and 6.02:1 at either end of the wash, both clearing AA. The file distinguishes
+the three cases in writing; a bare count would not.
+
+---
+
+## 4. Field labels are `sr-only` by default
+
+`Input`, `Datepicker`, `Select` and `FormField` all default `isLabelVisible` to `false`.
+The label still renders — as `sr-only`, never `hidden` or `display:none` — so the
+control keeps its accessible name whether or not anything is painted.
+
+The design draws **no field labels at all**: not in the Add/Edit Task modal, not on the
+search bar, nowhere across 100 export files. A field's own text carries its meaning — the
+placeholder in the empty state, the value in the filled one. Rendering the label
+visually would have meant inventing chrome the design does not have; dropping it
+entirely would have left screen-reader users with an unnamed input. `sr-only` is the
+only option that satisfies both.
+
+Pass `isLabelVisible` per control to opt in. When you do, the label uses the design's
+real spec for a small label on a dark surface, with the colour deviation from decision 2
+applied (`form-field.tsx:32-71`).
+
+---
+
+## Where these numbers come from
+
+Every figure on this page resolves to something in the repository: a class name in a
+component, an assertion in `src/styles/contrast.test.ts`, or an entry in
+`.storybook/a11y-allowlist.ts`. That is deliberate. This kit has previously carried
+figures inherited from planning documents that were never committed — a "measured"
+breakpoint among them — which read as authoritative and could not be checked by anyone.
+If a number here cannot be traced to a file, treat it as a defect in this page.
