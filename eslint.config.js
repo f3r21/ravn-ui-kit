@@ -12,8 +12,11 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    // Config/tooling files run under Node, not the browser.
-    files: ['*.{js,ts}', '.storybook/**/*.ts'],
+    // Config/tooling files run under Node, not the browser. `scripts/` is here
+    // for `hooks.test.mjs`, which spawns the Claude Code hooks as subprocesses
+    // and so reads `process.cwd()` and `process.env` — browser globals would
+    // leave every one of those an undefined.
+    files: ['*.{js,ts}', '.storybook/**/*.ts', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: globals.node,
     },
