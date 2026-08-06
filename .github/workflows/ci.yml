@@ -35,13 +35,31 @@ jobs:
       # Consistent with the SHA-pinning rule further down, which is this same rule read
       # the other way round: what is placed under control there is privilege, not
       # version. Only the two actions on the Pages publish path are pinned to full
-      # commit SHAs. These two are not, on purpose — an outdated major is the live risk
-      # for them, and a pin is the wrong instrument for that.
+      # commit SHAs. `actions/checkout` and `actions/setup-node` are not, on purpose —
+      # an outdated major is the live risk for them, and a pin is the wrong instrument
+      # for that. Nor is `dependency-review-action` between them, for the same reason:
+      # it holds no write scope either.
       #
-      # Note they are currently three majors behind (`@v7` is current for both) — that
-      # is the gap Dependabot is expected to close, not a pin to preserve.
+      # Note checkout and setup-node are currently three majors behind (`@v7` is current
+      # for both) — that is the gap Dependabot is expected to close, not a pin to preserve.
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Diffs the dependency graph of the base commit against the head commit and fails
+      # when the pull request *introduces* a dependency carrying a known advisory. That is
+      # the thing `npm audit` structurally cannot do: audit sees the tree the branch
+      # produces, so a vulnerability inherited from `main` and one added by this PR are
+      # indistinguishable to it, and the second is the one worth blocking a merge over.
+      #
+      # `pull_request` only — there is no base/head pair to diff on a push or a manual
+      # dispatch, and the action errors rather than skipping. `fail-on-severity` is held
+      # at the audit step's `high` on purpose: two gates disagreeing about what is
+      # acceptable is how a policy stops being one. The action's own default is `low`.
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
 
       # Kept in step with `.nvmrc` and with the consuming app, which runs 22 and
       # declares `engines.node: >=22.13.0`. One version across both repos is a
