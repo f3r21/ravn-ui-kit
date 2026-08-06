@@ -21,6 +21,18 @@ link on the "Second-session review" line below is what records that it happened.
 
 Closes #
 
+## Figures
+
+<!-- Every number this PR asserts, with the command that re-derives it — same line,
+     after an em-dash or an arrow. See CLAUDE.md. If this PR asserts no numbers,
+     write exactly "No figures in this PR."
+
+     - 527 tests, 33 files — `npm run gate 2>&1 | grep -E 'Test Files|Tests  '`
+
+     `node scripts/figure-audit.mjs` counts how many of yours carry one. Do not
+     write a number you have not just run the command for: a command that does not
+     reproduce its figure is worse than no command. -->
+
 ## How it was verified
 
 <!-- Commands actually run, with their result. Not "should be fine". -->

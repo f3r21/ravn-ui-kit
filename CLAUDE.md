@@ -122,6 +122,40 @@ unreadable — reaching for React Aria's own source means an override in the unt
 `--body-file`. A false deny rather than a false allow is the right direction for this, and it
 is a chosen behaviour rather than one to rediscover.
 
+## Every figure carries the command that re-derives it
+
+A number in an issue, a commit message, a PR body or this file is written once and read by
+sessions that cannot check it. So ship the command beside it, on the same line, after an em-dash
+or an arrow:
+
+```markdown
+- 527 tests, 33 files — `npm run gate 2>&1 | grep -E 'Test Files|Tests  '`
+- `grep -rn "forwardRef" src/` → 0 hits
+```
+
+A lane meeting a bare number decides whether to trust it. A lane meeting a number and its command
+runs the command. `file.tsx:48` citations and `#23` references need nothing — everything else
+does.
+
+**Never re-derive a figure from prose that quotes it, including prose you wrote earlier in the
+same session.** Go back to the enforced source. A single paragraph about the a11y allowlist took
+four revisions this way, each fixing the last and introducing a fresh arithmetic error, and what
+ended it was quoting `.storybook/a11y-allowlist.ts` verbatim.
+
+`node scripts/figure-audit.mjs <file>` counts how many figures in a body carry their command. It
+is a proxy — a regex cannot tell a claim from a mention — but it is a stable one, which is what a
+ratchet needs. Run it on a body before posting:
+
+```bash
+gh issue view 23 --json body -q .body | node scripts/figure-audit.mjs -
+```
+
+The measured baseline it exists to move, across the six issues #23 sampled (app #35, #41, #43;
+kit #11, #16, #20): **1 of 86 substantive figures carried a command, 1.2%.** The one that did is
+kit #11's `grep -rn "forwardRef" src/`.
+
+Do not sweep old issues to fix this. It applies to what you touch from now on.
+
 ## Changelog
 
 Every PR appends its entry under `## [Unreleased]`. `.gitattributes` sets `merge=union` on that
