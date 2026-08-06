@@ -20,6 +20,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # What is locked across this repo and the consuming app is the **Node version**,
+      # not these action majors. Node decides the bytes `npm run build` produces, which
+      # is why it is pinned in `.nvmrc` and why the committed `dist/` freshness check
+      # below only means anything if both pipelines agree on it.
+      #
+      # These `actions/*` majors are a different thing: they govern the runner-side JS
+      # runtime of the action wrapper, not the toolchain that builds the code. Holding
+      # them identical across the two repositories buys nothing the Node pin does not
+      # already buy, and it costs currency — an older major is the real risk, not a
+      # difference between the two. Both repositories let them float to current via
+      # Dependabot's `github-actions` ecosystem instead (`.github/dependabot.yml`).
+      #
+      # Consistent with the SHA-pinning rule further down: what is placed under control
+      # is privilege, not version. Only the two actions running with `pages: write` and
+      # `id-token: write` are pinned to full commit SHAs. These two are not, on purpose.
+      #
+      # Note they are currently three majors behind (`@v7` is current for both) — that
+      # is the gap Dependabot is expected to close, not a pin to preserve.
       - name: Checkout
         uses: actions/checkout@v4
 
