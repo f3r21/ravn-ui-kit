@@ -136,11 +136,24 @@ jobs:
         with:
           path: storybook-static
 
-      # audit-level=high: repo has one known, accepted moderate vuln (uuid via
-      # @storybook/addon-essentials -> @storybook/addon-actions). Fixing it
-      # requires downgrading @storybook/addon-essentials to 7.0.6 (a breaking
-      # Storybook change), tracked separately — not fixed here. This level
-      # still fails CI on any new high/critical vulnerability.
+      # `high` is a policy about what stops a merge. It is not a record of anything
+      # accepted, and nothing is accepted: `npm audit` reports **0 vulnerabilities even
+      # at `moderate`**. (This comment used to describe a known-accepted moderate `uuid`
+      # advisory via `@storybook/addon-essentials`, said fixing it meant downgrading to
+      # Storybook 7.0.6, and outlived the actual fix — `"overrides": { "uuid": "^11.1.1" }`
+      # in package.json — by several releases, leaving every reader since believing there
+      # was an open hole.)
+      #
+      # The bar stays at `high` because everything this audit sees below the two runtime
+      # dependencies is devDependencies: the package ships no server, and Storybook's
+      # transitive graph produces moderates on a schedule. Lowering it would trade a gate
+      # that means something for a recurring red build nobody can act on — which is how
+      # the stale comment above came to exist in the first place.
+      #
+      # The dependency-review step at the top of this job holds the same severity bar but
+      # a different scope: it sees what a pull request *adds*, so an advisory that arrives
+      # with a new dependency is attributable to the change that brought it, not just to
+      # the tree.
       - name: Audit dependencies
         run: npm audit --audit-level=high
 
