@@ -1,5 +1,17 @@
 node_modules/
-dist/
+
+# `dist/` is deliberately NOT ignored, and is deliberately tracked. The consuming app
+# installs this package straight from GitHub (`github:f3r21/ravn-ui-kit#<tag>`), and a
+# git install runs no build: npm clones, looks for a `prepare` script, finds none, and
+# packs whatever `package.json`'s `files` names. With `dist/` ignored that tarball ships
+# an exports map pointing at four files that are not in it.
+#
+# The alternative — `"prepare": "npm run build"` — was considered and rejected: it makes
+# every consumer install (their CI, every preview deploy, every worktree) pull this
+# repo's ~370 MB devDependency tree and run a full build. Committing 340 KB of generated
+# output keeps installs as fast as they are today and keeps the build in the repo that
+# owns it. `.gitattributes` marks it `linguist-generated -diff` so it does not drown out
+# real changes in review, and CI fails when it is stale — never hand-edit it.
 
 # Logs
 npm-debug.log*
