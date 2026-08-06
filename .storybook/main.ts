@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import remarkGfm from 'remark-gfm';
 
 /**
  * Plugins from `vite.config.ts` that exist only to produce the published package, and
@@ -70,6 +71,35 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../src/**/*.mdx'],
   addons: [
     '@storybook/addon-links',
+    {
+      // GFM, for tables. Core Markdown has none, so a pipe table was not "styled
+      // badly" — it was not a table at all, and published as a run-on line of `|`
+      // characters on the live site. `colors.mdx`'s 29-row alias table and
+      // `typography.mdx`'s 9-row scale were both prose, and the colour aliases are
+      // exactly what a consumer opens that page to read (#21).
+      //
+      // Configured on `@storybook/addon-docs` directly, and listed *before*
+      // essentials. Essentials delivers addon-docs, so the obvious spelling is to
+      // nest these under its `docs` key — that builds green and changes nothing,
+      // which is the same failure mode as the bug itself. Essentials skips
+      // registering addon-docs when it is already present, so naming it here is what
+      // gets the options to the MDX compiler rather than a double registration.
+      //
+      // GFM is more than tables — it also brings autolink literals, strikethrough,
+      // footnotes and task lists — so this changes how every `.mdx` page parses, not
+      // just the two with tables. That was measured before the change rather than
+      // assumed: across all four pages there are zero tildes, zero bare URLs, zero
+      // footnote references and zero task-list markers, so tables are the only GFM
+      // construct any of them contains. All four were re-rendered and read after it.
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        },
+      },
+    },
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     '@storybook/addon-a11y',

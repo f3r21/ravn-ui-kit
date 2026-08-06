@@ -95,11 +95,38 @@ Loading `AppShell`'s `Dashboard` story on its own and reading
 width below 833, which is what "the content cannot get narrower than this" looks like.
 832 overflows; 833 does not. Below the floor the shell scrolls rather than shrinking.
 
-| viewport | `scrollWidth` | overflows |
-| -------- | ------------- | --------- |
-| 375      | 833           | yes       |
-| 832      | 833           | yes       |
-| **833**  | 833           | **no**    |
+<table>
+  <thead>
+    <tr>
+      <th>viewport</th>
+      <th>
+        <code>scrollWidth</code>
+      </th>
+      <th>overflows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>375</td>
+      <td>833</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>832</td>
+      <td>833</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>
+        <strong>833</strong>
+      </td>
+      <td>833</td>
+      <td>
+        <strong>no</strong>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 Note what the number is not. 833 is where `AppShell` itself stops fitting; the **1436px**
 above is where the _table view_ stops fitting. A viewport between them shows a shell that

@@ -110,20 +110,29 @@ prose.
 
 Two things about MDX here that a green build will not tell you:
 
-- **Pipe tables do not render.** This Storybook's MDX pipeline has no
-  `remark-gfm`, so a Markdown table publishes as a run-on line of `|`
-  characters. `typography.mdx` and `colors.mdx` both show it today. Write a
-  literal `<table>` instead, as `decisions.mdx` does, and keep each `<td>` to
-  a single element — a cell mixing text and an element becomes a `<p>` and
-  gains vertical padding the other cells do not have.
+- **Pipe tables render, and that is recent.** `remark-gfm` is configured on
+  `@storybook/addon-docs` in `.storybook/main.ts`. Before it, core Markdown had
+  no tables at all and a pipe table published as a run-on line of `|`
+  characters — `colors.mdx` and `typography.mdx` shipped that way on the live
+  site (#21). Write pipe tables now; they are far easier to read and edit than
+  the literal `<table>` blocks still in `decisions.mdx`, which are correct and
+  are simply not worth churning. If you do write a literal `<table>`, keep each
+  `<td>` to a single element — a cell mixing text and an element becomes a `<p>`
+  and gains vertical padding the other cells do not have.
+
+  Configure MDX options on `@storybook/addon-docs` by name, listed before
+  `@storybook/addon-essentials`. Nesting them under essentials' own `docs` key
+  is the obvious spelling and is silently ignored: it builds green and changes
+  nothing, which is indistinguishable from the bug it is meant to fix. Verify a
+  table by rendering the page and looking for a real `<table>` element, never by
+  a green build.
+
 - **`{/* … */}` comments do not survive `npm run format`.** Prettier treats
   `.mdx` as Markdown, rewrites the `*` as emphasis, and leaves `{/_ … _/}`,
   which then fails the Storybook indexer with "Could not parse expression with
   acorn" — a build error nowhere near the file that caused it. Put the note in
-  the commit message or here instead.
-
-Both are worth fixing at the source one day; neither is a reason to hand-write
-a broken page in the meantime.
+  the commit message or here instead. Still true, and still unfixed: it caught
+  a comment added while fixing the tables above.
 
 ## Story file recipe
 
