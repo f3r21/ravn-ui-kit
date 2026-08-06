@@ -8,6 +8,57 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Claude Code hooks copied in `7514d38` were inert, and now are not.** Nothing in this
+  release changes `dist/`; it is repository tooling only, so consumers are unaffected.
+  - `.claude/hooks/block-dangerous.sh` read its command from `$1`. Claude Code passes the tool
+    call as JSON on stdin, so the pattern match ran against an empty string and **every one of
+    the 13 commands this repo claimed to block was permitted** — verified against the pre-fix
+    script in this worktree, not inherited from the app's report. Its exit code was wrong
+    independently: a non-zero exit that is not exactly `2` is a _non-blocking_ error, so the
+    refusal printed and the command then ran. It now returns `permissionDecision: "deny"`.
+  - The two `PostToolUse` formatter commands interpolated `$FILE_PATH`, which Claude Code never
+    sets, so `eslint --fix` and `prettier --write` ran against an empty argument on every edit
+    and `|| true` swallowed it. They are replaced by `.claude/hooks/format-file.sh`, which reads
+    `.tool_input.file_path` from stdin and skips files outside `CLAUDE_PROJECT_DIR`.
+  - `.claudeignore` is not a file Claude Code reads. Removed, and replaced with
+    `permissions.deny` entries in `.claude/settings.json` that actually deny.
+- **The documented breakpoint floor was "never measured". It is 833px.** `CLAUDE.md` and the
+  published **Decisions** page both stated no floor had ever been measured, and `CLAUDE.md` went
+  further and forbade quoting one. Measured on `layout-appshell--dashboard` by reading
+  `document.documentElement.scrollWidth` across viewport widths: 833 at every width below 833;
+  832 overflows, 833 does not. Both documents now state it, with the method and a table.
+  **The decision is unchanged** — the kit stays desktop-only and the consuming app keeps its own
+  shell permanently. What changes is that a consumer deciding whether to adopt `AppShell` can
+  have the number, and that a session which measures 833 correctly is no longer told by its own
+  instructions that it must have erred. Note that 833 is where `AppShell` stops fitting; the
+  separately documented 1436px is where the _table view_ stops fitting.
+- `CLAUDE.md` cited `.claudeignore` as the mechanism keeping `dist/` out of context. It now names
+  the `permissions.deny` `Read(./dist/**)` entry that actually does it.
+
+### Added
+
+- `scripts/hooks.test.mjs` — 33 cases that drive each hook exactly as Claude Code drives it, with
+  the payload as JSON on stdin. Vitest collects it, so it runs inside `npm run gate`. Restoring
+  the pre-fix `.claude/` and running it there: **22 of the 34 cases it collects fail** (34 rather
+  than 33 because the old `settings.json` wired three hook commands where the fix wires two).
+  Two cases exist only to pin the removed shapes, so a revert to argv or `$FILE_PATH` goes red
+  rather than quiet, and three check that `settings.json` still points at a script that exists
+  and is executable — a hook that works but is wired to nothing fails in exactly the original
+  way. Coverage is unaffected: the metric includes `src/**` alone, so the ratchet in
+  `vitest.config.ts` neither moves nor needs to.
+
+### Changed
+
+- Three of the safety patterns changed shape. They had never run, so there was no behaviour to
+  preserve: `rm` now requires recursive-and-force flags _and_ a root or home target, so
+  `rm -rf ./dist` — routine here, since `dist/` is committed — is allowed; `--force` no longer
+  matches `--force-with-lease` by substring, while a `git push origin +branch` refspec now
+  matches where it never did.
+- `eslint.config.js` gives `scripts/**/*.mjs` the Node globals it already gave root-level config
+  files.
+
 ## [0.4.0] - 2026-08-06
 
 **The first release that can be installed at all, and the first anyone installs by tag.**

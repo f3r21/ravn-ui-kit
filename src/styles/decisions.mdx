@@ -85,11 +85,27 @@ its inner grid, so add the two and the table view stops fitting a viewport at
 328 + 1108 = **1436px**; below that, the grid's `overflow-x-auto` wrapper scrolls it
 rather than reflowing it, which is the intended behaviour and not a fallback.
 
-**There is no measured floor below which the kit "breaks", and this page will not invent
-one.** The arithmetic above is derived from class names you can read; a breakpoint is
-not, because nobody ever measured one. What is certain is the shape of the constraint: a
-rigid sidebar and a table with a hard minimum, inside a shell with no breakpoints at
-all.
+**The floor is 833px, and it is measured rather than derived.** Earlier versions of this
+page said no floor existed and declined to invent one. That was the right instinct
+applied to the wrong fact: the arithmetic above comes from class names you can read, but
+the floor is not arithmetic — it is an observation, and it had simply never been taken.
+
+Loading `AppShell`'s `Dashboard` story on its own and reading
+`document.documentElement.scrollWidth` at a range of viewport widths gives 833 at every
+width below 833, which is what "the content cannot get narrower than this" looks like.
+832 overflows; 833 does not. Below the floor the shell scrolls rather than shrinking.
+
+| viewport | `scrollWidth` | overflows |
+| -------- | ------------- | --------- |
+| 375      | 833           | yes       |
+| 832      | 833           | yes       |
+| **833**  | 833           | **no**    |
+
+Note what the number is not. 833 is where `AppShell` itself stops fitting; the **1436px**
+above is where the _table view_ stops fitting. A viewport between them shows a shell that
+fits with a table that scrolls horizontally inside it. Both are intended, and neither is
+a breakpoint — the shape of the constraint is unchanged: a rigid sidebar and a table with
+a hard minimum, inside a shell with no breakpoints at all.
 
 **What this means for a consumer.** The app that uses this kit keeps its own `AppLayout`
 and `AppSidebar` permanently rather than adopting `AppShell` — that is the decision, not

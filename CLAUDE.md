@@ -31,10 +31,18 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 
 ## Decisions already made — do not re-open
 
-- **The kit is desktop-only.** `ApplicationSidebar` is a rigid `w-[232px] shrink-0`
-  (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive variant or a media
-  query. No breakpoint floor has ever been measured, so do not quote one — the derivation that
-  exists is on the **Decisions** page. The consuming app keeps its own shell permanently.
+- **The kit is desktop-only, and its floor is 833px.** `ApplicationSidebar` is a rigid
+  `w-[232px] shrink-0` (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive
+  variant or a media query. 833 is exact rather than approximate: on story
+  `layout-appshell--dashboard`, `document.documentElement.scrollWidth` reads 833 at every
+  narrower viewport — 832 overflows, 833 does not. Below the floor the shell scrolls; it does not
+  shrink. Re-measure by reading that property on the story's `iframe.html` at a few widths, which
+  is how the number above was checked against this branch's own Storybook build.
+  **Quote it** — a consumer deciding whether to adopt `AppShell` needs it. An earlier version of
+  this line said no floor had ever been measured and forbade quoting one, which is worse than
+  merely wrong: a session that measured 833 correctly would have assumed it had erred and thrown
+  the finding away. The number does not re-open the decision — the kit stays desktop-only, the
+  derivation is on the **Decisions** page, and the consuming app keeps its own shell permanently.
 - **WCAG AA wins over Figma fidelity where they conflict**, and the deviation is documented in a
   comment with its measured ratio. `src/styles/contrast.test.ts` pins those ratios so a
   regression fails the suite.
@@ -51,8 +59,9 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 ## `dist/` is committed, generated, and never hand-edited
 
 The app consumes this package as a git dependency pinned to a tag, and a git install runs no
-build — so `dist/` has to exist in the repo. It is in `.claudeignore`: 104 KB of minified JS
-and 122 KB of rolled-up types, never worth reading. Change the source and rebuild.
+build — so `dist/` has to exist in the repo. A `permissions.deny` entry of `Read(./dist/**)` in
+`.claude/settings.json` keeps it out of context: 104 KB of minified JS and 122 KB of rolled-up
+types, never worth reading. Change the source and rebuild.
 
 CI now fails when it is stale (`Check committed dist/ is fresh`, straight after the build
 step). That check is `git add --intent-to-add dist/ && git diff --exit-code dist/` — the
@@ -78,6 +87,33 @@ the tag and `git describe` on `main` broken permanently. So a lane cuts a **prer
 merges, and says in the release notes that it came from unmerged history. **The reviewer who
 merges the PR cuts the real `vX.Y.Z` on the merge commit** and the downstream consumer re-pins
 to it. Both are annotated tags with a matching GitHub release.
+
+## The Claude Code hooks are tested, because they were inert
+
+`.claude/hooks/` holds two scripts and `scripts/hooks.test.mjs` proves they work. Vitest
+collects it, so it runs inside `npm run gate` — the point of it existing. All three integration
+points 7514d38 copied in were inert: the safety hook read `$1`, both formatter hooks
+interpolated a `$FILE_PATH`, and `.claudeignore` is not a file Claude Code reads at all. A hook
+that does nothing exits 0 exactly like one that works, so nothing caught it. Two of the test's
+cases exist only to pin the removed shapes — a command on argv must still deny, a path on argv
+or in `$FILE_PATH` must leave the file untouched — so a revert to the broken input source goes
+red instead of quiet.
+
+Hook input is **JSON on stdin**, never argv and never an environment variable. Denying is
+`permissionDecision: "deny"` on stdout; a non-zero exit that is not exactly `2` prints the
+refusal and then runs the command anyway. `node` parses the payload, not `jq` — `npm install`
+never provides `jq`, and a parser missing on one machine is the same silent no-op again.
+
+**`.claudeignore` is gone; `permissions.deny` in `.claude/settings.json` replaces it.** That is
+a real control rather than a decorative one, and it costs accordingly: a `Read()` rule also
+covers Edit/Write/Glob/Grep and the shell's readers, so `node_modules/**` is genuinely
+unreadable — reaching for React Aria's own source means an override in the untracked
+`settings.local.json`.
+
+**Known false positive:** the safety hook matches the command line as text, so a
+`gh issue comment` whose body _quotes_ `rm -rf /` or `git push --force` is denied. Use
+`--body-file`. A false deny rather than a false allow is the right direction for this, and it
+is a chosen behaviour rather than one to rediscover.
 
 ## Changelog
 
