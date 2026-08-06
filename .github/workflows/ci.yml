@@ -49,6 +49,26 @@ jobs:
       - name: Build Storybook
         run: npm run build:storybook
 
+      # Chromium is not on the runner image, and `@storybook/test-runner` will not fetch it
+      # for you — it fails at launch instead. `--with-deps` pulls the shared libraries the
+      # headless browser needs, which a dev machine already has and a fresh runner does not.
+      # Chromium only: the accessibility findings this gates on are engine-independent, and
+      # three browsers would triple the step for no additional signal.
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      # The gate above never renders a component. `src/styles/contrast.test.ts` checks
+      # tokens against each other and the unit suite runs in jsdom, so a component that
+      # composes two individually-fine tokens into a failing pair passes both. This serves
+      # the Storybook built in the previous step and runs axe over all 144 stories in a real
+      # browser, failing on any finding not recorded in `.storybook/a11y-allowlist.ts`.
+      #
+      # If this step reports every story as failing, read the first message rather than the
+      # count: a runner that cannot reach the served Storybook fails the same way a genuine
+      # wall of violations does, and the runner says which it is.
+      - name: Accessibility (axe over every story)
+        run: npm run test:a11y:ci
+
       # Uploaded in the shape `actions/deploy-pages` consumes, rather than as a
       # plain artifact. The build already happened above; publishing it is the
       # only step that was missing, and without it the README's opening line —
