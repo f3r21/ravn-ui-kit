@@ -112,6 +112,38 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Merged branches are now deleted automatically (`deleteBranchOnMerge`), which had been
   off since the repo was created.
 
+### Fixed
+
+- **`EstimateModal`'s header label overflowed its own popover on every machine without
+  Apple's system font** — which is every Linux and Windows one, CI included.
+  `whitespace-nowrap` is now `truncate`.
+
+  `--font-sans` is `'SF Pro Display', system-ui, sans-serif` and this package ships none
+  of the three, so the rendered width of a label depends on the machine. macOS is saved by
+  the _second_ entry — `system-ui` resolves to the SF system font, and "Estimate" at
+  20px/600 measures 86.5px, inside the 88px content box that `w-[122px]` plus `px-4`
+  leaves. A Linux runner has neither of the first two, falls through to `sans-serif` ->
+  DejaVu Sans, and renders the same string at 105.5px — past the popover's own border.
+  `whitespace-nowrap` supplies only half of what was needed here; `truncate` adds
+  `overflow: hidden`, which both clips the label inside the card and drops the flex item's
+  automatic minimum size from min-content to 0 so it can clip at all. `LabelModal` and
+  `AssigneeModal` render the identical header and already used `truncate`; `EstimateModal`
+  was the outlier, and neither of the other two has enough text to overflow anyway.
+
+  This surfaced as an accessibility failure rather than a visual one, because axe refuses
+  to compute a contrast ratio for text whose background box does not contain it: it
+  reported `color-contrast` as `incomplete`/`elmPartiallyObscured` on
+  `Components/Modal/Estimate`'s two stories in CI and reported nothing at all on macOS.
+  The colour was never in question — the pairing measures **5.11:1**, and does so in both
+  environments now. A 0.5px overflow was.
+
+  The gate is what caught it, and the shape of the catch is worth keeping: because the
+  ratchet is bidirectional, an environment-specific finding has no valid allowlist entry —
+  listing it fails locally as `GONE`, omitting it fails CI as `NEW`. There was no way to
+  record this and no way to avoid fixing it. `.storybook/a11y-allowlist.ts` and
+  `CONTRIBUTING.md` now say so, and `CONTRIBUTING.md` gives the one-line devtools override
+  that reproduces the runner's wider font locally.
+
 ## [0.3.0] - 2026-08-05
 
 ### Added
