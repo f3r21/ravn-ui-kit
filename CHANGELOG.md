@@ -20,6 +20,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   uses, plus two groups the app has no need of (`storybook`, whose addons must move in
   lockstep with the core package, and `build-tooling`, which decides what `dist/` looks
   like) and a `github-actions` ecosystem block.
+
+  That last block settles a rule the consuming app had written the other way. What is
+  locked across the two repositories is the **Node version** — it decides the bytes
+  `npm run build` produces, which is the whole basis of the `dist/` freshness check.
+  `actions/checkout` and `actions/setup-node` majors govern the runner-side runtime of the
+  action wrapper, not the toolchain that builds the code, so holding them identical buys
+  nothing the Node pin does not already buy and costs currency. Both are three majors
+  behind current; Dependabot is expected to close that. The same principle governs which
+  actions get SHA-pinned: privilege, not version. The rule is stated in
+  `.github/workflows/ci.yml` in both repositories rather than in a review thread.
+
 - **`.github/pull_request_template.md`** — what changed, why, and how it was verified as a
   checklist of commands actually run. Its "Second-session review:" line holds the review
   permalink, which is the only evidence of review this repo can produce (see below).
@@ -77,15 +88,26 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **`main` is protected, and CI is now a merge gate rather than a report.** There was no
   branch protection, no ruleset and no required status check, so a red build did not stop
   a merge — and all four previous PRs merged with zero reviews. `main` now requires a pull
-  request, requires the `CI` check to pass, requires the branch to be up to date first,
-  enforces all of that on admins, and refuses force-pushes and deletion.
+  request, requires the `CI` check to pass, enforces all of that on admins, and refuses
+  force-pushes and deletion.
 
-  Two details are load-bearing. The required context is **`CI` and only `CI`** — that is
+  Three details are load-bearing. The required context is **`CI` and only `CI`** — that is
   the job's check-run name, and the workflow's second job (`Publish Storybook`) reports
   `skipped` on `pull_request` events, so requiring it would mean no PR could ever merge.
-  And **no approvals are required**: there is one account and GitHub forbids approving
+  **No approvals are required**: there is one account and GitHub forbids approving
   your own PR, so a required approval would deadlock the repo outright. Review is a
-  comment-only review from a separate session, recorded in the PR template.
+  comment-only review from a separate session, recorded in the PR template — configured
+  as `required_approving_review_count: 0` on a _present_ `required_pull_request_reviews`
+  object, because that object's presence is what requires a pull request at all. Setting
+  it to `null` does not mean "no approvals needed", it means no pull request needed, which
+  would remove half the gate while appearing to comply.
+
+  And the branch is **deliberately not required to be up to date before merging**
+  (`strict: false`). One writer means the up-to-date rule prevents no real race, while
+  `dist/` is about to become a committed build artifact — and generated output has no
+  merge driver, so a forced branch update over it is not hand-resolvable. The only correct
+  resolution there is always "rebuild and commit". Turning `strict` on would convert that
+  into a recurring obstacle in exchange for nothing.
 
   Merged branches are now deleted automatically (`deleteBranchOnMerge`), which had been
   off since the repo was created.
