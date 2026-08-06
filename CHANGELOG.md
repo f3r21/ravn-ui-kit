@@ -24,6 +24,18 @@ for the specific policy this repo follows for what bumps major/minor/patch.
     `.tool_input.file_path` from stdin and skips files outside `CLAUDE_PROJECT_DIR`.
   - `.claudeignore` is not a file Claude Code reads. Removed, and replaced with
     `permissions.deny` entries in `.claude/settings.json` that actually deny.
+- **The documented breakpoint floor was "never measured". It is 833px.** `CLAUDE.md` and the
+  published **Decisions** page both stated no floor had ever been measured, and `CLAUDE.md` went
+  further and forbade quoting one. Measured on `layout-appshell--dashboard` by reading
+  `document.documentElement.scrollWidth` across viewport widths: 833 at every width below 833;
+  832 overflows, 833 does not. Both documents now state it, with the method and a table.
+  **The decision is unchanged** — the kit stays desktop-only and the consuming app keeps its own
+  shell permanently. What changes is that a consumer deciding whether to adopt `AppShell` can
+  have the number, and that a session which measures 833 correctly is no longer told by its own
+  instructions that it must have erred. Note that 833 is where `AppShell` stops fitting; the
+  separately documented 1436px is where the _table view_ stops fitting.
+- `CLAUDE.md` cited `.claudeignore` as the mechanism keeping `dist/` out of context. It now names
+  the `permissions.deny` `Read(./dist/**)` entry that actually does it.
 
 ### Added
 
