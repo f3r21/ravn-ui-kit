@@ -1,5 +1,17 @@
 node_modules/
-dist/
+
+# `dist/` is deliberately NOT ignored, and is deliberately tracked. The consuming app
+# installs this package straight from GitHub (`github:f3r21/ravn-ui-kit#<tag>`), and a
+# git install runs no build: npm clones, looks for a `prepare` script, finds none, and
+# packs whatever `package.json`'s `files` names. With `dist/` ignored that tarball ships
+# an exports map pointing at four files that are not in it.
+#
+# The alternative — `"prepare": "npm run build"` — was considered and rejected: it makes
+# every consumer install (their CI, every preview deploy, every worktree) pull this
+# repo's ~370 MB devDependency tree and run a full build. Committing 340 KB of generated
+# output keeps installs as fast as they are today and keeps the build in the repo that
+# owns it. `.gitattributes` marks it `linguist-generated -diff` so it does not drown out
+# real changes in review, and CI fails when it is stale — never hand-edit it.
 
 # Logs
 npm-debug.log*
@@ -18,15 +30,27 @@ storybook-static/
 # Playwright MCP scratch artifacts
 .playwright-mcp/
 
-# Claude Code session state
-.claude/
+# Claude Code — per-machine session state only. The rest of .claude/ is tracked
+# deliberately: settings, hooks and commands must reach every git worktree, and a
+# worktree only receives files that are committed. Skills are excluded below
+# because corvus manages them and `corvus sync` restores them from .corvusrc.
+.claude/settings.local.json
+.claude/statsig/
+.claude/todos/
 
 # Internal audit docs — kept local only, not pushed
 UI_KIT_MASTER_PLAN.md
 MIGRATION_GAPS.md
 
+# `.corvusrc` is deliberately NOT ignored, and is deliberately tracked. It is the
+# skill manifest, and a `git worktree` only receives committed files — untrack it
+# and every fresh worker session starts with no skills and no way to discover
+# which ones this project expects, because `corvus sync` reads the manifest to
+# restore them. The skill directories below stay ignored; corvus owns their
+# contents. If `corvus install` rewrites the block and re-adds `.corvusrc`, the
+# tracking is what matters — delete the line again rather than untracking the file.
+
 # corvus — managed, do not edit this block
-.corvusrc
 .claude/skills/figma-to-react-components/
 .claude/skills/design-variations/
 .claude/skills/type-system-audit/
@@ -34,4 +58,12 @@ MIGRATION_GAPS.md
 .claude/skills/test-case-gen/
 .claude/skills/qa-happy-path/
 .claude/skills/qa-bug-fixer/
+.claude/skills/core-coding-standards/
+.claude/skills/lang-typescript/
+.claude/skills/platform-frontend/
+.claude/skills/tech-react/
+.claude/skills/design-accessibility/
+.claude/skills/platform-testing/
+.claude/skills/tech-vitest/
+.claude/skills/agent-pr-creator/
 # end corvus

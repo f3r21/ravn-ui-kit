@@ -5,7 +5,7 @@ A standalone, accessible, reusable UI kit built with **React 19, TypeScript, Tai
 **📖 [Browse the Storybook](https://f3r21.github.io/ravn-ui-kit/)** — every component, its
 props and its states, published from `main` on each green CI run.
 
-See the **Introduction** page there for the full component catalog and fidelity notes, and `UI_KIT_MASTER_PLAN.md` for the ground-truth audit log this library was built against.
+See the **Introduction** page there for the full component catalog and fidelity notes, and **Decisions** for the four calls this kit is built around — why it is desktop-only, why accessibility outranks Figma fidelity, which contrast failures are accepted and why, and why field labels are `sr-only` by default.
 
 Built for, and consumed by, **[ravn-task-management-challenge](https://github.com/f3r21/ravn-task-management-challenge)** ([live app](https://ravn-task-management-challenge.vercel.app)).
 
@@ -15,9 +15,20 @@ Built for, and consumed by, **[ravn-task-management-challenge](https://github.co
 
 ### 1. Install the package
 
+This package is not on any registry — `npm install @ravn/ui-kit` resolves to something
+else entirely. Install it from this repository, pinned to a tag:
+
 ```bash
-npm install @ravn/ui-kit
+npm install github:f3r21/ravn-ui-kit#v0.4.0
 ```
+
+The repository is public, so this clones anonymously: no token, no `.npmrc`, nothing to
+configure in CI. Pin a **tag**, not a branch — a branch reference re-resolves on every
+`npm ci` and gives you a different package on the same lockfile entry.
+
+`dist/` is committed here precisely so this works. A git install runs no build step, so
+what you get is exactly the artifact that was tagged; CI fails if that artifact does not
+match the source beside it.
 
 ### 2. Wire up styles
 

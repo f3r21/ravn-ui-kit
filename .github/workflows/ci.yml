@@ -20,13 +20,55 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # What is locked across this repo and the consuming app is the **Node version**,
+      # not these action majors. Node decides the bytes `npm run build` produces, which
+      # is why it is pinned in `.nvmrc` and why the committed `dist/` freshness check
+      # below only means anything if both pipelines agree on it.
+      #
+      # These `actions/*` majors are a different thing: they govern the runner-side JS
+      # runtime of the action wrapper, not the toolchain that builds the code. Holding
+      # them identical across the two repositories buys nothing the Node pin does not
+      # already buy, and it costs currency — an older major is the real risk, not a
+      # difference between the two. Both repositories let them float to current via
+      # Dependabot's `github-actions` ecosystem instead (`.github/dependabot.yml`).
+      #
+      # Consistent with the SHA-pinning rule further down, which is this same rule read
+      # the other way round: what is placed under control there is privilege, not
+      # version. Only the two actions on the Pages publish path are pinned to full
+      # commit SHAs. `actions/checkout` and `actions/setup-node` are not, on purpose —
+      # an outdated major is the live risk for them, and a pin is the wrong instrument
+      # for that. Nor is `dependency-review-action` between them, for the same reason:
+      # it holds no write scope either.
+      #
+      # Note checkout and setup-node are currently three majors behind (`@v7` is current
+      # for both) — that is the gap Dependabot is expected to close, not a pin to preserve.
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Diffs the dependency graph of the base commit against the head commit and fails
+      # when the pull request *introduces* a dependency carrying a known advisory. That is
+      # the thing `npm audit` structurally cannot do: audit sees the tree the branch
+      # produces, so a vulnerability inherited from `main` and one added by this PR are
+      # indistinguishable to it, and the second is the one worth blocking a merge over.
+      #
+      # `pull_request` only — there is no base/head pair to diff on a push or a manual
+      # dispatch, and the action errors rather than skipping. `fail-on-severity` is held
+      # at the audit step's `high` on purpose: two gates disagreeing about what is
+      # acceptable is how a policy stops being one. The action's own default is `low`.
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+      # Kept in step with `.nvmrc` and with the consuming app, which runs 22 and
+      # declares `engines.node: >=22.13.0`. One version across both repos is a
+      # precondition for verifying a committed `dist/` — a freshness check run on
+      # two different majors can disagree about a build that is in fact fine.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: .nvmrc
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -42,23 +84,102 @@ jobs:
       - name: Build library
         run: npm run build
 
+      # `dist/` is committed, because the consuming app installs this package straight
+      # from GitHub and a git install runs no build (see `.gitignore`). A committed
+      # build artifact is only worth anything if it matches the source beside it, and
+      # nothing else in either repository checks that — a stale `dist/` surfaces on the
+      # app's deploy, in front of whoever is reading it. This step is that check: the
+      # build ran immediately above, so any difference here is source that was changed
+      # without rebuilding.
+      #
+      # `--intent-to-add` is load-bearing, not decoration. A bare `git diff --exit-code
+      # dist/` compares tracked files only, so a build that *emits a new chunk* leaves
+      # it untracked and invisible: the diff is empty, the guard passes green, and the
+      # tarball ships without the chunk. `--intent-to-add` registers untracked paths
+      # with git so the diff can see them.
+      #
+      # `.gitattributes` marks `dist/**` as `-diff`, so a failure prints "Binary files
+      # differ" rather than a 100 KB patch. The exit code is still non-zero and the
+      # guard still works — do not "fix" the output by dropping the attribute, which
+      # exists so a generated file does not drown out real changes in review.
+      - name: Check committed dist/ is fresh
+        run: |
+          git add --intent-to-add dist/
+          git diff --exit-code dist/ || {
+            echo "::error::dist/ is stale. Run 'npm run build' and commit the result."
+            exit 1
+          }
+
       - name: Build Storybook
         run: npm run build:storybook
+
+      # Chromium is not on the runner image, and `@storybook/test-runner` will not fetch it
+      # for you — it fails at launch instead. `--with-deps` pulls the shared libraries the
+      # headless browser needs, which a dev machine already has and a fresh runner does not.
+      # Chromium only: the accessibility findings this gates on are engine-independent, and
+      # three browsers would triple the step for no additional signal.
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      # The gate above never renders a component. `src/styles/contrast.test.ts` checks
+      # tokens against each other and the unit suite runs in jsdom, so a component that
+      # composes two individually-fine tokens into a failing pair passes both. This serves
+      # the Storybook built in the previous step and runs axe over all 145 stories in a real
+      # browser, failing on any finding not recorded in `.storybook/a11y-allowlist.ts`.
+      #
+      # If this step reports every story as failing, read the first message rather than the
+      # count: a runner that cannot reach the served Storybook fails the same way a genuine
+      # wall of violations does, and the runner says which it is.
+      - name: Accessibility (axe over every story)
+        run: npm run test:a11y:ci
 
       # Uploaded in the shape `actions/deploy-pages` consumes, rather than as a
       # plain artifact. The build already happened above; publishing it is the
       # only step that was missing, and without it the README's opening line —
       # go and look at the Storybook — pointed at nothing a reader could open.
+      #
+      # ── Why this one is SHA-pinned, and `checkout`/`setup-node` above are not ──
+      #
+      # One rule, not two calls: what is placed under control here is **privilege, not
+      # version**. This step and `deploy-pages` in the job below are the two halves of
+      # the Pages publish path, which is the only privileged thing this workflow does —
+      # that job is the sole holder of `pages: write` + `id-token: write`, and this step
+      # decides the bytes it publishes. Pinning only the half holding the token would be
+      # theatre: a moved tag *here* lands arbitrary content on the public site through
+      # the privileged job downstream, without ever needing the scopes itself. Both
+      # halves or neither.
+      #
+      # `actions/checkout` and `actions/setup-node` stay on floating majors under the
+      # same rule: they hold no write scope, they govern the runner-side JS runtime of
+      # the action wrapper rather than the toolchain that builds the code, and for them
+      # an outdated major is the live risk — so they are expected to keep moving via the
+      # `github-actions` Dependabot ecosystem (`.github/dependabot.yml`). Pinning the two
+      # below costs nothing in currency, because Dependabot updates SHA pins and their
+      # trailing version comment too. Both actions already have a v5 and are expected to
+      # arrive that way: the pin records what runs today, it does not hold a version back.
       - name: Package Storybook for Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: storybook-static
 
-      # audit-level=high: repo has one known, accepted moderate vuln (uuid via
-      # @storybook/addon-essentials -> @storybook/addon-actions). Fixing it
-      # requires downgrading @storybook/addon-essentials to 7.0.6 (a breaking
-      # Storybook change), tracked separately — not fixed here. This level
-      # still fails CI on any new high/critical vulnerability.
+      # `high` is a policy about what stops a merge. It is not a record of anything
+      # accepted, and nothing is accepted: `npm audit` reports **0 vulnerabilities even
+      # at `moderate`**. (This comment used to describe a known-accepted moderate `uuid`
+      # advisory via `@storybook/addon-essentials`, said fixing it meant downgrading to
+      # Storybook 7.0.6, and outlived the actual fix — `"overrides": { "uuid": "^11.1.1" }`
+      # in package.json — by several releases, leaving every reader since believing there
+      # was an open hole.)
+      #
+      # The bar stays at `high` because everything this audit sees below the two runtime
+      # dependencies is devDependencies: the package ships no server, and Storybook's
+      # transitive graph produces moderates on a schedule. Lowering it would trade a gate
+      # that means something for a recurring red build nobody can act on — which is how
+      # the stale comment above came to exist in the first place.
+      #
+      # The dependency-review step at the top of this job holds the same severity bar but
+      # a different scope: it sees what a pull request *adds*, so an advisory that arrives
+      # with a new dependency is attributable to the change that brought it, not just to
+      # the tree.
       - name: Audit dependencies
         run: npm audit --audit-level=high
 
@@ -96,6 +217,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      # SHA-pinned under the rule stated in full at `upload-pages-artifact` in the `ci`
+      # job above — privilege, not version. This is the half of the Pages publish path
+      # that holds the scopes: `pages: write` and `id-token: write`, declared directly
+      # above and granted nowhere else in this workflow. It is therefore the one place
+      # in the repository where a moved tag buys an attacker something real, namely an
+      # OIDC-authenticated publish to the live documentation site.
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

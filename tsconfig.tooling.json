@@ -1,0 +1,17 @@
+{
+  // `tsconfig.json` has `include: ["src"]`, and it has to stay that way: `vite-plugin-dts`
+  // reads it to decide what to emit declarations for, and widening it is how
+  // `dist/.storybook/decorators.d.ts` leaked into the published package once already.
+  //
+  // The consequence was that nothing under `.storybook/` was ever typechecked — including
+  // `test-runner.ts`, which decides whether CI's accessibility gate passes. This config
+  // exists only so `npm run typecheck` covers it. It never emits.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "declaration": false,
+    "declarationDir": null
+  },
+  "include": [".storybook", "*.ts"]
+}

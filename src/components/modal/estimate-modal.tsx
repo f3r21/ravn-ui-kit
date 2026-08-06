@@ -54,8 +54,30 @@ export function EstimateModal({
     >
       <div className="flex items-center h-8 px-4">
         {/* `--color-muted-on-dark`, not `--color-muted`: this popover is `surface-overlay`,
-            where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. */}
-        <span className="text-body-xl font-semibold text-muted-on-dark font-sans whitespace-nowrap">
+            where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. As
+            rendered here the pairing measures 5.11:1, so the colour was never the fragile
+            part of this line — the width was.
+
+            `truncate`, not `whitespace-nowrap`. `truncate` is nowrap *plus* `overflow:
+            hidden`, and that second half is what actually keeps the label inside the card.
+            This popover is a hard `w-[122px]` from Figma, so `px-4` leaves an 88px content
+            box — and "Estimate" at 20px/600 does not reliably fit in 88px. `--font-sans` is
+            `'SF Pro Display', system-ui, sans-serif`, and the kit ships none of those: on
+            macOS the *second* entry saves it, because `system-ui` resolves to the SF system
+            font at 86.5px. A Linux runner has neither, falls through to `sans-serif` ->
+            DejaVu Sans, and renders the same string at 105.5px. With bare nowrap the label
+            then overran the popover's own border by 0.5px: invisible on a Mac, a real
+            overflow on every Linux and Windows machine, and enough that axe stopped
+            reporting this element as passing contrast and started reporting it as
+            unmeasurable
+            (`incomplete`/`elmPartiallyObscured` — axe will not compute a ratio for text
+            whose background box does not contain it). That is how a layout bug arrived
+            looking like a colour finding, and why local runs and CI disagreed about the
+            accessibility baseline at all. `overflow: hidden` also drops this flex item's
+            automatic minimum size from min-content to 0, which is the mechanism that lets
+            the label clip rather than push out of the box. `LabelModal` and `AssigneeModal`
+            render the same header and already use `truncate`; this one was the outlier. */}
+        <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
           Estimate
         </span>
       </div>

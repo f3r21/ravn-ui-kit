@@ -26,16 +26,20 @@ export interface AddTaskModalProps {
     assignee?: Assignee;
     label?: Label;
   }) => void;
-  /** Pre-fills the title field (edit flow — reopening on an existing task). */
-  initialTitle?: string;
-  /** Pre-fills the due-date trigger (edit flow). */
-  initialDueDate?: Date;
-  /** Pre-fills the estimate trigger (edit flow). */
-  initialPoints?: number;
-  /** Pre-fills the assignee trigger (edit flow). */
-  initialAssignee?: Assignee;
-  /** Pre-fills the label trigger (edit flow). */
-  initialLabel?: Label;
+  /**
+   * Pre-fills the title field (edit flow — reopening on an existing task). Uncontrolled:
+   * read when the widget opens, then owned by the field until it closes and reopens.
+   * @default ''
+   */
+  defaultTitle?: string;
+  /** Pre-fills the due-date trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
+  defaultDueDate?: Date;
+  /** Pre-fills the estimate trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
+  defaultPoints?: number;
+  /** Pre-fills the assignee trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
+  defaultAssignee?: Assignee;
+  /** Pre-fills the label trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
+  defaultLabel?: Label;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -68,8 +72,17 @@ export interface AddTaskModalProps {
  * space) reuses this exact same "Add Task Modal" component (identical 578×184/neutral-3/8px
  * anatomy) reopened with the Estimate ("0 Points") and Assignee ("Jerome Bell") triggers
  * already filled — confirming Edit is this same widget pre-populated, not a distinct
- * component. `initialTitle`/`initialDueDate`/`initialPoints`/`initialAssignee` (all optional,
- * defaulting to the prior blank-create behavior) seed the internal state for that reuse.
+ * component. `defaultTitle`/`defaultDueDate`/`defaultPoints`/`defaultAssignee`/`defaultLabel`
+ * (all optional, defaulting to the prior blank-create behavior) seed the internal state for
+ * that reuse — re-read every time the widget is reopened, not only on first mount, because
+ * `isOpen` gates rendering below the hooks and therefore never unmounts the state.
+ *
+ * They were `initial*` until 0.4.0. The kit's prefix for an uncontrolled seed is `default*`
+ * everywhere else (`defaultValue`, `defaultSelected`, `defaultSelectedKey`, `defaultOpen`),
+ * following React Aria, and one component spelling it differently is a reason to check the
+ * source rather than trust the pattern. The semantics are the `default*` ones: read at open,
+ * then owned by the field — this widget's open is its mount, since a closed one renders
+ * nothing.
  */
 export function AddTaskModal({
   isOpen,
@@ -77,18 +90,18 @@ export function AddTaskModal({
   assignees = [],
   labels = [],
   onSubmit,
-  initialTitle = '',
-  initialDueDate,
-  initialPoints,
-  initialAssignee,
-  initialLabel,
+  defaultTitle = '',
+  defaultDueDate,
+  defaultPoints,
+  defaultAssignee,
+  defaultLabel,
   className,
 }: AddTaskModalProps) {
-  const [title, setTitle] = React.useState(initialTitle);
-  const [dueDate, setDueDate] = React.useState<Date | undefined>(initialDueDate);
-  const [points, setPoints] = React.useState<number | undefined>(initialPoints);
-  const [assignee, setAssignee] = React.useState<Assignee | undefined>(initialAssignee);
-  const [label, setLabel] = React.useState<Label | undefined>(initialLabel);
+  const [title, setTitle] = React.useState(defaultTitle);
+  const [dueDate, setDueDate] = React.useState<Date | undefined>(defaultDueDate);
+  const [points, setPoints] = React.useState<number | undefined>(defaultPoints);
+  const [assignee, setAssignee] = React.useState<Assignee | undefined>(defaultAssignee);
+  const [label, setLabel] = React.useState<Label | undefined>(defaultLabel);
 
   const [openPopover, setOpenPopover] = React.useState<
     'estimate' | 'assignee' | 'label' | 'date' | null
@@ -102,27 +115,44 @@ export function AddTaskModal({
   const labelTriggerRef = React.useRef<HTMLButtonElement>(null);
   const dateTriggerRef = React.useRef<HTMLButtonElement>(null);
 
-  if (!isOpen) return null;
-
-  const reset = () => {
-    setTitle('');
-    setDueDate(undefined);
-    setPoints(undefined);
-    setAssignee(undefined);
-    setLabel(undefined);
+  // Puts the fields back to what the props say. `useState` above only reads them on the very
+  // first render, and the `isOpen` gate below is a render guard rather than an unmount — the
+  // component keeps its state across a close/open cycle — so without this, reopening for a
+  // *different* task showed the previous one's values, or nothing at all.
+  const seedFromProps = () => {
+    setTitle(defaultTitle);
+    setDueDate(defaultDueDate);
+    setPoints(defaultPoints);
+    setAssignee(defaultAssignee);
+    setLabel(defaultLabel);
     setOpenPopover(null);
   };
+
+  // Re-seed on the closed -> open edge, during render rather than in an effect: React discards
+  // this pass and re-renders with the new state before committing, so the first frame the user
+  // sees is already correct. An effect would paint the stale values first.
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = React.useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) seedFromProps();
+  }
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     onSubmit?.({ title: title.trim(), dueDate, points, assignee, label });
-    reset();
+    // Returns to the props' values rather than blanking the form. For the create flow those
+    // are empty, so this is the clear it always was; for the edit flow it is the task as it
+    // was opened, which is the only defensible reading of "reset" there.
+    seedFromProps();
     onClose();
   };
 
   const handleCancel = () => {
-    reset();
+    seedFromProps();
     onClose();
   };
 

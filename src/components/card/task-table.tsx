@@ -224,7 +224,12 @@ export interface TaskTableRowProps {
    * @default 'normal'
    */
   dueDateUrgency?: DueDateUrgency;
-  /** Called when the row is clicked. */
+  /**
+   * Called when the row is opened. Providing it renders the task title as a real `<button>`
+   * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
+   * whole row clickable for a pointer user. Fires once either way, and not at all when the
+   * row's own controls — the select checkbox, the "Details" link — are used.
+   */
   onClick?: () => void;
 }
 
@@ -262,7 +267,19 @@ export function TaskTableRow({
   onClick,
   onViewDetails,
 }: TaskTableRowProps) {
+  // A click on one of the row's own controls is not a click on the row. Without this, ticking
+  // the select checkbox or following the "Details" link also fired `onClick` and opened the
+  // task — including from the keyboard, where activating a control synthesises a click that
+  // bubbles just the same.
+  const stopRowOpen = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
+    // The row-wide handler is a pointer convenience only. A `<tr>` cannot be the control
+    // itself — giving it `role="button"` would strip its `row` role and break the table it
+    // has to live in — so the keyboard and screen-reader affordance is the title button in
+    // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
+    // existed this handler was the only way to open a task from the table, and it was
+    // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
     <tr onClick={onClick} className={cn('group', onClick && 'cursor-pointer')}>
       {/* Task Name Cell: padding 4px 16px 4px 0px -- the left edge is 0 so the accent stripe
           sits flush against it. */}
@@ -274,7 +291,14 @@ export function TaskTableRow({
               drawn on this label via `:has()`, and under that variant `outline-2` alone
               leaves `outline-style` unresolved: the ring computed a width and a colour and
               painted nothing. Verified by counting pixels in a real browser, 0 -> 291. */}
-          <label className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1">
+          {/* The handler below is a propagation guard, not an activation path — what a
+              keyboard operates here is the real `<input type="checkbox">` this label wraps,
+              which is exactly what the two suppressed rules exist to require. */}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
+          <label
+            onClick={stopRowOpen}
+            className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1"
+          >
             <input
               type="checkbox"
               className="sr-only"
@@ -294,7 +318,27 @@ export function TaskTableRow({
           <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>
             {String(index).padStart(2, '0')}
           </span>
-          <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
+          {/* The row's opener. A real `<button>` rather than a `role`/`tabIndex`/`onKeyDown`
+              trio on some wrapper: its accessible name is the task title, and focus, Enter
+              and Space come from the platform. It carries `truncate` itself so a long title
+              still clips at the column edge. */}
+          {onClick ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                stopRowOpen(e);
+                onClick();
+              }}
+              className={cn(
+                CELL_TEXT,
+                'flex-1 min-w-0 truncate text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1',
+              )}
+            >
+              {title}
+            </button>
+          ) : (
+            <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
+          )}
           {reactions.map((r) => (
             <span
               key={r.emoji}
@@ -307,7 +351,10 @@ export function TaskTableRow({
           {onViewDetails ? (
             <button
               type="button"
-              onClick={onViewDetails}
+              onClick={(e) => {
+                stopRowOpen(e);
+                onViewDetails();
+              }}
               className={cn(
                 CELL_TEXT,
                 // `hover:text-interactive-text`, not `hover:text-interactive`: this is a

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { TaskTable } from './task-table';
+import { TaskTable, type TaskTableRowProps } from './task-table';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -47,6 +47,99 @@ describe('TaskTable Component', () => {
       <TaskTable groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe' }] }]} />,
     );
     expect(screen.queryByText('—')).toBeNull();
+  });
+
+  describe('opening a task from the table', () => {
+    const renderRow = (row: Partial<TaskTableRowProps> = {}) =>
+      render(
+        <TaskTable
+          groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe', ...row }] }]}
+        />,
+      );
+
+    it('renders no opener when the row is not clickable', () => {
+      renderRow();
+      expect(screen.queryByRole('button', { name: 'Create wireframe' })).toBeNull();
+    });
+
+    /**
+     * The defect this pins: the row's only affordance used to be `onClick` on the `<tr>`,
+     * with no `role`, `tabIndex` or `onKeyDown` anywhere — so a keyboard or screen-reader
+     * user could not open a task from the table at all. Driven with the keyboard on
+     * purpose: `element.click()` passes against the broken version and reports nothing.
+     */
+    it('reaches the opener by tabbing and fires it with Enter', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      renderRow({ onClick });
+
+      await user.tab(); // the row-select checkbox
+      await user.tab(); // the title, which is the opener
+
+      const opener = screen.getByRole('button', { name: 'Create wireframe' });
+      expect(document.activeElement).toBe(opener);
+      expect(opener.tagName).toBe('BUTTON');
+
+      await user.keyboard('{Enter}');
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires the opener with Space', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      renderRow({ onClick });
+
+      screen.getByRole('button', { name: 'Create wireframe' }).focus();
+      await user.keyboard(' ');
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('opens once, not twice, when the opener is clicked with a pointer', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      renderRow({ onClick });
+
+      await user.click(screen.getByRole('button', { name: 'Create wireframe' }));
+
+      // The row itself is still clickable for a pointer user, so the opener has to stop the
+      // click from bubbling into that handler as well.
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('still opens from a click anywhere else in the row', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      renderRow({ onClick, assigneeName: 'Jonah Doe' });
+
+      await user.click(screen.getByText('Jonah Doe'));
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not open the task when the row-select checkbox is used', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const onSelectedChange = vi.fn();
+      renderRow({ onClick, onSelectedChange });
+
+      await user.click(screen.getByRole('checkbox', { name: 'Select Create wireframe' }));
+
+      expect(onSelectedChange).toHaveBeenCalledWith(true);
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('does not open the task when the Details link is used', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const onViewDetails = vi.fn();
+      renderRow({ onClick, onViewDetails });
+
+      await user.click(screen.getByRole('button', { name: 'Details' }));
+
+      expect(onViewDetails).toHaveBeenCalledTimes(1);
+      expect(onClick).not.toHaveBeenCalled();
+    });
   });
 
   /**

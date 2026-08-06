@@ -117,6 +117,41 @@ export const Playground: Story = {
   },
 };
 
+/**
+ * Rows with an `onClick`. The title becomes a real `<button>` — tab to it and press Enter or
+ * Space — and the rest of the row stays clickable for a pointer user. The row's own controls
+ * (select checkbox, "Details") do not open the task.
+ */
+export const ClickableRows: Story = {
+  args: {
+    groups: [
+      {
+        title: 'To Do (02)',
+        rows: [
+          {
+            index: 1,
+            title: 'Create wireframe',
+            estimationPoints: 4,
+            assigneeName: 'Amelia Nellson',
+            dueDate: '6 July, 2020',
+            onClick: fn(),
+            onSelectedChange: fn(),
+          },
+          {
+            index: 2,
+            title: 'Slack Logo Design',
+            estimationPoints: 2,
+            assigneeName: 'Jonah Doe',
+            dueDate: '6 July, 2020',
+            onClick: fn(),
+            onViewDetails: fn(),
+          },
+        ],
+      },
+    ],
+  },
+};
+
 export const Empty: Story = {
   args: { groups: [] },
 };

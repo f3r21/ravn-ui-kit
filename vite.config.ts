@@ -43,6 +43,21 @@ export default defineConfig({
       fileName: () => 'index.js',
     },
     rollupOptions: {
+      // Everything a consumer already resolves for itself. The first six are the
+      // declared `peerDependencies`, which is the obvious case. `clsx` and
+      // `tailwind-merge` are ordinary `dependencies` and belong here for a different
+      // reason: npm installs them into the consumer's tree either way, so bundling
+      // them ships a *second*, private copy alongside the one that is already there —
+      // and nothing imports the installed one. Left out of this list, `dist/index.js`
+      // began with clsx's source verbatim and carried tailwind-merge's config trie
+      // inline.
+      //
+      // The duplication is worse than bytes for `tailwind-merge`. A Tailwind v4 app
+      // near-certainly has its own instance (ours does), and a consumer that calls
+      // `extendTailwindMerge` to teach it about custom class groups can only reach
+      // that instance — a copy sealed inside this bundle would keep resolving the
+      // kit's own `cn()` calls under the stock config, silently disagreeing with the
+      // app about which of two conflicting classes wins.
       external: [
         'react',
         'react-dom',
@@ -50,6 +65,8 @@ export default defineConfig({
         'react-aria',
         'react-stately',
         '@internationalized/date',
+        'clsx',
+        'tailwind-merge',
       ],
       output: {
         globals: {

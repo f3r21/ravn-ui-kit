@@ -8,6 +8,430 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-06
+
+**The first release that can be installed at all, and the first anyone installs by tag.**
+Until now the only consumer got this package by committing a copy of `dist/` into its own
+repository. `dist/` is committed _here_ now, `LICENSE` ships in the tarball, and the
+install is:
+
+```bash
+npm install github:f3r21/ravn-ui-kit#v0.4.0
+```
+
+**Breaking, despite the minor version bump.** `AddTaskModal`'s `initialTitle`,
+`initialDueDate`, `initialPoints`, `initialAssignee` and `initialLabel` props are now
+`defaultTitle`, `defaultDueDate`, `defaultPoints`, `defaultAssignee` and `defaultLabel`.
+**No alias is kept** — a consumer passing the old names gets a type error, and at runtime
+the seed values are simply ignored. This lands as a minor bump under SemVer's pre-1.0
+carve-out, per `CONTRIBUTING.md`'s versioning policy, which requires calling it out
+explicitly either way. Full rationale under **Changed**, below.
+
+Also note under **Changed**: `clsx` and `tailwind-merge` are no longer bundled into
+`dist/index.js`. They are declared `dependencies`, so a normal install resolves them — but
+a consumer vendoring the built output by hand, rather than installing the package, now has
+two unresolved bare imports.
+
+### Added
+
+- **The package installs straight from GitHub, and `dist/` is committed to make that
+  possible.** The consuming app held a copy of this repo's build output at
+  `vendor/ravn-ui-kit` and installed it as `file:./vendor/ravn-ui-kit`. Measured in that
+  repository at `af790e0`, that copy is **50.4% of all line churn in it** — 22,859 of
+  45,346 lines, across 11 commits, because minified output reflows on any change. It was
+  also unverifiable: the app's lockfile entry is
+  `{"resolved": "vendor/ravn-ui-kit", "link": true}`, carrying no version and no integrity
+  hash, so `@ravn/ui-kit@0.3.0` names **three** mutually different `dist/` trees in that
+  repo's history — and `0.2.0` names **eight** — with nothing able to detect it.
+
+  Vendoring was originally chosen because this repository was private and reaching it from
+  the app's CI would have needed a cross-repo PAT secret. It is public now, so `npm ci`
+  clones it anonymously — no secret, no permission widening.
+
+  What still blocked a git install was `.gitignore`. **A git install runs no build**: npm
+  clones, looks for a `prepare` script, finds none, and packs whatever `package.json`'s
+  `files` names. With `dist/` ignored, that tarball shipped an exports map whose four
+  entries all pointed at files that were not in it.
+
+  `"prepare": "npm run build"` would have fixed that and was rejected: it makes every
+  consumer install — their CI, every preview deploy, every worktree — pull this repo's
+  dependency tree (614 distinct `name@version`, 432 MB of `node_modules`) and run a full
+  build. Committing 275 KB of generated output (281,596 bytes across the four files) keeps
+  installs as fast as they are and keeps the build in the repo that owns it.
+  `.gitattributes` already marked `dist/**` as `linguist-generated -diff`, so GitHub
+  collapses it in review and local diffs skip it.
+
+  The build was confirmed byte-identical across two consecutive runs before anything was
+  committed, because the freshness guard below would otherwise fail on every pull request
+  forever. It has since been confirmed byte-identical **across machines** too, which two
+  runs on one machine cannot show: the guard passed on `ubuntu-latest` against a `dist/`
+  built on macOS. Same Node major, from `.nvmrc`, which is why that pin is a precondition
+  for this whole arrangement rather than housekeeping.
+
+- **A CI step that fails when the committed `dist/` is stale** (`Check committed dist/ is
+fresh`, immediately after `Build library`). A committed build artifact is worth nothing
+  unless it matches the source beside it, and nothing checked that — a stale `dist/` would
+  surface on the app's deploy rather than here.
+
+  It runs `git add --intent-to-add dist/ && git diff --exit-code dist/`. The
+  `--intent-to-add` half is load-bearing: a bare `git diff --exit-code dist/` sees tracked
+  files only, so a build emitting a **new** chunk leaves it untracked and invisible — empty
+  diff, green guard, tarball missing the chunk, which is the exact failure the guard exists
+  to prevent. Because of the `-diff` attribute a failure prints "Binary files differ"
+  instead of a six-figure patch; the exit code is still non-zero, and
+  `.github/workflows/ci.yml` says so, since the obvious "fix" is to drop the attribute and
+  reintroduce the review noise it removes.
+
+- **A `Decisions` page in the published Storybook** (`src/styles/decisions.mdx`), beside
+  `Introduction`. Four decisions this kit is built around had no version-controlled home
+  a reader could reach: two lived only in host-local agent memory (the kit is
+  deliberately desktop-only; the remaining axe contrast findings are accepted rather than
+  outstanding), and two were recorded only in scattered call-site comments (WCAG AA
+  outranks Figma fidelity, with the measured ratio written down; field labels are
+  `sr-only` by default). They are now in `CONTRIBUTING.md`'s "Design values" for someone
+  about to write a component, and on that page for someone who has only ever seen
+  https://f3r21.github.io/ravn-ui-kit/.
+
+  Every figure on the page names a tracked file. That is the point of it: the same pass
+  removed three figures from `CLAUDE.md` that could not be derived from anything in this
+  repository — see below.
+
+- **`CONTRIBUTING.md` now states where a documentation page goes.** Its four Storybook
+  buckets only ever covered component stories; `Introduction` has sat outside them since
+  it was written, unexplained. Prose pages are top level, and adding one means adding its
+  title to `storySort.order` too, or it sorts below `Layout/`. The section also records
+  two MDX traps a green build does not reveal: pipe tables do not render (no
+  `remark-gfm`, which `typography.mdx` and `colors.mdx` demonstrate today), and
+  `{/* … */}` comments do not survive `npm run format`.
+
+- **An MIT `LICENSE`, and a matching `license` field in `package.json`.** The repo is
+  public and had neither, which is not "permissively licensed by omission" — default
+  copyright reserves every right, so the app consuming this as a git dependency had no
+  grant to do so.
+- **`.nvmrc`** (`22`). The CI workflow now reads it via `node-version-file` rather than
+  repeating the number, so the two cannot drift.
+- **`.github/dependabot.yml`** — grouped, weekly, in the shape the consuming app already
+  uses, plus two groups the app has no need of (`storybook`, whose addons must move in
+  lockstep with the core package, and `build-tooling`, which decides what `dist/` looks
+  like) and a `github-actions` ecosystem block.
+
+  That last block settles a rule the consuming app had written the other way. What is
+  locked across the two repositories is the **Node version** — it decides the bytes
+  `npm run build` produces, which is the whole basis of the `dist/` freshness check.
+  `actions/checkout` and `actions/setup-node` majors govern the runner-side runtime of the
+  action wrapper, not the toolchain that builds the code, so holding them identical buys
+  nothing the Node pin does not already buy and costs currency. Both are three majors
+  behind current; Dependabot is expected to close that. The same principle governs which
+  actions get SHA-pinned: privilege, not version. The rule is stated in
+  `.github/workflows/ci.yml` in both repositories rather than in a review thread.
+
+- **A dependency-review gate on `pull_request`** (`actions/dependency-review-action`). It
+  diffs the base commit's dependency graph against the head commit's and fails when a pull
+  request _introduces_ a dependency carrying a known advisory. `npm audit` structurally
+  cannot do that: it sees the tree the branch produces, so a vulnerability inherited from
+  `main` and one this PR added are indistinguishable to it. Held at the audit step's
+  `fail-on-severity: high` rather than the action's `low` default, so the two gates cannot
+  disagree about what is acceptable. CodeQL was considered and skipped — on a component
+  library with no server-side logic it finds approximately nothing.
+- **`.github/pull_request_template.md`** — what changed, why, and how it was verified as a
+  checklist of commands actually run. Its "Second-session review:" line holds the review
+  permalink, which is the only evidence of review this repo can produce (see below).
+- **An accessibility gate in CI** — `@storybook/test-runner` + `axe-playwright` run axe
+  over all 144 stories in headless Chromium (`npm run test:a11y:ci`), failing the build on
+  any finding not listed in `.storybook/a11y-allowlist.ts`. `@storybook/addon-a11y` was
+  already installed and registered, but it only paints violations in the Storybook UI: CI
+  ran `gate` + `build` + `build:storybook` and never rendered a story in a browser, so
+  everything the 0.3.0 palette pass fixed was guarded by nothing but memory.
+
+  The allowlist is keyed to **story id x rule id**, not to a count or a threshold, because
+  a bare budget lets a new violation move in the moment an old one is fixed. A rule firing
+  on a story that does not list it fails; a rule listed for a story that no longer reports
+  it also fails. The list can only be paid down. `incomplete` is ratcheted alongside
+  `violations` for the reason the `Card` entry in 0.3.0 records: axe files exact 1:1 text
+  under `incomplete`, so a violations-only sweep is blind to invisible text.
+
+  This does not replace `src/styles/contrast.test.ts`, and could not. That test checks
+  pairings no story renders — hover fills, placeholders, surfaces a component may be
+  dropped onto. This one catches what two individually-fine tokens compose into once a
+  component is actually painted. Neither sees the other's cases.
+
+  **The measured baseline, which corrects the figure previously repeated in `CLAUDE.md`:**
+  **21 violation nodes across 16 of 144 stories, plus 5 `incomplete`.** Not "16, all
+  `TextButton`". 16 is the `color-contrast` node count specifically, and 14 of those are
+  `TextButton variant="primary"` — mostly appearing as other components' story triggers,
+  which is why fixing one component would clear twelve entries. The other 2 come from
+  `FloatingPopover`'s story, which hand-rolls its trigger instead of using `TextButton`
+  and so reproduces the same 3.83:1 pairing on markup this package does not ship. Every
+  contrast ratio matches what `contrast.test.ts` already asserts, measured independently
+  by a browser: 3.83:1 on `primary-4`, 2.83:1 on `primary-3`.
+
+  The remaining **5 violation nodes are not contrast at all**, and are the first thing
+  this gate found that no previous audit had: `aria-prohibited-attr` on `TaskMetaBadges`,
+  which renders each badge as `<span aria-label>` with both children `aria-hidden`. A
+  `<span>` with no role is `generic`, `aria-label` is prohibited there and therefore
+  dropped, and both children are hidden — so attachment, subtask and comment counts
+  contribute nothing whatsoever to the accessibility tree. They are silent to a screen
+  reader today. Recorded in the allowlist as open debt rather than fixed here, because the
+  fix is a component change that wants its own test; the allowlist comment says so and
+  says which lines to delete when it lands.
+
+  The 5 `incomplete` findings are all one element — `SidebarItem`'s active label on its
+  gradient wash, which axe cannot measure a ratio against at all (`bgGradient`). It has
+  been measured by hand at 6.67:1 and 6.02:1, and `sidebar-item.tsx` carries the
+  arithmetic; pinning them means a sixth one nobody has looked at fails the build.
+
+### Changed
+
+- **`actions/upload-pages-artifact` and `actions/deploy-pages` are pinned to full commit
+  SHAs.** Everything else in the workflow stays on a floating major, and the comments state
+  that as one rule rather than two unrelated calls: what is placed under control is
+  **privilege, not version**.
+
+  The Pages publish path is the only privileged thing this workflow does.
+  `deploy-storybook` is the sole holder of `pages: write` + `id-token: write`, so a moved
+  tag on `deploy-pages` buys an OIDC-authenticated publish to the live documentation site.
+  `upload-pages-artifact` holds no scope itself — it runs in the `ci` job under the
+  workflow's `contents: read` — but it decides the bytes the privileged job publishes, so
+  pinning only the half holding the token would be theatre. **This corrects the premise
+  the work was filed under**, which had both actions running inside the privileged job;
+  they do not, and the conclusion survives the correction rather than depending on it.
+
+  `actions/checkout` and `actions/setup-node` stay floating under the same rule: no write
+  scope, and they govern the runner-side JS runtime of the action wrapper rather than the
+  toolchain that builds the code, where an outdated major is the live risk. That is the
+  position `.github/dependabot.yml` and `ci.yml` already take on cross-repository lockstep
+  — the Node version is what is locked, action-wrapper majors float to current.
+
+  Pinned at the tags in use (`v3.0.1`, `v4.0.5`), not bumped. Both actions have a v5 and
+  Dependabot's `github-actions` group is expected to propose it, updating the SHA and its
+  trailing comment together; the pin records what runs today rather than holding a version
+  back. Moving a major on the deploy path inside a supply-chain change would leave no way
+  to tell which of the two broke a deploy.
+
+- **CI runs Node 22, not 20.** The consuming app runs 22 and declares
+  `engines.node: >=22.13.0`; a package and its only consumer testing on different majors
+  is a difference waiting to be discovered downstream. It also has to be settled before
+  `dist/` becomes a verified build artifact, since a rebuild-and-diff freshness check only
+  means something if every machine produces the same bytes.
+- **`main` is protected, and CI is now a merge gate rather than a report.** There was no
+  branch protection, no ruleset and no required status check, so a red build did not stop
+  a merge — and all four previous PRs merged with zero reviews. `main` now requires a pull
+  request, requires the `CI` check to pass, enforces all of that on admins, and refuses
+  force-pushes and deletion.
+
+  Three details are load-bearing. The required context is **`CI` and only `CI`** — that is
+  the job's check-run name, and the workflow's second job (`Publish Storybook`) reports
+  `skipped` on `pull_request` events, so requiring it would mean no PR could ever merge.
+  **No approvals are required**: there is one account and GitHub forbids approving
+  your own PR, so a required approval would deadlock the repo outright. Review is a
+  comment-only review from a separate session, recorded in the PR template — configured
+  as `required_approving_review_count: 0` on a _present_ `required_pull_request_reviews`
+  object, because that object's presence is what requires a pull request at all. Setting
+  it to `null` does not mean "no approvals needed", it means no pull request needed, which
+  would remove half the gate while appearing to comply.
+
+  And the branch is **deliberately not required to be up to date before merging**
+  (`strict: false`). One writer means the up-to-date rule prevents no real race, while
+  `dist/` is about to become a committed build artifact — and generated output has no
+  merge driver, so a forced branch update over it is not hand-resolvable. The only correct
+  resolution there is always "rebuild and commit". Turning `strict` on would convert that
+  into a recurring obstacle in exchange for nothing.
+
+  Merged branches are now deleted automatically (`deleteBranchOnMerge`), which had been
+  off since the repo was created.
+
+- **`AddTaskModal`'s `initial*` props are now `default*`** — `initialTitle`,
+  `initialDueDate`, `initialPoints`, `initialAssignee` and `initialLabel` become
+  `defaultTitle`, `defaultDueDate`, `defaultPoints`, `defaultAssignee` and `defaultLabel`.
+  **This is a breaking rename with no alias kept**, landing as a minor bump under SemVer's
+  pre-1.0 carve-out, per `CONTRIBUTING.md`'s versioning policy.
+
+  `initial*` was the only place in the kit using that prefix. Every other uncontrolled seed
+  is `default*` — `defaultValue`, `defaultSelected`, `defaultSelectedKey`, `defaultOpen` —
+  following React Aria, and one component spelling it differently is a reason to go and read
+  the source instead of trusting the pattern. The semantics are the `default*` ones: read
+  when the widget opens, then owned by the field. Opening is this widget's mount, because a
+  closed one renders nothing.
+
+  Done now rather than deferred because the props' behaviour changed in the same release
+  anyway (see the reopen fix below), and because the cost is at its lowest it will ever be:
+  the one consumer imports `Menu`, `Modal`, `MultiSelect` and `Select` and nothing else.
+
+### Fixed
+
+- **`README.md`'s install command, which has never worked.** Step one was
+  `npm install @ravn/ui-kit`. Nothing publishes this package and `@ravn` is not a scope this
+  project owns, so the command either fails or installs a stranger's code. It now shows the
+  git install, and states the two things that make it keep working: pin a tag rather than a
+  branch, because a branch re-resolves on every `npm ci` behind an unchanged lockfile entry;
+  and `dist/` is committed, so what installs is the tagged artifact rather than a rebuild.
+
+- **Three figures in `CLAUDE.md` that no reader could check.** All three came from planning
+  documents that are gitignored, so they read as authoritative and resolved to nothing.
+  - "Current compliance is 99.2%" for JSDoc — `99.2` appears nowhere else in the repo and
+    nothing computes it. The rule (every exported prop carries JSDoc) stands without it.
+  - "Measured 833px floor" — every tracked occurrence of `833` is a Figma line range
+    (`L552-833`) or the hex `#fe833d`. No such measurement exists. The `232px` in the same
+    sentence does: `application-sidebar.tsx:48` is `w-[232px] shrink-0`, so it is kept and
+    cited, and the Decisions page derives what is derivable (328px of `AppShell` chrome, a
+    1436px fitting width for the table view) from class names instead.
+  - "16 axe contrast violations, all `TextButton variant="primary"`" — the count was right
+    by accident (16 nodes) but "all" was not. `.storybook/a11y-allowlist.ts` accepts
+    `color-contrast` on 14 stories: 12 rendering `TextButton`, and 2 rendering a trigger
+    `floating-popover.stories.tsx` hand-rolls with the same pairing. The allowlist is also
+    not uniformly "accepted" — its `aria-prohibited-attr` entries are open debt with an
+    issue attached — which a bare count erased.
+
+- **`README.md` and `introduction.mdx` no longer cite `UI_KIT_MASTER_PLAN.md`.** It is
+  gitignored (`.gitignore:30`), so "see it for the ground-truth audit log this library was
+  built against" resolved to nothing for every reader but its author — and the
+  `introduction.mdx` copy was published. Both now point at `Decisions`, and
+  `introduction.mdx` says plainly that the audit log is not part of this repository and
+  that the per-value citations live at the call site in each component.
+
+- **`clsx` and `tailwind-merge` were compiled into `dist/index.js`.** Both are declared in
+  `dependencies` but neither was in `rollupOptions.external`, so Rollup inlined them — the
+  bundle opened with clsx's source verbatim and carried tailwind-merge's class-group config
+  inline — while npm separately installed the real packages, which nothing imported. A
+  consumer shipped two copies of each.
+
+  For `tailwind-merge` that costs more than bytes. A Tailwind v4 app near-certainly has its
+  own instance, and a consumer calling `extendTailwindMerge` to teach it about custom class
+  groups can only reach that one; the copy sealed inside this bundle would go on resolving
+  the kit's `cn()` calls under the stock config and disagree with the app about which of
+  two conflicting classes wins. Left external, `cn()` imports the consumer's copy.
+
+  **`dist/index.js`: 183,908 → 103,225 bytes, a 44% cut**, which is the whole of it —
+  `dist/ui-kit.css` is byte-identical, and both packages now appear as bare imports. They
+  resolve for the one consumer that exists: the app declares `clsx` and `tailwind-merge` as
+  its own direct dependencies (`^2.1.1`, `^3.6.0`), and npm would install them transitively
+  from this package's `dependencies` in any case.
+
+- **The published prop table was hiding most of the API.** `.storybook/main.ts`'s
+  `propFilter` dropped every prop whose declaring interface resolved out of `node_modules`.
+  Every interactive component here extends a React Aria props interface, so that removed
+  most of what a consumer can actually pass: `Button`'s autodocs listed `variant`,
+  `isSelected`, `children`, `aria-label` and `className`, and hid `onPress`, `isDisabled`,
+  `autoFocus` and `excludeFromTabOrder` — the entire interaction API.
+
+  Measured across the component tree: **236 of 534 props reached a reader**, with ten
+  components affected — `Button`, `TextButton`, `Input`, `Datepicker`, `Select`,
+  `MultiSelect`, `Menu`, `ListBox`, `FloatingPopover`, `FormField`. (`TextButton`, not
+  `Card`, which the work was filed against: `Card` extends only `React.HTMLAttributes`, so
+  everything it hides is DOM noise and it is correctly unchanged at 2 props.) This is worth
+  more than a tidier table — `CONTRIBUTING.md` mandates JSDoc on every exported prop
+  _because_ autodocs publishes it, and `README.md` sends consumers to that Storybook as the
+  API reference, so one line was withholding documentation already written.
+
+  Replaced with an allowlist keyed on `react-aria`, `react-stately`, `@react-types/*` and,
+  defensively, the scoped `@react-aria/*`/`@react-stately/*` names. **The umbrella packages
+  are the load-bearing part.** This kit imports from `react-aria`/`react-stately` per
+  CONTRIBUTING.md's hooks-only rule, so docgen resolves parents to
+  `node_modules/react-aria/dist/types/**` — an allowlist of the scoped names alone, which
+  is the obvious form of this fix, matches nothing here and would go on hiding `isDisabled`
+  while looking correct.
+
+  `@types/react`'s 531 DOM attributes stay hidden; that is what the original filter was
+  for. React Aria documents its own props, so nothing restored here renders as a blank row:
+  **zero of the 534 are undocumented.** Verified in a real `build:storybook` rather than
+  from the config — `Button`'s emitted docgen block carries 43 props including all four
+  named above, and no `accessKey`/`contentEditable`/`onAnimationStart`.
+
+- **`src/index.ts`'s `import './styles/theme.css'` is annotated as build-time only.** It
+  reads like "importing the barrel gives you styles", and it does not: `@tailwindcss/vite`
+  extracts it to `dist/ui-kit.css` and emits no `.css` import into `dist/index.js`, so
+  nothing resolves at a consumer's runtime and `sideEffects: ["*.css"]` is correct but
+  moot. `README.md` §2 documents the real, manual two-path step.
+
+  Annotated rather than removed, and the comment says why: this import is the only thing
+  pulling `tailwindcss` and `tokens.css` into the library build graph, which makes it the
+  sole reason `dist/ui-kit.css` is emitted at all. Deleting it as dead code takes that file
+  with it, and with it `package.json`'s `"./ui-kit.css"` export and README §2's Path B.
+
+- **A CI comment described a vulnerability that had been fixed.** The `Audit dependencies`
+  step claimed one known, accepted moderate `uuid` advisory via
+  `@storybook/addon-essentials`, and that clearing it meant downgrading to Storybook 7.0.6.
+  It was cleared instead, by `"overrides": { "uuid": "^11.1.1" }` in `package.json`, and the
+  comment outlived the fix — `npm audit` reports **0 vulnerabilities even at `moderate`**.
+  Every reader since had been told there was an open hole.
+
+  Replaced rather than deleted, because `--audit-level=high` needs a reason now that its
+  stated one is gone: it is a policy about what stops a merge, not a record of anything
+  accepted.
+
+- **`EstimateModal`'s header label overflowed its own popover on every machine without
+  Apple's system font** — which is every Linux and Windows one, CI included.
+  `whitespace-nowrap` is now `truncate`.
+
+  `--font-sans` is `'SF Pro Display', system-ui, sans-serif` and this package ships none
+  of the three, so the rendered width of a label depends on the machine. macOS is saved by
+  the _second_ entry — `system-ui` resolves to the SF system font, and "Estimate" at
+  20px/600 measures 86.5px, inside the 88px content box that `w-[122px]` plus `px-4`
+  leaves. A Linux runner has neither of the first two, falls through to `sans-serif` ->
+  DejaVu Sans, and renders the same string at 105.5px — past the popover's own border.
+  `whitespace-nowrap` supplies only half of what was needed here; `truncate` adds
+  `overflow: hidden`, which both clips the label inside the card and drops the flex item's
+  automatic minimum size from min-content to 0 so it can clip at all. `LabelModal` and
+  `AssigneeModal` render the identical header and already used `truncate`; `EstimateModal`
+  was the outlier, and neither of the other two has enough text to overflow anyway.
+
+  This surfaced as an accessibility failure rather than a visual one, because axe refuses
+  to compute a contrast ratio for text whose background box does not contain it: it
+  reported `color-contrast` as `incomplete`/`elmPartiallyObscured` on
+  `Components/Modal/Estimate`'s two stories in CI and reported nothing at all on macOS.
+  The colour was never in question — the pairing measures **5.11:1**, and does so in both
+  environments now. A 0.5px overflow was.
+
+  The gate is what caught it, and the shape of the catch is worth keeping: because the
+  ratchet is bidirectional, an environment-specific finding has no valid allowlist entry —
+  listing it fails locally as `GONE`, omitting it fails CI as `NEW`. There was no way to
+  record this and no way to avoid fixing it. `.storybook/a11y-allowlist.ts` and
+  `CONTRIBUTING.md` now say so, and `CONTRIBUTING.md` gives the one-line devtools override
+  that reproduces the runner's wider font locally.
+
+- **`TaskTableRow` could not be opened from the keyboard at all.** Its `onClick` sat on the
+  `<tr>` with no `role`, no `tabIndex` and no `onKeyDown`, so opening a task from the table —
+  the primary task surface in the consuming app — required a pointer. The title now renders
+  as a real `<button>` when the row is clickable, named by the task title, and the row-wide
+  handler stays beside it as a pointer convenience. The `<tr>` itself could not become the
+  control: `role="button"` on it strips the `row` role the table depends on.
+
+  The row's own controls no longer open the task either. The select checkbox and the
+  "Details" link bubbled their clicks into the row handler, so ticking a checkbox opened the
+  task you were trying to select — and that only gets more reachable now that the row's
+  controls sit in a keyboard sequence, since activating a control synthesises a click that
+  bubbles the same way.
+
+- **`TaskCard` was one giant ARIA button.** It solved the same problem correctly — `role="button"`
+  - `tabIndex={0}` + Enter/Space on the card container — but at the container's expense: the
+    control's accessible name was the card's entire text content ("Fix bug 5 Pts OVERDUE BUG
+    Fernando Ramirez 12 comments"), and every interactive child it may hold sat inside a button,
+    which is invalid. It now uses the same explicit title button as the table row, via a new
+    optional `onTitleClick` on `ProjectInfo`.
+
+  That container role was also masking real findings. A button's descendants are
+  _presentational children_ in ARIA, so axe stopped evaluating roles inside the card and never
+  reached `TaskMetaBadges`' `aria-prohibited-attr` defect — which its own stories have been
+  reporting all along. Two `TaskCard` stories now report it too. Nothing about the badges
+  changed; the mask came off. Both new allowlist entries carry the same pointer to the issue
+  that closes all four.
+
+- **`AddTaskModal` came back up holding the previous task's values.** `isOpen` gates rendering
+  _below_ the hooks, so the widget is never unmounted and keeps its state across a close/open
+  cycle, and Cancel blanked the title rather than restoring it. Open on "Foo", cancel, reopen
+  on "Bar" and the field came up empty — which is exactly the edit-reuse case those seed props
+  exist for, and the case the component's own doc comment advertises. A consumer could not fix
+  it with a `key`, because nothing tells it the widget is holding stale state.
+
+  Every field is now re-seeded on the closed → open edge, during render rather than in an
+  effect, so the first frame is already correct instead of painting the previous task's values
+  and correcting them. It is bound to that edge and not to the props, so a parent re-render
+  cannot throw away a half-typed title. Cancel and submit both return the form to the props'
+  values: for the create flow those are empty and it clears exactly as before; for the edit
+  flow it is the task as it was opened, which is the only defensible reading of "reset" there.
+
+## [0.3.0] - 2026-08-05
+
 ### Added
 
 - **`isLabelVisible` on `Input`, `Datepicker`, `Select` and `FormField`**, defaulting to
@@ -493,8 +917,10 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 - **The `Select` and `MultiSelect` triggers are the design's chip again**, not a white
   field. Both hardcoded `bg-surface-neutral` — `#FFFFFF` — so the consuming app's dark
-  board carried five near-white 40px `rounded-md` pills, and its create/edit modal four
-  more. Figma draws every dropdown trigger in this system as the same `Tag` atom:
+  board carried four near-white 40px `rounded-md` pills, and its create/edit modal four
+  more. (This entry said five. The fifth chip in that row is the app's own due-date filter
+  markup, not a kit trigger — established in the app's PR #20 and never propagated back
+  here.) Figma draws every dropdown trigger in this system as the same `Tag` atom:
   `rgba(148, 151, 154, 0.1)` over the dark surface, 4px radius, 32px tall, 4px/16px
   padding, white 15px/600 label (`Dashboard Add Task/Add Task Modal00.md:78-140`, and the
   same chip again filled in the Edit Task modal). The triggers now use `Tag`'s own
@@ -620,6 +1046,31 @@ outline-offset-2` with no `outline-none` in front of it.
 
 ## [0.2.0] - 2026-08-04
 
-First version tracked by this changelog. Changes before this entry were not
-recorded individually here — see `git log` and `UI_KIT_MASTER_PLAN.md` for the
-full development history up to this point.
+First version tracked by this changelog. Changes before this entry were not recorded
+individually here — see `git log` for the full development history up to this point.
+
+This section is a stub and stays one. It was written pointing at a planning document
+(`UI_KIT_MASTER_PLAN.md`) which is gitignored, so the citation reaches no reader of this
+repository — `README.md` and `introduction.mdx` carried the same dangling reference until
+it was removed from both. Reconstructing the entries after the fact would mean inventing
+them, which is worse than saying so here.
+
+<!--
+Compare links, per Keep a Changelog.
+
+`v0.2.0` and `v0.3.0` are retro-tags, created with the packaging work and placed on
+`main`'s existing history rather than invented: `v0.2.0` on `cd767cd`, the commit that
+introduced `"version": "0.2.0"` (`b98dd0a` bumped it to 0.3.0), and `v0.3.0` on `ad3b5ad`,
+`main`'s tip, still at 0.3.0. Before that these links pointed at refs that did not exist.
+
+`v0.4.0` is cut by the reviewer on the merge commit, so the `[0.4.0]` link 404s until the
+pull request merges — a release tag must not sit on an integration branch, where a squash
+merge would orphan it. `v0.4.0-rc.1` exists at the branch tip in the meantime and is what
+the consuming app pins while the switch-over is verified. See `CLAUDE.md`'s tagging
+checklist.
+-->
+
+[unreleased]: https://github.com/f3r21/ravn-ui-kit/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/f3r21/ravn-ui-kit/releases/tag/v0.2.0
