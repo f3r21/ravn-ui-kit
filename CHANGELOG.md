@@ -31,6 +31,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   actions get SHA-pinned: privilege, not version. The rule is stated in
   `.github/workflows/ci.yml` in both repositories rather than in a review thread.
 
+- **A dependency-review gate on `pull_request`** (`actions/dependency-review-action`). It
+  diffs the base commit's dependency graph against the head commit's and fails when a pull
+  request _introduces_ a dependency carrying a known advisory. `npm audit` structurally
+  cannot do that: it sees the tree the branch produces, so a vulnerability inherited from
+  `main` and one this PR added are indistinguishable to it. Held at the audit step's
+  `fail-on-severity: high` rather than the action's `low` default, so the two gates cannot
+  disagree about what is acceptable. CodeQL was considered and skipped — on a component
+  library with no server-side logic it finds approximately nothing.
 - **`.github/pull_request_template.md`** — what changed, why, and how it was verified as a
   checklist of commands actually run. Its "Second-session review:" line holds the review
   permalink, which is the only evidence of review this repo can produce (see below).
@@ -80,6 +88,32 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Changed
 
+- **`actions/upload-pages-artifact` and `actions/deploy-pages` are pinned to full commit
+  SHAs.** Everything else in the workflow stays on a floating major, and the comments state
+  that as one rule rather than two unrelated calls: what is placed under control is
+  **privilege, not version**.
+
+  The Pages publish path is the only privileged thing this workflow does.
+  `deploy-storybook` is the sole holder of `pages: write` + `id-token: write`, so a moved
+  tag on `deploy-pages` buys an OIDC-authenticated publish to the live documentation site.
+  `upload-pages-artifact` holds no scope itself — it runs in the `ci` job under the
+  workflow's `contents: read` — but it decides the bytes the privileged job publishes, so
+  pinning only the half holding the token would be theatre. **This corrects the premise
+  the work was filed under**, which had both actions running inside the privileged job;
+  they do not, and the conclusion survives the correction rather than depending on it.
+
+  `actions/checkout` and `actions/setup-node` stay floating under the same rule: no write
+  scope, and they govern the runner-side JS runtime of the action wrapper rather than the
+  toolchain that builds the code, where an outdated major is the live risk. That is the
+  position `.github/dependabot.yml` and `ci.yml` already take on cross-repository lockstep
+  — the Node version is what is locked, action-wrapper majors float to current.
+
+  Pinned at the tags in use (`v3.0.1`, `v4.0.5`), not bumped. Both actions have a v5 and
+  Dependabot's `github-actions` group is expected to propose it, updating the SHA and its
+  trailing comment together; the pin records what runs today rather than holding a version
+  back. Moving a major on the deploy path inside a supply-chain change would leave no way
+  to tell which of the two broke a deploy.
+
 - **CI runs Node 22, not 20.** The consuming app runs 22 and declares
   `engines.node: >=22.13.0`; a package and its only consumer testing on different majors
   is a difference waiting to be discovered downstream. It also has to be settled before
@@ -113,6 +147,76 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   off since the repo was created.
 
 ### Fixed
+
+- **`clsx` and `tailwind-merge` were compiled into `dist/index.js`.** Both are declared in
+  `dependencies` but neither was in `rollupOptions.external`, so Rollup inlined them — the
+  bundle opened with clsx's source verbatim and carried tailwind-merge's class-group config
+  inline — while npm separately installed the real packages, which nothing imported. A
+  consumer shipped two copies of each.
+
+  For `tailwind-merge` that costs more than bytes. A Tailwind v4 app near-certainly has its
+  own instance, and a consumer calling `extendTailwindMerge` to teach it about custom class
+  groups can only reach that one; the copy sealed inside this bundle would go on resolving
+  the kit's `cn()` calls under the stock config and disagree with the app about which of
+  two conflicting classes wins. Left external, `cn()` imports the consumer's copy.
+
+  **`dist/index.js`: 183,908 → 103,225 bytes, a 44% cut**, which is the whole of it —
+  `dist/ui-kit.css` is byte-identical, and both packages now appear as bare imports. They
+  resolve for the one consumer that exists: the app declares `clsx` and `tailwind-merge` as
+  its own direct dependencies (`^2.1.1`, `^3.6.0`), and npm would install them transitively
+  from this package's `dependencies` in any case.
+
+- **The published prop table was hiding most of the API.** `.storybook/main.ts`'s
+  `propFilter` dropped every prop whose declaring interface resolved out of `node_modules`.
+  Every interactive component here extends a React Aria props interface, so that removed
+  most of what a consumer can actually pass: `Button`'s autodocs listed `variant`,
+  `isSelected`, `children`, `aria-label` and `className`, and hid `onPress`, `isDisabled`,
+  `autoFocus` and `excludeFromTabOrder` — the entire interaction API.
+
+  Measured across the component tree: **236 of 534 props reached a reader**, with ten
+  components affected — `Button`, `TextButton`, `Input`, `Datepicker`, `Select`,
+  `MultiSelect`, `Menu`, `ListBox`, `FloatingPopover`, `FormField`. (`TextButton`, not
+  `Card`, which the work was filed against: `Card` extends only `React.HTMLAttributes`, so
+  everything it hides is DOM noise and it is correctly unchanged at 2 props.) This is worth
+  more than a tidier table — `CONTRIBUTING.md` mandates JSDoc on every exported prop
+  _because_ autodocs publishes it, and `README.md` sends consumers to that Storybook as the
+  API reference, so one line was withholding documentation already written.
+
+  Replaced with an allowlist keyed on `react-aria`, `react-stately`, `@react-types/*` and,
+  defensively, the scoped `@react-aria/*`/`@react-stately/*` names. **The umbrella packages
+  are the load-bearing part.** This kit imports from `react-aria`/`react-stately` per
+  CONTRIBUTING.md's hooks-only rule, so docgen resolves parents to
+  `node_modules/react-aria/dist/types/**` — an allowlist of the scoped names alone, which
+  is the obvious form of this fix, matches nothing here and would go on hiding `isDisabled`
+  while looking correct.
+
+  `@types/react`'s 531 DOM attributes stay hidden; that is what the original filter was
+  for. React Aria documents its own props, so nothing restored here renders as a blank row:
+  **zero of the 534 are undocumented.** Verified in a real `build:storybook` rather than
+  from the config — `Button`'s emitted docgen block carries 43 props including all four
+  named above, and no `accessKey`/`contentEditable`/`onAnimationStart`.
+
+- **`src/index.ts`'s `import './styles/theme.css'` is annotated as build-time only.** It
+  reads like "importing the barrel gives you styles", and it does not: `@tailwindcss/vite`
+  extracts it to `dist/ui-kit.css` and emits no `.css` import into `dist/index.js`, so
+  nothing resolves at a consumer's runtime and `sideEffects: ["*.css"]` is correct but
+  moot. `README.md` §2 documents the real, manual two-path step.
+
+  Annotated rather than removed, and the comment says why: this import is the only thing
+  pulling `tailwindcss` and `tokens.css` into the library build graph, which makes it the
+  sole reason `dist/ui-kit.css` is emitted at all. Deleting it as dead code takes that file
+  with it, and with it `package.json`'s `"./ui-kit.css"` export and README §2's Path B.
+
+- **A CI comment described a vulnerability that had been fixed.** The `Audit dependencies`
+  step claimed one known, accepted moderate `uuid` advisory via
+  `@storybook/addon-essentials`, and that clearing it meant downgrading to Storybook 7.0.6.
+  It was cleared instead, by `"overrides": { "uuid": "^11.1.1" }` in `package.json`, and the
+  comment outlived the fix — `npm audit` reports **0 vulnerabilities even at `moderate`**.
+  Every reader since had been told there was an open hole.
+
+  Replaced rather than deleted, because `--audit-level=high` needs a reason now that its
+  stated one is gone: it is a policy about what stops a merge, not a record of anything
+  accepted.
 
 - **`EstimateModal`'s header label overflowed its own popover on every machine without
   Apple's system font** — which is every Linux and Windows one, CI included.
