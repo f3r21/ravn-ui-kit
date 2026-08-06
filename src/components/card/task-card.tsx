@@ -46,7 +46,11 @@ export interface TaskCardProps {
   metaBadges?: TaskMetaBadge[];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
-  /** Called when the card is clicked. */
+  /**
+   * Called when the card is opened. Providing it renders the title as a real `<button>`
+   * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes
+   * the whole card surface clickable for a pointer user. Fires once either way.
+   */
   onClick?: () => void;
 }
 
@@ -71,26 +75,29 @@ export function TaskCard({
   onClick,
 }: TaskCardProps) {
   return (
+    // The whole card stays clickable for a pointer user, but it is deliberately no longer an
+    // ARIA button. `role="button"` + `tabIndex={0}` here made the card one control whose
+    // accessible name was its entire text content ("Fix bug 5 Pts OVERDUE BUG Fernando Ramirez
+    // 12 comments"), and put every interactive child it may hold — a removable `Tag`, a future
+    // footer action — inside a button, which is invalid. The keyboard and screen-reader
+    // affordance is now the title button `ProjectInfo` renders below, named by the task title;
+    // this handler is the redundant pointer target beside it, which is what the two rules
+    // suppressed here exist to catch when it is the *only* thing on offer. Same treatment as
+    // `TaskTableRow`, which had no keyboard path at all.
+    //
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={
-        onClick
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick();
-              }
-            }
-          : undefined
-      }
       className={cn(
         // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
         // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
         // No border is ever rendered on the card in the export, so the resting border is transparent
         // (kept as a real border utility, not removed, so the hover reveal below still works).
-        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2',
+        //
+        // No `focus-visible:outline-*` here any more: the card is not focusable, so those
+        // utilities could never match. The ring lives on the title button that replaced them.
+        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all select-none',
+        onClick && 'cursor-pointer',
         className,
       )}
     >
@@ -102,8 +109,11 @@ export function TaskCard({
           remains a generic, unnamed placeholder in the export (not a real "Arrow Chevron
           Back/Forward" icon — those exist elsewhere in the file with distinct component IDs), so
           the earlier "chevron/expand" description was a guess and has been corrected; still not
-          wired up, since there's no real icon identity to wire in without inventing one. */}
-      <ProjectInfo title={title} />
+          wired up, since there's no real icon identity to wire in without inventing one.
+
+          `onTitleClick` is what makes a clickable card reachable without a pointer — see the
+          container's comment above for why the affordance moved here. */}
+      <ProjectInfo title={title} onTitleClick={onClick} />
 
       {/* Timer Row: Points & Due Date (Figma "Timer" auto-layout, Cards01.md L319-437 — points is
           plain text sharing this row with the due-date "Tag", not a badge in the title row). */}
