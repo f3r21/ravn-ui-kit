@@ -30,8 +30,15 @@ storybook-static/
 UI_KIT_MASTER_PLAN.md
 MIGRATION_GAPS.md
 
+# `.corvusrc` is deliberately NOT ignored, and is deliberately tracked. It is the
+# skill manifest, and a `git worktree` only receives committed files — untrack it
+# and every fresh worker session starts with no skills and no way to discover
+# which ones this project expects, because `corvus sync` reads the manifest to
+# restore them. The skill directories below stay ignored; corvus owns their
+# contents. If `corvus install` rewrites the block and re-adds `.corvusrc`, the
+# tracking is what matters — delete the line again rather than untracking the file.
+
 # corvus — managed, do not edit this block
-.corvusrc
 .claude/skills/figma-to-react-components/
 .claude/skills/design-variations/
 .claude/skills/type-system-audit/
