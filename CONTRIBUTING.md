@@ -121,12 +121,33 @@ Changelog](https://keepachangelog.com/en/1.1.0/)'s `Added`/`Changed`/
 `Fixed`/`Removed` grouping. Move `[Unreleased]` into a dated version section
 when `package.json`'s version is bumped.
 
+## The accessibility ratchet
+
+CI runs axe over every story in a real browser (`npm run test:a11y:ci`, after
+`npm run build:storybook`) and fails on any finding not recorded in
+`.storybook/a11y-allowlist.ts`. The allowlist is keyed to **story id × rule id**:
+a rule firing on a story that does not list it fails the build, and a rule listed
+for a story that no longer reports it _also_ fails, so the list only ever shrinks
+on its own. `incomplete` findings are ratcheted alongside `violations` — axe files
+exact 1:1 text under `incomplete`, so a violations-only sweep cannot see invisible
+text.
+
+If a story of yours trips it, the failure message prints the offending element and
+the exact allowlist line that would accept it. Prefer fixing the finding. Accepting
+one is a design decision and needs a written reason next to the entry — a measured
+ratio and why the palette cannot serve it, or a pointer to the work that closes it.
+
+This does not replace `src/styles/contrast.test.ts`, which checks token pairings no
+story renders (hover fills, placeholders, surfaces a component may be dropped onto).
+Neither check sees the other's cases; a new colour decision usually wants both.
+
 ## Before committing
 
 ```bash
 npm run gate            # typecheck -> lint -> format:check -> coverage
 npm run build
 npm run build:storybook
+npm run test:a11y:ci    # axe over every story; needs the Storybook build above
 ```
 
 `gate` is the bar, and it is the same command CI runs. It fails on a coverage
@@ -135,3 +156,9 @@ a ratchet, so a change that drops coverage below where it already was will not
 pass. Raise them when you add tests; never lower them to get green.
 
 `npm run format` rewrites in place if `format:check` fails.
+
+`test:a11y:ci` serves `storybook-static/` and runs the suite against it; it needs
+Playwright's Chromium (`npx playwright install chromium`, once). If _every_ story
+fails, read the first message rather than the count — a runner that cannot reach the
+served Storybook fails identically to a wall of real violations, and the runner says
+which of the two it is.

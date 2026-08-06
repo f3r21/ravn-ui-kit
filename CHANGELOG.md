@@ -23,6 +23,49 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **`.github/pull_request_template.md`** — what changed, why, and how it was verified as a
   checklist of commands actually run. Its "Second-session review:" line holds the review
   permalink, which is the only evidence of review this repo can produce (see below).
+- **An accessibility gate in CI** — `@storybook/test-runner` + `axe-playwright` run axe
+  over all 144 stories in headless Chromium (`npm run test:a11y:ci`), failing the build on
+  any finding not listed in `.storybook/a11y-allowlist.ts`. `@storybook/addon-a11y` was
+  already installed and registered, but it only paints violations in the Storybook UI: CI
+  ran `gate` + `build` + `build:storybook` and never rendered a story in a browser, so
+  everything the 0.3.0 palette pass fixed was guarded by nothing but memory.
+
+  The allowlist is keyed to **story id x rule id**, not to a count or a threshold, because
+  a bare budget lets a new violation move in the moment an old one is fixed. A rule firing
+  on a story that does not list it fails; a rule listed for a story that no longer reports
+  it also fails. The list can only be paid down. `incomplete` is ratcheted alongside
+  `violations` for the reason the `Card` entry in 0.3.0 records: axe files exact 1:1 text
+  under `incomplete`, so a violations-only sweep is blind to invisible text.
+
+  This does not replace `src/styles/contrast.test.ts`, and could not. That test checks
+  pairings no story renders — hover fills, placeholders, surfaces a component may be
+  dropped onto. This one catches what two individually-fine tokens compose into once a
+  component is actually painted. Neither sees the other's cases.
+
+  **The measured baseline, which corrects the figure previously repeated in `CLAUDE.md`:**
+  **21 violation nodes across 16 of 144 stories, plus 5 `incomplete`.** Not "16, all
+  `TextButton`". 16 is the `color-contrast` node count specifically, and 14 of those are
+  `TextButton variant="primary"` — mostly appearing as other components' story triggers,
+  which is why fixing one component would clear twelve entries. The other 2 come from
+  `FloatingPopover`'s story, which hand-rolls its trigger instead of using `TextButton`
+  and so reproduces the same 3.83:1 pairing on markup this package does not ship. Every
+  contrast ratio matches what `contrast.test.ts` already asserts, measured independently
+  by a browser: 3.83:1 on `primary-4`, 2.83:1 on `primary-3`.
+
+  The remaining **5 violation nodes are not contrast at all**, and are the first thing
+  this gate found that no previous audit had: `aria-prohibited-attr` on `TaskMetaBadges`,
+  which renders each badge as `<span aria-label>` with both children `aria-hidden`. A
+  `<span>` with no role is `generic`, `aria-label` is prohibited there and therefore
+  dropped, and both children are hidden — so attachment, subtask and comment counts
+  contribute nothing whatsoever to the accessibility tree. They are silent to a screen
+  reader today. Recorded in the allowlist as open debt rather than fixed here, because the
+  fix is a component change that wants its own test; the allowlist comment says so and
+  says which lines to delete when it lands.
+
+  The 5 `incomplete` findings are all one element — `SidebarItem`'s active label on its
+  gradient wash, which axe cannot measure a ratio against at all (`bgGradient`). It has
+  been measured by hand at 6.67:1 and 6.02:1, and `sidebar-item.tsx` carries the
+  arithmetic; pinning them means a sixth one nobody has looked at fails the build.
 
 ### Changed
 
