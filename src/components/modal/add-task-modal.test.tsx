@@ -87,20 +87,20 @@ describe('AddTaskModal Component', () => {
     it('shows the new props when reopened for a different task', async () => {
       const user = userEvent.setup();
       const { rerender } = render(
-        <AddTaskModal isOpen onClose={vi.fn()} initialTitle="Fix the GraphQL bug" />,
+        <AddTaskModal isOpen onClose={vi.fn()} defaultTitle="Fix the GraphQL bug" />,
       );
       expect(titleField().value).toBe('Fix the GraphQL bug');
 
       await user.click(screen.getByRole('button', { name: 'Cancel' }));
-      rerender(<AddTaskModal isOpen={false} onClose={vi.fn()} initialTitle="Write the docs" />);
-      rerender(<AddTaskModal isOpen onClose={vi.fn()} initialTitle="Write the docs" />);
+      rerender(<AddTaskModal isOpen={false} onClose={vi.fn()} defaultTitle="Write the docs" />);
+      rerender(<AddTaskModal isOpen onClose={vi.fn()} defaultTitle="Write the docs" />);
 
       expect(titleField().value).toBe('Write the docs');
     });
 
     it('discards what the user typed when it is reopened on the same task', async () => {
       const user = userEvent.setup();
-      const props = { onClose: vi.fn(), initialTitle: 'Fix the GraphQL bug' };
+      const props = { onClose: vi.fn(), defaultTitle: 'Fix the GraphQL bug' };
       const { rerender } = render(<AddTaskModal isOpen {...props} />);
 
       await user.type(titleField(), ' — actually something else');
@@ -115,12 +115,12 @@ describe('AddTaskModal Component', () => {
       const jane = { id: '2', name: 'Jane Doe' };
       const props = { onClose: vi.fn(), assignees: [jerome, jane] };
       const { rerender } = render(
-        <AddTaskModal isOpen {...props} initialPoints={3} initialAssignee={jerome} />,
+        <AddTaskModal isOpen {...props} defaultPoints={3} defaultAssignee={jerome} />,
       );
       expect(screen.getByRole('button', { name: /3 Points/ })).toBeDefined();
 
-      rerender(<AddTaskModal isOpen={false} {...props} initialPoints={8} initialAssignee={jane} />);
-      rerender(<AddTaskModal isOpen {...props} initialPoints={8} initialAssignee={jane} />);
+      rerender(<AddTaskModal isOpen={false} {...props} defaultPoints={8} defaultAssignee={jane} />);
+      rerender(<AddTaskModal isOpen {...props} defaultPoints={8} defaultAssignee={jane} />);
 
       expect(screen.getByRole('button', { name: /8 Points/ })).toBeDefined();
       expect(screen.getByRole('button', { name: /Jane Doe/ })).toBeDefined();
@@ -128,11 +128,11 @@ describe('AddTaskModal Component', () => {
 
     it('leaves an open widget alone when its props change under it', async () => {
       const user = userEvent.setup();
-      const { rerender } = render(<AddTaskModal isOpen onClose={vi.fn()} initialTitle="First" />);
+      const { rerender } = render(<AddTaskModal isOpen onClose={vi.fn()} defaultTitle="First" />);
 
       await user.clear(titleField());
       await user.type(titleField(), 'Half-written');
-      rerender(<AddTaskModal isOpen onClose={vi.fn()} initialTitle="Second" />);
+      rerender(<AddTaskModal isOpen onClose={vi.fn()} defaultTitle="Second" />);
 
       // Re-seeding is bound to the closed -> open edge, not to the props themselves: a
       // parent re-render must not throw away what the user is in the middle of typing.

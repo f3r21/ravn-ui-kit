@@ -67,10 +67,10 @@ export const Edit: Story = {
           onSubmit={args.onSubmit}
           isOpen={isOpen}
           onClose={close}
-          initialTitle="Fix critical GraphQL bug"
-          initialPoints={0}
-          initialAssignee={ASSIGNEES[0]}
-          initialLabel={LABELS[0]}
+          defaultTitle="Fix critical GraphQL bug"
+          defaultPoints={0}
+          defaultAssignee={ASSIGNEES[0]}
+          defaultLabel={LABELS[0]}
         />
       </div>
     );
