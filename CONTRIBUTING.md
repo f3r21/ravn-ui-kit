@@ -108,6 +108,23 @@ Adding another top-level page means adding its title to `storySort.order` in
 sorts to the bottom, below `Layout/`, which is not where a reader looks for
 prose.
 
+Two things about MDX here that a green build will not tell you:
+
+- **Pipe tables do not render.** This Storybook's MDX pipeline has no
+  `remark-gfm`, so a Markdown table publishes as a run-on line of `|`
+  characters. `typography.mdx` and `colors.mdx` both show it today. Write a
+  literal `<table>` instead, as `decisions.mdx` does, and keep each `<td>` to
+  a single element — a cell mixing text and an element becomes a `<p>` and
+  gains vertical padding the other cells do not have.
+- **`{/* … */}` comments do not survive `npm run format`.** Prettier treats
+  `.mdx` as Markdown, rewrites the `*` as emphasis, and leaves `{/_ … _/}`,
+  which then fails the Storybook indexer with "Could not parse expression with
+  acorn" — a build error nowhere near the file that caused it. Put the note in
+  the commit message or here instead.
+
+Both are worth fixing at the source one day; neither is a reason to hand-write
+a broken page in the meantime.
+
 ## Story file recipe
 
 Every `*.stories.tsx` file should follow this shape (see

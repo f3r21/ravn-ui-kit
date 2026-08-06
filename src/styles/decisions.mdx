@@ -22,19 +22,68 @@ Nothing in `src/` carries a Tailwind responsive variant (`sm:`, `md:`, `lg:`) or
 `@media` query. The layout pieces are built to fixed widths lifted from the 1440px Figma
 canvas:
 
-| Piece                | Constraint           | Source                       |
-| -------------------- | -------------------- | ---------------------------- |
-| `ApplicationSidebar` | `w-[232px] shrink-0` | `application-sidebar.tsx:48` |
-| `TaskTable`'s grid   | `min-w-[1108px]`     | `task-table.tsx:515`         |
-| `AddTaskModal`       | `w-[578px]`          | `add-task-modal.tsx:163`     |
-| `DatepickerMenu`     | `w-[280px]`          | `datepicker-menu.tsx:153`    |
+<table>
+  <thead>
+    <tr>
+      <th>Piece</th>
+      <th>Constraint</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>ApplicationSidebar</code>
+      </td>
+      <td>
+        <code>w-[232px] shrink-0</code>
+      </td>
+      <td>
+        <code>application-sidebar.tsx:48</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>TaskTable</code>
+      </td>
+      <td>
+        <code>min-w-[1108px]</code>
+      </td>
+      <td>
+        <code>task-table.tsx:515</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>AddTaskModal</code>
+      </td>
+      <td>
+        <code>w-[578px]</code>
+      </td>
+      <td>
+        <code>add-task-modal.tsx:163</code>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>DatepickerMenu</code>
+      </td>
+      <td>
+        <code>w-[280px]</code>
+      </td>
+      <td>
+        <code>datepicker-menu.tsx:153</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 `AppShell` then spends a further fixed budget before content gets a pixel: `p-8` on both
 sides plus a `gap-8` between sidebar and content, so 32 + 232 + 32 + 32 = **328px** of
-any viewport is chrome (`app-shell.tsx:62-66`). Add the table's own minimum to that and
-the table view stops fitting a viewport at 328 + 1108 = **1436px**; below that, its
-`overflow-x-auto` wrapper scrolls the grid rather than reflowing it, which is the
-intended behaviour and not a fallback.
+any viewport is chrome (`app-shell.tsx:62-66`). `TaskTable`'s `min-w-[1108px]` sits on
+its inner grid, so add the two and the table view stops fitting a viewport at
+328 + 1108 = **1436px**; below that, the grid's `overflow-x-auto` wrapper scrolls it
+rather than reflowing it, which is the intended behaviour and not a fallback.
 
 **There is no measured floor below which the kit "breaks", and this page will not invent
 one.** The arithmetic above is derived from class names you can read; a breakpoint is
