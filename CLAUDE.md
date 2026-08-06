@@ -31,10 +31,18 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 
 ## Decisions already made — do not re-open
 
-- **The kit is desktop-only.** `ApplicationSidebar` is a rigid `w-[232px] shrink-0`
-  (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive variant or a media
-  query. No breakpoint floor has ever been measured, so do not quote one — the derivation that
-  exists is on the **Decisions** page. The consuming app keeps its own shell permanently.
+- **The kit is desktop-only, and its floor is 833px.** `ApplicationSidebar` is a rigid
+  `w-[232px] shrink-0` (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive
+  variant or a media query. 833 is exact rather than approximate: on story
+  `layout-appshell--dashboard`, `document.documentElement.scrollWidth` reads 833 at every
+  narrower viewport — 832 overflows, 833 does not. Below the floor the shell scrolls; it does not
+  shrink. Re-measure by reading that property on the story's `iframe.html` at a few widths, which
+  is how the number above was checked against this branch's own Storybook build.
+  **Quote it** — a consumer deciding whether to adopt `AppShell` needs it. An earlier version of
+  this line said no floor had ever been measured and forbade quoting one, which is worse than
+  merely wrong: a session that measured 833 correctly would have assumed it had erred and thrown
+  the finding away. The number does not re-open the decision — the kit stays desktop-only, the
+  derivation is on the **Decisions** page, and the consuming app keeps its own shell permanently.
 - **WCAG AA wins over Figma fidelity where they conflict**, and the deviation is documented in a
   comment with its measured ratio. `src/styles/contrast.test.ts` pins those ratios so a
   regression fails the suite.
@@ -51,9 +59,9 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 ## `dist/` is committed, generated, and never hand-edited
 
 The app consumes this package as a git dependency pinned to a tag, and a git install runs no
-build — so `dist/` has to exist in the repo. It is denied to `Read` in `.claude/settings.json`:
-104 KB of minified JS and 122 KB of rolled-up types, never worth reading. Change the source and
-rebuild.
+build — so `dist/` has to exist in the repo. A `permissions.deny` entry of `Read(./dist/**)` in
+`.claude/settings.json` keeps it out of context: 104 KB of minified JS and 122 KB of rolled-up
+types, never worth reading. Change the source and rebuild.
 
 CI now fails when it is stale (`Check committed dist/ is fresh`, straight after the build
 step). That check is `git add --intent-to-add dist/ && git diff --exit-code dist/` — the
