@@ -10,6 +10,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **A `Decisions` page in the published Storybook** (`src/styles/decisions.mdx`), beside
+  `Introduction`. Four decisions this kit is built around had no version-controlled home
+  a reader could reach: two lived only in host-local agent memory (the kit is
+  deliberately desktop-only; the remaining axe contrast findings are accepted rather than
+  outstanding), and two were recorded only in scattered call-site comments (WCAG AA
+  outranks Figma fidelity, with the measured ratio written down; field labels are
+  `sr-only` by default). They are now in `CONTRIBUTING.md`'s "Design values" for someone
+  about to write a component, and on that page for someone who has only ever seen
+  https://f3r21.github.io/ravn-ui-kit/.
+
+  Every figure on the page names a tracked file. That is the point of it: the same pass
+  removed three figures from `CLAUDE.md` that could not be derived from anything in this
+  repository — see below.
+
+- **`CONTRIBUTING.md` now states where a documentation page goes.** Its four Storybook
+  buckets only ever covered component stories; `Introduction` has sat outside them since
+  it was written, unexplained. Prose pages are top level, and adding one means adding its
+  title to `storySort.order` too, or it sorts below `Layout/`. The section also records
+  two MDX traps a green build does not reveal: pipe tables do not render (no
+  `remark-gfm`, which `typography.mdx` and `colors.mdx` demonstrate today), and
+  `{/* … */}` comments do not survive `npm run format`.
+
 - **An MIT `LICENSE`, and a matching `license` field in `package.json`.** The repo is
   public and had neither, which is not "permissively licensed by omission" — default
   copyright reserves every right, so the app consuming this as a git dependency had no
@@ -164,6 +186,29 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   the one consumer imports `Menu`, `Modal`, `MultiSelect` and `Select` and nothing else.
 
 ### Fixed
+
+- **Three figures in `CLAUDE.md` that no reader could check.** All three came from planning
+  documents that are gitignored, so they read as authoritative and resolved to nothing.
+  - "Current compliance is 99.2%" for JSDoc — `99.2` appears nowhere else in the repo and
+    nothing computes it. The rule (every exported prop carries JSDoc) stands without it.
+  - "Measured 833px floor" — every tracked occurrence of `833` is a Figma line range
+    (`L552-833`) or the hex `#fe833d`. No such measurement exists. The `232px` in the same
+    sentence does: `application-sidebar.tsx:48` is `w-[232px] shrink-0`, so it is kept and
+    cited, and the Decisions page derives what is derivable (328px of `AppShell` chrome, a
+    1436px fitting width for the table view) from class names instead.
+  - "16 axe contrast violations, all `TextButton variant="primary"`" — the count was right
+    by accident (16 nodes) but "all" was not. `.storybook/a11y-allowlist.ts` accepts
+    `color-contrast` on 14 stories: 12 rendering `TextButton`, and 2 rendering a trigger
+    `floating-popover.stories.tsx` hand-rolls with the same pairing. The allowlist is also
+    not uniformly "accepted" — its `aria-prohibited-attr` entries are open debt with an
+    issue attached — which a bare count erased.
+
+- **`README.md` and `introduction.mdx` no longer cite `UI_KIT_MASTER_PLAN.md`.** It is
+  gitignored (`.gitignore:30`), so "see it for the ground-truth audit log this library was
+  built against" resolved to nothing for every reader but its author — and the
+  `introduction.mdx` copy was published. Both now point at `Decisions`, and
+  `introduction.mdx` says plainly that the audit log is not part of this repository and
+  that the per-value citations live at the call site in each component.
 
 - **`clsx` and `tailwind-merge` were compiled into `dist/index.js`.** Both are declared in
   `dependencies` but neither was in `rollupOptions.external`, so Rollup inlined them — the
