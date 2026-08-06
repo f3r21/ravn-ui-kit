@@ -13,7 +13,7 @@ export interface BadgeProps {
    * @default 'neutral'
    */
   variant?: StatusTone;
-  /** Badge label / content. */
+  /** Badge label / content. THROWAWAY EDIT — proves the dist freshness guard fails. */
   children: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
