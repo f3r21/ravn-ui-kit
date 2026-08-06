@@ -7,9 +7,53 @@
   from Figma's Dev Mode / Inspect panel. Never invent or approximate a style.
   If a value is uncertain, flag it in a code comment and leave the existing
   behavior unchanged rather than guessing.
+- **WCAG AA wins where it conflicts with Figma fidelity**, and the deviation
+  gets written down at the call site with the ratio that forced it. This is
+  the house style rather than an exception — `tag.tsx:47`, `badge.test.tsx:9`
+  and `form-field.tsx:45` are the worked examples, and `colors.mdx` collects
+  them for readers of the published docs. `src/styles/contrast.test.ts`
+  computes the ratios from `tokens.css` itself, so a changed hex fails the
+  suite instead of shipping and being found by someone running axe months
+  later. Note the rule cuts the other way too: it is AA that wins, not
+  "whatever contrasts better" — a passing pairing is never a reason to
+  redraw something the design has an opinion about.
+- **One conflict has no resolution, and is accepted rather than fixed.**
+  `TextButton variant="primary"` paints `text-main` on `bg-primary-4` at
+  **3.83:1**, and `isSelected`'s `primary-3` at **2.83:1**, against 1.4.3's
+  4.5:1. No label colour in the palette clears `primary-4` (`neutral-5`, the
+  darkest thing in it, reaches 4.02:1) and `primary-4` is already its ramp's
+  darkest step — so the only fix is a red Figma does not contain, which the
+  first rule above forbids. `text-button.tsx:36` carries the full argument.
+  It is a judgement call with a measurement behind it, not a bug someone has
+  not got to. **`.storybook/a11y-allowlist.ts` is the only place that says
+  what is currently accepted**; read it rather than quoting a count from
+  prose, and note that not every entry in it is an acceptance — some are
+  open debt with an issue number attached.
+- **The kit is desktop-only, and that is a decision rather than a gap.**
+  Nothing in `src/` carries a Tailwind responsive variant (`sm:`/`md:`/`lg:`)
+  or a `@media` query, and the layout pieces are built to fixed widths taken
+  from the 1440px Figma canvas: `ApplicationSidebar` is `w-[232px] shrink-0`
+  (`application-sidebar.tsx:48`), `TaskTable`'s grid is `min-w-[1108px]`
+  (`task-table.tsx:515`), `AddTaskModal` is a hard `w-[578px]`
+  (`add-task-modal.tsx:163`). The consuming app keeps its own `AppLayout`
+  and `AppSidebar` permanently for this reason. Do not add a breakpoint to
+  one component in isolation — it makes that component responsive inside a
+  shell that is not, which is worse than either answer on its own.
+- **Field labels are `sr-only` by default.** `Input`, `Datepicker`, `Select`
+  and `FormField` all default `isLabelVisible` to `false` and render the
+  label `sr-only` — never `hidden`/`display:none`, so the accessible name
+  survives either way (`form-field.tsx:63-71`). The design draws no field
+  labels anywhere across 100 export files; a field's own text carries its
+  meaning — the placeholder in the empty state, the value in the filled one.
+  A new control follows the same default; a consumer who wants a painted
+  label opts in per control.
 - Accessibility: use React Aria / React Stately hooks for interactive
   components. Do not use `react-aria-components` — this library wires the
   low-level hooks directly.
+
+The reasoning behind the four decisions above is published, not just tracked
+— see the **Decisions** page in [the Storybook](https://f3r21.github.io/ravn-ui-kit/),
+which is written for someone who has not cloned this repo.
 
 ## Component file conventions
 
@@ -42,6 +86,27 @@ or `Modal/Base` + `Modal/AddTask` + ...), nest them under a shared prefix.
 Otherwise keep titles flat, even for components with an obvious parent/child
 relationship (e.g. `Layout/SidebarItem` and `Layout/ApplicationSidebar` stay
 siblings, not nested).
+
+### Standalone documentation pages
+
+Those four buckets govern **story** titles. A pure documentation page — MDX
+with a `<Meta>` and no component behind it — does not belong in any of them,
+and filing one under `Design Tokens/` would misrepresent it as a token
+reference. Such pages sit at the top level of the sidebar instead, one word
+each:
+
+| Title          | File                          |
+| -------------- | ----------------------------- |
+| `Introduction` | `src/styles/introduction.mdx` |
+| `Decisions`    | `src/styles/decisions.mdx`    |
+
+`Design Tokens/Colors` and `Design Tokens/Typography` are MDX too but are not
+this case — they document tokens, which is exactly what their bucket is for.
+
+Adding another top-level page means adding its title to `storySort.order` in
+`.storybook/preview.ts` as well. That order is explicit and an unlisted title
+sorts to the bottom, below `Layout/`, which is not where a reader looks for
+prose.
 
 ## Story file recipe
 
