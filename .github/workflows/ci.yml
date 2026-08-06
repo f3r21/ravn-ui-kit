@@ -23,10 +23,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Kept in step with `.nvmrc` and with the consuming app, which runs 22 and
+      # declares `engines.node: >=22.13.0`. One version across both repos is a
+      # precondition for verifying a committed `dist/` — a freshness check run on
+      # two different majors can disagree about a build that is in fact fine.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: .nvmrc
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
