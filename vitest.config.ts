@@ -43,11 +43,16 @@ export default defineConfig({
       // (Badge was one of the 10 untested files) plus class-level guards on
       // `Tag` and `Avatar`, then the completeness audit added guards for the two
       // :has()-drawn focus rings. 85.94 -> 86.56.
+      //
+      // Then the two-defect fix (`TaskTableRow`'s missing keyboard path,
+      // `AddTaskModal`'s stale reopen) added `project-info.test.tsx` — another of
+      // the 10 untested files — and covered the row and widget branches those
+      // fixes introduced. 86.56 -> 88.76.
       thresholds: {
-        statements: 86.56,
-        branches: 85.21,
-        functions: 80.91,
-        lines: 86.56,
+        statements: 88.76,
+        branches: 87.63,
+        functions: 84.32,
+        lines: 88.76,
       },
     },
   },
