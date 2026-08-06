@@ -21,7 +21,8 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
   from `src/styles/tokens.css`. If Figma has no value for something, say so in a comment rather
   than eyeballing one. There are two existing violations, both self-flagged in `user-row.tsx`.
 - **Every exported prop carries JSDoc.** Storybook's autodocs is the published API reference and
-  the README points consumers at it. Current compliance is 99.2%; do not lower it.
+  the README points consumers at it. Nothing in this repo computes a compliance percentage, so
+  do not quote one — the rule is _every_ prop, and the check is the rendered prop table.
 - **Zero `any`, zero `React.FC`, zero non-null assertions** in public paths.
 - **Never add `outline-none` in front of a focus ring.** In Tailwind v4 it compiles to
   `--tw-outline-style: none`, which makes `outline-2` resolve to `outline-style: none` and paint
@@ -30,13 +31,20 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 
 ## Decisions already made — do not re-open
 
-- **The kit is desktop-only.** Measured 833px floor, `ApplicationSidebar` rigid at 232px. The
-  consuming app keeps its own shell permanently.
+- **The kit is desktop-only.** `ApplicationSidebar` is a rigid `w-[232px] shrink-0`
+  (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive variant or a media
+  query. No breakpoint floor has ever been measured, so do not quote one — the derivation that
+  exists is on the **Decisions** page. The consuming app keeps its own shell permanently.
 - **WCAG AA wins over Figma fidelity where they conflict**, and the deviation is documented in a
   comment with its measured ratio. `src/styles/contrast.test.ts` pins those ratios so a
   regression fails the suite.
-- **16 axe contrast violations are accepted**, all `TextButton variant="primary"` — no palette
-  colour clears 4.5:1 on `primary-4` and inventing a darker red is forbidden by the rule above.
+- **`.storybook/a11y-allowlist.ts` is the only source for which axe findings are accepted**, and
+  it is keyed to story × rule, not to a count. `color-contrast` is accepted on 14 stories: 12
+  rendering `TextButton variant="primary"` (`text-main` on `primary-4`, 3.83:1) and 2 rendering
+  a hand-rolled trigger in `floating-popover.stories.tsx` that reproduces the same pairing. No
+  palette colour clears 4.5:1 on `primary-4` and inventing a darker red is forbidden by the rule
+  above. Not every entry in that file is accepted — `aria-prohibited-attr` on four stories is
+  open debt (#19).
 - **Gaps the consumer hits get fixed here**, not worked around in the app. This repo is the fix
   site; that is the whole point of it existing separately.
 
