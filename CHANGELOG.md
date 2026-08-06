@@ -21,6 +21,21 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   across the six issues #23 sampled: **1 of 86 substantive figures, 1.2%** —
   `node scripts/figure-audit.mjs <bodies>`. Repository process only; `dist/` is untouched.
 
+- **`scripts/new-lane.sh` provisions a lane worktree that cannot start subtly broken.** Doing it
+  by hand surfaced four silent failures — gitignored `.claude/skills/`, gitignored
+  `.claude/settings.local.json`, a worktree nested inside the repo, and a gate nobody ran first.
+  None of them fail loudly. The script does all four and prints a checklist read back out of the
+  provisioned worktree, because every failure it catches looks like success from the inside.
+  Verified end to end on a throwaway lane: `skills 15/15`, `mcp playwright, eslint, context7`,
+  `gate exit 0`, then removed with nothing left behind. `scripts/new-lane.test.mjs` pins the
+  pre-flight guards. Repository tooling only; `dist/` is untouched.
+
+  Two things the issue asked to check first were checked, and both shrank the script:
+  `enabledMcpjsonServers` is set at **user** scope, so no per-worktree MCP write is needed —
+  confirmed by removing a worktree's `settings.local.json` and seeing `claude mcp list` still
+  resolve all three servers; and this repo has no `.env` and no MCP server wanting one, so that
+  step is a guarded no-op rather than a copy.
+
 - `scripts/hooks.test.mjs` — 33 cases that drive each hook exactly as Claude Code drives it, with
   the payload as JSON on stdin. Vitest collects it, so it runs inside `npm run gate`. Restoring
   the pre-fix `.claude/` and running it there: **22 of the 34 cases it collects fail** (34 rather

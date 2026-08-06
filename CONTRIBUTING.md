@@ -257,6 +257,31 @@ This does not replace `src/styles/contrast.test.ts`, which checks token pairings
 story renders (hover fills, placeholders, surfaces a component may be dropped onto).
 Neither check sees the other's cases; a new colour decision usually wants both.
 
+## Starting a lane
+
+```bash
+scripts/new-lane.sh <lane-name> [branch]      # branch defaults to int/<lane-name>
+```
+
+Provisioning by hand went silently wrong four times, so do not do it by hand. Four
+things a `git worktree add` does **not** give you, none of which fail loudly:
+`.claude/skills/` is gitignored per skill, so the lane starts with none of them;
+`.claude/settings.local.json` is gitignored too and holds accumulated permission
+approvals; the worktree must live **outside** the repo, or Vitest, ESLint and
+Prettier all collect it and its tests resolve the `@` alias to the outer `src/`;
+and the gate must be run **before** you touch anything, or a red tree gets
+misattributed to your first change.
+
+The script does all four and then prints a checklist read back out of the new
+worktree — skills present versus declared, MCP servers, whether the settings file
+arrived, and the gate's exit code. Read it rather than assuming; every failure it
+exists to catch looks like success from the inside.
+
+MCP servers need no per-worktree setup: `enabledMcpjsonServers` is set at user
+scope in `~/.claude/settings.json` and is inherited. Verified by removing a
+worktree's `settings.local.json` and confirming `claude mcp list` still resolved
+this repo's three servers.
+
 ## Before committing
 
 ```bash
