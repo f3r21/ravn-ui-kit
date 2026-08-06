@@ -12,7 +12,14 @@ file is the short version of what changes how you work.
 tests, never lower them to go green.
 
 If you touch anything that ships, also run `npm run build` and `npm run build:storybook`. CI
-runs both, and the Storybook build catches story and MDX errors the unit tests cannot.
+runs both, and the Storybook build catches story and MDX errors the unit tests cannot — _errors_
+only, though. It is silent on whether a page renders correctly, which is how #21's pipe tables
+published as raw `|` characters and built green for this repo's whole history. Render the page.
+
+`.claude/commands/start-issue.md` and `finish-issue.md` are the rituals either side of a piece of
+work, and they carry the rules this repo has already paid for once: what its checks structurally
+cannot see, how to prove a new check has teeth, and how not to hand off into a deadlock. Read
+them there rather than restating them here.
 
 ## Rules that are not negotiable
 
