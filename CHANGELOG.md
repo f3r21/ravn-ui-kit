@@ -27,11 +27,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
-- `scripts/hooks.test.mjs` — 30 cases that drive each hook exactly as Claude Code drives it.
-  Vitest collects it, so it runs inside `npm run gate`; against the pre-fix scripts 20 of the 30
-  fail. Two cases exist only to pin the removed shapes, so a revert to argv or `$FILE_PATH` goes
-  red rather than quiet. Coverage is unaffected — the metric includes `src/**` alone, and the
-  ratchet in `vitest.config.ts` neither moves nor needs to.
+- `scripts/hooks.test.mjs` — 33 cases that drive each hook exactly as Claude Code drives it, with
+  the payload as JSON on stdin. Vitest collects it, so it runs inside `npm run gate`. Restoring
+  the pre-fix `.claude/` and running it there: **22 of the 34 cases it collects fail** (34 rather
+  than 33 because the old `settings.json` wired three hook commands where the fix wires two).
+  Two cases exist only to pin the removed shapes, so a revert to argv or `$FILE_PATH` goes red
+  rather than quiet, and three check that `settings.json` still points at a script that exists
+  and is executable — a hook that works but is wired to nothing fails in exactly the original
+  way. Coverage is unaffected: the metric includes `src/**` alone, so the ratchet in
+  `vitest.config.ts` neither moves nor needs to.
 
 ### Changed
 

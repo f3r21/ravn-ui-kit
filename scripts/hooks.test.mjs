@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { accessSync, constants, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
@@ -44,6 +44,32 @@ function decision(result) {
   expect(result.status).toBe(0);
   return result.stdout.trim() === '' ? null : JSON.parse(result.stdout);
 }
+
+// The two suites below run the scripts by path, which leaves one way back to
+// inert that they cannot see: a hook that works perfectly and is wired to
+// nothing. Renaming a script, or mistyping the path in settings.json, restores
+// the exact original failure — configuration present, nothing running, exit 0
+// everywhere.
+describe('.claude/settings.json (wiring)', () => {
+  const settings = JSON.parse(readFileSync(join(projectDir, '.claude', 'settings.json'), 'utf8'));
+
+  const commands = Object.entries(settings.hooks ?? {}).flatMap(([event, matchers]) =>
+    matchers.flatMap((matcher) =>
+      matcher.hooks.map((entry) => [`${event}:${matcher.matcher}`, entry.command]),
+    ),
+  );
+
+  it('registers a hook for both events this repo relies on', () => {
+    expect(Object.keys(settings.hooks ?? {}).sort()).toEqual(['PostToolUse', 'PreToolUse']);
+  });
+
+  it.each(commands)('%s runs a script that exists and is executable', (_event, command) => {
+    // `$CLAUDE_PROJECT_DIR` is the only interpolation Claude Code performs in a
+    // hook command, and it is the form both entries use.
+    const script = command.replace('$CLAUDE_PROJECT_DIR', projectDir);
+    expect(() => accessSync(script, constants.X_OK)).not.toThrow();
+  });
+});
 
 describe('block-dangerous.sh (PreToolUse: Bash)', () => {
   const judge = (command) =>
