@@ -159,6 +159,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `ListBox`/`Tabs` use. See the component's doc comment for why it bakes in
   no default trigger chrome and exposes no selection or "destructive item"
   API.
+- **An MIT `LICENSE`, and a matching `license` field in `package.json`.** The repo is
+  public and had neither, which is not "permissively licensed by omission" — default
+  copyright reserves every right, so the app consuming this as a git dependency had no
+  grant to do so.
+- **`.nvmrc`** (`22`). The CI workflow now reads it via `node-version-file` rather than
+  repeating the number, so the two cannot drift.
+- **`.github/dependabot.yml`** — grouped, weekly, in the shape the consuming app already
+  uses, plus two groups the app has no need of (`storybook`, whose addons must move in
+  lockstep with the core package, and `build-tooling`, which decides what `dist/` looks
+  like) and a `github-actions` ecosystem block.
+- **`.github/pull_request_template.md`** — what changed, why, and how it was verified as a
+  checklist of commands actually run. Its "Second-session review:" line holds the review
+  permalink, which is the only evidence of review this repo can produce (see below).
 
 ### Changed
 
@@ -269,6 +282,26 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   ever spec-confirmed, never their interactivity).
 - `AddTaskModal`'s four trigger buttons (Estimate/Assignee/Label/Due date) now
   carry `aria-haspopup="dialog"` and `aria-expanded`, previously absent.
+- **CI runs Node 22, not 20.** The consuming app runs 22 and declares
+  `engines.node: >=22.13.0`; a package and its only consumer testing on different majors
+  is a difference waiting to be discovered downstream. It also has to be settled before
+  `dist/` becomes a verified build artifact, since a rebuild-and-diff freshness check only
+  means something if every machine produces the same bytes.
+- **`main` is protected, and CI is now a merge gate rather than a report.** There was no
+  branch protection, no ruleset and no required status check, so a red build did not stop
+  a merge — and all four previous PRs merged with zero reviews. `main` now requires a pull
+  request, requires the `CI` check to pass, requires the branch to be up to date first,
+  enforces all of that on admins, and refuses force-pushes and deletion.
+
+  Two details are load-bearing. The required context is **`CI` and only `CI`** — that is
+  the job's check-run name, and the workflow's second job (`Publish Storybook`) reports
+  `skipped` on `pull_request` events, so requiring it would mean no PR could ever merge.
+  And **no approvals are required**: there is one account and GitHub forbids approving
+  your own PR, so a required approval would deadlock the repo outright. Review is a
+  comment-only review from a separate session, recorded in the PR template.
+
+  Merged branches are now deleted automatically (`deleteBranchOnMerge`), which had been
+  off since the repo was created.
 
 ### Fixed
 
