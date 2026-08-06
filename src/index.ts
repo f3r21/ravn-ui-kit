@@ -1,4 +1,15 @@
 // ─── Styles ───────────────────────────────────────────────────────
+// **Build-time only — importing this barrel does not give a consumer any styles.**
+// `@tailwindcss/vite` extracts this to `dist/ui-kit.css` and emits no `.css` import into
+// `dist/index.js` at all, so nothing resolves at a consumer's runtime. `sideEffects:
+// ["*.css"]` in package.json is correct and moot for the same reason. Wiring the CSS up is
+// a manual step either way; README.md §2 documents the two paths.
+//
+// **Do not delete this line.** `src/styles/theme.css` is two imports — `tailwindcss` and
+// `./tokens.css` — and this is the only thing that pulls either into the library build
+// graph, which makes it the sole reason `dist/ui-kit.css` is emitted. Removing it takes
+// that file with it, and with it package.json's `"./ui-kit.css"` export and README.md
+// §2's Path B, the integration path for consumers not running their own Tailwind v4 build.
 import './styles/theme.css';
 
 // ─── Utilities ────────────────────────────────────────────────────
