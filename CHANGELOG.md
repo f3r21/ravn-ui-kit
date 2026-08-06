@@ -8,7 +8,74 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-06
+
+**The first release that can be installed at all, and the first anyone installs by tag.**
+Until now the only consumer got this package by committing a copy of `dist/` into its own
+repository. `dist/` is committed _here_ now, `LICENSE` ships in the tarball, and the
+install is:
+
+```bash
+npm install github:f3r21/ravn-ui-kit#v0.4.0
+```
+
+**Breaking, despite the minor version bump.** `AddTaskModal`'s `initialTitle`,
+`initialDueDate`, `initialPoints`, `initialAssignee` and `initialLabel` props are now
+`defaultTitle`, `defaultDueDate`, `defaultPoints`, `defaultAssignee` and `defaultLabel`.
+**No alias is kept** — a consumer passing the old names gets a type error, and at runtime
+the seed values are simply ignored. This lands as a minor bump under SemVer's pre-1.0
+carve-out, per `CONTRIBUTING.md`'s versioning policy, which requires calling it out
+explicitly either way. Full rationale under **Changed**, below.
+
+Also note under **Changed**: `clsx` and `tailwind-merge` are no longer bundled into
+`dist/index.js`. They are declared `dependencies`, so a normal install resolves them — but
+a consumer vendoring the built output by hand, rather than installing the package, now has
+two unresolved bare imports.
+
 ### Added
+
+- **The package installs straight from GitHub, and `dist/` is committed to make that
+  possible.** The consuming app held a copy of this repo's build output at
+  `vendor/ravn-ui-kit` and installed it as `file:./vendor/ravn-ui-kit`. That copy was
+  **50.8% of all line churn in the app repo** — 23,468 lines across 12 commits, because
+  minified output reflows on any change — and it was unverifiable: the app's lockfile entry
+  is `{"resolved": "vendor/ravn-ui-kit", "link": true}`, carrying no version and no
+  integrity hash, so `@ravn/ui-kit@0.3.0` names four mutually different artifacts in that
+  repo's history with nothing able to detect it.
+
+  Vendoring was originally chosen because this repository was private and reaching it from
+  the app's CI would have needed a cross-repo PAT secret. It is public now, so `npm ci`
+  clones it anonymously — no secret, no permission widening.
+
+  What still blocked a git install was `.gitignore`. **A git install runs no build**: npm
+  clones, looks for a `prepare` script, finds none, and packs whatever `package.json`'s
+  `files` names. With `dist/` ignored, that tarball shipped an exports map whose four
+  entries all pointed at files that were not in it.
+
+  `"prepare": "npm run build"` would have fixed that and was rejected: it makes every
+  consumer install — their CI, every preview deploy, every worktree — pull this repo's
+  695-package / ~370 MB devDependency tree and run a full build. Committing 276 KB of
+  generated output keeps installs as fast as they are and keeps the build in the repo that
+  owns it. `.gitattributes` already marked `dist/**` as `linguist-generated -diff`, so
+  GitHub collapses it in review and local diffs skip it.
+
+  The build was confirmed byte-identical across two consecutive runs before anything was
+  committed, because the freshness guard below would otherwise fail on every pull request
+  forever.
+
+- **A CI step that fails when the committed `dist/` is stale** (`Check committed dist/ is
+fresh`, immediately after `Build library`). A committed build artifact is worth nothing
+  unless it matches the source beside it, and nothing checked that — a stale `dist/` would
+  surface on the app's deploy rather than here.
+
+  It runs `git add --intent-to-add dist/ && git diff --exit-code dist/`. The
+  `--intent-to-add` half is load-bearing: a bare `git diff --exit-code dist/` sees tracked
+  files only, so a build emitting a **new** chunk leaves it untracked and invisible — empty
+  diff, green guard, tarball missing the chunk, which is the exact failure the guard exists
+  to prevent. Because of the `-diff` attribute a failure prints "Binary files differ"
+  instead of a six-figure patch; the exit code is still non-zero, and
+  `.github/workflows/ci.yml` says so, since the obvious "fix" is to drop the attribute and
+  reintroduce the review noise it removes.
 
 - **A `Decisions` page in the published Storybook** (`src/styles/decisions.mdx`), beside
   `Introduction`. Four decisions this kit is built around had no version-controlled home
@@ -186,6 +253,13 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   the one consumer imports `Menu`, `Modal`, `MultiSelect` and `Select` and nothing else.
 
 ### Fixed
+
+- **`README.md`'s install command, which has never worked.** Step one was
+  `npm install @ravn/ui-kit`. Nothing publishes this package and `@ravn` is not a scope this
+  project owns, so the command either fails or installs a stranger's code. It now shows the
+  git install, and states the two things that make it keep working: pin a tag rather than a
+  branch, because a branch re-resolves on every `npm ci` behind an unchanged lockfile entry;
+  and `dist/` is committed, so what installs is the tagged artifact rather than a rebuild.
 
 - **Three figures in `CLAUDE.md` that no reader could check.** All three came from planning
   documents that are gitignored, so they read as authoritative and resolved to nothing.
@@ -977,11 +1051,21 @@ it was removed from both. Reconstructing the entries after the fact would mean i
 them, which is worse than saying so here.
 
 <!--
-Compare links, per Keep a Changelog. These 404 until the tags exist: this repository has
-no tags at all yet, and creating `v0.2.0`/`v0.3.0` belongs to the packaging work, not
-here. They are written in their final form so that tagging is the only remaining step.
+Compare links, per Keep a Changelog.
+
+`v0.2.0` and `v0.3.0` are retro-tags, created with the packaging work and placed on
+`main`'s existing history rather than invented: `v0.2.0` on `cd767cd`, the commit that
+introduced `"version": "0.2.0"` (`b98dd0a` bumped it to 0.3.0), and `v0.3.0` on `ad3b5ad`,
+`main`'s tip, still at 0.3.0. Before that these links pointed at refs that did not exist.
+
+`v0.4.0` is cut by the reviewer on the merge commit, so the `[0.4.0]` link 404s until the
+pull request merges — a release tag must not sit on an integration branch, where a squash
+merge would orphan it. `v0.4.0-rc.1` exists at the branch tip in the meantime and is what
+the consuming app pins while the switch-over is verified. See `CLAUDE.md`'s tagging
+checklist.
 -->
 
-[unreleased]: https://github.com/f3r21/ravn-ui-kit/compare/v0.3.0...HEAD
+[unreleased]: https://github.com/f3r21/ravn-ui-kit/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/f3r21/ravn-ui-kit/releases/tag/v0.2.0
