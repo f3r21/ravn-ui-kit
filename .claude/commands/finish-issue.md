@@ -7,6 +7,18 @@ is **`CI`**, the preview is **Storybook on GitHub Pages**, and two things have n
 there at all: `npm run build` plus `npm run build:storybook` with `dist/` **committed**, and the
 release checklist in `CLAUDE.md`. Do not sync the two — each repo edits only its own copy.
 
+0. **Re-read the comments before anything else** — you last read them at claim time, and the
+   correction channel this project runs on is comments on the issue:
+
+   ```bash
+   gh issue view <n> --comments
+   ```
+
+   An amendment posted while you worked lands here, at your own checkpoint, rather than after
+   your PR is open and a reviewer has to say it again. This turns "the amendment must reach the
+   lane immediately" into "it must reach the lane by its next checkpoint", which is a far easier
+   problem — and it is the reason a working lane rarely needs interrupting.
+
 1. `npm run gate` — green, zero failures. Then `npm run build` and `npm run build:storybook` if
    anything that ships changed.
 2. Commit with conventional commits, one concern each, `Closes #<n>` in the final one.
