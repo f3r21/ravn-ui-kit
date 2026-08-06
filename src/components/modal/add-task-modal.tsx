@@ -68,8 +68,10 @@ export interface AddTaskModalProps {
  * space) reuses this exact same "Add Task Modal" component (identical 578×184/neutral-3/8px
  * anatomy) reopened with the Estimate ("0 Points") and Assignee ("Jerome Bell") triggers
  * already filled — confirming Edit is this same widget pre-populated, not a distinct
- * component. `initialTitle`/`initialDueDate`/`initialPoints`/`initialAssignee` (all optional,
- * defaulting to the prior blank-create behavior) seed the internal state for that reuse.
+ * component. `initialTitle`/`initialDueDate`/`initialPoints`/`initialAssignee`/`initialLabel`
+ * (all optional, defaulting to the prior blank-create behavior) seed the internal state for
+ * that reuse — re-read every time the widget is reopened, not only on first mount, because
+ * `isOpen` gates rendering below the hooks and therefore never unmounts the state.
  */
 export function AddTaskModal({
   isOpen,
@@ -102,27 +104,44 @@ export function AddTaskModal({
   const labelTriggerRef = React.useRef<HTMLButtonElement>(null);
   const dateTriggerRef = React.useRef<HTMLButtonElement>(null);
 
-  if (!isOpen) return null;
-
-  const reset = () => {
-    setTitle('');
-    setDueDate(undefined);
-    setPoints(undefined);
-    setAssignee(undefined);
-    setLabel(undefined);
+  // Puts the fields back to what the props say. `useState` above only reads them on the very
+  // first render, and the `isOpen` gate below is a render guard rather than an unmount — the
+  // component keeps its state across a close/open cycle — so without this, reopening for a
+  // *different* task showed the previous one's values, or nothing at all.
+  const seedFromProps = () => {
+    setTitle(initialTitle);
+    setDueDate(initialDueDate);
+    setPoints(initialPoints);
+    setAssignee(initialAssignee);
+    setLabel(initialLabel);
     setOpenPopover(null);
   };
+
+  // Re-seed on the closed -> open edge, during render rather than in an effect: React discards
+  // this pass and re-renders with the new state before committing, so the first frame the user
+  // sees is already correct. An effect would paint the stale values first.
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [wasOpen, setWasOpen] = React.useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) seedFromProps();
+  }
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     onSubmit?.({ title: title.trim(), dueDate, points, assignee, label });
-    reset();
+    // Returns to the props' values rather than blanking the form. For the create flow those
+    // are empty, so this is the clear it always was; for the edit flow it is the task as it
+    // was opened, which is the only defensible reading of "reset" there.
+    seedFromProps();
     onClose();
   };
 
   const handleCancel = () => {
-    reset();
+    seedFromProps();
     onClose();
   };
 
