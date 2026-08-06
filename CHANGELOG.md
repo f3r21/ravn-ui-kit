@@ -21,6 +21,43 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   across the six issues #23 sampled: **1 of 86 substantive figures, 1.2%** —
   `node scripts/figure-audit.mjs <bodies>`. Repository process only; `dist/` is untouched.
 
+- `scripts/hooks.test.mjs` — 33 cases that drive each hook exactly as Claude Code drives it, with
+  the payload as JSON on stdin. Vitest collects it, so it runs inside `npm run gate`. Restoring
+  the pre-fix `.claude/` and running it there: **22 of the 34 cases it collects fail** (34 rather
+  than 33 because the old `settings.json` wired three hook commands where the fix wires two).
+  Two cases exist only to pin the removed shapes, so a revert to argv or `$FILE_PATH` goes red
+  rather than quiet, and three check that `settings.json` still points at a script that exists
+  and is executable — a hook that works but is wired to nothing fails in exactly the original
+  way. Coverage is unaffected: the metric includes `src/**` alone, so the ratchet in
+  `vitest.config.ts` neither moves nor needs to.
+
+### Changed
+
+- **Lanes can read issue comments.** `.claude/commands/start-issue.md` told a session to run
+  `gh issue view <n>`, which prints the body and a comment _count_ — never the comments. The
+  correction channel this project runs on is comments on the issue, so it had been write-only.
+  The ritual now specifies one command that returns both halves,
+  `gh issue view <n> --json body,comments`, because two commands can be half-followed and one
+  cannot. `--comments` is not the fix on its own: it suppresses the body —
+  `gh issue view 22 | wc -c` → 3800 with the body present, `gh issue view 22 --comments | wc -c`
+  → 8029 with zero occurrences of any body phrase.
+
+  `finish-issue.md` gains a step 0 that re-reads the comments before the gate, so an amendment
+  posted mid-work lands at the lane's own checkpoint rather than after its PR is open.
+
+  Also records the ritual hardening that merged in #37 without a changelog entry, contrary to
+  this file's own rule: the deadlock, dead-check, figure-provenance and subagent-scoping rules,
+  the tagging pointer, and that a red check with no named step executed is infrastructure rather
+  than your defect.
+
+- Three of the safety patterns changed shape. They had never run, so there was no behaviour to
+  preserve: `rm` now requires recursive-and-force flags _and_ a root or home target, so
+  `rm -rf ./dist` — routine here, since `dist/` is committed — is allowed; `--force` no longer
+  matches `--force-with-lease` by substring, while a `git push origin +branch` refspec now
+  matches where it never did.
+- `eslint.config.js` gives `scripts/**/*.mjs` the Node globals it already gave root-level config
+  files.
+
 ### Fixed
 
 - **The published token tables rendered as raw `|` characters. They are tables now.** This
@@ -73,28 +110,6 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   separately documented 1436px is where the _table view_ stops fitting.
 - `CLAUDE.md` cited `.claudeignore` as the mechanism keeping `dist/` out of context. It now names
   the `permissions.deny` `Read(./dist/**)` entry that actually does it.
-
-### Added
-
-- `scripts/hooks.test.mjs` — 33 cases that drive each hook exactly as Claude Code drives it, with
-  the payload as JSON on stdin. Vitest collects it, so it runs inside `npm run gate`. Restoring
-  the pre-fix `.claude/` and running it there: **22 of the 34 cases it collects fail** (34 rather
-  than 33 because the old `settings.json` wired three hook commands where the fix wires two).
-  Two cases exist only to pin the removed shapes, so a revert to argv or `$FILE_PATH` goes red
-  rather than quiet, and three check that `settings.json` still points at a script that exists
-  and is executable — a hook that works but is wired to nothing fails in exactly the original
-  way. Coverage is unaffected: the metric includes `src/**` alone, so the ratchet in
-  `vitest.config.ts` neither moves nor needs to.
-
-### Changed
-
-- Three of the safety patterns changed shape. They had never run, so there was no behaviour to
-  preserve: `rm` now requires recursive-and-force flags _and_ a root or home target, so
-  `rm -rf ./dist` — routine here, since `dist/` is committed — is allowed; `--force` no longer
-  matches `--force-with-lease` by substring, while a `git push origin +branch` refspec now
-  matches where it never did.
-- `eslint.config.js` gives `scripts/**/*.mjs` the Node globals it already gave root-level config
-  files.
 
 ## [0.4.0] - 2026-08-06
 
