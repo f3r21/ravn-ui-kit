@@ -1,0 +1,67 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Grouped so a routine week is one PR to review rather than fifteen. Security
+    # updates are deliberately left ungrouped by Dependabot itself and still
+    # arrive as their own PRs.
+    groups:
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      # Peer dependencies, so a bump here is a compatibility statement about what
+      # the consuming app must install — not an internal upgrade. They travel
+      # together because the kit builds every interactive component on the hooks.
+      react-aria:
+        patterns:
+          - react-aria
+          - react-stately
+          - '@internationalized/*'
+      # Storybook is the published API reference (`README.md` points consumers at
+      # it) and its addons must move in lockstep with the core package, so a
+      # split bump would break the build rather than the tests.
+      storybook:
+        patterns:
+          - storybook
+          - '@storybook/*'
+          - storybook-addon-*
+          - eslint-plugin-storybook
+      dev-tooling:
+        patterns:
+          - eslint
+          - eslint-plugin-jsx-a11y
+          - eslint-plugin-react-hooks
+          - '@eslint/*'
+          - typescript-eslint
+          - prettier
+          - vitest
+          - '@vitest/*'
+          - '@testing-library/*'
+      build-tooling:
+        patterns:
+          - vite
+          - vite-plugin-dts
+          - '@vitejs/*'
+          - tailwindcss
+          - '@tailwindcss/*'
+
+  # The app has no equivalent block; this one is here because CI is now a required
+  # status check on `main`. A pinned action that goes unmaintained or gets
+  # deprecated stops being a warning in a log nobody reads and starts blocking
+  # every merge, so the versions need the same weekly attention as the npm tree.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns:
+          - '*'
