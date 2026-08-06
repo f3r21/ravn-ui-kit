@@ -51,8 +51,9 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 ## `dist/` is committed, generated, and never hand-edited
 
 The app consumes this package as a git dependency pinned to a tag, and a git install runs no
-build — so `dist/` has to exist in the repo. It is in `.claudeignore`: 104 KB of minified JS
-and 122 KB of rolled-up types, never worth reading. Change the source and rebuild.
+build — so `dist/` has to exist in the repo. It is denied to `Read` in `.claude/settings.json`:
+104 KB of minified JS and 122 KB of rolled-up types, never worth reading. Change the source and
+rebuild.
 
 CI now fails when it is stale (`Check committed dist/ is fresh`, straight after the build
 step). That check is `git add --intent-to-add dist/ && git diff --exit-code dist/` — the
@@ -78,6 +79,33 @@ the tag and `git describe` on `main` broken permanently. So a lane cuts a **prer
 merges, and says in the release notes that it came from unmerged history. **The reviewer who
 merges the PR cuts the real `vX.Y.Z` on the merge commit** and the downstream consumer re-pins
 to it. Both are annotated tags with a matching GitHub release.
+
+## The Claude Code hooks are tested, because they were inert
+
+`.claude/hooks/` holds two scripts and `scripts/hooks.test.mjs` proves they work. Vitest
+collects it, so it runs inside `npm run gate` — the point of it existing. All three integration
+points 7514d38 copied in were inert: the safety hook read `$1`, both formatter hooks
+interpolated a `$FILE_PATH`, and `.claudeignore` is not a file Claude Code reads at all. A hook
+that does nothing exits 0 exactly like one that works, so nothing caught it. Two of the test's
+cases exist only to pin the removed shapes — a command on argv must still deny, a path on argv
+or in `$FILE_PATH` must leave the file untouched — so a revert to the broken input source goes
+red instead of quiet.
+
+Hook input is **JSON on stdin**, never argv and never an environment variable. Denying is
+`permissionDecision: "deny"` on stdout; a non-zero exit that is not exactly `2` prints the
+refusal and then runs the command anyway. `node` parses the payload, not `jq` — `npm install`
+never provides `jq`, and a parser missing on one machine is the same silent no-op again.
+
+**`.claudeignore` is gone; `permissions.deny` in `.claude/settings.json` replaces it.** That is
+a real control rather than a decorative one, and it costs accordingly: a `Read()` rule also
+covers Edit/Write/Glob/Grep and the shell's readers, so `node_modules/**` is genuinely
+unreadable — reaching for React Aria's own source means an override in the untracked
+`settings.local.json`.
+
+**Known false positive:** the safety hook matches the command line as text, so a
+`gh issue comment` whose body _quotes_ `rm -rf /` or `git push --force` is denied. Use
+`--body-file`. A false deny rather than a false allow is the right direction for this, and it
+is a chosen behaviour rather than one to rediscover.
 
 ## Changelog
 
