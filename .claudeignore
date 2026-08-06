@@ -4,8 +4,8 @@ coverage/
 storybook-static/
 .playwright-mcp/
 
-# Generated build output. Once it is committed (so the package installs straight
-# from GitHub), dist/index.js is ~180 KB of minified bundle and index.d.ts ~119 KB
-# of rolled-up types — never worth reading, and expensive to pull into context.
+# Generated build output. It is committed, so the package installs straight from
+# GitHub — dist/index.js is ~104 KB of minified bundle and index.d.ts ~122 KB of
+# rolled-up types, never worth reading and expensive to pull into context.
 # Change the source and rebuild; never hand-edit these.
 dist/

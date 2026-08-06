@@ -50,9 +50,16 @@ runs both, and the Storybook build catches story and MDX errors the unit tests c
 
 ## `dist/` is committed, generated, and never hand-edited
 
-The app consumes this package as a git dependency pinned to a tag, so `dist/` has to exist in
-the repo. It is in `.claudeignore` — 180 KB of minified JS and 119 KB of rolled-up types, never
-worth reading. Change the source and rebuild.
+The app consumes this package as a git dependency pinned to a tag, and a git install runs no
+build — so `dist/` has to exist in the repo. It is in `.claudeignore`: 104 KB of minified JS
+and 122 KB of rolled-up types, never worth reading. Change the source and rebuild.
+
+CI now fails when it is stale (`Check committed dist/ is fresh`, straight after the build
+step). That check is `git add --intent-to-add dist/ && git diff --exit-code dist/` — the
+`--intent-to-add` half is what lets it see a _newly emitted_ file, which a bare diff cannot.
+`.gitattributes` marks `dist/**` as `-diff`, so a failure prints "Binary files differ" rather
+than a 100 KB patch; the exit code is still non-zero, so do not "fix" that by removing the
+attribute.
 
 **Tagging is a checklist, not a command.** Before `git tag`:
 
@@ -60,8 +67,17 @@ worth reading. Change the source and rebuild.
 2. `npm run build` run, and the resulting `dist/` **committed**
 3. `CHANGELOG.md`'s `[Unreleased]` moved into a dated version section matching `package.json`
 
-Skipping step 2 tags a version whose `dist/` is stale. Nothing in either repo's CI catches
-that — it surfaces on the app's deploy, in front of whoever is reading it.
+Skipping step 2 tags a version whose `dist/` is stale. CI catches it on a pull request now,
+but a tag is cut by hand at a commit and nothing checks that — it would surface on the app's
+deploy, in front of whoever is reading it.
+
+**Who cuts which tag.** A tag points at a commit, so a release tag must not be cut on an
+integration branch: a squash merge orphans that commit, leaving the version reachable only via
+the tag and `git describe` on `main` broken permanently. So a lane cuts a **prerelease**
+(`vX.Y.Z-rc.N`) at its branch tip when something downstream needs to install the work before it
+merges, and says in the release notes that it came from unmerged history. **The reviewer who
+merges the PR cuts the real `vX.Y.Z` on the merge commit** and the downstream consumer re-pins
+to it. Both are annotated tags with a matching GitHub release.
 
 ## Changelog
 
