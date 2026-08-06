@@ -8,6 +8,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **Every figure now carries the command that re-derives it.** A number in an issue, commit, PR
+  body or `CLAUDE.md` is written once and read by sessions that cannot check it, so the command
+  ships beside it. `.github/ISSUE_TEMPLATE/lane-task.md` (new — the repo had no issue template)
+  and the PR template both require a **Figures** section or the explicit line "no figures".
+  `CLAUDE.md` carries the rule where lanes already load it.
+
+  `scripts/figure-audit.mjs` counts how many figures in a body carry a command, so the metric is
+  re-derivable rather than asserted — the rule applied to the thing measuring the rule. Baseline
+  across the six issues #23 sampled: **1 of 86 substantive figures, 1.2%** —
+  `node scripts/figure-audit.mjs <bodies>`. Repository process only; `dist/` is untouched.
+
 ### Fixed
 
 - **The published token tables rendered as raw `|` characters. They are tables now.** This
