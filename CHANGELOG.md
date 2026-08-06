@@ -10,6 +10,30 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The published token tables rendered as raw `|` characters. They are tables now.** This
+  Storybook's MDX pipeline had no `remark-gfm`, and GFM tables are not part of core Markdown, so
+  a pipe table was not a badly-styled table — it was a paragraph, published verbatim on the live
+  site. `colors.mdx`'s alias table and `typography.mdx`'s type scale were both affected, and the
+  colour alias table is exactly what a consumer opens that page to read.
+
+  `remark-gfm` is now configured on `@storybook/addon-docs` in `.storybook/main.ts`. Verified by
+  rendering, not by building — a green build is what this bug survived for its whole life.
+  `colors.mdx` now renders three real `<table>` elements with 13, 7 and 3 body rows, and
+  `typography.mdx` one with 7; both pages show zero lines of visible pipe text.
+
+  Chosen over converting both pages to literal `<table>` markup on measured grounds: there are
+  only four `.mdx` pages, and across all of them there are zero tildes, zero bare URLs, zero
+  footnote references and zero task-list markers — so tables are the only GFM construct the kit
+  contains, and the parser change cannot alter anything else. All four were re-rendered and read
+  afterwards regardless. `introduction.mdx`, which has no tables, renders to a character-identical
+  4621-character document before and after. The alternative would also have left the trap armed
+  for the next person to write a pipe table.
+
+  `@storybook/addon-docs` is now a direct devDependency, pinned to exactly `8.6.14` rather than a
+  caret range. Configuring MDX options requires naming the addon, and the version must match what
+  `@storybook/addon-essentials` pins internally — a caret resolves to a newer patch and npm then
+  installs a second copy alongside the one essentials carries.
+
 - **The Claude Code hooks copied in `7514d38` were inert, and now are not.** Nothing in this
   release changes `dist/`; it is repository tooling only, so consumers are unaffected.
   - `.claude/hooks/block-dangerous.sh` read its command from `$1`. Claude Code passes the tool
