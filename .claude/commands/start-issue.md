@@ -28,15 +28,24 @@ This applies to the issue text as much as to the tree. An issue written days ago
 like "#22, still open" that stopped being true; check the state of anything it cites before you
 build on it.
 
-Then read the issue — **the whole body and every comment**:
+Then read the issue — **the whole body and every comment**. That is two commands, not one:
 
 ```bash
-gh issue view <n> --comments        # NOT `gh issue view <n>`, and never piped through `head`
+gh issue view <n>                   # the body, and a comment COUNT rather than the comments
+gh issue view <n> --comments        # the comments, and ONLY those — this one omits the body
 ```
 
-`gh issue view <n>` prints the body and a comment _count_, not the comments. A correction or a
-second requirement often lives there, and reading only the body means shipping half the issue —
-which has happened here. Do not truncate the output; the part you cut is the part you will miss.
+Neither is a superset of the other, so run both and never pipe either through `head`. Reading
+only the body means shipping half the issue — that happened here on #22, where a comment
+carrying two further requirements went unread and only one of them shipped, by coincidence.
+Reading only `--comments` is the same mistake pointed the other way. The part you truncate is
+the part you will miss.
+
+If you would rather have one command whose output cannot hide either half:
+
+```bash
+gh issue view <n> --json body,comments -q '.body, (.comments[] | "--- \(.author.login)\n\(.body)")'
+```
 
 The issue is your complete briefing — it is written for someone with no prior context, which is
 what you are.
