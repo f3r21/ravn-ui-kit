@@ -5,7 +5,7 @@ A standalone, accessible, reusable UI kit built with **React 19, TypeScript, Tai
 **📖 [Browse the Storybook](https://f3r21.github.io/ravn-ui-kit/)** — every component, its
 props and its states, published from `main` on each green CI run.
 
-See the **Introduction** page there for the full component catalog and fidelity notes, and `UI_KIT_MASTER_PLAN.md` for the ground-truth audit log this library was built against.
+See the **Introduction** page there for the full component catalog and fidelity notes, and **Decisions** for the four calls this kit is built around — why it is desktop-only, why accessibility outranks Figma fidelity, which contrast failures are accepted and why, and why field labels are `sr-only` by default.
 
 Built for, and consumed by, **[ravn-task-management-challenge](https://github.com/f3r21/ravn-task-management-challenge)** ([live app](https://ravn-task-management-challenge.vercel.app)).
 

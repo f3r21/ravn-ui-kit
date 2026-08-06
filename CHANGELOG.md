@@ -927,8 +927,9 @@ individually here — see `git log` for the full development history up to this 
 
 This section is a stub and stays one. It was written pointing at a planning document
 (`UI_KIT_MASTER_PLAN.md`) which is gitignored, so the citation reaches no reader of this
-repository — the same dangling reference `README.md` still carries. Reconstructing the
-entries after the fact would mean inventing them, which is worse than saying so here.
+repository — `README.md` and `introduction.mdx` carried the same dangling reference until
+it was removed from both. Reconstructing the entries after the fact would mean inventing
+them, which is worse than saying so here.
 
 <!--
 Compare links, per Keep a Changelog. These 404 until the tags exist: this repository has
