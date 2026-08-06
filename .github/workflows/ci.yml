@@ -98,7 +98,7 @@ jobs:
       # The gate above never renders a component. `src/styles/contrast.test.ts` checks
       # tokens against each other and the unit suite runs in jsdom, so a component that
       # composes two individually-fine tokens into a failing pair passes both. This serves
-      # the Storybook built in the previous step and runs axe over all 144 stories in a real
+      # the Storybook built in the previous step and runs axe over all 145 stories in a real
       # browser, failing on any finding not recorded in `.storybook/a11y-allowlist.ts`.
       #
       # If this step reports every story as failing, read the first message rather than the

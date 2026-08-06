@@ -1,7 +1,7 @@
 /**
  * Accepted axe findings, keyed by **story id** and then by **axe rule id**.
  *
- * This is the ratchet `.storybook/test-runner.ts` enforces over all 144 stories. It is
+ * This is the ratchet `.storybook/test-runner.ts` enforces over all 145 stories. It is
  * keyed this narrowly on purpose: a bare count or a global threshold lets a brand-new
  * violation hide inside the budget the moment an old one is fixed. Here, a rule firing on
  * a story that does not list it fails the build, and a rule listed for a story that no
@@ -113,7 +113,7 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   },
 
   // --- OPEN DEBT: `aria-prohibited-attr` on `TaskMetaBadges` ---------------------------
-  // 5 nodes across 2 stories, and **not an accepted deviation** — this is a real defect
+  // 8 nodes across 4 stories, and **not an accepted deviation** — this is a real defect
   // that no previous audit had found, because every previous audit looked only at colour.
   //
   // `task-meta-badges.tsx` renders each badge as `<span aria-label={label}>` with both of
@@ -124,9 +124,19 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   //
   // Recorded here rather than fixed because this issue's job is to install the gate and
   // baseline it honestly; the fix is a component change that needs its own test and
-  // coverage ratchet. Delete these two lines as part of that fix.
+  // coverage ratchet. It is issue #19, and these four lines go with it.
   'components-taskmetabadges--default': { violations: ['aria-prohibited-attr'] }, // 3 nodes
   'components-taskmetabadges--counts-only': { violations: ['aria-prohibited-attr'] }, // 2 nodes
+
+  // The same defect, on the two `TaskCard` stories that render badges — 3 nodes. These
+  // stories used to pass, and the reason they did is worth keeping: the card carried
+  // `role="button"`, and a button's descendants are *presentational children* in ARIA, so
+  // axe stopped evaluating roles inside it and never reached the badges. Removing that role
+  // (the card's keyboard affordance is now a real button on the title) did not introduce a
+  // finding, it stopped one being masked — which is what a container-wide `role="button"`
+  // does to everything it wraps. Same fix, same issue #19, delete all four together.
+  'components-taskcard--default': { violations: ['aria-prohibited-attr'] }, // 2 nodes
+  'components-taskcard--overdue': { violations: ['aria-prohibited-attr'] }, // 1 node
 
   // --- `incomplete` — `SidebarItem`'s selected gradient --------------------------------
   // 5 nodes across 5 stories, all one element: the active item's label, which sits on
