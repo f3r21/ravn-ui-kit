@@ -84,6 +84,32 @@ jobs:
       - name: Build library
         run: npm run build
 
+      # `dist/` is committed, because the consuming app installs this package straight
+      # from GitHub and a git install runs no build (see `.gitignore`). A committed
+      # build artifact is only worth anything if it matches the source beside it, and
+      # nothing else in either repository checks that — a stale `dist/` surfaces on the
+      # app's deploy, in front of whoever is reading it. This step is that check: the
+      # build ran immediately above, so any difference here is source that was changed
+      # without rebuilding.
+      #
+      # `--intent-to-add` is load-bearing, not decoration. A bare `git diff --exit-code
+      # dist/` compares tracked files only, so a build that *emits a new chunk* leaves
+      # it untracked and invisible: the diff is empty, the guard passes green, and the
+      # tarball ships without the chunk. `--intent-to-add` registers untracked paths
+      # with git so the diff can see them.
+      #
+      # `.gitattributes` marks `dist/**` as `-diff`, so a failure prints "Binary files
+      # differ" rather than a 100 KB patch. The exit code is still non-zero and the
+      # guard still works — do not "fix" the output by dropping the attribute, which
+      # exists so a generated file does not drown out real changes in review.
+      - name: Check committed dist/ is fresh
+        run: |
+          git add --intent-to-add dist/
+          git diff --exit-code dist/ || {
+            echo "::error::dist/ is stale. Run 'npm run build' and commit the result."
+            exit 1
+          }
+
       - name: Build Storybook
         run: npm run build:storybook
 
