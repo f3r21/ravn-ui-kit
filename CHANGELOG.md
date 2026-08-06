@@ -534,8 +534,10 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 - **The `Select` and `MultiSelect` triggers are the design's chip again**, not a white
   field. Both hardcoded `bg-surface-neutral` — `#FFFFFF` — so the consuming app's dark
-  board carried five near-white 40px `rounded-md` pills, and its create/edit modal four
-  more. Figma draws every dropdown trigger in this system as the same `Tag` atom:
+  board carried four near-white 40px `rounded-md` pills, and its create/edit modal four
+  more. (This entry said five. The fifth chip in that row is the app's own due-date filter
+  markup, not a kit trigger — established in the app's PR #20 and never propagated back
+  here.) Figma draws every dropdown trigger in this system as the same `Tag` atom:
   `rgba(148, 151, 154, 0.1)` over the dark surface, 4px radius, 32px tall, 4px/16px
   padding, white 15px/600 label (`Dashboard Add Task/Add Task Modal00.md:78-140`, and the
   same chip again filled in the Edit Task modal). The triggers now use `Tag`'s own
