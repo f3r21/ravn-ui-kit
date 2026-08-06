@@ -146,6 +146,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Merged branches are now deleted automatically (`deleteBranchOnMerge`), which had been
   off since the repo was created.
 
+- **`AddTaskModal`'s `initial*` props are now `default*`** — `initialTitle`,
+  `initialDueDate`, `initialPoints`, `initialAssignee` and `initialLabel` become
+  `defaultTitle`, `defaultDueDate`, `defaultPoints`, `defaultAssignee` and `defaultLabel`.
+  **This is a breaking rename with no alias kept**, landing as a minor bump under SemVer's
+  pre-1.0 carve-out, per `CONTRIBUTING.md`'s versioning policy.
+
+  `initial*` was the only place in the kit using that prefix. Every other uncontrolled seed
+  is `default*` — `defaultValue`, `defaultSelected`, `defaultSelectedKey`, `defaultOpen` —
+  following React Aria, and one component spelling it differently is a reason to go and read
+  the source instead of trusting the pattern. The semantics are the `default*` ones: read
+  when the widget opens, then owned by the field. Opening is this widget's mount, because a
+  closed one renders nothing.
+
+  Done now rather than deferred because the props' behaviour changed in the same release
+  anyway (see the reopen fix below), and because the cost is at its lowest it will ever be:
+  the one consumer imports `Menu`, `Modal`, `MultiSelect` and `Select` and nothing else.
+
 ### Fixed
 
 - **`clsx` and `tailwind-merge` were compiled into `dist/index.js`.** Both are declared in
@@ -247,6 +264,47 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   record this and no way to avoid fixing it. `.storybook/a11y-allowlist.ts` and
   `CONTRIBUTING.md` now say so, and `CONTRIBUTING.md` gives the one-line devtools override
   that reproduces the runner's wider font locally.
+
+- **`TaskTableRow` could not be opened from the keyboard at all.** Its `onClick` sat on the
+  `<tr>` with no `role`, no `tabIndex` and no `onKeyDown`, so opening a task from the table —
+  the primary task surface in the consuming app — required a pointer. The title now renders
+  as a real `<button>` when the row is clickable, named by the task title, and the row-wide
+  handler stays beside it as a pointer convenience. The `<tr>` itself could not become the
+  control: `role="button"` on it strips the `row` role the table depends on.
+
+  The row's own controls no longer open the task either. The select checkbox and the
+  "Details" link bubbled their clicks into the row handler, so ticking a checkbox opened the
+  task you were trying to select — and that only gets more reachable now that the row's
+  controls sit in a keyboard sequence, since activating a control synthesises a click that
+  bubbles the same way.
+
+- **`TaskCard` was one giant ARIA button.** It solved the same problem correctly — `role="button"`
+  - `tabIndex={0}` + Enter/Space on the card container — but at the container's expense: the
+    control's accessible name was the card's entire text content ("Fix bug 5 Pts OVERDUE BUG
+    Fernando Ramirez 12 comments"), and every interactive child it may hold sat inside a button,
+    which is invalid. It now uses the same explicit title button as the table row, via a new
+    optional `onTitleClick` on `ProjectInfo`.
+
+  That container role was also masking real findings. A button's descendants are
+  _presentational children_ in ARIA, so axe stopped evaluating roles inside the card and never
+  reached `TaskMetaBadges`' `aria-prohibited-attr` defect — which its own stories have been
+  reporting all along. Two `TaskCard` stories now report it too. Nothing about the badges
+  changed; the mask came off. Both new allowlist entries carry the same pointer to the issue
+  that closes all four.
+
+- **`AddTaskModal` came back up holding the previous task's values.** `isOpen` gates rendering
+  _below_ the hooks, so the widget is never unmounted and keeps its state across a close/open
+  cycle, and Cancel blanked the title rather than restoring it. Open on "Foo", cancel, reopen
+  on "Bar" and the field came up empty — which is exactly the edit-reuse case those seed props
+  exist for, and the case the component's own doc comment advertises. A consumer could not fix
+  it with a `key`, because nothing tells it the widget is holding stale state.
+
+  Every field is now re-seeded on the closed → open edge, during render rather than in an
+  effect, so the first frame is already correct instead of painting the previous task's values
+  and correcting them. It is bound to that edge and not to the props, so a parent re-render
+  cannot throw away a half-typed title. Cancel and submit both return the form to the props'
+  values: for the create flow those are empty and it clears exactly as before; for the edit
+  flow it is the task as it was opened, which is the only defensible reading of "reset" there.
 
 ## [0.3.0] - 2026-08-05
 
