@@ -137,6 +137,31 @@ the exact allowlist line that would accept it. Prefer fixing the finding. Accept
 one is a design decision and needs a written reason next to the entry — a measured
 ratio and why the palette cannot serve it, or a pointer to the work that closes it.
 
+**If it only fails in CI, do not reach for the allowlist.** Because the ratchet runs
+both ways, an environment-specific finding has no valid entry: listing it fails your
+machine with `GONE`, omitting it fails CI with `NEW`. That is on purpose — the gap
+has to be closed, not recorded.
+
+The cause so far has always been the same one. `--font-sans` is `'SF Pro Display',
+system-ui, sans-serif` and the kit ships none of those, so what you measure depends on
+the machine: macOS resolves `system-ui` to the SF system font, while a Linux runner
+falls through to `sans-serif` — DejaVu Sans, which is appreciably wider. Text that fits
+a fixed-pixel box here can overflow it there, and axe will not compute a contrast ratio
+for text whose background box does not contain it, so it files `color-contrast` under
+`incomplete` with `elmPartiallyObscured`. That is a layout bug wearing a colour bug's
+clothes; see `estimate-modal.tsx` for the worked example.
+
+Do not trust a local pass on a story with a fixed pixel width. Check it against a
+wider font first — Verdana ships with macOS and is slightly wider than the runner's
+DejaVu Sans, so it is a safe stand-in:
+
+```js
+// devtools console, on the story's iframe in the built Storybook
+document.documentElement.style.setProperty('--font-sans', 'Verdana, sans-serif');
+```
+
+If nothing overflows its container under that, the runner will not see it either.
+
 This does not replace `src/styles/contrast.test.ts`, which checks token pairings no
 story renders (hover fills, placeholders, surfaces a component may be dropped onto).
 Neither check sees the other's cases; a new colour decision usually wants both.

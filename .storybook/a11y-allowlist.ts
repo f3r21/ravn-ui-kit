@@ -32,6 +32,27 @@
  * gaining another `TextButton` is normal work, not new debt), and it is the one hole in
  * this ratchet worth knowing about.
  *
+ * ## This list has to hold on every machine, so it is not where an environment gap goes
+ *
+ * It is written on macOS and enforced on an Ubuntu runner, and those two do not render
+ * identically. Because the ratchet is bidirectional, a finding that appears in only one of
+ * them cannot be recorded here at all: list it and local runs fail with `GONE`, omit it and
+ * CI fails with `NEW`. No entry satisfies both. That is the intended outcome — it forces
+ * the divergence to be removed rather than described.
+ *
+ * The one that has actually happened: `--font-sans` starts with `'SF Pro Display'`, which
+ * no Linux runner has, so CI renders every label in the fallback — DejaVu Sans, which is
+ * appreciably wider. In `EstimateModal` that pushed a nowrap header 0.5px past its
+ * fixed-width popover, and axe will not compute contrast for text whose background box does
+ * not contain it, so it filed `color-contrast` under `incomplete`
+ * (`elmPartiallyObscured`). It read as a colour finding and was a layout bug;
+ * `estimate-modal.tsx` carries the measurements and the fix.
+ *
+ * So before adding an entry: a finding that only CI sees is a geometry difference until
+ * proven otherwise, and the fixed pixel widths (`w-[122px]`, `w-[160px]`, `w-[239px]`,
+ * `w-[280px]`, `w-[578px]`) are where it will land. Confirm the finding reproduces in both
+ * places before deciding it is a colour you have to accept.
+ *
  * ## Known limitation
  *
  * Nothing detects an entry whose story id no longer exists — a renamed or deleted story
