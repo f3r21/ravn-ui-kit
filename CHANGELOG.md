@@ -36,12 +36,13 @@ two unresolved bare imports.
 
 - **The package installs straight from GitHub, and `dist/` is committed to make that
   possible.** The consuming app held a copy of this repo's build output at
-  `vendor/ravn-ui-kit` and installed it as `file:./vendor/ravn-ui-kit`. That copy was
-  **50.8% of all line churn in the app repo** — 23,468 lines across 12 commits, because
-  minified output reflows on any change — and it was unverifiable: the app's lockfile entry
-  is `{"resolved": "vendor/ravn-ui-kit", "link": true}`, carrying no version and no
-  integrity hash, so `@ravn/ui-kit@0.3.0` names four mutually different artifacts in that
-  repo's history with nothing able to detect it.
+  `vendor/ravn-ui-kit` and installed it as `file:./vendor/ravn-ui-kit`. Measured in that
+  repository at `af790e0`, that copy is **50.4% of all line churn in it** — 22,859 of
+  45,346 lines, across 11 commits, because minified output reflows on any change. It was
+  also unverifiable: the app's lockfile entry is
+  `{"resolved": "vendor/ravn-ui-kit", "link": true}`, carrying no version and no integrity
+  hash, so `@ravn/ui-kit@0.3.0` names **three** mutually different `dist/` trees in that
+  repo's history — and `0.2.0` names **eight** — with nothing able to detect it.
 
   Vendoring was originally chosen because this repository was private and reaching it from
   the app's CI would have needed a cross-repo PAT secret. It is public now, so `npm ci`
@@ -54,14 +55,18 @@ two unresolved bare imports.
 
   `"prepare": "npm run build"` would have fixed that and was rejected: it makes every
   consumer install — their CI, every preview deploy, every worktree — pull this repo's
-  695-package / ~370 MB devDependency tree and run a full build. Committing 276 KB of
-  generated output keeps installs as fast as they are and keeps the build in the repo that
-  owns it. `.gitattributes` already marked `dist/**` as `linguist-generated -diff`, so
-  GitHub collapses it in review and local diffs skip it.
+  dependency tree (614 distinct `name@version`, 432 MB of `node_modules`) and run a full
+  build. Committing 275 KB of generated output (281,596 bytes across the four files) keeps
+  installs as fast as they are and keeps the build in the repo that owns it.
+  `.gitattributes` already marked `dist/**` as `linguist-generated -diff`, so GitHub
+  collapses it in review and local diffs skip it.
 
   The build was confirmed byte-identical across two consecutive runs before anything was
   committed, because the freshness guard below would otherwise fail on every pull request
-  forever.
+  forever. It has since been confirmed byte-identical **across machines** too, which two
+  runs on one machine cannot show: the guard passed on `ubuntu-latest` against a `dist/`
+  built on macOS. Same Node major, from `.nvmrc`, which is why that pin is a precondition
+  for this whole arrangement rather than housekeeping.
 
 - **A CI step that fails when the committed `dist/` is stale** (`Check committed dist/ is
 fresh`, immediately after `Build library`). A committed build artifact is worth nothing
