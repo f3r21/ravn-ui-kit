@@ -49,6 +49,21 @@ Then stop. Do not merge; the reviewer does that.
 - **Prove a new check has teeth by sabotage, on a real runner.** Break what it protects, watch
   `CI` go red, record the **failing run URL** in the PR body, restore. A check nobody has ever
   seen fail is a claim, not a guard.
+- **A red check is not automatically your defect** — the inverse of the rule above, and the same
+  point: a check's colour is not its verdict. Read which step failed before you read your diff. If
+  **no named step executed**, it is infrastructure: re-run once with
+  `gh run rerun <id> --failed`, and only investigate if it fails the same way twice. A failure
+  _inside_ a step you can name is yours until proven otherwise.
+
+  ```bash
+  gh run view <id> --json jobs -q '.jobs[] | "\(.name): \(.conclusion)", (.steps[] | "  \(.number). \(.name) → \(.conclusion)")'
+  ```
+
+  Two infrastructure shapes turned up on one day: `Set up job` failing with "Failed to resolve
+  action download info", and — run `31119698609` here — **zero steps recorded** with the job
+  `cancelled`, because a runner that is never acquired logs none. In that second shape the command
+  prints the job line and nothing else. That silence is the diagnosis, not a broken command.
+
 - **State what the check structurally cannot see.** For this repo that list is specific:
   - `jsdom` computes no styles and evaluates no media queries. `outline-none` shipped broken
     across 21 components — in Tailwind v4 it compiles to `--tw-outline-style: none`, so
