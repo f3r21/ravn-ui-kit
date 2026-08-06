@@ -1,0 +1,42 @@
+<!--
+This repo merges through PRs only — `main` requires one, and requires the `CI`
+check to pass. Approvals are deliberately NOT required: there is one account and
+GitHub forbids approving your own PR, so a required approval would deadlock the
+repo. Review happens as a comment-only review from a separate session, and the
+link on the "Second-session review" line below is what records that it happened.
+-->
+
+## What changed
+
+<!-- The change itself, in the terms a consumer would notice. Name the components
+     or config touched. If nothing user-facing changed, say so explicitly. -->
+
+## Why
+
+<!-- The problem this solves, not a restatement of the diff. Link the issue.
+     If a design value deviates from Figma, state the measured ratio and the rule
+     that forced it (see CLAUDE.md). If something was deliberately NOT done, say
+     what and why here — a reviewer with none of your context cannot tell an
+     omission from a decision. -->
+
+Closes #
+
+## How it was verified
+
+<!-- Commands actually run, with their result. Not "should be fine". -->
+
+- [ ] `npm run gate` (typecheck, lint, format:check, coverage) — green
+- [ ] `npm run build` — only if this PR touches anything that ships
+- [ ] `npm run build:storybook` — catches story and MDX errors the unit tests cannot
+- [ ] Coverage thresholds in `vitest.config.ts` raised, or unchanged — never lowered
+- [ ] `CHANGELOG.md` entry appended under `## [Unreleased]`
+- [ ] `dist/` rebuilt and committed, if source that ships changed
+
+<!-- Anything else: a Storybook story to open, a screenshot, an axe run, a measured
+     contrast ratio. -->
+
+## Second-session review:
+
+<!-- Paste the `gh pr review --comment` permalink here once a separate session has
+     read this PR. Leave the line in place even when the review is pending, so its
+     absence is visible rather than silent. -->
