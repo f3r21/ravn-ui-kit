@@ -23,6 +23,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   re-reading it: both sabotages tested the _rule_ and passed, and only the corpus tested the
   _implementation_ of the rule. Corpus effect measured, not asserted — sourced 149 → 155 across
   68 documents, with exactly one document moving. Repository tooling only; `dist/` is untouched.
+
 - **`CLAUDE.md` contradicted itself about who cuts tags** (#76). #61 rewrote the top of that file
   for the Release workflow and left the "Who cuts which tag" section describing the pre-workflow
   regime — so `:113` said "Do not cut tags by hand" while `:124` still said "the reviewer who
