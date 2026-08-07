@@ -138,4 +138,40 @@ describe('DatePickerMenu Component', () => {
     await user.keyboard('{Escape}');
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
+
+  describe('timeZone', () => {
+    // One absolute instant, read in two zones on either side of the date line. This is
+    // deliberately independent of the machine's own zone — the old code read the Date's
+    // *local* wall-clock fields, so it would answer with one day for both of these, and
+    // whichever of the two assertions does not match the runner's zone goes red. That is
+    // the point: a timezone test pinned to the runner's own zone proves nothing.
+    const instant = new Date('2026-03-15T00:00:00Z');
+
+    it('reads a date in the zone it is given, not the machine’s', () => {
+      const { unmount } = render(
+        <DatePickerMenu value={instant} timeZone="UTC" onClose={vi.fn()} />,
+      );
+      expect(isCellSelected(getDayButton('15'))).toBe(true);
+      unmount();
+
+      // UTC-11: the same instant is still 14 March there.
+      render(<DatePickerMenu value={instant} timeZone="Pacific/Niue" onClose={vi.fn()} />);
+      expect(isCellSelected(getDayButton('14'))).toBe(true);
+    });
+
+    it('writes back an instant that lands on the clicked day in that zone', async () => {
+      const handleChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <DatePickerMenu value={instant} timeZone="UTC" onChange={handleChange} onClose={vi.fn()} />,
+      );
+
+      await user.click(getDayButton('20'));
+
+      const result = handleChange.mock.calls[0][0] as Date;
+      // Asserted in UTC, because UTC is what was asked for. `getDate()` would read the
+      // runner's zone and pass or fail by accident.
+      expect(result.toISOString().slice(0, 10)).toBe('2026-03-20');
+    });
+  });
 });
