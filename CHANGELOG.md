@@ -8,6 +8,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.5.2] — 2026-08-07
+
+**The first tag cut by the Release workflow rather than by hand**, and the first with
+`tag-check.yml` live as a backstop. Everything below shipped to `main` after `v0.5.1`.
+
+For the consuming app this is the release that closes the last three kit gaps blocking its
+migration: `Modal`'s dropped `contentProps` (#64), and — already in `v0.5.1` — `Skeleton`'s
+reduced-motion guard and `Button`'s icon frame.
+
 ### Fixed
 
 - **`figure-audit.mjs` no longer credits a command that cannot detect a failing run** (#53). It
