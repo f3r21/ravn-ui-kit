@@ -45,6 +45,23 @@ describe('figure-audit', () => {
       expect(r.blind).toBe(0);
       expect(r.sourced).toBe(r.substantive);
     });
+
+    /**
+     * #71. The verification must be UPSTREAM of the pipe, not merely present in the string.
+     * Here the gate's status is already resolved at the `$(...)` boundary and the later pipe
+     * masks nothing — flagging it penalises the practice this tool exists to encourage, which
+     * is the failure mode that drives people back to bare numbers.
+     *
+     * Found by running the detector over the existing corpus, not by re-reading the code: the
+     * sabotage tested the rule, and only the corpus tested the implementation of the rule.
+     */
+    it('does not flag a pipe that is downstream of a command substitution', () => {
+      const r = auditText(
+        `- 595 tests, 38 files — \`out=$(npm run gate 2>&1); echo "$out" | grep 'Tests  '\`\n`,
+      );
+      expect(r.blind).toBe(0);
+      expect(r.sourced).toBe(r.substantive);
+    });
   });
 
   describe('isBlindPipe', () => {
@@ -56,6 +73,11 @@ describe('figure-audit', () => {
       ['`grep -c foo src/x.ts`', false],
       ['`git show v0.5.1:package.json | grep version`', false],
       ['`npm run gate`', false],
+      // #71: verification upstream of the pipe, vs. resolved before it.
+      ['`out=$(npm run gate 2>&1); echo "$out" | grep Tests`', false],
+      ['`out=$(npm run gate 2>&1); rc=$?; echo "$out" | tail -6`', false],
+      // Still blind — the substitution is present but the verification is NOT inside it.
+      ['`echo $(date) ; npm run gate 2>&1 | tail -6`', true],
     ])('%s -> %s', (text, expected) => {
       expect(isBlindPipe(text)).toBe(expected);
     });
