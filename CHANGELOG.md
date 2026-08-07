@@ -10,6 +10,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`figure-audit.mjs` no longer credits a command that cannot detect a failing run** (#53). It
+  taught `npm run gate 2>&1 | tail -6` as its own exemplar and scored it as valid provenance. A
+  pipeline's `$?` is the *last* command's status, and `tail` succeeds on empty input, so that
+  command cannot tell a passing gate from a failing one — while the coverage summary prints its
+  percentages identically either way, so there is no visual cue either.
+
+  The rule is **narrow on purpose**: the hazard is not a pipe, it is a pipe that discards a
+  status the figure depends on. `grep -rn foo src/ | wc -l` stays credited, because the figure
+  *is* the output and grep's status carries no claim. What is refused is piping a **verification**
+  — a gate, test, build or typecheck — where the figure means nothing unless the thing passed.
+  Blind lines are reported separately from unsourced ones, since the fix differs: "add a command"
+  versus "that command cannot fail".
+
+  Also the **first test for this script**, which had none despite scoring every issue and PR body
+  in the repo — the same shape as the Claude Code hooks `CLAUDE.md` records as installed, running
+  and inert. Repository tooling only; `dist/` is untouched.
+
 - **The `dist/` freshness guard now catches a deleted file** (#33). One word:
   `git diff --exit-code dist/` → `git diff HEAD --exit-code dist/`.
 
