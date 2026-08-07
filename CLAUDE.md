@@ -92,15 +92,30 @@ the `HEAD` form exits 1.
 than a 100 KB patch; the exit code is still non-zero, so do not "fix" that by removing the
 attribute.
 
-**Tagging is a checklist, not a command.** Before `git tag`:
+**Tagging is a command now, and the checklist is what it verifies.** Run the **Release** workflow
+(`.github/workflows/release.yml`, `workflow_dispatch`, on `main`) with the version. It checks all
+three facts below and only then creates the annotated tag and the GitHub release:
 
 1. `npm run gate` green
-2. `npm run build` run, and the resulting `dist/` **committed**
+2. `npm run build` run, and the committed `dist/` reproducing from source
 3. `CHANGELOG.md`'s `[Unreleased]` moved into a dated version section matching `package.json`
 
-Skipping step 2 tags a version whose `dist/` is stale. CI catches it on a pull request now,
-but a tag is cut by hand at a commit and nothing checks that — it would surface on the app's
-deploy, in front of whoever is reading it.
+It **verifies** the version bump rather than performing it — a bump is a change to a tracked file
+and belongs in a reviewed PR — so a release attempted without one is refused rather than
+silently wrong.
+
+`v0.5.0` is why this is a workflow rather than a list. It was tagged with `package.json` still
+reading `0.4.0` and `[Unreleased]` never rolled, because a checklist is steps a person performs
+under release pressure in the order they remember them. The check that would have caught it
+already existed — the app's `ui-kit-smoke.test.tsx`, whose comment names this gap verbatim — and
+was not run, which is why a _second_ thing to remember would not have fixed it either.
+
+Do not cut tags by hand. That still works — this repo has no tag protection
+(`gh api repos/f3r21/ravn-ui-kit/rulesets -q length` → 0, where the app returns 1, so the query
+works) and #59 is what would close it. If you do anyway, `.github/workflows/tag-check.yml` fires
+on the tag push and re-checks facts 1 and 3; a tag it fails is **not a release**, so do not pin
+it. It deliberately does not fire for tags the Release workflow cut, since those were checked
+before the tag existed.
 
 **Who cuts which tag.** A tag points at a commit, so a release tag must not be cut on an
 integration branch: a squash merge orphans that commit, leaving the version reachable only via
@@ -144,13 +159,44 @@ sessions that cannot check it. So ship the command beside it, on the same line, 
 or an arrow:
 
 ```markdown
-- 527 tests, 33 files — `npm run gate 2>&1 | grep -E 'Test Files|Tests  '`
+- 527 tests, 33 files — `out=$(npm run gate 2>&1); rc=$?; echo "$out" | grep -E 'Test Files|Tests  '`
 - `grep -rn "forwardRef" src/` → 0 hits
 ```
 
 A lane meeting a bare number decides whether to trust it. A lane meeting a number and its command
 runs the command. `file.tsx:48` citations and `#23` references need nothing — everything else
 does.
+
+**A figure sourced through a pipe is not sourced** (#61). That first line used to read
+`npm run gate 2>&1 | grep -E 'Test Files|Tests  '`, which cannot tell a passing gate from a
+failing one — a pipeline's `$?` is the _last_ command's status, so it reports `grep`'s. Command
+substitution avoids the problem entirely, which is why the exemplar above uses it. If you must
+pipe, the exit status has to be echoed, and the spelling is shell-specific — lanes run **zsh**,
+where the bash form silently prints an empty string, which looks like provenance and is not:
+
+```bash
+npm run gate 2>&1 | grep -E 'Tests  ' ; echo "exit=${PIPESTATUS[0]}"   # bash
+npm run gate 2>&1 | grep -E 'Tests  ' ; echo "exit=$pipestatus[1]"     # zsh
+```
+
+Demonstrate it with a grep that **matches**, which is the real case — a failing gate still prints
+its summary table, so the grep succeeds and hides the failure. The obvious demonstration is the
+wrong one and reports "no problem":
+
+```zsh
+( exit 1 ) | grep -E 'x'                         ; echo $?              # 1 — but only because
+                                                                        # grep found nothing
+( echo 'Tests  595'; exit 1 ) | grep -E 'Tests  '; echo $?              # 0 — the hazard
+( echo 'Tests  595'; exit 1 ) | grep -E 'Tests  '; echo $pipestatus[1]  # 1 — the truth
+( echo 'Tests  595'; exit 0 ) | grep -E 'Tests  '; echo $pipestatus[1]  # 0 — control: it is
+                                                                        # not simply always 1
+```
+
+This is not pedantry about one line. `npm run coverage` prints its percentage table **identically
+whether the thresholds passed or the run failed**, so a piped reading of it says "green" on a red
+run. Measured: three consecutive runs on `main`, where run 1 exited 1 with percentages
+byte-identical to the two that exited 0 — five tests had hit the 5000ms timeout under load
+(#63).
 
 **Never re-derive a figure from prose that quotes it, including prose you wrote earlier in the
 same session.** Go back to the enforced source. A single paragraph about the a11y allowlist took
