@@ -1621,32 +1621,33 @@ function Sn({
   onClose: l,
   children: r,
   width: i = "max-w-md",
-  role: s = "dialog"
+  role: s = "dialog",
+  isDismissable: a = !0
 }) {
-  const a = y(null), o = y(null), u = te({
+  const o = y(null), u = y(null), f = te({
     isOpen: n,
-    onOpenChange: (x) => {
-      x || l();
+    onOpenChange: (v) => {
+      v || l();
     }
-  }), { modalProps: f, underlayProps: b } = ze(
-    { isDismissable: !0 },
-    u,
-    a
-  ), { dialogProps: m, titleProps: p } = _e({ role: s }, o);
+  }), { modalProps: b, underlayProps: m } = ze(
+    { isDismissable: a, isKeyboardDismissDisabled: !a },
+    f,
+    o
+  ), { dialogProps: p, titleProps: x, contentProps: h } = _e({ role: s }, u);
   return n ? /* @__PURE__ */ e(
     "div",
     {
-      ...b,
+      ...m,
       className: "fixed inset-0 z-overlay flex items-center justify-center bg-black/60 backdrop-blur-sm p-4",
-      children: /* @__PURE__ */ e(ee, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...f, ref: a, className: d("w-full", i), children: /* @__PURE__ */ c(
+      children: /* @__PURE__ */ e(ee, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...b, ref: o, className: d("w-full", i), children: /* @__PURE__ */ c(
         "div",
         {
-          ...m,
-          ref: o,
+          ...p,
+          ref: u,
           className: "flex flex-col bg-surface-overlay rounded-sm border border-subtle overflow-hidden",
           children: [
             /* @__PURE__ */ c("div", { className: "flex items-center justify-between px-4 py-4 border-b border-neutral-4", children: [
-              /* @__PURE__ */ e("h2", { ...p, className: "font-sans font-bold text-base text-main", children: t }),
+              /* @__PURE__ */ e("h2", { ...x, className: "font-sans font-bold text-base text-main", children: t }),
               /* @__PURE__ */ e(
                 "button",
                 {
@@ -1658,7 +1659,7 @@ function Sn({
                 }
               )
             ] }),
-            /* @__PURE__ */ e("div", { className: "px-4 py-4", children: r })
+            /* @__PURE__ */ e("div", { ...h, className: "px-4 py-4", children: r })
           ]
         }
       ) }) })

@@ -47,6 +47,22 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **`CLAUDE.md` said tagging is a checklist, not a command.** True until #57/#58 landed the
   Release workflow; the section now describes the workflow, what it verifies rather than
   performs, and what `tag-check.yml` does about a hand-cut tag.
+- **`Modal` describes an `alertdialog`, and can be pinned open** (#64). `useDialog` returns three
+  things and `contentProps` was dropped, so React Aria generated a description id, pointed
+  `aria-describedby` at it, then discarded it in a layout effect because nothing carried it — the
+  role was announced and the body text that is the entire reason for choosing `alertdialog` was
+  not. `contentProps` now wraps the body specifically, not the dialog, which would otherwise make
+  the dialog describe itself including its own title.
+
+  New `isDismissable` prop, `@default true`, so a consumer can stop a modal being dismissed while
+  an operation is in flight. **One prop drives two react-aria options**: `isDismissable` governs
+  the backdrop only, and Escape is a separate switch (`isKeyboardDismissDisabled`) — a bare
+  passthrough still let Escape close a pinned modal, which is exactly the case it exists for.
+  Found by the test, not by reading the types; both spellings typecheck.
+
+  This was the last kit gap blocking the consuming app's `dialog` swap. **Minor** — additive, and
+  the description is a fix rather than a behaviour change for `role="dialog"`, which React Aria
+  deliberately does not describe.
 
 - **`npm run test:a11y:ci` no longer serves a stale Storybook.** `http-server` defaults to
   `Cache-Control: max-age=3600`, so a rebuilt story could keep reading stale for an hour — a

@@ -28,6 +28,15 @@ export interface ModalProps {
    * @default 'dialog'
    */
   role?: 'dialog' | 'alertdialog';
+  /**
+   * Whether Escape and a click on the backdrop close the modal. Set `false` while an operation
+   * is in flight — a delete that is already running should not be dismissable half-way through.
+   *
+   * Gating `onClose` yourself is **not** equivalent: Escape, the backdrop and the close button
+   * all still fire it, so the caller has to defend every path instead of one.
+   * @default true
+   */
+  isDismissable?: boolean;
 }
 
 /**
@@ -44,6 +53,7 @@ export function Modal({
   children,
   width = 'max-w-md',
   role = 'dialog',
+  isDismissable = true,
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -58,12 +68,21 @@ export function Modal({
     },
   });
 
+  // One prop drives two react-aria options on purpose. `isDismissable` governs the *backdrop*
+  // click only; Escape is a separate switch (`isKeyboardDismissDisabled`), so passing
+  // `isDismissable` through alone leaves Escape closing a modal the consumer asked to pin —
+  // which is precisely the case this exists for, a delete already in flight. Caught by the test
+  // below rather than by reading the types, since both spellings typecheck.
   const { modalProps, underlayProps } = useModalOverlay(
-    { isDismissable: true },
+    { isDismissable, isKeyboardDismissDisabled: !isDismissable },
     triggerState,
     overlayRef,
   );
-  const { dialogProps, titleProps } = useDialog({ role }, dialogRef);
+  // `contentProps` is the third thing `useDialog` returns and dropping it is not cosmetic (#64).
+  // For `role="alertdialog"` React Aria generates an id, points `aria-describedby` at it, and
+  // then discards the id in a layout effect (`useSlotId`) when nothing carries it — so the role
+  // is announced and the body text that is the entire reason for choosing that role is not.
+  const { dialogProps, titleProps, contentProps } = useDialog({ role }, dialogRef);
 
   if (!isOpen) return null;
 
@@ -98,8 +117,12 @@ export function Modal({
               </button>
             </div>
 
-            {/* Body */}
-            <div className="px-4 py-4">{children}</div>
+            {/* Body. `contentProps` belongs here rather than on the dialog: it carries the id
+                `aria-describedby` points at, so it has to wrap the content that IS the
+                description — not the header, and not the whole dialog including its own title. */}
+            <div {...contentProps} className="px-4 py-4">
+              {children}
+            </div>
           </div>
         </div>
       </FocusScope>
