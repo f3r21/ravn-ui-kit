@@ -82,10 +82,30 @@ const VERIFICATION =
 // pipeline at all and is why it is the exemplar above rather than a suffix to memorise.
 const STATUS_ECHO = /PIPESTATUS|pipestatus|\brc=\$\?/;
 
-/** True when `text` sources a figure with a verification whose exit status it throws away. */
+/**
+ * True when `text` sources a figure with a verification whose exit status it throws away.
+ *
+ * The verification has to be UPSTREAM of the pipe, not merely present in the string (#71). The
+ * first version tested "contains a verification AND contains a pipe", which flagged
+ * `out=$(npm run gate 2>&1); echo "$out" | grep 'Tests  '` — where the pipe is downstream of the
+ * substitution and masks nothing, because the gate's status is resolved at the `$(...)`
+ * boundary. That is the worst kind of wrong answer for a tool like this: it penalises the
+ * practice the tool exists to encourage, and a rule that punishes correct behaviour drives
+ * people back to bare numbers.
+ *
+ * Found by running the detector over the existing corpus, not by re-reading the code — the
+ * sabotage tested the RULE, and only the corpus tested the implementation of the rule.
+ */
 export function isBlindPipe(text) {
   for (const cmd of text.match(/`[^`]*`/g) ?? []) {
-    if (cmd.includes('|') && VERIFICATION.test(cmd) && !STATUS_ECHO.test(cmd)) return true;
+    if (!cmd.includes('|') || STATUS_ECHO.test(cmd)) continue;
+
+    // A verification inside `$(...)` has already yielded its status at the substitution; a pipe
+    // later on the same line cannot mask it. Blank the substitutions before splitting.
+    const segments = cmd.replace(/\$\([^)]*\)/g, ' ').split('|');
+
+    // `$?` is the LAST segment's status, so a verification anywhere earlier is discarded.
+    if (segments.slice(0, -1).some((s) => VERIFICATION.test(s))) return true;
   }
   return false;
 }
