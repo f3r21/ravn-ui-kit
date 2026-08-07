@@ -109,20 +109,26 @@ export function AddTaskModal({
   const togglePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
     setOpenPopover((prev) => (prev === name ? null : name));
 
-  // Identity-aware, and that is the whole fix (#82). Switching chips fires two things: the new
-  // chip's `onClick` sets its own name, and the OLD popover's interact-outside handler calls
-  // this. An unconditional `setOpenPopover(null)` meant whichever ran second won — and when it
-  // was the close, the click opened a popover and then immediately shut it, so the first click
-  // on a different chip silently did nothing and it took two.
+  // Insurance, NOT the fix for #82. The fix is `dismissExemptRef` on the chip row below.
   //
-  // Comparing against `prev` makes the order irrelevant: a popover may only close ITSELF, so a
-  // stale one cannot clear a newer one. Close-then-open and open-then-close both end with the
-  // new popover open.
+  // Identity-awareness means a popover may only close ITSELF, so a stale one cannot clear a
+  // newer one whichever order the handlers run in. Measured: removing this breaks no test in
+  // the suite, under either jsdom, while removing the row exemption fails the target test. It
+  // is kept because it costs nothing and makes the state machine order-independent — but it
+  // earns no credit for the defect being gone.
   //
-  // This was invisible under jsdom 26, which does not implement `PointerEvent` — react-aria's
-  // `useInteractOutside` takes a different path without it, so the outside-close never ran and
-  // the test passed through a branch no browser executes. jsdom 30 provides `PointerEvent`
-  // (#32), which is how it surfaced. The defect was always live in the browser.
+  // **The first diagnosis was that this WAS the fix, and it was wrong.** That theory said the
+  // sibling's `onClick` set the new popover and the old one's outside-handler then nulled it —
+  // open-then-close, whichever ran second winning. It is recorded here because it is plausible,
+  // it is what the state alone suggests, and it cost an hour: the fix was made, rebuilt, and
+  // the bug still reproduced in the browser.
+  //
+  // What actually happens is that the sibling's `onClick` NEVER RUNS. react-aria's
+  // outside-click handling is a capture-phase listener that calls `stopPropagation()`
+  // (`useInteractOutside.mjs:54`, `useOverlay.mjs:49`), so the click is consumed before it
+  // reaches the chip. Nothing opens because nothing was ever told to.
+  //
+  // Do not reason about state ordering here. The defect was never about state ordering.
   const closePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
     setOpenPopover((prev) => (prev === name ? null : prev));
 

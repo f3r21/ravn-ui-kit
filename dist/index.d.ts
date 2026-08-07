@@ -1533,11 +1533,18 @@ export declare interface PopoverProps {
     /** Called when the popover should close — Escape, an outside click, or a `DismissButton`. */
     onClose: () => void;
     /**
-     * Ref to the element that toggles this popover open/closed. Clicking it is
-     * excluded from "outside interaction" so a toggle-button trigger doesn't
-     * immediately reopen the popover it just closed (react-aria's outside-click
-     * handling runs in the click event's capture phase, before the trigger's
-     * own `onClick` fires).
+     * Ref to the element that toggles this popover open/closed. Clicking it is excluded from
+     * "outside interaction" so a toggle-button trigger doesn't immediately reopen the popover it
+     * just closed.
+     *
+     * **The general rule, because this is where people look and the narrow version cost an hour
+     * (#82):** react-aria's outside-click handling is a **capture-phase** listener that calls
+     * `stopPropagation()` — `useInteractOutside.mjs:54`, `useOverlay.mjs:49`. So a click that
+     * dismisses this popover is *consumed*: it never reaches whatever was clicked. Any control
+     * that both dismisses an open popover and is meant to do something itself has to be exempted,
+     * or its own handler simply never runs and the user has to click twice.
+     *
+     * `triggerRef` exempts one such control. `dismissExemptRef` below exempts a region of them.
      */
     triggerRef?: default_2.RefObject<HTMLElement | null>;
     /**
