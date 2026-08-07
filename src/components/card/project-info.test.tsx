@@ -58,4 +58,22 @@ describe('ProjectInfo Component', () => {
     expect(button.className).toContain('focus-visible:outline-2');
     expect(button.className).not.toContain('outline-none');
   });
+
+  it('defaults to h3 and renders the level it is given', () => {
+    // The level was hardcoded, so a column header and its own cards were both level 3 and
+    // `getAllByRole('heading', { level: 3 })` returned them interleaved.
+    const { rerender } = render(<ProjectInfo title="Working (03)" />);
+    expect(screen.getByRole('heading', { level: 3, name: 'Working (03)' }).tagName).toBe('H3');
+
+    rerender(<ProjectInfo title="Working (03)" headingLevel={2} />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Working (03)' }).tagName).toBe('H2');
+
+    rerender(<ProjectInfo title="Working (03)" headingLevel={6} />);
+    expect(screen.getByRole('heading', { level: 6, name: 'Working (03)' }).tagName).toBe('H6');
+  });
+
+  it('puts titleId on the heading, so an ancestor can point aria-labelledby at it', () => {
+    render(<ProjectInfo title="Fix auth bug" titleId="task-7-title" />);
+    expect(screen.getByRole('heading', { name: 'Fix auth bug' }).id).toBe('task-7-title');
+  });
 });

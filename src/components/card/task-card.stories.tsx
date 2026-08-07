@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { TaskCard } from './task-card';
+import { MenuDotsIcon } from '../icons/icons';
 
 const CommentIcon = () => (
   <svg
@@ -75,6 +76,35 @@ export const Playground: Story = {
     points: 3,
     dueDateText: '3 DAYS',
     dueDateUrgency: 'soon',
+  },
+};
+
+/**
+ * The `actions` slot holds a per-card control — in practice an overflow menu. Name it for the
+ * task it belongs to, because a board of cards otherwise offers a screen-reader user a list of
+ * identical "options" buttons. Activating it does not open the card behind it.
+ *
+ * The card is an `<article>` labelled by its own title heading, so it is reachable by article
+ * navigation without being one big control named by every string it renders.
+ */
+export const WithActions: Story = {
+  args: {
+    title: 'Fix Critical GraphQL Bug',
+    points: 5,
+    dueDateText: '3 DAYS',
+    dueDateUrgency: 'soon',
+    tags: [{ label: 'BUG', variant: 'red' }],
+    assigneeName: 'Fernando Ramirez',
+    onClick: fn(),
+    actions: (
+      <button
+        type="button"
+        aria-label="Task options for Fix Critical GraphQL Bug"
+        className="flex items-center justify-center w-6 h-6 rounded-xs text-muted hover:text-main cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+      >
+        <MenuDotsIcon className="size-6" />
+      </button>
+    ),
   },
 };
 

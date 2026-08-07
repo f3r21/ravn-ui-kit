@@ -69,4 +69,71 @@ describe('TaskCard Component keyboard accessibility', () => {
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('is an article named by its own title heading', () => {
+    // It was a <div> with no role and therefore no accessible name at all. An <article> is
+    // a container, not a control, so this does NOT reinstate the `role="button"` that was
+    // deliberately removed — see the comment at the top of task-card.tsx's render.
+    render(<TaskCard title="Fix auth bug" />);
+
+    const article = screen.getByRole('article', { name: 'Fix auth bug' });
+    const heading = screen.getByRole('heading', { name: 'Fix auth bug' });
+    expect(article.getAttribute('aria-labelledby')).toBe(heading.id);
+    expect(heading.id).toBeTruthy();
+  });
+
+  it('names the card by the title alone, not by every string it renders', () => {
+    // The regression this guards: an accessible name computed by concatenation read
+    // "Fix auth bug 5 Pts OVERDUE BUG Fernando Ramirez".
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        points={5}
+        dueDateText="OVERDUE"
+        tags={[{ label: 'BUG' }]}
+        assigneeName="Fernando Ramirez"
+      />,
+    );
+
+    // An exact-name match would throw if the name had absorbed the rest of the card.
+    const article = screen.getByRole('article', { name: 'Fix auth bug' });
+    expect(article.getAttribute('aria-labelledby')).toBeTruthy();
+  });
+
+  it('renders an actions slot in the header row', () => {
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        actions={<button type="button">Task options for Fix auth bug</button>}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Task options for Fix auth bug' })).toBeDefined();
+  });
+
+  it('does not open the card when a control in the actions slot is used', async () => {
+    // A menu trigger sitting on a clickable card must not also open the card behind it.
+    const onClick = vi.fn();
+    const onOptions = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        onClick={onClick}
+        actions={
+          <button type="button" onClick={onOptions}>
+            Task options
+          </button>
+        }
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Task options' }));
+    expect(onOptions).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('forwards headingLevel so cards nest under their column header', () => {
+    render(<TaskCard title="Fix auth bug" headingLevel={4} />);
+    expect(screen.getByRole('heading', { level: 4, name: 'Fix auth bug' })).toBeDefined();
+  });
 });

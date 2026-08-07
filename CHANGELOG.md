@@ -18,7 +18,11 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   hand-rolled pattern rather than `useRadio`/`useRadioGroup` — see that component's doc comment
   for why those hooks do not fit an icon-button shape. New `label` prop names the group,
   `@default 'View'`. First test file for this component, which had none: 13 cases,
-  `npx vitest run src/components/layout/view-switcher.test.tsx`. **Minor** — additive.
+  `npx vitest run src/components/layout/view-switcher.test.tsx`. **Minor** — a behavioural break
+  for any consumer querying the old `button` role, under the pre-1.0 carve-out. The two controls
+  answered `getByRole('button', { name })` before and answer `getByRole('radio')` now; the
+  `SearchBar` textbox→searchbox change below is called a break on the same standard. No consumer
+  is affected today — the app has its own `useRadioGroup` switcher and does not import this one.
 
 - **`Button` can carry radio semantics** (#9), via `role="radio"` and `aria-checked`, applied
   after `useButton`'s props because `useButton` drops both — passed through it they arrive on
@@ -51,6 +55,70 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   (`CONTRIBUTING.md`). `type="search"` also opts into WebKit's native clear glyph, suppressed
   with `[&::-webkit-search-cancel-button]:appearance-none` because `TopNav` renders its own
   labelled clear button and two of them — one unlabelled — is worse than the one that was there.
+- **`TaskCard` gained an `actions` slot, and is an `<article>` named by its own title** (#9).
+  There was nowhere to put a per-card overflow menu: the only callback was `onClick`, and
+  `ProjectInfo`'s `icon` is a fixed 24×24 box specified for a decorative glyph, so a real
+  control passed through it loses its padding and focus ring. `actions` sits beside the title
+  and swallows its own clicks, so a menu trigger does not also open the card behind it.
+
+  The `<article aria-labelledby>` is **additive to** the deliberate removal of `role="button"`
+  documented at `task-card.tsx:78`, not a reversal of it: an article is a container, not a
+  control, so the card gets a name for article navigation without becoming one focusable thing
+  whose name is its entire text content. **Minor** — additive.
+
+- **`HeadingLevel` is exported from the package root** (#9, and #14's "export the types
+  consumers need"), and `ProjectInfo`, `TaskCard`, `TaskListView` and `TaskTableRow` all take
+  a `headingLevel` prop under that one name. Heading level belongs to the document a component
+  is dropped into, not to the component: every title here was a hardcoded `<h3>`, so a board's
+  column headers and its own card titles were both level 3 and
+  `getAllByRole('heading', { level: 3 })` returned them interleaved. `ProjectInfo` also gained
+  `titleId`, which is what lets `TaskCard`'s `aria-labelledby` point at its heading.
+  `TaskTableRow`'s is opt-in and off by default — a heading in every row of a long table is
+  noise for a reader already navigating it as a grid. **Minor** — all additive, defaults
+  unchanged.
+
+- **`TaskListView` can render as a named landmark** (#9), via `label`. This is the decision the
+  issue asked for rather than a default: a `<section>` is only a landmark once it has a name, a
+  board emits one per column, and a consumer that already wraps this in its own `<section>`
+  would end up with two nested landmarks. Omitted, the markup is byte-identical to before.
+  **Minor**.
+
+- **`TaskTableRow` can omit its select checkbox**, via `isSelectable={false}` (#9). The checkbox
+  is `sr-only` and merely `opacity-0` until hover, so it was always in the accessibility tree —
+  one extra announced, tabbable checkbox per row for a consumer with no bulk-selection feature,
+  and no way to turn it off. **Minor** — defaults to today's behaviour.
+
+- **`DatePickerMenu` takes a `timeZone`** (#9). It read `getFullYear`/`getMonth`/`getDate` — the
+  machine's local wall-clock fields — and wrote back through `getLocalTimeZone()`. Self-consistent,
+  and still wrong for a consumer that stores and formats in UTC: `2026-03-15T00:00:00Z` read on a
+  UTC-9 machine is the 14th, so the calendar highlighted the day before the one the rest of the app
+  displayed. All four conversion sites now take the zone, including the month/year header, which
+  converted in one zone and formatted in another. Defaults to `getLocalTimeZone()`, so existing
+  behaviour is unchanged. **Minor** — additive.
+
+### Fixed
+
+- **`Button` no longer stretches its glyph to fill the icon frame** (#46). Figma's "Icon
+  Placeholder" is inset 20% of the 40px button — exactly 24px, and identical on every variant —
+  while the "Vector" inside it is inset 20.83% on Primary (**14px**), 12.5% on Secondary
+  (**18px**), and 12.5%/16.67% on one `ViewSwitcher` glyph (**18×16, non-square**) —
+  `grep -n 'Icon Placeholder' -A6 'UI-Kit/Components/Button, Switch Button01.md'`.
+  `[&>svg]:w-full [&>svg]:h-full` flattened all three to 24×24 and distorted the non-square one.
+
+  It also made the frame unarguable: a descendant selector outranks a plain utility, so a
+  consumer passing `<PlusIcon className="size-3.5" />` — the spec size — was silently
+  overridden. The 24px frame stays and now centres its child; the glyph carries its own size.
+  **Breaking for anything that relied on the stretch**, which is any icon passed without a size
+  class; the kit's own story fixtures are updated to the spec sizes. Minor bump under SemVer's
+  pre-1.0 carve-out.
+
+- **`Skeleton`'s pulse is guarded by `prefers-reduced-motion`** (#45). `animate-pulse` was
+  unconditional, so the placeholder kept pulsing for a user who had asked their OS to reduce
+  motion — an indefinite looping animation is the central case WCAG 2.2.2 exists for. Now
+  `motion-safe:animate-pulse`, which fails _safe_: a browser without the query gets no animation
+  rather than an unguarded one. The guard stays in the primitive rather than moving to a
+  `motion-reduce:animate-none` per call site, where the next caller omits it silently. This
+  blocked the consuming app from migrating its own `Skeleton` at two call sites. **Patch**.
 
 - **Every figure now carries the command that re-derives it.** A number in an issue, commit, PR
   body or `CLAUDE.md` is written once and read by sessions that cannot check it, so the command

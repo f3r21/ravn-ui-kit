@@ -7,6 +7,7 @@ import { TaskTable } from '../card/task-table';
 
 const GridIcon = () => (
   <svg
+    className="size-[18px]"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -24,6 +25,7 @@ const GridIcon = () => (
 
 const ListIcon = () => (
   <svg
+    className="size-[18px]"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -38,6 +40,7 @@ const ListIcon = () => (
 
 const PlusIcon = () => (
   <svg
+    className="size-3.5"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"

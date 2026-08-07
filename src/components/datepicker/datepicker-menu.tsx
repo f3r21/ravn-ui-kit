@@ -2,9 +2,11 @@ import { useRef } from 'react';
 import {
   CalendarDate,
   createCalendar,
+  fromDate,
   getLocalTimeZone,
   isSameMonth,
   today,
+  toCalendarDate as zonedToCalendarDate,
 } from '@internationalized/date';
 import { useButton, useCalendar, useCalendarCell, useCalendarGrid } from 'react-aria';
 import { useCalendarState, type CalendarState } from 'react-stately';
@@ -17,12 +19,18 @@ import {
   ChevronRightIcon,
 } from '../icons/icons';
 
-function toCalendarDate(date: Date): CalendarDate {
-  return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+// Both directions take an explicit zone. Previously this read `getFullYear/getMonth/getDate`,
+// which are the machine's *local* wall-clock fields, and wrote back through
+// `getLocalTimeZone()`. That is self-consistent, and still wrong for a consumer that stores and
+// formats dates in UTC: `2026-03-15T00:00:00Z` read in UTC-9 is the 14th, so the calendar
+// highlighted the day before the one the rest of the app displayed. The consuming app hit
+// exactly this bug class once already and now formats every date with `timeZone: 'UTC'`.
+function toCalendarDate(date: Date, timeZone: string): CalendarDate {
+  return zonedToCalendarDate(fromDate(date, timeZone));
 }
 
-function toNativeDate(date: CalendarDate): Date {
-  return date.toDate(getLocalTimeZone());
+function toNativeDate(date: CalendarDate, timeZone: string): Date {
+  return date.toDate(timeZone);
 }
 
 export interface DatePickerMenuProps {
@@ -37,6 +45,18 @@ export interface DatePickerMenuProps {
   onChange?: (date: Date) => void;
   /** Called when the popover should close without a selection — Escape or an outside click. */
   onClose: () => void;
+  /**
+   * IANA time zone used to read `value`/`defaultValue` into calendar days and to build the
+   * `Date` handed back to `onChange` — e.g. `'UTC'`, `'America/New_York'`.
+   *
+   * Defaults to the machine's zone, which is the behaviour this component always had, so
+   * nothing changes for an existing consumer. Set it to whatever zone your app *formats*
+   * dates in: a `Date` is an absolute instant, and reading its day in one zone while
+   * displaying it in another is how a picker ends up highlighting the day before the one on
+   * screen. An app that renders with `timeZone: 'UTC'` should pass `'UTC'` here.
+   * @default getLocalTimeZone()
+   */
+  timeZone?: string;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
   triggerRef?: PopoverProps['triggerRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
@@ -107,16 +127,17 @@ export function DatePickerMenu({
   onChange,
   onClose,
   triggerRef,
+  timeZone = getLocalTimeZone(),
   className,
 }: DatePickerMenuProps) {
   const valueProps =
     controlledValue !== undefined
-      ? { value: toCalendarDate(controlledValue) }
-      : { defaultValue: defaultValue ? toCalendarDate(defaultValue) : null };
+      ? { value: toCalendarDate(controlledValue, timeZone) }
+      : { defaultValue: defaultValue ? toCalendarDate(defaultValue, timeZone) : null };
 
   const state = useCalendarState({
     ...valueProps,
-    onChange: (date: CalendarDate) => onChange?.(toNativeDate(date)),
+    onChange: (date: CalendarDate) => onChange?.(toNativeDate(date, timeZone)),
     createCalendar,
     // Hardcoded, matching the prior implementation's hardcoded English
     // MONTHS/DAYS arrays — no `I18nProvider`/locale story exists in this kit
@@ -138,7 +159,7 @@ export function DatePickerMenu({
   const { buttonProps: nextMonthProps } = useButton(nextButtonProps, nextMonthRef);
 
   const goToday = () => {
-    const todayDate = today(getLocalTimeZone());
+    const todayDate = today(timeZone);
     state.setFocusedDate(todayDate);
     state.selectDate(todayDate);
   };
@@ -177,9 +198,14 @@ export function DatePickerMenu({
           </div>
 
           <span className="font-sans font-semibold text-body-sm text-main">
+            {/* `timeZone` on both halves. Converting to an instant in one zone and then
+                formatting it in another is the same off-by-one the helpers above fix: with
+                `timeZone="UTC"` on a UTC-9 machine, the 1st of the month converts to
+                midnight UTC and formats as the last day of the *previous* month, so the
+                header would name a month the grid is not showing. */}
             {state.visibleRange.start
-              .toDate(getLocalTimeZone())
-              .toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              .toDate(timeZone)
+              .toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone })}
           </span>
 
           <div className="flex items-center gap-1">

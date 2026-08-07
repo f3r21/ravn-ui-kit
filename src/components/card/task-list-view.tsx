@@ -1,4 +1,5 @@
 import { cn } from '../../utils/cn';
+import type { HeadingLevel } from '../../types/heading-level';
 import { ProjectInfo } from './project-info';
 import { TaskCard, type TaskCardProps } from './task-card';
 import { Skeleton } from '../skeleton/skeleton';
@@ -7,6 +8,24 @@ import { EmptyState } from '../empty-state/empty-state';
 export interface TaskListViewProps {
   /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
   title: string;
+  /**
+   * Which `<h*>` the column title renders as, forwarded to `ProjectInfo`. A board is
+   * usually `2` here so the `TaskCard`s below can keep the default `3` and nest under it —
+   * both were level 3 before, which made the header indistinguishable from its own cards.
+   * @default 3
+   */
+  headingLevel?: HeadingLevel;
+  /**
+   * Renders the column as a labelled `<section>` landmark instead of a plain `<div>`, so a
+   * screen-reader user can jump between columns of a board rather than scrolling through
+   * every card.
+   *
+   * Opt-in, and this is the decision #9 asked for rather than a default: there is no Figma
+   * basis for a landmark, a board of three columns emits three of them, and a consumer that
+   * already wraps this in its own `<section>` would get two nested landmarks with different
+   * names. Pass the column's own name (`"Working"`); omitted, the markup is unchanged.
+   */
+  label?: string;
   /** Optional trailing 24×24 icon forwarded to `ProjectInfo`. */
   icon?: React.ReactNode;
   /** Tasks rendered as a vertical stack below the header, each spread onto a `TaskCard`. Renders an `EmptyState` when the array is empty. */
@@ -71,11 +90,17 @@ export function TaskListView({
   emptyTitle = 'No tasks in this view',
   emptyDescription,
   emptyAction,
+  headingLevel = 3,
+  label,
   className,
 }: TaskListViewProps) {
+  // `<section>` is only a landmark once it has an accessible name — an unnamed one is a
+  // plain generic container, so there is no point rendering it without `label`.
+  const Root = label ? 'section' : 'div';
+
   return (
-    <div className={cn('flex flex-col gap-4 w-full', className)}>
-      <ProjectInfo title={title} icon={icon} />
+    <Root aria-label={label} className={cn('flex flex-col gap-4 w-full', className)}>
+      <ProjectInfo title={title} icon={icon} headingLevel={headingLevel} />
       {isLoading ? (
         <>
           <TaskCardSkeleton />
@@ -87,6 +112,6 @@ export function TaskListView({
       ) : (
         tasks.map((task, idx) => <TaskCard key={idx} {...task} className="w-full" />)
       )}
-    </div>
+    </Root>
   );
 }

@@ -3,8 +3,14 @@ import { fn } from '@storybook/test';
 import { Button } from './button';
 import { withSurface } from '../../../.storybook/decorators';
 
-const PlusIcon = () => (
+/**
+ * Glyph sizes come from the consumer now, not from the button (#46). Figma insets "Vector"
+ * 20.83% inside the 24px "Icon Placeholder" on Primary — 14px, i.e. `size-3.5` — and 12.5%
+ * on Secondary, which is 18px.
+ */
+const PlusIcon = ({ className = 'size-3.5' }: { className?: string }) => (
   <svg
+    className={className}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -56,11 +62,12 @@ export const States: Story = {
       <Button {...args} variant="primary" aria-label="Add">
         <PlusIcon />
       </Button>
+      {/* 18px on Secondary, per "Vector" inset 12.5% of the 24px frame. */}
       <Button {...args} variant="secondary" isSelected aria-label="Selected">
-        <PlusIcon />
+        <PlusIcon className="size-[18px]" />
       </Button>
       <Button {...args} variant="secondary" isSelected={false} aria-label="Unselected">
-        <PlusIcon />
+        <PlusIcon className="size-[18px]" />
       </Button>
     </div>
   ),

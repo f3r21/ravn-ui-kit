@@ -16,7 +16,15 @@ export interface ButtonProps extends AriaButtonProps {
    * @default false
    */
   isSelected?: boolean;
-  /** 24×24 icon content. Should use `currentColor` so it inherits the button's icon color. */
+  /**
+   * Icon content, rendered centred inside the 24×24 "Icon Placeholder" frame. Should use
+   * `currentColor` so it inherits the button's icon colour.
+   *
+   * **Size the glyph yourself** — the frame is 24px, the glyph inside it is not (#46). Figma
+   * draws `size-3.5` (14px) for `variant="primary"` and `size-[18px]` for `secondary`; one
+   * `ViewSwitcher` glyph is 18×16, non-square. This used to force `w-full h-full` onto the
+   * child, which collapsed all three to 24×24 and stretched the non-square one.
+   */
   children: React.ReactNode;
   /** Required — icon-only buttons need an accessible name. */
   'aria-label': string;
@@ -124,7 +132,15 @@ export function Button({
         className,
       )}
     >
-      <span className="w-6 h-6 shrink-0 [&>svg]:w-full [&>svg]:h-full">{children}</span>
+      {/* Figma's "Icon Placeholder": inset 20% of the 40px button, i.e. exactly 24px, and
+          identical across every variant. The glyph inside it is NOT — "Vector" is inset
+          20.83% of this frame on Primary (14px), 12.5% on Secondary (18px), and 12.5%/16.67%
+          on one ViewSwitcher glyph (18×16, non-square). `[&>svg]:w-full [&>svg]:h-full` here
+          flattened all three to 24px and distorted the non-square one, and it beat a
+          consumer's own `size-*` class on specificity — a descendant selector outranks a
+          plain utility, so passing `className="size-3.5"` had no effect at all. The frame
+          stays; the glyph sizes itself. */}
+      <span className="w-6 h-6 shrink-0 flex items-center justify-center">{children}</span>
     </button>
   );
 }

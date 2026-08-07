@@ -76,3 +76,40 @@ export const Board: Story = {
     </div>
   ),
 };
+
+/**
+ * The same board, wired for assistive technology: each column is a named `region` a screen
+ * reader can jump between, and `headingLevel={2}` puts the column titles one level above the
+ * card titles inside them. Without it both are `h3` and a heading list reads as a flat run of
+ * columns and cards with nothing distinguishing one from the other.
+ *
+ * Both are opt-in — there is no Figma basis for a landmark, and three unnamed `<section>`s
+ * would be worse than none.
+ */
+export const BoardWithLandmarks: Story = {
+  render: () => (
+    <div className="flex flex-row items-start gap-8">
+      <TaskListView
+        title="Working (03)"
+        label="Working"
+        headingLevel={2}
+        tasks={sampleTasks}
+        className="w-[348px]"
+      />
+      <TaskListView
+        title="In review (01)"
+        label="In review"
+        headingLevel={2}
+        tasks={[sampleTasks[0]]}
+        className="w-[348px]"
+      />
+      <TaskListView
+        title="Done (14)"
+        label="Done"
+        headingLevel={2}
+        tasks={[]}
+        className="w-[348px]"
+      />
+    </div>
+  ),
+};

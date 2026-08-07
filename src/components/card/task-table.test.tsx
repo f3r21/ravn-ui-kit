@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { TaskTable, type TaskTableRowProps } from './task-table';
+import { TaskTable, TaskTableRow, type TaskTableRowProps } from './task-table';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -166,5 +166,68 @@ describe('TaskTable Component', () => {
     expect(label.className).toContain('has-[:focus-visible]:outline-solid');
     expect(label.className).toContain('has-[:focus-visible]:outline-interactive-text');
     expect(label.className).not.toContain('outline-none');
+  });
+
+  it('omits the select checkbox entirely when the row is not selectable', () => {
+    // The checkbox is `sr-only` and only visually `opacity-0`, so it was always in the
+    // accessibility tree — one extra tabbable, announced checkbox per row for a consumer
+    // with no bulk-selection feature, and no way to turn it off.
+    const { rerender } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Select Fix auth bug' })).toBeDefined();
+
+    rerender(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" isSelectable={false} />
+        </tbody>
+      </table>,
+    );
+    expect(screen.queryByRole('checkbox')).toBeNull();
+  });
+
+  it('leaves the title unwrapped by default and wraps it in a heading on request', () => {
+    // Opt-in: a heading in every row of a long table is noise for a reader already
+    // navigating it as a grid, so the default must stay exactly as it was.
+    const { rerender } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" />
+        </tbody>
+      </table>,
+    );
+    expect(screen.queryByRole('heading')).toBeNull();
+
+    rerender(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" headingLevel={4} />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByRole('heading', { level: 4, name: 'Fix auth bug' }).tagName).toBe('H4');
+  });
+
+  it('keeps the title operable as a button inside its heading', () => {
+    // The heading must wrap the control, not replace it — otherwise the opt-in silently
+    // costs the row its keyboard path.
+    const onClick = vi.fn();
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" headingLevel={3} onClick={onClick} />
+        </tbody>
+      </table>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Fix auth bug' });
+    expect(button.closest('h3')).not.toBeNull();
+    expect(button.className).toContain('focus-visible:outline-2');
+    expect(button.className).not.toContain('outline-none');
   });
 });

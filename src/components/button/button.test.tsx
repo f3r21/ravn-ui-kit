@@ -81,4 +81,50 @@ describe('Button Component', () => {
     // `isSelected` is visual only — it must not leak into the accessibility tree.
     expect(button.getAttribute('aria-checked')).toBeNull();
   });
+
+  it('keeps the 24px frame but does not stretch the glyph to fill it', () => {
+    // #46. Figma's "Icon Placeholder" is inset 20% of the 40px button — 24px, identical on
+    // every variant — while "Vector" inside it is 14px on Primary, 18px on Secondary, and
+    // 18×16 on one ViewSwitcher glyph. `[&>svg]:w-full [&>svg]:h-full` collapsed all three
+    // to 24px and stretched the non-square one.
+    //
+    // Asserting the frame exists is NOT enough — it existed on the broken code too. What
+    // has teeth is the absence of the stretch utilities: restore either one and this fails.
+    // jsdom applies no stylesheet, so the rendered pixel sizes are proved in a browser
+    // against the built Storybook instead; see the PR body.
+    const { container } = render(
+      <Button aria-label="Add">
+        <svg data-testid="glyph" className="size-3.5" />
+      </Button>,
+    );
+    const frame = container.querySelector('span');
+
+    expect(frame?.className).toContain('w-6');
+    expect(frame?.className).toContain('h-6');
+    expect(frame?.className).not.toContain('[&>svg]:w-full');
+    expect(frame?.className).not.toContain('[&>svg]:h-full');
+  });
+
+  it('passes a consumer’s size class through to the glyph element', () => {
+    // NOT the guard for #46, despite reading like one — do not delete the assertion above as
+    // redundant to this. The class was always *on* the element; what the bug took away was the
+    // CASCADE, because `[&>svg]:w-full` compiles to a descendant selector at (0,2,0) and a
+    // plain `.size-3.5` is (0,1,0). This suite runs on jsdom with no stylesheet imported, so
+    // there is no cascade here to observe and this assertion passes unchanged against the
+    // broken button.
+    //
+    // What actually proves the fix: the `not.toContain('[&>svg]:w-full')` assertion above,
+    // which fails the moment the stretch returns, and a real browser against the built
+    // Storybook — `primitives-button--states` reads frame 24px / glyph 14px on primary and
+    // 18px on secondary. See the PR body.
+    //
+    // This case earns its place only by pinning that the child is rendered untouched, i.e.
+    // that no future refactor starts rewriting the consumer's className.
+    render(
+      <Button aria-label="Add">
+        <svg data-testid="glyph" className="size-3.5" />
+      </Button>,
+    );
+    expect([...screen.getByTestId('glyph').classList]).toContain('size-3.5');
+  });
 });
