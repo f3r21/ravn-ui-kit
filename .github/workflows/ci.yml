@@ -40,8 +40,9 @@ jobs:
       # for that. Nor is `dependency-review-action` between them, for the same reason:
       # it holds no write scope either.
       #
-      # Note checkout and setup-node are currently three majors behind (`@v7` is current
-      # for both) — that is the gap Dependabot is expected to close, not a pin to preserve.
+      # Both are on the current major (`@v7`), and are expected to keep moving there via the
+      # `github-actions` Dependabot ecosystem (`.github/dependabot.yml`) rather than being
+      # held at a version — the pin below records what runs today, it does not preserve it.
       - name: Checkout
         uses: actions/checkout@v7
 
