@@ -8,6 +8,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-08-07
+
+**Supersedes `v0.5.0`, which must not be pinned** (#54). That tag's `package.json` still read
+`0.4.0` — it was never bumped — and its `[Unreleased]` was never rolled into a dated section.
+Its built `dist/` is correct and contains everything below; only the version metadata was wrong,
+which is why the consuming app's `ui-kit-smoke.test.tsx` caught it immediately
+(`expected 'v0.4.0' to be 'v0.5.1'`). `v0.5.0` is left in place rather than moved or deleted —
+a published tag is never rewritten, and #54 is the record of why nobody should pin it.
+
+Everything in this section shipped in the `v0.5.0` commit too; the version is the only change.
+
 ### Fixed
 
 - **`Avatar` has an accessible name in both states** (#47). The name moves onto the wrapper as
