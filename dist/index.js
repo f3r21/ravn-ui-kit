@@ -1,6 +1,6 @@
 import { clsx as we } from "clsx";
 import { twMerge as ke } from "tailwind-merge";
-import { jsx as e, jsxs as o, Fragment as de } from "react/jsx-runtime";
+import { jsx as e, jsxs as c, Fragment as de } from "react/jsx-runtime";
 import M, { useRef as y, useState as fe, useMemo as me, useId as Pe, Fragment as Me, useEffect as ie, useContext as Ve, createContext as Le } from "react";
 import { useButton as R, useField as J, useTextField as Q, useTabList as He, useTab as Se, useTabPanel as Te, useOverlay as Ie, FocusScope as ee, DismissButton as z, usePopover as De, Overlay as Re, useListBox as je, useOption as Ze, useSelect as Be, HiddenSelect as Oe, useMenuTrigger as Ee, useMenu as Ae, useMenuItem as Fe, useModalOverlay as ze, useDialog as _e, useCalendar as We, useCalendarGrid as Ue, useCalendarCell as Ke, useToastRegion as $e, useToast as qe, useCheckbox as Ge } from "react-aria";
 import { useTabListState as Ye, Item as Xe, useSelectState as Je, useOverlayTriggerState as te, useListState as Qe, useMenuTriggerState as et, useTreeState as tt, useCalendarState as nt, useToastState as lt, useToggleState as st } from "react-stately";
@@ -142,7 +142,7 @@ function xt(t) {
   ) });
 }
 function gn(t) {
-  return /* @__PURE__ */ o(C, { viewBox: "0 0 40 40", ...t, children: [
+  return /* @__PURE__ */ c(C, { viewBox: "0 0 40 40", ...t, children: [
     /* @__PURE__ */ e("g", { transform: "translate(0 2)", children: /* @__PURE__ */ e(
       "path",
       {
@@ -246,9 +246,9 @@ function oe({
   isDisabled: i,
   role: s,
   "aria-checked": a,
-  ...c
+  ...o
 }) {
-  const u = y(null), { buttonProps: f } = R({ ...c, isDisabled: i }, u);
+  const u = y(null), { buttonProps: f } = R({ ...o, isDisabled: i }, u);
   return /* @__PURE__ */ e(
     "button",
     {
@@ -275,7 +275,7 @@ function ce({
   isDisabled: r,
   ...i
 }) {
-  const s = y(null), { buttonProps: a } = R({ ...i, isDisabled: r }, s), c = {
+  const s = y(null), { buttonProps: a } = R({ ...i, isDisabled: r }, s), o = {
     primary: d(
       "text-main",
       r ? "bg-primary-2" : n ? "bg-primary-3" : "bg-primary-4 hover:bg-primary-2"
@@ -294,7 +294,7 @@ function ce({
       ref: s,
       className: d(
         "inline-flex items-center justify-center p-2 text-body-m font-normal rounded-sm transition-colors cursor-pointer font-sans select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:pointer-events-none",
-        c[t],
+        o[t],
         l
       ),
       children: i.children
@@ -325,17 +325,17 @@ function yn({
   isRequired: i = !1,
   children: s,
   className: a,
-  ...c
+  ...o
 }) {
   const { labelProps: u, fieldProps: f, descriptionProps: b, errorMessageProps: m } = J({
-    ...c,
+    ...o,
     label: t,
     description: l,
     errorMessage: r,
     isInvalid: !!r
   });
-  return /* @__PURE__ */ o("div", { className: d("flex flex-col gap-1.5", a), children: [
-    t ? /* @__PURE__ */ o("label", { ...u, className: _(n), children: [
+  return /* @__PURE__ */ c("div", { className: d("flex flex-col gap-1.5", a), children: [
+    t ? /* @__PURE__ */ c("label", { ...u, className: _(n), children: [
       t,
       i ? /* @__PURE__ */ e(E, {}) : null
     ] }) : null,
@@ -363,12 +363,12 @@ function Nn({
   className: i,
   ...s
 }) {
-  const a = y(null), { labelProps: c, inputProps: u, descriptionProps: f, errorMessageProps: b } = Q(
+  const a = y(null), { labelProps: o, inputProps: u, descriptionProps: f, errorMessageProps: b } = Q(
     { ...s, label: t, description: r, isInvalid: !!l, errorMessage: l },
     a
   );
-  return /* @__PURE__ */ o("div", { className: "flex flex-col gap-1.5 w-full", children: [
-    t ? /* @__PURE__ */ o("label", { ...c, className: _(n), children: [
+  return /* @__PURE__ */ c("div", { className: "flex flex-col gap-1.5 w-full", children: [
+    t ? /* @__PURE__ */ c("label", { ...o, className: _(n), children: [
       t,
       s.isRequired ? /* @__PURE__ */ e(E, {}) : null
     ] }) : null,
@@ -404,7 +404,7 @@ function Pt({
   id: s,
   className: a
 }) {
-  const [c, u] = fe(""), f = n !== void 0, b = f ? n : c, m = y(null), { inputProps: p } = Q(
+  const [o, u] = fe(""), f = n !== void 0, b = f ? n : o, m = y(null), { inputProps: p } = Q(
     {
       value: b,
       onChange: (x) => {
@@ -424,7 +424,7 @@ function Pt({
     },
     m
   );
-  return /* @__PURE__ */ o("div", { className: d("inline-flex items-center gap-6 min-w-0", a), children: [
+  return /* @__PURE__ */ c("div", { className: d("inline-flex items-center gap-6 min-w-0", a), children: [
     /* @__PURE__ */ e(bt, { className: "w-6 h-6 text-muted shrink-0" }),
     /* @__PURE__ */ e(
       "input",
@@ -451,12 +451,13 @@ function A({
     if (!u) return "?";
     const f = u.trim().split(" ");
     return f.length >= 2 ? `${f[0][0]}${f[1][0]}`.toUpperCase() : f[0].substring(0, 2).toUpperCase();
-  };
+  }, o = n || l;
   return /* @__PURE__ */ e(
     "div",
     {
       role: "img",
-      "aria-label": n || l,
+      "aria-label": o,
+      title: o,
       className: d(
         // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
         // they used to be. That pairing measured 2.61:1 and was the single largest
@@ -494,7 +495,7 @@ function Mt({
   searchLabel: i,
   icon: s,
   onNotificationsClick: a,
-  notificationsLabel: c = "Notifications",
+  notificationsLabel: o = "Notifications",
   userName: u,
   userAvatar: f,
   className: b
@@ -504,7 +505,7 @@ function Mt({
   }, g = () => {
     x || p(""), l == null || l("");
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "header",
     {
       className: d(
@@ -523,7 +524,7 @@ function Mt({
             className: "flex-1"
           }
         ),
-        /* @__PURE__ */ o("div", { className: "flex items-center gap-6 shrink-0", children: [
+        /* @__PURE__ */ c("div", { className: "flex items-center gap-6 shrink-0", children: [
           h ? /* @__PURE__ */ e(
             "button",
             {
@@ -539,7 +540,7 @@ function Mt({
             {
               type: "button",
               onClick: a,
-              "aria-label": c,
+              "aria-label": o,
               className: "w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full",
               children: s ?? /* @__PURE__ */ e(ae, {})
             }
@@ -559,7 +560,7 @@ function Cn({
   className: s
 }) {
   var b;
-  const a = me(() => new Map(t.map((m) => [m.id, m])), [t]), c = Ye({
+  const a = me(() => new Map(t.map((m) => [m.id, m])), [t]), o = Ye({
     items: t,
     selectedKey: r,
     defaultSelectedKey: l ?? ((b = t[0]) == null ? void 0 : b.id),
@@ -567,28 +568,28 @@ function Cn({
     children: (m) => /* @__PURE__ */ e(Xe, { textValue: m.label, children: m.label }, m.id)
   }), u = y(null), { tabListProps: f } = He(
     { "aria-label": "Tab navigation" },
-    c,
+    o,
     u
   );
-  return /* @__PURE__ */ o("div", { className: d("flex flex-col", s), children: [
-    /* @__PURE__ */ e("div", { ...f, ref: u, className: "flex items-end", children: [...c.collection].map((m) => {
+  return /* @__PURE__ */ c("div", { className: d("flex flex-col", s), children: [
+    /* @__PURE__ */ e("div", { ...f, ref: u, className: "flex items-end", children: [...o.collection].map((m) => {
       var p;
       return /* @__PURE__ */ e(
         Vt,
         {
           item: m,
-          state: c,
+          state: o,
           icon: (p = a.get(String(m.key))) == null ? void 0 : p.icon
         },
         m.key
       );
     }) }),
-    n ? /* @__PURE__ */ e(Lt, { state: c, panels: n }) : null
+    n ? /* @__PURE__ */ e(Lt, { state: o, panels: n }) : null
   ] });
 }
 function Vt({ item: t, state: n, icon: l }) {
   const r = y(null), { tabProps: i, isSelected: s } = Se({ key: t.key }, n, r);
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "button",
     {
       ...i,
@@ -636,8 +637,8 @@ function wn({
   className: s
 }) {
   var x;
-  const [a, c] = M.useState(l ?? ((x = t[0]) == null ? void 0 : x.id) ?? ""), u = n !== void 0, f = u ? n : a, b = y([]), m = (h) => {
-    u || c(h), r == null || r(h);
+  const [a, o] = M.useState(l ?? ((x = t[0]) == null ? void 0 : x.id) ?? ""), u = n !== void 0, f = u ? n : a, b = y([]), m = (h) => {
+    u || o(h), r == null || r(h);
   }, p = (h) => {
     var D;
     const v = t.findIndex((T) => T.id === f);
@@ -673,7 +674,7 @@ function wn({
       className: d("inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10", s),
       children: t.map((h, v) => {
         const g = f === h.id;
-        return /* @__PURE__ */ o(
+        return /* @__PURE__ */ c(
           "button",
           {
             ref: (N) => {
@@ -756,7 +757,7 @@ function I({
       outline: "border border-blue text-main"
     }
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "span",
     {
       className: d(
@@ -794,7 +795,7 @@ function X({
   className: s
 }) {
   const a = `h${r}`;
-  return /* @__PURE__ */ o("div", { className: d("flex items-center gap-2 w-full", s), children: [
+  return /* @__PURE__ */ c("div", { className: d("flex items-center gap-2 w-full", s), children: [
     /* @__PURE__ */ e(
       a,
       {
@@ -807,8 +808,8 @@ function X({
           "button",
           {
             type: "button",
-            onClick: (c) => {
-              c.stopPropagation(), l();
+            onClick: (o) => {
+              o.stopPropagation(), l();
             },
             className: "inline-block max-w-full truncate align-bottom text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
             children: t
@@ -822,7 +823,7 @@ function X({
 function Ht({ badges: t, className: n }) {
   return (
     // gap-4 matches Figma's "Frame 653" gap (16px, Cards01.md L614 / Cards00.md L657).
-    /* @__PURE__ */ e("div", { className: d("flex flex-wrap items-center gap-4", n), children: t.map((l) => /* @__PURE__ */ o(
+    /* @__PURE__ */ e("div", { className: d("flex flex-wrap items-center gap-4", n), children: t.map((l) => /* @__PURE__ */ c(
       "span",
       {
         className: "inline-flex items-center gap-1 text-body-m font-normal font-sans text-main",
@@ -844,7 +845,7 @@ function St({
   tags: i = [],
   assigneeName: s,
   assigneeAvatar: a,
-  metaBadges: c = [],
+  metaBadges: o = [],
   actions: u,
   headingLevel: f = 3,
   titleId: b,
@@ -872,7 +873,7 @@ function St({
     // a `titleId`.
     //
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-    /* @__PURE__ */ o(
+    /* @__PURE__ */ c(
       "article",
       {
         "aria-labelledby": h,
@@ -890,7 +891,7 @@ function St({
           m
         ),
         children: [
-          u ? /* @__PURE__ */ o("div", { className: "flex items-start gap-2", children: [
+          u ? /* @__PURE__ */ c("div", { className: "flex items-start gap-2", children: [
             /* @__PURE__ */ e(
               X,
               {
@@ -911,11 +912,11 @@ function St({
               titleId: h
             }
           ),
-          n !== void 0 || l ? /* @__PURE__ */ o("div", { className: "flex items-center justify-between gap-2", children: [
+          n !== void 0 || l ? /* @__PURE__ */ c("div", { className: "flex items-center justify-between gap-2", children: [
             n !== void 0 ? (
               // Desktop/Body/M/bold: SF Pro Display, 15px/24px, weight 600, letter-spacing 0.75px
               // (tracking-wider, exact at this size). Was previously `text-sm font-bold` (14px/700).
-              /* @__PURE__ */ o("span", { className: "text-body-m font-semibold text-main font-sans", children: [
+              /* @__PURE__ */ c("span", { className: "text-body-m font-semibold text-main font-sans", children: [
                 n,
                 " Pts"
               ] })
@@ -935,12 +936,12 @@ function St({
             ) : null
           ] }) : null,
           i.length > 0 ? /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: i.map((v, g) => /* @__PURE__ */ e(I, { variant: v.variant || "neutral", children: v.label }, g)) }) : null,
-          /* @__PURE__ */ o("div", { className: "flex items-center justify-between", children: [
-            /* @__PURE__ */ o("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ c("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ c("div", { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ e(A, { src: a, name: s, size: "sm" }),
               s ? /* @__PURE__ */ e("span", { className: "font-sans text-xs font-medium text-muted truncate max-w-[120px]", children: s }) : null
             ] }),
-            c.length > 0 ? /* @__PURE__ */ e(Ht, { badges: c }) : null
+            o.length > 0 ? /* @__PURE__ */ e(Ht, { badges: o }) : null
           ] })
         ]
       }
@@ -964,7 +965,7 @@ function pe({
   label: i = "No results",
   className: s
 }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "div",
     {
       role: "group",
@@ -984,13 +985,13 @@ function pe({
   );
 }
 function G() {
-  return /* @__PURE__ */ o("div", { className: "flex flex-col gap-4 p-4 bg-surface-panel rounded-sm border border-transparent", children: [
+  return /* @__PURE__ */ c("div", { className: "flex flex-col gap-4 p-4 bg-surface-panel rounded-sm border border-transparent", children: [
     /* @__PURE__ */ e(L, { className: "h-6 w-3/4" }),
-    /* @__PURE__ */ o("div", { className: "flex items-center justify-between gap-2", children: [
+    /* @__PURE__ */ c("div", { className: "flex items-center justify-between gap-2", children: [
       /* @__PURE__ */ e(L, { className: "h-6 w-16" }),
       /* @__PURE__ */ e(L, { className: "h-6 w-20 rounded" })
     ] }),
-    /* @__PURE__ */ e("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ o("div", { className: "flex items-center gap-2", children: [
+    /* @__PURE__ */ e("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2", children: [
       /* @__PURE__ */ e(L, { className: "w-8 h-8 rounded-full" }),
       /* @__PURE__ */ e(L, { className: "h-3 w-20" })
     ] }) })
@@ -1004,13 +1005,13 @@ function Pn({
   emptyTitle: i = "No tasks in this view",
   emptyDescription: s,
   emptyAction: a,
-  headingLevel: c = 3,
+  headingLevel: o = 3,
   label: u,
   className: f
 }) {
-  return /* @__PURE__ */ o(u ? "section" : "div", { "aria-label": u, className: d("flex flex-col gap-4 w-full", f), children: [
-    /* @__PURE__ */ e(X, { title: t, icon: n, headingLevel: c }),
-    r ? /* @__PURE__ */ o(de, { children: [
+  return /* @__PURE__ */ c(u ? "section" : "div", { "aria-label": u, className: d("flex flex-col gap-4 w-full", f), children: [
+    /* @__PURE__ */ e(X, { title: t, icon: n, headingLevel: o }),
+    r ? /* @__PURE__ */ c(de, { children: [
       /* @__PURE__ */ e(G, {}),
       /* @__PURE__ */ e(G, {}),
       /* @__PURE__ */ e(G, {})
@@ -1054,13 +1055,13 @@ function It({ date: t, urgency: n = "normal" }) {
   }[n]), children: t });
 }
 function Dt({ name: t, avatarSrc: n }) {
-  return /* @__PURE__ */ o("div", { className: "flex items-center gap-2 min-w-0", children: [
+  return /* @__PURE__ */ c("div", { className: "flex items-center gap-2 min-w-0", children: [
     /* @__PURE__ */ e(A, { src: n, name: t, size: "sm" }),
     /* @__PURE__ */ e("span", { className: d(S, "truncate"), children: t })
   ] });
 }
 function Rt({ points: t }) {
-  return /* @__PURE__ */ o("span", { className: d(S, "tabular-nums"), children: [
+  return /* @__PURE__ */ c("span", { className: d(S, "tabular-nums"), children: [
     t,
     " ",
     t === 1 ? "Point" : "Points"
@@ -1084,7 +1085,7 @@ function Bt({
   isSelected: i = !1,
   onSelectedChange: s,
   isSelectable: a = !0,
-  headingLevel: c,
+  headingLevel: o,
   tags: u = [],
   estimationPoints: f,
   assigneeName: b,
@@ -1094,7 +1095,7 @@ function Bt({
   onClick: h,
   onViewDetails: v
 }) {
-  const g = (w) => w.stopPropagation(), N = c ? `h${c}` : null, D = N ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", T = h ? /* @__PURE__ */ e(
+  const g = (w) => w.stopPropagation(), N = o ? `h${o}` : null, D = N ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", T = h ? /* @__PURE__ */ e(
     "button",
     {
       type: "button",
@@ -1116,12 +1117,12 @@ function Bt({
     // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
-    /* @__PURE__ */ o("tr", { onClick: h, className: d("group", h && "cursor-pointer"), children: [
-      /* @__PURE__ */ e("td", { className: d(H, "pl-0 pr-4 border-l"), style: { width: P.name }, children: /* @__PURE__ */ o("div", { className: "flex items-center gap-2 h-full", children: [
+    /* @__PURE__ */ c("tr", { onClick: h, className: d("group", h && "cursor-pointer"), children: [
+      /* @__PURE__ */ e("td", { className: d(H, "pl-0 pr-4 border-l"), style: { width: P.name }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
         /* @__PURE__ */ e("span", { className: d("w-1 h-full shrink-0", Zt[l]) }),
         a ? (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-          /* @__PURE__ */ o(
+          /* @__PURE__ */ c(
             "label",
             {
               onClick: g,
@@ -1152,7 +1153,7 @@ function Bt({
         ) : null,
         /* @__PURE__ */ e("span", { className: d(S, "shrink-0 tabular-nums"), children: String(t).padStart(2, "0") }),
         N ? /* @__PURE__ */ e(N, { className: d(S, "flex-1 min-w-0"), children: T }) : T,
-        r.map((w) => /* @__PURE__ */ o(
+        r.map((w) => /* @__PURE__ */ c(
           "span",
           {
             className: d(S, "inline-flex items-center gap-1 shrink-0"),
@@ -1163,7 +1164,7 @@ function Bt({
           },
           w.emoji
         )),
-        v ? /* @__PURE__ */ o(
+        v ? /* @__PURE__ */ c(
           "button",
           {
             type: "button",
@@ -1193,11 +1194,11 @@ function Bt({
   );
 }
 function Ot() {
-  return /* @__PURE__ */ o("tr", { children: [
+  return /* @__PURE__ */ c("tr", { children: [
     /* @__PURE__ */ e("td", { className: d(H, "pl-4 pr-4 border-l"), style: { width: P.name }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(L, { className: "h-4 w-full" }) }) }),
     /* @__PURE__ */ e("td", { className: d(H, "pl-4 pr-4"), style: { width: P.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(L, { className: "h-6 w-16 rounded" }) }) }),
     /* @__PURE__ */ e("td", { className: d(H, "pl-4 pr-4"), style: { width: P.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(L, { className: "h-4 w-16" }) }) }),
-    /* @__PURE__ */ e("td", { className: d(H, "pl-4 pr-4"), style: { width: P.assignee }, children: /* @__PURE__ */ o("div", { className: "flex items-center gap-2 h-full", children: [
+    /* @__PURE__ */ e("td", { className: d(H, "pl-4 pr-4"), style: { width: P.assignee }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
       /* @__PURE__ */ e(L, { className: "w-8 h-8 rounded-full shrink-0" }),
       /* @__PURE__ */ e(L, { className: "h-4 w-20" })
     ] }) }),
@@ -1227,8 +1228,8 @@ function Mn({
         "[scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-3 [&::-webkit-scrollbar-thumb]:rounded-full",
         s
       ),
-      children: /* @__PURE__ */ o("div", { className: "flex flex-col gap-4 min-w-[1108px]", children: [
-        /* @__PURE__ */ e("div", { className: "flex", children: O.map(({ key: a, label: c }, u) => /* @__PURE__ */ e(
+      children: /* @__PURE__ */ c("div", { className: "flex flex-col gap-4 min-w-[1108px]", children: [
+        /* @__PURE__ */ e("div", { className: "flex", children: O.map(({ key: a, label: o }, u) => /* @__PURE__ */ e(
           "div",
           {
             className: d(
@@ -1238,24 +1239,24 @@ function Mn({
               u === O.length - 1 && "rounded-r-4"
             ),
             style: { width: P[a] },
-            children: /* @__PURE__ */ e("span", { className: S, children: c })
+            children: /* @__PURE__ */ e("span", { className: S, children: o })
           },
           a
         )) }),
-        n ? /* @__PURE__ */ o("table", { className: "border-collapse table-fixed", children: [
+        n ? /* @__PURE__ */ c("table", { className: "border-collapse table-fixed", children: [
           /* @__PURE__ */ e("colgroup", { children: O.map(({ key: a }) => /* @__PURE__ */ e("col", { style: { width: P[a] } }, a)) }),
-          /* @__PURE__ */ e("tbody", { children: Array.from({ length: 5 }).map((a, c) => /* @__PURE__ */ e(Ot, {}, c)) })
-        ] }) : t.length === 0 ? /* @__PURE__ */ e(pe, { title: l, description: r, action: i }) : t.map((a, c) => /* @__PURE__ */ o("table", { className: "border-collapse table-fixed", children: [
+          /* @__PURE__ */ e("tbody", { children: Array.from({ length: 5 }).map((a, o) => /* @__PURE__ */ e(Ot, {}, o)) })
+        ] }) : t.length === 0 ? /* @__PURE__ */ e(pe, { title: l, description: r, action: i }) : t.map((a, o) => /* @__PURE__ */ c("table", { className: "border-collapse table-fixed", children: [
           /* @__PURE__ */ e("colgroup", { children: O.map(({ key: u }) => /* @__PURE__ */ e("col", { style: { width: P[u] } }, u)) }),
-          /* @__PURE__ */ o("tbody", { children: [
-            /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: O.length, className: "p-0 border border-neutral-3", children: /* @__PURE__ */ o("div", { className: "flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4", children: [
+          /* @__PURE__ */ c("tbody", { children: [
+            /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: O.length, className: "p-0 border border-neutral-3", children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4", children: [
               /* @__PURE__ */ e(ne, { className: "w-6 h-6 shrink-0 text-muted" }),
               /* @__PURE__ */ e("h3", { className: "flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans", children: a.title }),
               a.actions
             ] }) }) }),
             a.rows.map((u, f) => /* @__PURE__ */ e(Bt, { ...u }, f))
           ] })
-        ] }, c))
+        ] }, o))
       ] })
     }
   );
@@ -1269,7 +1270,7 @@ function W({
   className: s,
   ...a
 }) {
-  const c = y(null), { overlayProps: u } = Ie(
+  const o = y(null), { overlayProps: u } = Ie(
     {
       isOpen: t,
       onClose: n,
@@ -1279,11 +1280,11 @@ function W({
         return !((b = l == null ? void 0 : l.current) != null && b.contains(f));
       }
     },
-    c
+    o
   );
   return t ? (
     // eslint-disable-next-line jsx-a11y/no-autofocus
-    /* @__PURE__ */ e(ee, { restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ o("div", { ...u, ...a, ref: c, role: r, className: s, children: [
+    /* @__PURE__ */ e(ee, { restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ c("div", { ...u, ...a, ref: o, role: r, className: s, children: [
       /* @__PURE__ */ e(z, { onDismiss: n }),
       i,
       /* @__PURE__ */ e(z, { onDismiss: n })
@@ -1297,13 +1298,13 @@ function se({
   className: r,
   ...i
 }) {
-  const s = y(null), a = l ?? s, { popoverProps: c, underlayProps: u } = De({ ...i, popoverRef: a }, t);
-  return /* @__PURE__ */ o(Re, { children: [
+  const s = y(null), a = l ?? s, { popoverProps: o, underlayProps: u } = De({ ...i, popoverRef: a }, t);
+  return /* @__PURE__ */ c(Re, { children: [
     /* @__PURE__ */ e("div", { ...u, className: "fixed inset-0" }),
-    /* @__PURE__ */ e(ee, { restoreFocus: !0, children: /* @__PURE__ */ o(
+    /* @__PURE__ */ e(ee, { restoreFocus: !0, children: /* @__PURE__ */ c(
       "div",
       {
-        ...c,
+        ...o,
         ref: a,
         onKeyDownCapture: (f) => {
           f.key === "Escape" && (f.stopPropagation(), t.close());
@@ -1334,7 +1335,7 @@ function he({
       ...a,
       ref: s,
       className: d("max-h-64 min-w-40 overflow-auto py-2 outline-none", l),
-      children: [...t.collection].map((c) => /* @__PURE__ */ e(Et, { item: c, state: t }, c.key))
+      children: [...t.collection].map((o) => /* @__PURE__ */ e(Et, { item: o, state: t }, o.key))
     }
   );
 }
@@ -1344,7 +1345,7 @@ function Et({ item: t, state: n }) {
     n,
     l
   );
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "li",
     {
       ...r,
@@ -1389,18 +1390,18 @@ function Vn({
   className: s,
   ...a
 }) {
-  const c = Je(a), u = y(null), { labelProps: f, triggerProps: b, valueProps: m, menuProps: p, descriptionProps: x, errorMessageProps: h } = Be(
+  const o = Je(a), u = y(null), { labelProps: f, triggerProps: b, valueProps: m, menuProps: p, descriptionProps: x, errorMessageProps: h } = Be(
     { ...a, description: i, errorMessage: r, isInvalid: !!r },
-    c,
+    o,
     u
   ), { buttonProps: v } = R(b, u);
-  return /* @__PURE__ */ o("div", { className: d("inline-flex flex-col gap-1.5", s), children: [
-    a.label ? /* @__PURE__ */ o("span", { ...f, className: _(t), children: [
+  return /* @__PURE__ */ c("div", { className: d("inline-flex flex-col gap-1.5", s), children: [
+    a.label ? /* @__PURE__ */ c("span", { ...f, className: _(t), children: [
       a.label,
       a.isRequired ? /* @__PURE__ */ e(E, {}) : null
     ] }) : null,
-    /* @__PURE__ */ e(Oe, { state: c, triggerRef: u, label: a.label, name: a.name }),
-    /* @__PURE__ */ o(
+    /* @__PURE__ */ e(Oe, { state: o, triggerRef: u, label: a.label, name: a.name }),
+    /* @__PURE__ */ c(
       "button",
       {
         ...v,
@@ -1432,7 +1433,7 @@ function Vn({
           // fails AA on all three. `muted-on-dark` composites against whatever it lands
           // on, so it carries the empty state instead.
           "inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
-          c.selectedItem ? "text-main" : "text-muted-on-dark",
+          o.selectedItem ? "text-main" : "text-muted-on-dark",
           // A `ring`, not a `border`: the design gives this chip no boundary at all, so
           // an invalid one has to appear out of nothing. A border would add 2px to a
           // control whose height the design fixes at 32px, nudging the whole filter row
@@ -1458,7 +1459,7 @@ function Vn({
         ),
         children: [
           l,
-          /* @__PURE__ */ e("span", { ...m, className: "flex-1 text-left truncate", children: c.selectedItem ? c.selectedItem.rendered : n }),
+          /* @__PURE__ */ e("span", { ...m, className: "flex-1 text-left truncate", children: o.selectedItem ? o.selectedItem.rendered : n }),
           /* @__PURE__ */ e(ne, { className: "w-3 h-3 shrink-0" })
         ]
       }
@@ -1472,7 +1473,7 @@ function Vn({
         errorMessageProps: h
       }
     ),
-    c.isOpen ? /* @__PURE__ */ e(se, { state: c, triggerRef: u, placement: "bottom start", children: /* @__PURE__ */ e(he, { ...p, state: c }) }) : null
+    o.isOpen ? /* @__PURE__ */ e(se, { state: o, triggerRef: u, placement: "bottom start", children: /* @__PURE__ */ e(he, { ...p, state: o }) }) : null
   ] });
 }
 function Ln({
@@ -1483,10 +1484,10 @@ function Ln({
   error: i,
   description: s,
   className: a,
-  ...c
+  ...o
 }) {
   const u = te({}), f = y(null), b = Qe({
-    ...c,
+    ...o,
     selectionMode: "multiple",
     // Explicit, not the default: a plain click on an item should add it to
     // the selection, not replace it — the behavior a set of checkable tags
@@ -1503,8 +1504,8 @@ function Ln({
   ), v = [...b.collection].filter(
     (g) => b.selectionManager.isSelected(g.key)
   );
-  return /* @__PURE__ */ o("div", { className: d("inline-flex flex-col gap-1.5", a), children: [
-    /* @__PURE__ */ o(
+  return /* @__PURE__ */ c("div", { className: d("inline-flex flex-col gap-1.5", a), children: [
+    /* @__PURE__ */ c(
       "button",
       {
         ...h,
@@ -1525,7 +1526,7 @@ function Ln({
         ),
         children: [
           l,
-          /* @__PURE__ */ e("span", { className: "flex-1 text-left truncate", children: v.length > 0 ? v.map((g, N) => /* @__PURE__ */ o(Me, { children: [
+          /* @__PURE__ */ e("span", { className: "flex-1 text-left truncate", children: v.length > 0 ? v.map((g, N) => /* @__PURE__ */ c(Me, { children: [
             N > 0 ? ", " : null,
             g.rendered
           ] }, g.key)) : n }),
@@ -1552,15 +1553,15 @@ function Hn({
   triggerClassName: r,
   ...i
 }) {
-  const s = et({}), a = y(null), { menuTriggerProps: c, menuProps: u } = Ee(
+  const s = et({}), a = y(null), { menuTriggerProps: o, menuProps: u } = Ee(
     { isDisabled: l },
     s,
     a
   ), { buttonProps: f } = R(
-    { ...c, isDisabled: l, "aria-label": t },
+    { ...o, isDisabled: l, "aria-label": t },
     a
   );
-  return /* @__PURE__ */ o(de, { children: [
+  return /* @__PURE__ */ c(de, { children: [
     /* @__PURE__ */ e(
       "button",
       {
@@ -1587,7 +1588,7 @@ function Hn({
 }
 function At({ children: t, onAction: n, onClose: l, ...r }) {
   const i = tt({ ...r, children: t, selectionMode: "none" }), s = y(null), { menuProps: a } = Ae({ ...r, onAction: n, onClose: l }, i, s);
-  return /* @__PURE__ */ e("ul", { ...a, ref: s, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...i.collection].map((c) => /* @__PURE__ */ e(Ft, { item: c, state: i, onClose: l }, c.key)) });
+  return /* @__PURE__ */ e("ul", { ...a, ref: s, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...i.collection].map((o) => /* @__PURE__ */ e(Ft, { item: o, state: i, onClose: l }, o.key)) });
 }
 function Ft({ item: t, state: n, onClose: l }) {
   const r = y(null), { menuItemProps: i, isFocused: s, isDisabled: a } = Fe(
@@ -1622,7 +1623,7 @@ function Sn({
   width: i = "max-w-md",
   role: s = "dialog"
 }) {
-  const a = y(null), c = y(null), u = te({
+  const a = y(null), o = y(null), u = te({
     isOpen: n,
     onOpenChange: (x) => {
       x || l();
@@ -1631,20 +1632,20 @@ function Sn({
     { isDismissable: !0 },
     u,
     a
-  ), { dialogProps: m, titleProps: p } = _e({ role: s }, c);
+  ), { dialogProps: m, titleProps: p } = _e({ role: s }, o);
   return n ? /* @__PURE__ */ e(
     "div",
     {
       ...b,
       className: "fixed inset-0 z-overlay flex items-center justify-center bg-black/60 backdrop-blur-sm p-4",
-      children: /* @__PURE__ */ e(ee, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...f, ref: a, className: d("w-full", i), children: /* @__PURE__ */ o(
+      children: /* @__PURE__ */ e(ee, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...f, ref: a, className: d("w-full", i), children: /* @__PURE__ */ c(
         "div",
         {
           ...m,
-          ref: c,
+          ref: o,
           className: "flex flex-col bg-surface-overlay rounded-sm border border-subtle overflow-hidden",
           children: [
-            /* @__PURE__ */ o("div", { className: "flex items-center justify-between px-4 py-4 border-b border-neutral-4", children: [
+            /* @__PURE__ */ c("div", { className: "flex items-center justify-between px-4 py-4 border-b border-neutral-4", children: [
               /* @__PURE__ */ e("h2", { ...p, className: "font-sans font-bold text-base text-main", children: t }),
               /* @__PURE__ */ e(
                 "button",
@@ -1688,8 +1689,8 @@ function _t({
   timeZone: s = it(),
   className: a
 }) {
-  const c = t !== void 0 ? { value: ue(t, s) } : { defaultValue: n ? ue(n, s) : null }, u = nt({
-    ...c,
+  const o = t !== void 0 ? { value: ue(t, s) } : { defaultValue: n ? ue(n, s) : null }, u = nt({
+    ...o,
     onChange: (N) => l == null ? void 0 : l(zt(N, s)),
     createCalendar: rt,
     // Hardcoded, matching the prior implementation's hardcoded English
@@ -1706,7 +1707,7 @@ function _t({
     const N = ct(s);
     u.setFocusedDate(N), u.selectDate(N);
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     W,
     {
       isOpen: !0,
@@ -1718,9 +1719,9 @@ function _t({
         a
       ),
       children: [
-        /* @__PURE__ */ o("div", { ...f, className: "flex flex-col", children: [
-          /* @__PURE__ */ o("div", { className: "flex items-center justify-between px-2 py-[9px] h-10", children: [
-            /* @__PURE__ */ o("div", { className: "flex items-center gap-1", children: [
+        /* @__PURE__ */ c("div", { ...f, className: "flex flex-col", children: [
+          /* @__PURE__ */ c("div", { className: "flex items-center justify-between px-2 py-[9px] h-10", children: [
+            /* @__PURE__ */ c("div", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ e(
                 "button",
                 {
@@ -1743,7 +1744,7 @@ function _t({
               )
             ] }),
             /* @__PURE__ */ e("span", { className: "font-sans font-semibold text-body-sm text-main", children: u.visibleRange.start.toDate(s).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: s }) }),
-            /* @__PURE__ */ o("div", { className: "flex items-center gap-1", children: [
+            /* @__PURE__ */ c("div", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ e(
                 "button",
                 {
@@ -1788,9 +1789,9 @@ function Wt({ state: t }) {
     { weekdayStyle: "short" },
     t
   ), s = t.visibleRange.start;
-  return /* @__PURE__ */ o("div", { ...n, className: "flex flex-col px-3 py-2", children: [
-    /* @__PURE__ */ e("div", { ...l, className: "grid grid-cols-7", children: r.map((a, c) => /* @__PURE__ */ e("span", { className: "text-center text-body-sm font-normal text-main font-sans", children: a }, c)) }),
-    Array.from({ length: i }, (a, c) => /* @__PURE__ */ e("div", { role: "row", className: "grid grid-cols-7", children: t.getDatesInWeek(c).map(
+  return /* @__PURE__ */ c("div", { ...n, className: "flex flex-col px-3 py-2", children: [
+    /* @__PURE__ */ e("div", { ...l, className: "grid grid-cols-7", children: r.map((a, o) => /* @__PURE__ */ e("span", { className: "text-center text-body-sm font-normal text-main font-sans", children: a }, o)) }),
+    Array.from({ length: i }, (a, o) => /* @__PURE__ */ e("div", { role: "row", className: "grid grid-cols-7", children: t.getDatesInWeek(o).map(
       (u, f) => u ? /* @__PURE__ */ e(
         Ut,
         {
@@ -1800,7 +1801,7 @@ function Wt({ state: t }) {
         },
         u.toString()
       ) : /* @__PURE__ */ e("div", { role: "gridcell", "aria-hidden": "true" }, f)
-    ) }, c))
+    ) }, o))
   ] });
 }
 function Ut({
@@ -1808,7 +1809,7 @@ function Ut({
   date: n,
   currentMonth: l
 }) {
-  const r = y(null), i = !ut(n, l), { cellProps: s, buttonProps: a, isSelected: c, isDisabled: u, formattedDate: f } = Ke(
+  const r = y(null), i = !ut(n, l), { cellProps: s, buttonProps: a, isSelected: o, isDisabled: u, formattedDate: f } = Ke(
     { date: n, isOutsideMonth: i },
     t,
     r
@@ -1820,7 +1821,7 @@ function Ut({
       ref: r,
       className: d(
         "flex items-center justify-center w-6 h-6 rounded-2 text-body-sm font-normal font-sans transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text",
-        u ? "text-muted cursor-default" : c ? "border border-primary-4 text-main cursor-pointer" : "text-main hover:bg-neutral-3 cursor-pointer"
+        u ? "text-muted cursor-default" : o ? "border border-primary-4 text-main cursor-pointer" : "text-main hover:bg-neutral-3 cursor-pointer"
       ),
       children: f
     }
@@ -1834,7 +1835,7 @@ function $t({
   triggerRef: r,
   className: i
 }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     W,
     {
       isOpen: !0,
@@ -1847,7 +1848,7 @@ function $t({
       ),
       children: [
         /* @__PURE__ */ e("div", { className: "flex items-center h-8 px-4", children: /* @__PURE__ */ e("span", { className: "text-body-xl font-semibold text-muted-on-dark font-sans truncate", children: "Estimate" }) }),
-        Kt.map((s) => /* @__PURE__ */ o(
+        Kt.map((s) => /* @__PURE__ */ c(
           "button",
           {
             type: "button",
@@ -1863,7 +1864,7 @@ function $t({
             ),
             children: [
               /* @__PURE__ */ e("span", { className: "w-6 h-6 shrink-0", children: /* @__PURE__ */ e(Y, { className: "size-6" }) }),
-              /* @__PURE__ */ o("span", { className: "whitespace-nowrap", children: [
+              /* @__PURE__ */ c("span", { className: "whitespace-nowrap", children: [
                 s,
                 " Point",
                 s !== 1 ? "s" : ""
@@ -1885,12 +1886,12 @@ function qt({
   className: s,
   onClick: a
 }) {
-  const c = {
+  const o = {
     sm: "text-[10px]",
     md: "text-xs",
     lg: "text-sm"
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     a ? "button" : "div",
     {
       type: a ? "button" : void 0,
@@ -1902,18 +1903,18 @@ function qt({
         s
       ),
       children: [
-        /* @__PURE__ */ o("div", { className: "relative shrink-0", children: [
+        /* @__PURE__ */ c("div", { className: "relative shrink-0", children: [
           /* @__PURE__ */ e(A, { src: l, name: t, size: r }),
           i ? /* @__PURE__ */ e("span", { className: "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary-4 border-2 border-neutral-5" }) : null
         ] }),
-        /* @__PURE__ */ o("div", { className: "flex flex-col min-w-0", children: [
+        /* @__PURE__ */ c("div", { className: "flex flex-col min-w-0", children: [
           /* @__PURE__ */ e("span", { className: "font-sans font-normal text-body-m text-main truncate", children: t }),
           n ? /* @__PURE__ */ e(
             "span",
             {
               className: d(
                 "font-sans text-muted-on-dark truncate leading-tight",
-                c[r]
+                o[r]
               ),
               children: n
             }
@@ -1930,7 +1931,7 @@ function Gt({
   triggerRef: r,
   className: i
 }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     W,
     {
       isOpen: !0,
@@ -1958,7 +1959,7 @@ function Gt({
   );
 }
 function Yt({ labels: t, onSelect: n, onClose: l, triggerRef: r, className: i }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     W,
     {
       isOpen: !0,
@@ -1993,13 +1994,13 @@ function In({
   onSubmit: i,
   defaultTitle: s = "",
   defaultDueDate: a,
-  defaultPoints: c,
+  defaultPoints: o,
   defaultAssignee: u,
   defaultLabel: f,
   className: b
 }) {
-  const [m, p] = M.useState(s), [x, h] = M.useState(a), [v, g] = M.useState(c), [N, D] = M.useState(u), [T, w] = M.useState(f), [V, j] = M.useState(null), Z = (k) => j((Ce) => Ce === k ? null : k), F = () => j(null), U = M.useRef(null), K = M.useRef(null), $ = M.useRef(null), re = M.useRef(null), q = () => {
-    p(s), h(a), g(c), D(u), w(f), j(null);
+  const [m, p] = M.useState(s), [x, h] = M.useState(a), [v, g] = M.useState(o), [N, D] = M.useState(u), [T, w] = M.useState(f), [V, j] = M.useState(null), Z = (k) => j((Ce) => Ce === k ? null : k), F = () => j(null), U = M.useRef(null), K = M.useRef(null), $ = M.useRef(null), re = M.useRef(null), q = () => {
+    p(s), h(a), g(o), D(u), w(f), j(null);
   }, [ve, ge] = M.useState(t);
   if (t !== ve && (ge(t), t && q()), !t) return null;
   const ye = (k) => {
@@ -2007,7 +2008,7 @@ function In({
   }, Ne = () => {
     q(), n();
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "form",
     {
       onSubmit: ye,
@@ -2027,8 +2028,8 @@ function In({
             className: "w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
           }
         ),
-        /* @__PURE__ */ o("div", { className: "flex items-center gap-4 w-full", children: [
-          /* @__PURE__ */ o("div", { className: "relative", children: [
+        /* @__PURE__ */ c("div", { className: "flex items-center gap-4 w-full", children: [
+          /* @__PURE__ */ c("div", { className: "relative", children: [
             v === void 0 ? /* @__PURE__ */ e(
               "button",
               {
@@ -2040,7 +2041,7 @@ function In({
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: /* @__PURE__ */ e(I, { icon: /* @__PURE__ */ e(Y, { className: "size-6" }), children: "Estimate" })
               }
-            ) : /* @__PURE__ */ o(
+            ) : /* @__PURE__ */ c(
               "button",
               {
                 ref: U,
@@ -2070,8 +2071,8 @@ function In({
               }
             ) : null
           ] }),
-          /* @__PURE__ */ o("div", { className: "relative", children: [
-            N ? /* @__PURE__ */ o(
+          /* @__PURE__ */ c("div", { className: "relative", children: [
+            N ? /* @__PURE__ */ c(
               "button",
               {
                 ref: K,
@@ -2110,7 +2111,7 @@ function In({
               }
             ) : null
           ] }),
-          /* @__PURE__ */ o("div", { className: "relative", children: [
+          /* @__PURE__ */ c("div", { className: "relative", children: [
             T ? /* @__PURE__ */ e(
               "button",
               {
@@ -2147,7 +2148,7 @@ function In({
               }
             ) : null
           ] }),
-          /* @__PURE__ */ o("div", { className: "relative", children: [
+          /* @__PURE__ */ c("div", { className: "relative", children: [
             /* @__PURE__ */ e(
               "button",
               {
@@ -2174,7 +2175,7 @@ function In({
             ) : null
           ] })
         ] }),
-        /* @__PURE__ */ o("div", { className: "flex items-center gap-6", children: [
+        /* @__PURE__ */ c("div", { className: "flex items-center gap-6", children: [
           /* @__PURE__ */ e(ce, { variant: "secondary", onPress: Ne, children: "Cancel" }),
           /* @__PURE__ */ e(ce, { variant: "primary", type: "submit", isDisabled: !m.trim(), children: "Create Task" })
         ] })
@@ -2227,12 +2228,12 @@ function Qt({
   state: n,
   closeLabel: l
 }) {
-  const r = y(null), i = y(null), { toastProps: s, contentProps: a, titleProps: c, closeButtonProps: u } = qe(
+  const r = y(null), i = y(null), { toastProps: s, contentProps: a, titleProps: o, closeButtonProps: u } = qe(
     { toast: t },
     n,
     r
   ), { buttonProps: f } = R(u, i);
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "div",
     {
       ...s,
@@ -2243,7 +2244,7 @@ function Qt({
         Jt[t.content.tone]
       ),
       children: [
-        /* @__PURE__ */ e("div", { ...a, children: /* @__PURE__ */ e("span", { ...c, children: t.content.message }) }),
+        /* @__PURE__ */ e("div", { ...a, children: /* @__PURE__ */ e("span", { ...o, children: t.content.message }) }),
         /* @__PURE__ */ e(
           "button",
           {
@@ -2288,9 +2289,9 @@ function jn({
   ie(() => {
     a.current = s;
   }, [s]);
-  const c = y(n);
+  const o = y(n);
   ie(() => {
-    c.current = n;
+    o.current = n;
   }, [n]);
   const u = me(
     () => ({
@@ -2300,13 +2301,13 @@ function jn({
         // an explicit `null` means "stay until dismissed", which react-stately
         // expresses as a timeout of 0.
         {
-          timeout: (m == null ? void 0 : m.timeout) === null ? 0 : (m == null ? void 0 : m.timeout) ?? c.current
+          timeout: (m == null ? void 0 : m.timeout) === null ? 0 : (m == null ? void 0 : m.timeout) ?? o.current
         }
       )
     }),
     []
   );
-  return /* @__PURE__ */ o(xe.Provider, { value: u, children: [
+  return /* @__PURE__ */ c(xe.Provider, { value: u, children: [
     t,
     s.visibleToasts.length > 0 ? /* @__PURE__ */ e(en, { state: s, label: r, closeLabel: i }) : null
   ] });
@@ -2319,7 +2320,7 @@ function Zn({
   isDisabled: i = !1,
   isIndeterminate: s = !1,
   error: a,
-  description: c,
+  description: o,
   isRequired: u = !1,
   className: f
 }) {
@@ -2328,7 +2329,7 @@ function Zn({
     defaultSelected: l,
     onChange: r
   }), m = y(null), { fieldProps: p, descriptionProps: x, errorMessageProps: h } = J({
-    description: c,
+    description: o,
     errorMessage: a,
     isInvalid: !!a
   }), { inputProps: v, labelProps: g } = Ge(
@@ -2342,7 +2343,7 @@ function Zn({
     },
     b,
     m
-  ), N = /* @__PURE__ */ o(
+  ), N = /* @__PURE__ */ c(
     "label",
     {
       ...g,
@@ -2374,7 +2375,7 @@ function Zn({
             className: "sr-only"
           }
         ),
-        /* @__PURE__ */ o(
+        /* @__PURE__ */ c(
           "svg",
           {
             className: d("w-6 h-6 shrink-0", a ? "text-danger-text" : "text-main"),
@@ -2397,19 +2398,19 @@ function Zn({
             ]
           }
         ),
-        /* @__PURE__ */ o("span", { className: "text-body-m font-normal font-sans text-main", children: [
+        /* @__PURE__ */ c("span", { className: "text-body-m font-normal font-sans text-main", children: [
           t,
           u ? /* @__PURE__ */ e(E, {}) : null
         ] })
       ]
     }
   );
-  return !a && !c ? N : /* @__PURE__ */ o("div", { className: "inline-flex flex-col gap-1", children: [
+  return !a && !o ? N : /* @__PURE__ */ c("div", { className: "inline-flex flex-col gap-1", children: [
     N,
     /* @__PURE__ */ e("span", { className: "px-4", children: /* @__PURE__ */ e(
       B,
       {
-        description: c,
+        description: o,
         error: a,
         descriptionProps: x,
         errorMessageProps: h
@@ -2425,12 +2426,12 @@ function Bn({
   className: i,
   ...s
 }) {
-  const a = y(null), { labelProps: c, inputProps: u, descriptionProps: f, errorMessageProps: b } = Q(
+  const a = y(null), { labelProps: o, inputProps: u, descriptionProps: f, errorMessageProps: b } = Q(
     { ...s, label: t, description: r, type: "date", isInvalid: !!l, errorMessage: l },
     a
   );
-  return /* @__PURE__ */ o("div", { className: "flex flex-col gap-1.5 w-full", children: [
-    t ? /* @__PURE__ */ o("label", { ...c, className: _(n), children: [
+  return /* @__PURE__ */ c("div", { className: "flex flex-col gap-1.5 w-full", children: [
+    t ? /* @__PURE__ */ c("label", { ...o, className: _(n), children: [
       t,
       s.isRequired ? /* @__PURE__ */ e(E, {}) : null
     ] }) : null,
@@ -2466,7 +2467,7 @@ function tn({
   onClick: i,
   className: s
 }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "button",
     {
       type: "button",
@@ -2523,7 +2524,7 @@ function tn({
   );
 }
 function nn({ logo: t, items: n, className: l }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "nav",
     {
       "aria-label": "Main navigation",
@@ -2547,7 +2548,7 @@ function On({
   leftLabel: i,
   rightLabel: s,
   label: a = "View",
-  className: c
+  className: o
 }) {
   const u = y(null), f = (m) => {
     var p, x;
@@ -2574,13 +2575,13 @@ function On({
     }
     m.preventDefault(), f(p);
   };
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "div",
     {
       ref: u,
       role: "radiogroup",
       "aria-label": a,
-      className: d("flex items-center w-20 h-10 bg-surface-shell rounded-sm", c),
+      className: d("flex items-center w-20 h-10 bg-surface-shell rounded-sm", o),
       children: [
         /* @__PURE__ */ e(
           oe,
@@ -2622,15 +2623,15 @@ function En({
   children: i,
   className: s
 }) {
-  return /* @__PURE__ */ o(
+  return /* @__PURE__ */ c(
     "div",
     {
       className: d("flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8", s),
       children: [
         /* @__PURE__ */ e(nn, { logo: t, items: n, className: "self-stretch" }),
-        /* @__PURE__ */ o("div", { className: "flex flex-col gap-8 flex-1 min-w-0", children: [
+        /* @__PURE__ */ c("div", { className: "flex flex-col gap-8 flex-1 min-w-0", children: [
           /* @__PURE__ */ e(Mt, { ...l }),
-          /* @__PURE__ */ o("div", { className: "flex flex-col gap-4", children: [
+          /* @__PURE__ */ c("div", { className: "flex flex-col gap-4", children: [
             r ? /* @__PURE__ */ e("div", { className: "flex items-start justify-between gap-6", children: r }) : null,
             i
           ] })

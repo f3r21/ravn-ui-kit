@@ -77,6 +77,13 @@ export function Avatar({
     <div
       role="img"
       aria-label={label}
+      // Same string as `aria-label`, deliberately, and not a second prop. This is the hover
+      // tooltip a pointer user gets — an avatar is a picture of a name, and without it the
+      // only way to find out whose is to hover something else. `aria-label` outranks `title`
+      // in the accessible-name computation, so this adds a tooltip without touching what a
+      // screen reader announces or announcing anything twice. The consuming app's own avatar
+      // carries the same `title`, so the swap keeps its tooltips rather than dropping them.
+      title={label}
       className={cn(
         // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
         // they used to be. That pairing measured 2.61:1 and was the single largest

@@ -49,10 +49,32 @@ describe('Avatar Component', () => {
     expect(screen.getByRole('img', { name: 'Sin asignar' })).toBeDefined();
   });
 
-  it('does not announce the avatar twice', () => {
-    // The name is on the wrapper and the image is `alt=""`, so exactly one element carries it.
+  it('guards the empty alt: exactly one element carries the name, never two', () => {
+    // This IS the guard for the `alt=""` half, and it is the only case that covers it — do not
+    // read it as a redundant restatement of the case above.
+    //
+    // It does pass against the fully-broken component, because there the wrapper has no role
+    // and only the `<img>` matches, which is still exactly one. What it catches is the
+    // half-fix: keep the wrapper's `role="img"` and put an `alt` back on the image and this
+    // returns 2 and goes red. Verified by doing exactly that — `expected [ …(2) ] to have a
+    // length of 1 but got 2`.
     render(<Avatar src="https://example.com/a.jpg" name="Grace Stone" />);
     expect(screen.getAllByRole('img', { name: 'Grace Stone' })).toHaveLength(1);
+  });
+
+  it('carries a hover tooltip with the same name', () => {
+    // Not accessibility — `aria-label` outranks `title` for the accessible name, and nothing
+    // asserts on it in the consumer's suite. It is the tooltip a pointer user gets, which the
+    // app's own avatar has; without it the swap would quietly drop hover-to-see-who.
+    const { rerender } = render(<Avatar name="Grace Stone" />);
+    expect(screen.getByRole('img', { name: 'Grace Stone' }).getAttribute('title')).toBe(
+      'Grace Stone',
+    );
+
+    rerender(<Avatar />);
+    expect(screen.getByRole('img', { name: 'Unassigned' }).getAttribute('title')).toBe(
+      'Unassigned',
+    );
   });
 
   /**
