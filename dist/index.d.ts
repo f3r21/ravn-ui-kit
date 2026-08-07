@@ -1377,7 +1377,7 @@ export declare interface MenuProps<T extends object> extends Omit<AriaMenuProps<
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export declare function Modal({ title, isOpen, onClose, children, width, role, }: ModalProps): default_2.JSX.Element | null;
+export declare function Modal({ title, isOpen, onClose, children, width, role, isDismissable, }: ModalProps): default_2.JSX.Element | null;
 
 export declare interface ModalProps {
     /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
@@ -1401,6 +1401,15 @@ export declare interface ModalProps {
      * @default 'dialog'
      */
     role?: 'dialog' | 'alertdialog';
+    /**
+     * Whether Escape and a click on the backdrop close the modal. Set `false` while an operation
+     * is in flight — a delete that is already running should not be dismissable half-way through.
+     *
+     * Gating `onClose` yourself is **not** equivalent: Escape, the backdrop and the close button
+     * all still fire it, so the caller has to defend every path instead of one.
+     * @default true
+     */
+    isDismissable?: boolean;
 }
 
 /**
