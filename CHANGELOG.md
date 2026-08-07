@@ -17,6 +17,18 @@ For the consuming app this is the release that closes the last three kit gaps bl
 migration: `Modal`'s dropped `contentProps` (#64), and — already in `v0.5.1` — `Skeleton`'s
 reduced-motion guard and `Button`'s icon frame.
 
+### Build
+
+- **CI actions bumped** (#27): `actions/checkout` and `actions/setup-node` v4 → v7,
+  `dependency-review-action` v4 → v5, and both Pages actions to v5.0.0 —
+  `upload-pages-artifact` `56afc60` → `fc324d3`, `deploy-pages` `d6db901` → `cd2ce8f`. The two on
+  the Pages publish path stay SHA-pinned, which is the rule `ci.yml` explains: what is under
+  control there is privilege, not version. `.github/workflows/ci.yml` only — no consumer surface.
+
+- **`@types/node` `^22.13.0` → `^26.1.2`** (#31), devDependency. Not consumer-visible:
+  `git show origin/main:dist/index.d.ts | grep -c 'node:'` → **0**, so nothing in the published
+  types reaches into it.
+
 ### Fixed
 
 - **`figure-audit.mjs` no longer credits a command that cannot detect a failing run** (#53). It
