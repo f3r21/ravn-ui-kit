@@ -1,0 +1,86 @@
+name: Tag check
+
+# The backstop for a tag nobody dispatched (#56).
+#
+# `release.yml` (#57) is the preventive half: it verifies everything and then cuts the tag
+# itself. This is the detective half, and it exists for the one case that workflow structurally
+# cannot intercept — someone running `git tag v0.6.0 && git push origin v0.6.0` from a laptop.
+# That still works and will keep working until #59's `v*` ruleset lands:
+#   gh api repos/f3r21/ravn-ui-kit/rulesets -q length   -> 0
+#   (control: the consuming app returns 1, so the query works)
+#
+# `on: push: tags:` is the only trigger that cannot be skipped, because it fires on the ref
+# existing rather than on anyone remembering to invoke it. That is the whole argument: `v0.5.0`
+# was not caught by a missing check — the consuming app's `ui-kit-smoke.test.tsx` already
+# asserted exactly this and its comment names the gap verbatim. It simply was not run.
+#
+# **This job will NOT run for tags cut by `release.yml`, and that is intended.** A ref pushed
+# with the default `GITHUB_TOKEN` does not trigger further workflow runs; GitHub suppresses it
+# to prevent recursion. Every check here has already run there, on the same commit, before the
+# tag existed — plus the gate, the library build, the `dist/` freshness guard and the Storybook
+# build, which this job deliberately skips. So the silence is correct, not a hole.
+#
+# Verify that property rather than rediscovering it: after the next dispatched release, confirm
+# no run of this workflow exists for that tag —
+#   gh run list --workflow=tag-check.yml --json headBranch -q '[.[].headBranch]'
+# Do not "fix" the silence with a PAT. It would buy a duplicate of checks that already ran and
+# hand a longer-lived credential to `release.yml`, the only job in this repo with write scope.
+#
+# **A tag is not a release until this is green.** That is the half that matters: it converts an
+# immutable mistake into a revocable one. `v0.5.0` was deletable precisely because it was caught
+# before anything consumed it.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: tag-check-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  tag-check:
+    name: Tag check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Full depth so the default branch is fetchable below. The tag's own tree is what gets
+      # checked; `main`'s is only where the checker comes from.
+      - name: Checkout the tagged commit
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # No `npm ci`. `scripts/release-checks.mjs` imports only `node:fs` and `node:path`, which
+      # is what lets this job answer in seconds and read nothing but two files from the tagged
+      # tree. Re-derive: `grep '^import' scripts/release-checks.mjs`.
+      - name: Take the checker from the default branch, not from the tag
+        run: |
+          git fetch --no-tags origin '+refs/heads/${{ github.event.repository.default_branch }}:refs/remotes/origin/default'
+          git show origin/default:scripts/release-checks.mjs > /tmp/release-checks.mjs
+        # Deliberately decoupled. Running the tagged tree's own copy would mean a tag cut on a
+        # commit predating this script fails with "module not found" instead of a useful answer,
+        # and a bug fixed in the checker would need a re-tag to take effect. The tag supplies the
+        # facts; `main` supplies the judgement.
+
+      # The same two checks `release.yml` runs, from the same implementation — one behaviour with
+      # two triggers rather than two copies that can drift. They are proved to fail
+      # *independently*, with a positive control, in `scripts/release-checks.test.mjs`; Vitest
+      # collects it, so `npm run gate` runs it on every PR.
+      - name: Verify the tag against package.json and CHANGELOG.md
+        run: |
+          TAG='${{ github.ref_name }}'
+          node /tmp/release-checks.mjs "$TAG" "$GITHUB_WORKSPACE" > /dev/null || {
+            echo "::error::$TAG does not describe its own commit. This tag is NOT a release — do not pin it. See the errors above, fix on main, and cut a new tag; published tags are never moved or deleted (#54)."
+            exit 1
+          }
+          echo "::notice::$TAG checks out: package.json and CHANGELOG.md agree with the tag."
