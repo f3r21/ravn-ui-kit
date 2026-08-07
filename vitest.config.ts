@@ -53,10 +53,10 @@ export default defineConfig({
       // the 10 untested files — and covered the row and widget branches those
       // fixes introduced. 86.56 -> 88.76.
       thresholds: {
-        statements: 90.18,
-        branches: 88.71,
-        functions: 84.78,
-        lines: 90.18,
+        statements: 90.68,
+        branches: 89.44,
+        functions: 84.89,
+        lines: 90.68,
       },
     },
   },
