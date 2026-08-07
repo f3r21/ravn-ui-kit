@@ -39,6 +39,9 @@ const meta: Meta<typeof ViewSwitcher> = {
   component: ViewSwitcher,
   tags: ['autodocs'],
   decorators: [withSurface('neutral-4')],
+  argTypes: {
+    value: { control: 'select', options: ['left', 'right'] },
+  },
   args: {
     leftIcon: <GridIcon />,
     rightIcon: <ListIcon />,
@@ -56,6 +59,14 @@ export const LeftSelected: Story = {
 
 export const RightSelected: Story = {
   args: { value: 'right' },
+};
+
+/**
+ * The group carries its own accessible name, announced before the selected option. It
+ * defaults to "View"; give it something specific when a page holds more than one switcher.
+ */
+export const CustomGroupLabel: Story = {
+  args: { value: 'left', label: 'Task layout' },
 };
 
 export const Playground: Story = {

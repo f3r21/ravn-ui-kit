@@ -20,6 +20,27 @@ export interface ButtonProps extends AriaButtonProps {
   children: React.ReactNode;
   /** Required — icon-only buttons need an accessible name. */
   'aria-label': string;
+  /**
+   * ARIA role, for a button that is one option inside a composite widget — currently only
+   * `'radio'`, for a button sitting in a `role="radiogroup"` (see `ViewSwitcher`). Omit for
+   * an ordinary button, which is almost always what you want.
+   *
+   * This and `aria-checked` are applied *after* `useButton`'s props rather than passed
+   * through them, because `useButton` returns only the props it knows about and these two
+   * are not among them — passed in, both arrive on the element as `null`. Re-derive by
+   * rendering `<Button aria-label="p" role="radio" aria-checked />` and reading
+   * `el.getAttribute('role')`; `button.test.tsx` pins it.
+   *
+   * The roving tabindex a radiogroup also needs does *not* go here: `useButton` owns
+   * `tabIndex` and hardcodes `0`, so use `excludeFromTabOrder` (already on
+   * `AriaButtonProps`) to get `-1` on the unselected option.
+   */
+  role?: 'radio';
+  /**
+   * Selected state for `role="radio"`. Has no effect without a `role` — a plain button has
+   * no checked state, and `isSelected` is the visual-only prop for that case.
+   */
+  'aria-checked'?: boolean;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -76,6 +97,8 @@ export function Button({
   children,
   className,
   isDisabled,
+  role,
+  'aria-checked': ariaChecked,
   ...props
 }: ButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -91,6 +114,9 @@ export function Button({
   return (
     <button
       {...buttonProps}
+      // After the spread, deliberately: `useButton` does not carry these and would drop them.
+      role={role}
+      aria-checked={ariaChecked}
       ref={ref}
       className={cn(
         'inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',

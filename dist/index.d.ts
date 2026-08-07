@@ -414,7 +414,7 @@ export declare function BellIcon(props: IconProps): JSX.Element;
  * `outline-none` also outranks a consumer's own `@layer base :focus-visible`
  * rule, so it suppressed the app's global ring too.
  */
-export declare function Button({ variant, isSelected, children, className, isDisabled, ...props }: ButtonProps): JSX.Element;
+export declare function Button({ variant, isSelected, children, className, isDisabled, role, 'aria-checked': ariaChecked, ...props }: ButtonProps): JSX.Element;
 
 export declare interface ButtonProps extends AriaButtonProps {
     /**
@@ -434,6 +434,27 @@ export declare interface ButtonProps extends AriaButtonProps {
     children: React.ReactNode;
     /** Required — icon-only buttons need an accessible name. */
     'aria-label': string;
+    /**
+     * ARIA role, for a button that is one option inside a composite widget — currently only
+     * `'radio'`, for a button sitting in a `role="radiogroup"` (see `ViewSwitcher`). Omit for
+     * an ordinary button, which is almost always what you want.
+     *
+     * This and `aria-checked` are applied *after* `useButton`'s props rather than passed
+     * through them, because `useButton` returns only the props it knows about and these two
+     * are not among them — passed in, both arrive on the element as `null`. Re-derive by
+     * rendering `<Button aria-label="p" role="radio" aria-checked />` and reading
+     * `el.getAttribute('role')`; `button.test.tsx` pins it.
+     *
+     * The roving tabindex a radiogroup also needs does *not* go here: `useButton` owns
+     * `tabIndex` and hardcodes `0`, so use `excludeFromTabOrder` (already on
+     * `AriaButtonProps`) to get `-1` on the unselected option.
+     */
+    role?: 'radio';
+    /**
+     * Selected state for `role="radio"`. Has no effect without a `role` — a plain button has
+     * no checked state, and `isSelected` is the visual-only prop for that case.
+     */
+    'aria-checked'?: boolean;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -1517,7 +1538,7 @@ export declare function RequiredIndicator(): JSX.Element;
  * - Icon: 24x24, neutral-2
  * - Text: Desktop/Body/M/regular — SF Pro Display 15px/24px, letter-spacing 0.75px, neutral-2
  */
-export declare function SearchBar({ placeholder, value: controlledValue, onChange, onSubmit, className, }: SearchBarProps): JSX.Element;
+export declare function SearchBar({ placeholder, value: controlledValue, onChange, onSubmit, label, id, className, }: SearchBarProps): JSX.Element;
 
 export declare interface SearchBarProps {
     /**
@@ -1531,6 +1552,22 @@ export declare interface SearchBarProps {
     onChange?: (value: string) => void;
     /** Called when user submits (Enter). */
     onSubmit?: (value: string) => void;
+    /**
+     * Accessible name for the input. Was hardcoded to `'Search'` with no way past it, so a
+     * consumer whose page holds more than one search — or which simply says something more
+     * specific, e.g. `'Search tasks'` — could not name its own field.
+     * @default 'Search'
+     */
+    label?: string;
+    /**
+     * `id` for the input element. Only needed when something outside this component has to
+     * point at the field — an external `<label htmlFor>`, an `aria-controls` on a results
+     * region. Left off, React Aria generates one.
+     *
+     * Note that `label` above still wins as the accessible name: an `aria-label` overrides a
+     * `<label>` element. Pass one or the other, not both.
+     */
+    id?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -1577,7 +1614,7 @@ export declare function SearchIcon(props: IconProps): JSX.Element;
  * radiogroup pattern those hooks implement (selection follows focus, one
  * tab stop for the whole group).
  */
-export declare function SegmentedControl({ options, value: controlledValue, defaultValue, onChange, className, }: SegmentedControlProps): default_2.JSX.Element;
+export declare function SegmentedControl({ options, value: controlledValue, defaultValue, onChange, label, className, }: SegmentedControlProps): default_2.JSX.Element;
 
 export declare interface SegmentedControlOption {
     /** Unique identifier for the option, used to match against `value`/`defaultValue` and reported by `onChange`. */
@@ -1597,6 +1634,14 @@ export declare interface SegmentedControlProps {
     defaultValue?: string;
     /** Called with the newly selected option's `id` whenever the user picks a segment. */
     onChange?: (value: string) => void;
+    /**
+     * Accessible name for the group as a whole, announced before the selected segment.
+     * Was hardcoded to `'View'`, which is right for a view switcher and wrong for every
+     * other use of a segmented control; that string stays the default so existing callers
+     * are unaffected.
+     * @default 'View'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2279,7 +2324,7 @@ export declare type ToastTone = StatusTone;
  * default, but this is a values-based judgment call, not a confirmed fact. No `title` prop:
  * no title/heading layer exists anywhere in the real component.
  */
-export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, icon, userName, userAvatar, className, }: TopNavProps): JSX.Element;
+export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, className, }: TopNavProps): JSX.Element;
 
 export declare interface TopNavProps {
     /** Controlled search value. */
@@ -2290,8 +2335,31 @@ export declare interface TopNavProps {
     onSearchChange?: (value: string) => void;
     /** Called when the search is submitted (Enter). */
     onSearchSubmit?: (value: string) => void;
+    /**
+     * Accessible name for the search input, forwarded to `SearchBar`.
+     * @default 'Search'
+     */
+    searchLabel?: string;
     /** Trailing 24x24 icon (Figma "Icon Placeholder", `currentColor`). Defaults to a bell/notifications glyph. */
     icon?: ReactNode;
+    /**
+     * Called when the notifications icon is activated. Providing it turns that icon into a
+     * real `<button>` — focusable, Enter/Space-activatable, and named by
+     * `notificationsLabel`. Left off, the icon stays the non-interactive decoration it has
+     * always been, so existing consumers are unchanged.
+     *
+     * The `icon` slot above can still carry a consumer's own control instead, but it renders
+     * into a fixed 24×24 box sized for a glyph, so a button smuggled through it has nowhere
+     * to put padding or a focus ring. This prop is the supported path.
+     */
+    onNotificationsClick?: () => void;
+    /**
+     * Accessible name for the notifications button. Ignored unless `onNotificationsClick`
+     * is set. Include the unread count when there is one — "Notifications, 3 unread" — since
+     * a bare bell tells a screen-reader user nothing about whether it is worth opening.
+     * @default 'Notifications'
+     */
+    notificationsLabel?: string;
     /** Logged-in user's name (used for avatar initials/alt text). */
     userName?: string;
     /** Logged-in user's avatar image URL. */
@@ -2371,8 +2439,17 @@ export declare function useToast(): ToastApi;
  * are consumer-supplied (no default glyph) since the source vector paths aren't
  * legible enough to reproduce faithfully, the same "leave the un-legible glyph
  * unimplemented" discipline used for TaskTable/TaskCard's unglyphed slots.
+ *
+ * Accessibility: the two buttons are a `role="radiogroup"` of `role="radio"`s, following
+ * `SegmentedControl` — read its doc comment for why the roles are hand-rolled rather than
+ * taken from `useRadio`/`useRadioGroup` (those hooks drive a real `<input type="radio">`,
+ * which this component's icon-button shape has no room for). Selection follows focus, and
+ * the group is one tab stop: the selected side is the only tabbable one, arrows and
+ * Home/End move between them. Before this, selection was carried by border colour alone —
+ * nothing in the accessibility tree said which side was active, or that the two buttons
+ * were related at all.
  */
-export declare function ViewSwitcher({ value, onChange, leftIcon, rightIcon, leftLabel, rightLabel, className, }: ViewSwitcherProps): JSX.Element;
+export declare function ViewSwitcher({ value, onChange, leftIcon, rightIcon, leftLabel, rightLabel, label, className, }: ViewSwitcherProps): JSX.Element;
 
 export declare interface ViewSwitcherProps {
     /** Which side is currently active. */
@@ -2387,6 +2464,16 @@ export declare interface ViewSwitcherProps {
     leftLabel: string;
     /** Accessible name for the right button. */
     rightLabel: string;
+    /**
+     * Accessible name for the group as a whole, announced before the selected option
+     * ("View, Board, radio button, 1 of 2"). Without one the two buttons read as an
+     * unexplained pair, which is what "board vs list" needs explaining.
+     *
+     * Defaults to `'View'`, matching `SegmentedControl`'s own group name so the kit's two
+     * radiogroups agree; pass something specific when the page holds more than one.
+     * @default 'View'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }

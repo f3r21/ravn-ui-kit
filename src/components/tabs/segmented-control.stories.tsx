@@ -31,3 +31,14 @@ export const Playground: Story = {
     defaultValue: 'board',
   },
 };
+
+/**
+ * The group's accessible name. It defaults to "View", which was hardcoded before this prop
+ * existed — right for a view switcher, wrong for every other use of a segmented control.
+ */
+export const CustomGroupLabel: Story = {
+  args: {
+    defaultValue: 'board',
+    label: 'Density',
+  },
+};

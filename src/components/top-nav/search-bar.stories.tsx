@@ -30,3 +30,12 @@ export const Playground: Story = {
 export const WithValue: Story = {
   args: { value: 'Fix auth bug', placeholder: 'Search...' },
 };
+
+/**
+ * The field is a `searchbox`, and its accessible name is the `label` prop rather than a
+ * fixed "Search" — a page with more than one search, or one that simply says something more
+ * specific, can now name its own field.
+ */
+export const CustomLabel: Story = {
+  args: { label: 'Search tasks', placeholder: 'Search tasks, projects...' },
+};

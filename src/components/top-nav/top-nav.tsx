@@ -13,8 +13,31 @@ export interface TopNavProps {
   onSearchChange?: (value: string) => void;
   /** Called when the search is submitted (Enter). */
   onSearchSubmit?: (value: string) => void;
+  /**
+   * Accessible name for the search input, forwarded to `SearchBar`.
+   * @default 'Search'
+   */
+  searchLabel?: string;
   /** Trailing 24x24 icon (Figma "Icon Placeholder", `currentColor`). Defaults to a bell/notifications glyph. */
   icon?: ReactNode;
+  /**
+   * Called when the notifications icon is activated. Providing it turns that icon into a
+   * real `<button>` — focusable, Enter/Space-activatable, and named by
+   * `notificationsLabel`. Left off, the icon stays the non-interactive decoration it has
+   * always been, so existing consumers are unchanged.
+   *
+   * The `icon` slot above can still carry a consumer's own control instead, but it renders
+   * into a fixed 24×24 box sized for a glyph, so a button smuggled through it has nowhere
+   * to put padding or a focus ring. This prop is the supported path.
+   */
+  onNotificationsClick?: () => void;
+  /**
+   * Accessible name for the notifications button. Ignored unless `onNotificationsClick`
+   * is set. Include the unread count when there is one — "Notifications, 3 unread" — since
+   * a bare bell tells a screen-reader user nothing about whether it is worth opening.
+   * @default 'Notifications'
+   */
+  notificationsLabel?: string;
   /** Logged-in user's name (used for avatar initials/alt text). */
   userName?: string;
   /** Logged-in user's avatar image URL. */
@@ -53,7 +76,10 @@ export function TopNav({
   searchPlaceholder,
   onSearchChange,
   onSearchSubmit,
+  searchLabel,
   icon,
+  onNotificationsClick,
+  notificationsLabel = 'Notifications',
   userName,
   userAvatar,
   className,
@@ -84,6 +110,7 @@ export function TopNav({
         value={searchValue}
         onChange={handleSearchChange}
         onSubmit={onSearchSubmit}
+        label={searchLabel}
         className="flex-1"
       />
 
@@ -99,9 +126,26 @@ export function TopNav({
           </button>
         ) : null}
 
-        <span className="w-6 h-6 text-muted shrink-0 [&>svg]:w-full [&>svg]:h-full">
-          {icon ?? <BellIcon />}
-        </span>
+        {/* The bell was a bare `<span>`: not focusable, not activatable, and with no
+            accessible name, so the only notifications affordance in the shell did not exist
+            for a keyboard or screen-reader user at all. It becomes a real button only when
+            given something to do — a button that does nothing is its own defect — and it
+            carries the same ring as "Clear search" above, because a new keyboard-reachable
+            control with no visible focus indicator would trade one barrier for another. */}
+        {onNotificationsClick ? (
+          <button
+            type="button"
+            onClick={onNotificationsClick}
+            aria-label={notificationsLabel}
+            className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full"
+          >
+            {icon ?? <BellIcon />}
+          </button>
+        ) : (
+          <span className="w-6 h-6 text-muted shrink-0 [&>svg]:w-full [&>svg]:h-full">
+            {icon ?? <BellIcon />}
+          </span>
+        )}
 
         {userName || userAvatar ? <Avatar src={userAvatar} name={userName} size="md" /> : null}
       </div>

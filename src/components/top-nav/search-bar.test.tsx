@@ -4,15 +4,44 @@ import userEvent from '@testing-library/user-event';
 import { SearchBar } from './search-bar';
 
 describe('SearchBar Component', () => {
-  it('renders with the fixed accessible name and default placeholder', () => {
+  it('renders with the default accessible name and default placeholder', () => {
     render(<SearchBar />);
-    const input = screen.getByRole('textbox', { name: 'Search' });
+    const input = screen.getByRole('searchbox', { name: 'Search' });
     expect(input.getAttribute('placeholder')).toBe('Search...');
+  });
+
+  it('is a searchbox, not a plain textbox', () => {
+    // The role is what a screen reader announces and what a consumer queries by. This was a
+    // `textbox` — `type` was never set — so `getByRole('searchbox')` found nothing at all.
+    render(<SearchBar />);
+    expect(screen.getByRole('searchbox').getAttribute('type')).toBe('search');
+    expect(screen.queryByRole('textbox')).toBeNull();
+  });
+
+  it('lets a consumer name the field', () => {
+    // `aria-label` was hardcoded to 'Search' with no prop past it, so an app whose own label
+    // reads "Search tasks" could not say so.
+    render(<SearchBar label="Search tasks" />);
+    expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeDefined();
+  });
+
+  it('accepts an id so something outside can point at the field', () => {
+    render(<SearchBar id="task-search" />);
+    expect(screen.getByRole('searchbox').getAttribute('id')).toBe('task-search');
+  });
+
+  it('suppresses the native WebKit clear glyph, which would duplicate TopNav’s own', () => {
+    // `type="search"` opts into a platform clear button; TopNav already renders a labelled
+    // one. jsdom does not paint it, so what is pinned here is the utility that removes it.
+    render(<SearchBar />);
+    expect(screen.getByRole('searchbox').className).toContain(
+      '[&::-webkit-search-cancel-button]:appearance-none',
+    );
   });
 
   it('respects a custom placeholder', () => {
     render(<SearchBar placeholder="Find a task..." />);
-    expect(screen.getByRole('textbox', { name: 'Search' }).getAttribute('placeholder')).toBe(
+    expect(screen.getByRole('searchbox', { name: 'Search' }).getAttribute('placeholder')).toBe(
       'Find a task...',
     );
   });
@@ -22,7 +51,7 @@ describe('SearchBar Component', () => {
     const user = userEvent.setup();
 
     render(<SearchBar onChange={handleChange} />);
-    const input = screen.getByRole('textbox', { name: 'Search' }) as HTMLInputElement;
+    const input = screen.getByRole('searchbox', { name: 'Search' }) as HTMLInputElement;
     await user.type(input, 'abc');
 
     expect(input.value).toBe('abc');
@@ -35,7 +64,7 @@ describe('SearchBar Component', () => {
     const user = userEvent.setup();
 
     render(<SearchBar onSubmit={handleSubmit} />);
-    const input = screen.getByRole('textbox', { name: 'Search' });
+    const input = screen.getByRole('searchbox', { name: 'Search' });
     await user.type(input, 'abc{Enter}');
 
     expect(handleSubmit).toHaveBeenCalledWith('abc');
@@ -46,7 +75,7 @@ describe('SearchBar Component', () => {
     const user = userEvent.setup();
 
     render(<SearchBar value="abc" onChange={handleChange} />);
-    const input = screen.getByRole('textbox', { name: 'Search' }) as HTMLInputElement;
+    const input = screen.getByRole('searchbox', { name: 'Search' }) as HTMLInputElement;
     await user.type(input, 'd');
 
     expect(handleChange).toHaveBeenCalledWith('abcd');
@@ -62,7 +91,7 @@ describe('SearchBar Component', () => {
     // previously had `outline-none` and no focus affordance at all. See button.tsx's doc
     // comment for the full mechanics.
     render(<SearchBar />);
-    const input = screen.getByRole('textbox', { name: 'Search' });
+    const input = screen.getByRole('searchbox', { name: 'Search' });
 
     expect(input.className).not.toContain('outline-none');
     expect(input.className).toContain('focus-visible:outline-2');

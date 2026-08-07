@@ -8,7 +8,7 @@ describe('TopNav Component', () => {
     const user = userEvent.setup();
     const onSearchChange = vi.fn();
     render(<TopNav onSearchChange={onSearchChange} />);
-    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'auth');
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'auth');
     expect(onSearchChange).toHaveBeenLastCalledWith('auth');
   });
 
@@ -17,7 +17,7 @@ describe('TopNav Component', () => {
     render(<TopNav />);
     expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
 
-    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'auth');
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'auth');
     expect(screen.getByRole('button', { name: 'Clear search' })).toBeDefined();
   });
 
@@ -25,12 +25,56 @@ describe('TopNav Component', () => {
     const user = userEvent.setup();
     const onSearchChange = vi.fn();
     render(<TopNav onSearchChange={onSearchChange} />);
-    const input = screen.getByRole('textbox', { name: 'Search' });
+    const input = screen.getByRole('searchbox', { name: 'Search' });
     await user.type(input, 'auth');
 
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect((input as HTMLInputElement).value).toBe('');
     expect(onSearchChange).toHaveBeenLastCalledWith('');
+  });
+
+  it('leaves the notifications bell decorative when it has nothing to do', () => {
+    // A button that does nothing is its own defect, so the non-interactive span stays the
+    // default and existing consumers are unchanged.
+    render(<TopNav />);
+    expect(screen.queryByRole('button', { name: 'Notifications' })).toBeNull();
+  });
+
+  it('turns the notifications bell into a real, named button when given a handler', async () => {
+    // It was a bare <span>: not focusable, not activatable, no accessible name — the only
+    // notifications affordance in the shell, absent from the accessibility tree entirely.
+    const user = userEvent.setup();
+    const onNotificationsClick = vi.fn();
+    render(<TopNav onNotificationsClick={onNotificationsClick} />);
+
+    const bell = screen.getByRole('button', { name: 'Notifications' });
+    await user.click(bell);
+    expect(onNotificationsClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('activates the bell from the keyboard, and paints a ring while doing it', async () => {
+    const user = userEvent.setup();
+    const onNotificationsClick = vi.fn();
+    render(<TopNav onNotificationsClick={onNotificationsClick} />);
+
+    const bell = screen.getByRole('button', { name: 'Notifications' });
+    bell.focus();
+    expect(bell).toBe(document.activeElement);
+    await user.keyboard('{Enter}');
+    expect(onNotificationsClick).toHaveBeenCalledTimes(1);
+
+    expect(bell.className).not.toContain('outline-none');
+    expect(bell.className).toContain('focus-visible:outline-2');
+  });
+
+  it('lets the bell carry an unread count in its name', () => {
+    render(<TopNav onNotificationsClick={vi.fn()} notificationsLabel="Notifications, 3 unread" />);
+    expect(screen.getByRole('button', { name: 'Notifications, 3 unread' })).toBeDefined();
+  });
+
+  it('forwards a search label through to the input', () => {
+    render(<TopNav searchLabel="Search tasks" />);
+    expect(screen.getByRole('searchbox', { name: 'Search tasks' })).toBeDefined();
   });
 
   it('only renders the avatar when a user is provided', () => {
