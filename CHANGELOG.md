@@ -8,6 +8,22 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`figure-audit.mjs` no longer flags a pipe that is downstream of a command substitution**
+  (#71). `isBlindPipe` tested "contains a verification AND contains a pipe", so
+  `out=$(npm run gate 2>&1); echo "$out" | grep 'Tests  '` was reported blind — but that pipe
+  masks nothing, because the gate's status is resolved at the `$(...)` boundary. It now blanks
+  substitutions, splits on `|`, and flags only a verification in a segment other than the last,
+  since `$?` is the last segment's status.
+
+  This was the only one of #71's classes that made the tool give a **wrong** answer about a
+  **correct** practice — the rest dilute a number; this one inverted the incentive the tool
+  exists to create. Found by running the detector over the repo's own corpus rather than by
+  re-reading it: both sabotages tested the _rule_ and passed, and only the corpus tested the
+  _implementation_ of the rule. Corpus effect measured, not asserted — sourced 149 → 155 across
+  68 documents, with exactly one document moving. Repository tooling only; `dist/` is untouched.
+
 ## [0.5.2] — 2026-08-07
 
 **The first tag cut by the Release workflow rather than by hand**, and the first with
