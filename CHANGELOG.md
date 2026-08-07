@@ -29,6 +29,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   jsdom 30 (#32) provides it. Verified in real Chrome in all three directions — one click
   switches, clicking an open chip still closes it, and a click outside the row still dismisses.
   **Minor** — `dismissExemptRef` is additive and optional.
+
 - **`figure-audit.mjs` counted command internals as claims, and penalised `pipefail`**
   (#69, #70, #78). Three defects in one family, fixed together because they are one file and
   each one's corpus pass invalidates the next.
