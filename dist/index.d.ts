@@ -324,14 +324,43 @@ export declare interface AssigneeNameCellProps {
  */
 export declare function AttachmentIcon(props: IconProps): JSX.Element;
 
-/** Circular user avatar that shows an image, or initials derived from `name` when no `src` is provided. */
-export declare function Avatar({ src, name, size, className }: AvatarProps): JSX.Element;
+/**
+ * Circular user avatar that shows an image, or initials derived from `name` when no `src` is
+ * provided.
+ *
+ * **The accessible name lives on the wrapper, not on the `<img>`** (#47), and the image is
+ * `alt=""`. Two reasons, and the second is why this was a migration blocker:
+ *
+ * - An avatar conveys *who*, not what a picture looks like. With the name on the image, a
+ *   screen reader announces "image, Alice" — the "image" part is noise and "Alice" is the
+ *   whole point.
+ * - Without an image there is no `<img>`, so there was no `alt` and nothing else carried a
+ *   name: the component became a `<div>` holding two letters, with **no role and no
+ *   accessible name at all**. That is not an edge case — the consuming API's `User.avatar`
+ *   and `Task.assignee` are both nullable, which is why the initials fallback exists.
+ *
+ * `role="img"` makes the wrapper's contents presentational, so the initials are not announced
+ * on top of `aria-label`; they remain in `textContent` for anyone asserting on them.
+ */
+export declare function Avatar({ src, name, fallbackLabel, size, className, }: AvatarProps): JSX.Element;
 
 export declare interface AvatarProps {
     /** Image URL to render. Falls back to initials derived from `name` when omitted. */
     src?: string;
-    /** Full name used for the fallback initials and the image `alt` text. */
+    /**
+     * Full name of the person. This is the avatar's **accessible name** in both states — with
+     * an image and without one — and the source of the fallback initials.
+     */
     name?: string;
+    /**
+     * Accessible name used when `name` is absent, e.g. an unassigned task.
+     *
+     * Overridable rather than hardcoded for the same reason `TaskListView`'s `emptyTitle` is:
+     * the kit cannot know the consumer's language or domain. The visible fallback stays `'?'`
+     * — this names it, it does not relabel it.
+     * @default 'Unassigned'
+     */
+    fallbackLabel?: string;
     /**
      * Controls the avatar's width, height, and initials font size.
      * @default 'md'

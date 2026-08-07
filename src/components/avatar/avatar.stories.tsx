@@ -65,7 +65,16 @@ export const InitialsLarge: Story = {
  * Override `fallbackLabel` for a non-English consumer.
  */
 export const Unassigned: Story = {
-  args: { size: 'md' },
+  // A `render` rather than args, because args cannot express "no name" here. Story args are
+  // merged over the meta's, and this file's meta sets `name: 'Jerome Bell'` — omitting `name`
+  // inherits it, and passing `name: undefined` does NOT override it either, because Storybook
+  // strips undefined values during the merge. Both spellings render a normal named avatar and
+  // the story silently documents the wrong state. Found by opening the page, not by the build.
+  // `name: undefined` is load-bearing, not noise. Story args are merged over the meta's, and
+  // this file's meta sets `name: 'Jerome Bell'` — so simply omitting `name` here inherits it
+  // and the story renders an ordinary named avatar, silently documenting the wrong state.
+  // The build is green either way; this was caught by opening the page.
+  args: { name: undefined, size: 'md' },
 };
 
 /**
