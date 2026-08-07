@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Popover } from './popover';
 
@@ -102,5 +102,63 @@ describe('Popover Component', () => {
     expect(screen.getByRole('button', { name: 'Option' })).toBe(document.activeElement);
     await user.tab();
     expect(screen.getByRole('button', { name: 'After' })).toBe(document.activeElement);
+  });
+});
+
+/**
+ * #82. Outside-click handling runs in the capture phase and CONSUMES the click, so a region
+ * declared exempt is the difference between a sibling trigger receiving its own click and the
+ * user having to click twice. `AddTaskModal`'s four chips are the case this exists for.
+ */
+describe('Popover dismissExemptRef (#82)', () => {
+  function Harness({ exempt }: { exempt: boolean }) {
+    const rowRef = React.useRef<HTMLDivElement>(null);
+    return (
+      <div>
+        <div ref={rowRef} data-testid="row">
+          <button type="button">sibling</button>
+        </div>
+        <button type="button" data-testid="far">
+          far away
+        </button>
+        <Popover
+          isOpen
+          onClose={onCloseSpy}
+          aria-label="Test"
+          dismissExemptRef={exempt ? rowRef : undefined}
+        >
+          <p>content</p>
+        </Popover>
+      </div>
+    );
+  }
+  let onCloseSpy: ReturnType<typeof vi.fn>;
+  beforeEach(() => {
+    onCloseSpy = vi.fn();
+  });
+
+  it('does not dismiss when the interaction is inside the exempt region', async () => {
+    const user = userEvent.setup();
+    render(<Harness exempt />);
+    await user.click(screen.getByText('sibling'));
+    expect(onCloseSpy).not.toHaveBeenCalled();
+  });
+
+  /**
+   * The control, and it is doing real work: without it, "never dismisses at all" passes the case
+   * above. A popover that cannot be dismissed is a worse bug than the one being fixed.
+   */
+  it('control: still dismisses when the interaction is genuinely outside', async () => {
+    const user = userEvent.setup();
+    render(<Harness exempt />);
+    await user.click(screen.getByTestId('far'));
+    expect(onCloseSpy).toHaveBeenCalled();
+  });
+
+  it('control: without the prop, the same sibling click dismisses', async () => {
+    const user = userEvent.setup();
+    render(<Harness exempt={false} />);
+    await user.click(screen.getByText('sibling'));
+    expect(onCloseSpy).toHaveBeenCalled();
   });
 });

@@ -287,7 +287,7 @@ export declare function AssigneeIcon(props: IconProps): JSX.Element;
  * action (every real "User" row instance renders identically, with no highlighted/selected
  * variant anywhere in the export).
  */
-export declare function AssigneeModal({ assignees, onSelect, onClose, triggerRef, className, }: AssigneeModalProps): JSX.Element;
+export declare function AssigneeModal({ assignees, onSelect, onClose, triggerRef, dismissExemptRef, className, }: AssigneeModalProps): JSX.Element;
 
 export declare interface AssigneeModalProps {
     /** Full list of assignable people shown as rows. */
@@ -298,6 +298,11 @@ export declare interface AssigneeModalProps {
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
     triggerRef?: PopoverProps['triggerRef'];
+    /**
+     * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+     * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+     */
+    dismissExemptRef?: PopoverProps['dismissExemptRef'];
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -647,7 +652,7 @@ export declare function Datepicker({ label, isLabelVisible, error, description, 
  * correct, standard grid semantics is a net accessibility improvement, not a regression against
  * verified spec.
  */
-export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, timeZone, className, }: DatePickerMenuProps): JSX.Element;
+export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, className, }: DatePickerMenuProps): JSX.Element;
 
 export declare interface DatePickerMenuProps {
     /**
@@ -675,6 +680,11 @@ export declare interface DatePickerMenuProps {
     timeZone?: string;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
     triggerRef?: PopoverProps['triggerRef'];
+    /**
+     * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+     * Needed when this menu is one of several sibling triggers, e.g. `AddTaskModal`'s chip row.
+     */
+    dismissExemptRef?: PopoverProps['dismissExemptRef'];
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -793,7 +803,7 @@ export declare interface EmptyStateProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export declare function EstimateModal({ value, onSelect, onClose, triggerRef, className, }: EstimateModalProps): JSX.Element;
+export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, className, }: EstimateModalProps): JSX.Element;
 
 export declare interface EstimateModalProps {
     /** Currently selected point value, if any — highlights the matching row. */
@@ -804,6 +814,11 @@ export declare interface EstimateModalProps {
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
     triggerRef?: PopoverProps['triggerRef'];
+    /**
+     * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+     * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+     */
+    dismissExemptRef?: PopoverProps['dismissExemptRef'];
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -1241,7 +1256,7 @@ export declare function LabelIcon(props: IconProps): JSX.Element;
  * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
  * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export declare function LabelModal({ labels, onSelect, onClose, triggerRef, className }: LabelModalProps): JSX.Element;
+export declare function LabelModal({ labels, onSelect, onClose, triggerRef, dismissExemptRef, className, }: LabelModalProps): JSX.Element;
 
 export declare interface LabelModalProps {
     /** Full list of selectable labels shown as rows. */
@@ -1252,6 +1267,11 @@ export declare interface LabelModalProps {
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
     triggerRef?: PopoverProps['triggerRef'];
+    /**
+     * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+     * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+     */
+    dismissExemptRef?: PopoverProps['dismissExemptRef'];
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -1505,7 +1525,7 @@ export declare function PointsIcon(props: IconProps): JSX.Element;
  * content has an explicit way to close the popover, rather than needing to
  * know Escape or find the trigger again.
  */
-export declare function Popover({ isOpen, onClose, triggerRef, role, children, className, ...ariaProps }: PopoverProps): default_2.JSX.Element | null;
+export declare function Popover({ isOpen, onClose, triggerRef, dismissExemptRef, role, children, className, ...ariaProps }: PopoverProps): default_2.JSX.Element | null;
 
 export declare interface PopoverProps {
     /** Whether the popover is currently open. When `false`, nothing is rendered. */
@@ -1513,13 +1533,34 @@ export declare interface PopoverProps {
     /** Called when the popover should close — Escape, an outside click, or a `DismissButton`. */
     onClose: () => void;
     /**
-     * Ref to the element that toggles this popover open/closed. Clicking it is
-     * excluded from "outside interaction" so a toggle-button trigger doesn't
-     * immediately reopen the popover it just closed (react-aria's outside-click
-     * handling runs in the click event's capture phase, before the trigger's
-     * own `onClick` fires).
+     * Ref to the element that toggles this popover open/closed. Clicking it is excluded from
+     * "outside interaction" so a toggle-button trigger doesn't immediately reopen the popover it
+     * just closed.
+     *
+     * **The general rule, because this is where people look and the narrow version cost an hour
+     * (#82):** react-aria's outside-click handling is a **capture-phase** listener that calls
+     * `stopPropagation()` — `useInteractOutside.mjs:54`, `useOverlay.mjs:49`. So a click that
+     * dismisses this popover is *consumed*: it never reaches whatever was clicked. Any control
+     * that both dismisses an open popover and is meant to do something itself has to be exempted,
+     * or its own handler simply never runs and the user has to click twice.
+     *
+     * `triggerRef` exempts one such control. `dismissExemptRef` below exempts a region of them.
      */
     triggerRef?: default_2.RefObject<HTMLElement | null>;
+    /**
+     * A region that does not count as "outside" for dismissal, beyond `triggerRef` itself — for a
+     * group of sibling triggers that share one popover slot (#82).
+     *
+     * The reason is the same one `triggerRef` exists for, one step wider. Outside-click handling
+     * runs in the capture phase and **consumes the click**, so with only the popover's own trigger
+     * exempt, clicking a *sibling* trigger dismisses the open popover and that click never reaches
+     * the sibling. The user sees the first click do nothing and has to click again.
+     *
+     * Exempting the whole group makes switching purely state-driven: the sibling's `onClick` runs,
+     * selects itself, and the previously-open popover unmounts because its `isOpen` went false.
+     * Clicking genuinely outside the group still dismisses normally.
+     */
+    dismissExemptRef?: default_2.RefObject<HTMLElement | null>;
     /**
      * ARIA role for the popover surface. `'dialog'` fits every current consumer:
      * `DatePickerMenu` (a calendar grid — `role="grid"` — inside a dialog

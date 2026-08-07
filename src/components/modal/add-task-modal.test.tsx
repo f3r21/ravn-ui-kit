@@ -155,3 +155,26 @@ describe('AddTaskModal Component', () => {
     expect(input.className).toContain('focus-visible:outline-interactive-text');
   });
 });
+
+/**
+ * #82. Each chip's popover closes only ITSELF, and clicking outside the chip row still
+ * dismisses. Both halves matter: the fix exempts the whole row from outside-dismiss so a
+ * sibling chip receives its own click, and the risk of that fix is a popover that can no
+ * longer be dismissed at all.
+ */
+describe('closing a chip popover from outside the row (#82)', () => {
+  it.each([['Estimate'], ['Assignee'], ['Label'], ['Due date']])(
+    '%s dismisses when the click lands outside the chip row',
+    async (chip) => {
+      const user = userEvent.setup();
+      render(<AddTaskModal isOpen onClose={vi.fn()} />);
+
+      await user.click(screen.getByRole('button', { name: chip }));
+      expect(screen.getByRole('dialog')).toBeDefined();
+
+      // The title input is outside the row, so this is a genuine outside interaction.
+      await user.click(screen.getByPlaceholderText('Task name'));
+      expect(screen.queryByRole('dialog')).toBeNull();
+    },
+  );
+});

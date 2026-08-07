@@ -87,10 +87,10 @@ export default defineConfig({
       // And check the exit status — `out=$(npm run gate 2>&1); rc=$?` — because the
       // coverage summary prints identical percentages whether or not the thresholds passed.
       thresholds: {
-        statements: 90.71,
-        branches: 89.69,
-        functions: 84.89,
-        lines: 90.71,
+        statements: 91.06,
+        branches: 90.19,
+        functions: 86.01,
+        lines: 91.06,
       },
     },
   },

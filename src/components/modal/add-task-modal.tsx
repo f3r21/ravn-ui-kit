@@ -108,8 +108,31 @@ export function AddTaskModal({
   >(null);
   const togglePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
     setOpenPopover((prev) => (prev === name ? null : name));
-  const closePopover = () => setOpenPopover(null);
 
+  // Insurance, NOT the fix for #82. The fix is `dismissExemptRef` on the chip row below.
+  //
+  // Identity-awareness means a popover may only close ITSELF, so a stale one cannot clear a
+  // newer one whichever order the handlers run in. Measured: removing this breaks no test in
+  // the suite, under either jsdom, while removing the row exemption fails the target test. It
+  // is kept because it costs nothing and makes the state machine order-independent — but it
+  // earns no credit for the defect being gone.
+  //
+  // **The first diagnosis was that this WAS the fix, and it was wrong.** That theory said the
+  // sibling's `onClick` set the new popover and the old one's outside-handler then nulled it —
+  // open-then-close, whichever ran second winning. It is recorded here because it is plausible,
+  // it is what the state alone suggests, and it cost an hour: the fix was made, rebuilt, and
+  // the bug still reproduced in the browser.
+  //
+  // What actually happens is that the sibling's `onClick` NEVER RUNS. react-aria's
+  // outside-click handling is a capture-phase listener that calls `stopPropagation()`
+  // (`useInteractOutside.mjs:54`, `useOverlay.mjs:49`), so the click is consumed before it
+  // reaches the chip. Nothing opens because nothing was ever told to.
+  //
+  // Do not reason about state ordering here. The defect was never about state ordering.
+  const closePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
+    setOpenPopover((prev) => (prev === name ? null : prev));
+
+  const chipRowRef = React.useRef<HTMLDivElement>(null);
   const estimateTriggerRef = React.useRef<HTMLButtonElement>(null);
   const assigneeTriggerRef = React.useRef<HTMLButtonElement>(null);
   const labelTriggerRef = React.useRef<HTMLButtonElement>(null);
@@ -184,7 +207,10 @@ export function AddTaskModal({
         className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
       />
 
-      <div className="flex items-center gap-4 w-full">
+      {/* The whole chip row is exempt from every popover's outside-dismiss (#82). Without it,
+          clicking a sibling chip is consumed by the open popover's capture-phase dismiss and
+          never reaches that chip, so the first click does nothing and it takes two. */}
+      <div ref={chipRowRef} className="flex items-center gap-4 w-full">
         {/* Estimate trigger */}
         <div className="relative">
           {points === undefined ? (
@@ -222,7 +248,8 @@ export function AddTaskModal({
                 setPoints(p);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('estimate')}
               triggerRef={estimateTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -263,7 +290,8 @@ export function AddTaskModal({
                 setAssignee(a);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('assignee')}
               triggerRef={assigneeTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -302,7 +330,8 @@ export function AddTaskModal({
                 setLabel(l);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('label')}
               triggerRef={labelTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -330,7 +359,8 @@ export function AddTaskModal({
                 setDueDate(d);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('date')}
               triggerRef={dateTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />

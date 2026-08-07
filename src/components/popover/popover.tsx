@@ -7,13 +7,34 @@ export interface PopoverProps {
   /** Called when the popover should close — Escape, an outside click, or a `DismissButton`. */
   onClose: () => void;
   /**
-   * Ref to the element that toggles this popover open/closed. Clicking it is
-   * excluded from "outside interaction" so a toggle-button trigger doesn't
-   * immediately reopen the popover it just closed (react-aria's outside-click
-   * handling runs in the click event's capture phase, before the trigger's
-   * own `onClick` fires).
+   * Ref to the element that toggles this popover open/closed. Clicking it is excluded from
+   * "outside interaction" so a toggle-button trigger doesn't immediately reopen the popover it
+   * just closed.
+   *
+   * **The general rule, because this is where people look and the narrow version cost an hour
+   * (#82):** react-aria's outside-click handling is a **capture-phase** listener that calls
+   * `stopPropagation()` — `useInteractOutside.mjs:54`, `useOverlay.mjs:49`. So a click that
+   * dismisses this popover is *consumed*: it never reaches whatever was clicked. Any control
+   * that both dismisses an open popover and is meant to do something itself has to be exempted,
+   * or its own handler simply never runs and the user has to click twice.
+   *
+   * `triggerRef` exempts one such control. `dismissExemptRef` below exempts a region of them.
    */
   triggerRef?: React.RefObject<HTMLElement | null>;
+  /**
+   * A region that does not count as "outside" for dismissal, beyond `triggerRef` itself — for a
+   * group of sibling triggers that share one popover slot (#82).
+   *
+   * The reason is the same one `triggerRef` exists for, one step wider. Outside-click handling
+   * runs in the capture phase and **consumes the click**, so with only the popover's own trigger
+   * exempt, clicking a *sibling* trigger dismisses the open popover and that click never reaches
+   * the sibling. The user sees the first click do nothing and has to click again.
+   *
+   * Exempting the whole group makes switching purely state-driven: the sibling's `onClick` runs,
+   * selects itself, and the previously-open popover unmounts because its `isOpen` went false.
+   * Clicking genuinely outside the group still dismisses normally.
+   */
+  dismissExemptRef?: React.RefObject<HTMLElement | null>;
   /**
    * ARIA role for the popover surface. `'dialog'` fits every current consumer:
    * `DatePickerMenu` (a calendar grid — `role="grid"` — inside a dialog
@@ -63,6 +84,7 @@ export function Popover({
   isOpen,
   onClose,
   triggerRef,
+  dismissExemptRef,
   role = 'dialog',
   children,
   className,
@@ -75,7 +97,8 @@ export function Popover({
       isOpen,
       onClose,
       isDismissable: true,
-      shouldCloseOnInteractOutside: (element) => !triggerRef?.current?.contains(element),
+      shouldCloseOnInteractOutside: (element) =>
+        !triggerRef?.current?.contains(element) && !dismissExemptRef?.current?.contains(element),
     },
     overlayRef,
   );
