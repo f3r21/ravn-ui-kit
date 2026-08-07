@@ -3,8 +3,20 @@ import { cn } from '../../utils/cn';
 export interface AvatarProps {
   /** Image URL to render. Falls back to initials derived from `name` when omitted. */
   src?: string;
-  /** Full name used for the fallback initials and the image `alt` text. */
+  /**
+   * Full name of the person. This is the avatar's **accessible name** in both states — with
+   * an image and without one — and the source of the fallback initials.
+   */
   name?: string;
+  /**
+   * Accessible name used when `name` is absent, e.g. an unassigned task.
+   *
+   * Overridable rather than hardcoded for the same reason `TaskListView`'s `emptyTitle` is:
+   * the kit cannot know the consumer's language or domain. The visible fallback stays `'?'`
+   * — this names it, it does not relabel it.
+   * @default 'Unassigned'
+   */
+  fallbackLabel?: string;
   /**
    * Controls the avatar's width, height, and initials font size.
    * @default 'md'
@@ -14,8 +26,31 @@ export interface AvatarProps {
   className?: string;
 }
 
-/** Circular user avatar that shows an image, or initials derived from `name` when no `src` is provided. */
-export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
+/**
+ * Circular user avatar that shows an image, or initials derived from `name` when no `src` is
+ * provided.
+ *
+ * **The accessible name lives on the wrapper, not on the `<img>`** (#47), and the image is
+ * `alt=""`. Two reasons, and the second is why this was a migration blocker:
+ *
+ * - An avatar conveys *who*, not what a picture looks like. With the name on the image, a
+ *   screen reader announces "image, Alice" — the "image" part is noise and "Alice" is the
+ *   whole point.
+ * - Without an image there is no `<img>`, so there was no `alt` and nothing else carried a
+ *   name: the component became a `<div>` holding two letters, with **no role and no
+ *   accessible name at all**. That is not an edge case — the consuming API's `User.avatar`
+ *   and `Task.assignee` are both nullable, which is why the initials fallback exists.
+ *
+ * `role="img"` makes the wrapper's contents presentational, so the initials are not announced
+ * on top of `aria-label`; they remain in `textContent` for anyone asserting on them.
+ */
+export function Avatar({
+  src,
+  name,
+  fallbackLabel = 'Unassigned',
+  size = 'md',
+  className,
+}: AvatarProps) {
   // Sizes match the Figma "Avatar" component variants (Property 1=Default/Variant2/Variant3):
   // 32px / 40px / 48px. Initials font-size per variant has no dedicated Figma spec (exported
   // examples are all image-filled), so existing text sizes are kept as-is.
@@ -34,8 +69,14 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
     return parts[0].substring(0, 2).toUpperCase();
   };
 
+  // Falsy rather than nullish, matching `getInitials` below: an empty-string name is not a
+  // name, and it would otherwise produce an avatar labelled with nothing at all.
+  const label = name || fallbackLabel;
+
   return (
     <div
+      role="img"
+      aria-label={label}
       className={cn(
         // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
         // they used to be. That pairing measured 2.61:1 and was the single largest
@@ -59,7 +100,9 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
       )}
     >
       {src ? (
-        <img src={src} alt={name || 'User avatar'} className="w-full h-full object-cover" />
+        // `alt=""`, deliberately. The wrapper above already carries the name; an `alt` here
+        // would have the avatar announced twice, and as "image, Alice" rather than "Alice".
+        <img src={src} alt="" className="w-full h-full object-cover" />
       ) : (
         <span>{getInitials(name)}</span>
       )}
