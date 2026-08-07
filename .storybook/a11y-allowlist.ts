@@ -125,8 +125,6 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   // Recorded here rather than fixed because this issue's job is to install the gate and
   // baseline it honestly; the fix is a component change that needs its own test and
   // coverage ratchet. It is issue #19, and these four lines go with it.
-  'components-taskmetabadges--default': { violations: ['aria-prohibited-attr'] }, // 3 nodes
-  'components-taskmetabadges--counts-only': { violations: ['aria-prohibited-attr'] }, // 2 nodes
 
   // The same defect, on the two `TaskCard` stories that render badges — 3 nodes. These
   // stories used to pass, and the reason they did is worth keeping: the card carried
@@ -135,8 +133,6 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   // (the card's keyboard affordance is now a real button on the title) did not introduce a
   // finding, it stopped one being masked — which is what a container-wide `role="button"`
   // does to everything it wraps. Same fix, same issue #19, delete all four together.
-  'components-taskcard--default': { violations: ['aria-prohibited-attr'] }, // 2 nodes
-  'components-taskcard--overdue': { violations: ['aria-prohibited-attr'] }, // 1 node
 
   // --- `incomplete` — `SidebarItem`'s selected gradient --------------------------------
   // 5 nodes across 5 stories, all one element: the active item's label, which sits on

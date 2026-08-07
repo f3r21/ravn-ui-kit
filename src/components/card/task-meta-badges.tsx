@@ -5,7 +5,13 @@ export interface TaskMetaBadge {
   icon: React.ReactNode;
   /** Count value shown next to the icon. Omitted entirely for an icon-only badge (e.g. a plain attachment indicator). */
   count?: number;
-  /** Accessible label describing what this badge represents (e.g. "3 comments"). Used as its React key and announced to screen readers in place of the visual count+icon. */
+  /**
+   * What this badge means, announced to screen readers and used as its React key.
+   *
+   * **It must include the count** — "3 comments", not "comments". The visible count and icon
+   * are `aria-hidden`, so this string is the entire accessible content of the badge; a label
+   * without the number announces that there are comments but not how many.
+   */
   label: string;
 }
 
@@ -45,8 +51,18 @@ export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
         <span
           key={b.label}
           className="inline-flex items-center gap-1 text-body-m font-normal font-sans text-main"
-          aria-label={b.label}
         >
+          {/* The badge's accessible name is real text, hidden visually — not an `aria-label`
+              on the wrapper. A `<span>` with no explicit role is `generic`, and `aria-label`
+              is *prohibited* there, so it was dropped; with both children `aria-hidden` there
+              was nothing left to fall back on and the badge announced nothing at all. axe
+              reported it as `aria-prohibited-attr` across four stories.
+
+              `sr-only` is the house pattern rather than a new invention — `FormField`,
+              `Input` and `DatePicker` all keep an accessible name this way. Giving the
+              wrapper `role="img"` would also have permitted a name, but this keeps the
+              announced text and the visible content as one thing, so they cannot drift. */}
+          <span className="sr-only">{b.label}</span>
           {b.count !== undefined ? (
             <span className="tabular-nums" aria-hidden>
               {b.count}
