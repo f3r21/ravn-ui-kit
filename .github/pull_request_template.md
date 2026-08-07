@@ -47,8 +47,19 @@ Closes #
 <!-- Anything else: a Storybook story to open, a screenshot, an axe run, a measured
      contrast ratio. -->
 
-## Second-session review:
+<!-- Paste the `gh pr review --comment` permalink under the heading below, once a separate
+     session has read this PR. Leave the heading in place even when the review is pending, so
+     its absence is visible rather than silent.
 
-<!-- Paste the `gh pr review --comment` permalink here once a separate session has
-     read this PR. Leave the line in place even when the review is pending, so its
-     absence is visible rather than silent. -->
+     This guidance sits ABOVE the heading on purpose (#79). Under it, the section is never
+     empty — the comment itself is a non-blank line — so any check for "has this been
+     reviewed?" reads a template as a review. That is not hypothetical: an orchestrator's
+     review-line probe was validated against four kit PRs and then passed an unreviewed app PR,
+     because the app's template guaranteed a non-blank line beneath that heading on every PR
+     forever. Two populations, one instrument.
+
+     It has not fired here only because lanes strip these comments when writing a body — so the
+     correctness rested on a habit rather than on the document, and leaving the comment in is
+     what a template comment invites rather than a mistake. -->
+
+## Second-session review:
