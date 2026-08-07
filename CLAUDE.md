@@ -21,6 +21,16 @@ work, and they carry the rules this repo has already paid for once: what its che
 cannot see, how to prove a new check has teeth, and how not to hand off into a deadlock. Read
 them there rather than restating them here.
 
+**`/start-issue` cuts the branch for you, and refuses when it cannot do so safely.** It derives
+the base (`origin/dev` if the repo has one, else the repo's default — `main` here, `dev` in the
+app), then **stops** if the branch you are standing on has an open PR, rather than extending work
+a reviewer is already looking at. Issue branches are named `<type>/<issue>-<slug>`, so branch →
+issue is `^[a-z]+/([0-9]+)-`; the number is optional, because `int/` branches and `main` answer to
+no issue and branches cut before #40 do not have one. Branches are cut `--no-track`, so an
+unpushed branch still reads as unpushed rather than inheriting an upstream it never earned. The
+reasoning, and the `switch -C` variant that looks idempotent while silently orphaning commits, are
+in `.claude/commands/start-issue.md`.
+
 ## Rules that are not negotiable
 
 - **React Aria _hooks_ only** — `react-aria` / `react-stately`. Never `react-aria-components`.
