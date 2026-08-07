@@ -1,8 +1,23 @@
 import { cn } from '../../utils/cn';
+import type { HeadingLevel } from '../../types/heading-level';
 
 export interface ProjectInfoProps {
   /** Task/project title. Grows to fill the row and truncates to a single line. */
   title: string;
+  /**
+   * Which `<h*>` the title renders as. Was hardcoded to `3`, which is why a board's column
+   * headers and its card titles were both level 3 and could not be told apart by
+   * `getAllByRole('heading', { level: 3 })` — give the header a `2` and its cards the
+   * default `3` and the outline nests properly.
+   * @default 3
+   */
+  headingLevel?: HeadingLevel;
+  /**
+   * `id` placed on the heading element, so something outside can point at it — chiefly a
+   * containing `<article aria-labelledby>` (which is exactly what `TaskCard` does). The
+   * heading carried no `id`, so that reference was impossible to write.
+   */
+  titleId?: string;
   /**
    * Turns the title into the row's activation affordance: it renders as a real `<button>`
    * whose accessible name is `title`, so it is tabbable and Enter/Space-activatable with no
@@ -35,7 +50,16 @@ export interface ProjectInfoProps {
  * clickable card or row gets a keyboard path: one real control named by the title, with the
  * container's own click handler left as a redundant pointer target beside it.
  */
-export function ProjectInfo({ title, icon, onTitleClick, className }: ProjectInfoProps) {
+export function ProjectInfo({
+  title,
+  icon,
+  onTitleClick,
+  headingLevel = 3,
+  titleId,
+  className,
+}: ProjectInfoProps) {
+  const Heading = `h${headingLevel}` as const;
+
   return (
     <div className={cn('flex items-center gap-2 w-full', className)}>
       {/* Desktop/Body/L/bold: SF Pro Display, 18px/32px, weight 600, letter-spacing 0.75px.
@@ -47,7 +71,8 @@ export function ProjectInfo({ title, icon, onTitleClick, className }: ProjectInf
           truncating <h3> would clip the button's ring away on all four sides. The button
           inherits this element's typography (Tailwind's preflight sets `font: inherit` on
           form controls), so the two render identically. */}
-      <h3
+      <Heading
+        id={titleId}
         className={cn(
           'flex-1 min-w-0 text-body-l font-semibold text-main font-sans',
           !onTitleClick && 'truncate',
@@ -69,7 +94,7 @@ export function ProjectInfo({ title, icon, onTitleClick, className }: ProjectInf
         ) : (
           title
         )}
-      </h3>
+      </Heading>
       {icon ? (
         <span className="flex items-center justify-center w-6 h-6 shrink-0 text-muted">{icon}</span>
       ) : null}

@@ -4,6 +4,7 @@ import { Tag } from '../tag/tag';
 import { Skeleton } from '../skeleton/skeleton';
 import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
 import type { AccentColor, DueDateUrgency } from '../../types/color-variants';
+import type { HeadingLevel } from '../../types/heading-level';
 import { EmptyState } from '../empty-state/empty-state';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
@@ -207,6 +208,22 @@ export interface TaskTableRowProps {
   /** Called with the row's next selected state when the checkbox is toggled. */
   onSelectedChange?: (isSelected: boolean) => void;
   /**
+   * Whether the row renders its select checkbox at all. The checkbox is `sr-only` and
+   * merely `opacity-0` until hover, so it was always in the accessibility tree even for a
+   * consumer with no bulk-selection feature — one extra checkbox per row, announced,
+   * tabbable, and doing nothing. There was no way to omit it.
+   * @default true
+   */
+  isSelectable?: boolean;
+  /**
+   * Renders the row's title inside an `<h*>` of this level, giving list view the per-task
+   * heading navigation a board of `TaskCard`s has. Omitted, the title stays a plain
+   * `<button>`/`<span>` exactly as before — a heading in every row of a long table is real
+   * noise for a screen reader that already navigates the table as a grid, so this is opt-in
+   * rather than a default. Named to match `ProjectInfo`'s prop of the same name.
+   */
+  headingLevel?: HeadingLevel;
+  /**
    * Tags rendered in the Task Tags column.
    * @default []
    */
@@ -258,6 +275,8 @@ export function TaskTableRow({
   reactions = [],
   isSelected = false,
   onSelectedChange,
+  isSelectable = true,
+  headingLevel,
   tags = [],
   estimationPoints,
   assigneeName,
@@ -272,6 +291,29 @@ export function TaskTableRow({
   // task — including from the keyboard, where activating a control synthesises a click that
   // bubbles just the same.
   const stopRowOpen = (e: React.MouseEvent) => e.stopPropagation();
+
+  const TitleHeading = headingLevel ? (`h${headingLevel}` as const) : null;
+  // Sizing lives on whichever element is outermost, so the two shapes do not both claim it.
+  const titleSizing = TitleHeading ? 'inline-block max-w-full align-bottom' : 'flex-1 min-w-0';
+
+  const titleControl = onClick ? (
+    <button
+      type="button"
+      onClick={(e) => {
+        stopRowOpen(e);
+        onClick();
+      }}
+      className={cn(
+        CELL_TEXT,
+        titleSizing,
+        'truncate text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1',
+      )}
+    >
+      {title}
+    </button>
+  ) : (
+    <span className={cn(CELL_TEXT, titleSizing, 'truncate')}>{title}</span>
+  );
 
   return (
     // The row-wide handler is a pointer convenience only. A `<tr>` cannot be the control
@@ -294,27 +336,29 @@ export function TaskTableRow({
           {/* The handler below is a propagation guard, not an activation path — what a
               keyboard operates here is the real `<input type="checkbox">` this label wraps,
               which is exactly what the two suppressed rules exist to require. */}
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
-          <label
-            onClick={stopRowOpen}
-            className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1"
-          >
-            <input
-              type="checkbox"
-              className="sr-only"
-              checked={isSelected}
-              onChange={(e) => onSelectedChange?.(e.target.checked)}
-              aria-label={`Select ${title}`}
-            />
-            <CheckboxBoxIcon
-              className={cn(
-                'w-6 h-6 text-main transition-opacity',
-                isSelected
-                  ? 'opacity-100'
-                  : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
-              )}
-            />
-          </label>
+          {isSelectable ? (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+            <label
+              onClick={stopRowOpen}
+              className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1"
+            >
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={isSelected}
+                onChange={(e) => onSelectedChange?.(e.target.checked)}
+                aria-label={`Select ${title}`}
+              />
+              <CheckboxBoxIcon
+                className={cn(
+                  'w-6 h-6 text-main transition-opacity',
+                  isSelected
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
+                )}
+              />
+            </label>
+          ) : null}
           <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>
             {String(index).padStart(2, '0')}
           </span>
@@ -322,22 +366,14 @@ export function TaskTableRow({
               trio on some wrapper: its accessible name is the task title, and focus, Enter
               and Space come from the platform. It carries `truncate` itself so a long title
               still clips at the column edge. */}
-          {onClick ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                stopRowOpen(e);
-                onClick();
-              }}
-              className={cn(
-                CELL_TEXT,
-                'flex-1 min-w-0 truncate text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1',
-              )}
-            >
-              {title}
-            </button>
+          {/* Under a `headingLevel`, the sizing moves to the heading and the control keeps
+              only `max-w-full truncate` — same reason as `ProjectInfo`: `truncate` sets
+              `overflow: hidden`, and a focus ring is painted outside the box, so a
+              truncating ancestor would clip the ring away on all four sides. */}
+          {TitleHeading ? (
+            <TitleHeading className={cn(CELL_TEXT, 'flex-1 min-w-0')}>{titleControl}</TitleHeading>
           ) : (
-            <span className={cn(CELL_TEXT, 'flex-1 min-w-0 truncate')}>{title}</span>
+            titleControl
           )}
           {reactions.map((r) => (
             <span

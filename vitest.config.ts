@@ -27,6 +27,10 @@ export default defineConfig({
         'src/**/*.stories.tsx',
         // The public barrel: re-exports only, no logic to cover.
         'src/index.ts',
+        // Types-only, so it emits no JavaScript at all. v8 still lists it and reports 0%,
+        // which reads as an untested file rather than as one there is nothing to test.
+        // `color-variants.ts` is deliberately NOT here — it ships a real runtime map.
+        'src/types/heading-level.ts',
       ],
       // A ratchet, not a target. These are set just under the numbers the suite
       // actually produced when coverage was first wired up, so the gate starts
@@ -50,7 +54,7 @@ export default defineConfig({
       // fixes introduced. 86.56 -> 88.76.
       thresholds: {
         statements: 90.18,
-        branches: 88.45,
+        branches: 88.71,
         functions: 84.78,
         lines: 90.18,
       },

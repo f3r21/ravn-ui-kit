@@ -1,4 +1,6 @@
+import { useId } from 'react';
 import { cn } from '../../utils/cn';
+import type { HeadingLevel } from '../../types/heading-level';
 import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
 import { ProjectInfo } from './project-info';
@@ -44,6 +46,29 @@ export interface TaskCardProps {
    * @default []
    */
   metaBadges?: TaskMetaBadge[];
+  /**
+   * Controls rendered at the end of the header row, beside the title — in practice a
+   * per-card overflow menu (Edit / Delete). Name it for the task it belongs to
+   * (`"Task options for Fix auth bug"`), because a page of cards otherwise offers a
+   * screen-reader user a list of identical "options" buttons.
+   *
+   * This is a slot of its own rather than `ProjectInfo`'s `icon`: that one is specified as
+   * a decorative 24×24 glyph and renders into a fixed `w-6 h-6` box, so a real control
+   * passed through it has nowhere to put padding or a focus ring.
+   */
+  actions?: React.ReactNode;
+  /**
+   * Which `<h*>` the card title renders as, forwarded to `ProjectInfo`. Set it one level
+   * below whatever heading introduces the column the card sits in.
+   * @default 3
+   */
+  headingLevel?: HeadingLevel;
+  /**
+   * `id` for the card's title heading, which the card's own `<article aria-labelledby>`
+   * points at. Generated when omitted; pass one only if something else must reference the
+   * same heading.
+   */
+  titleId?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
   /**
@@ -71,9 +96,15 @@ export function TaskCard({
   assigneeName,
   assigneeAvatar,
   metaBadges = [],
+  actions,
+  headingLevel = 3,
+  titleId,
   className,
   onClick,
 }: TaskCardProps) {
+  const generatedTitleId = useId();
+  const headingId = titleId ?? generatedTitleId;
+
   return (
     // The whole card stays clickable for a pointer user, but it is deliberately no longer an
     // ARIA button. `role="button"` + `tabIndex={0}` here made the card one control whose
@@ -85,8 +116,17 @@ export function TaskCard({
     // suppressed here exist to catch when it is the *only* thing on offer. Same treatment as
     // `TaskTableRow`, which had no keyboard path at all.
     //
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    <div
+    //
+    // It is an `<article>` rather than a `<div>`, and that is additive to the decision
+    // above rather than a reversal of it: an article is a landmark-like container, not a
+    // control, so it names the card for a screen reader's article navigation without
+    // making it one focusable thing whose name is its whole text content. `aria-labelledby`
+    // points at the title heading `ProjectInfo` renders, which is why that component gained
+    // a `titleId`.
+    //
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+    <article
+      aria-labelledby={headingId}
       onClick={onClick}
       className={cn(
         // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
@@ -112,8 +152,34 @@ export function TaskCard({
           wired up, since there's no real icon identity to wire in without inventing one.
 
           `onTitleClick` is what makes a clickable card reachable without a pointer — see the
-          container's comment above for why the affordance moved here. */}
-      <ProjectInfo title={title} onTitleClick={onClick} />
+          container's comment above for why the affordance moved here.
+
+          `actions` sits beside it rather than inside `ProjectInfo`'s `icon` slot: that slot is
+          a fixed 24×24 box specified for a decorative glyph, which would clip a real control's
+          padding and focus ring. */}
+      {actions ? (
+        <div className="flex items-start gap-2">
+          <ProjectInfo
+            title={title}
+            onTitleClick={onClick}
+            headingLevel={headingLevel}
+            titleId={headingId}
+            className="flex-1 min-w-0"
+          />
+          {/* Stops a click on the menu trigger from also opening the card behind it. */}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            {actions}
+          </div>
+        </div>
+      ) : (
+        <ProjectInfo
+          title={title}
+          onTitleClick={onClick}
+          headingLevel={headingLevel}
+          titleId={headingId}
+        />
+      )}
 
       {/* Timer Row: Points & Due Date (Figma "Timer" auto-layout, Cards01.md L319-437 — points is
           plain text sharing this row with the due-date "Tag", not a badge in the title row). */}
@@ -167,6 +233,6 @@ export function TaskCard({
             icon-only leading slot is just a badge with `count` omitted, not a special case. */}
         {metaBadges.length > 0 ? <TaskMetaBadges badges={metaBadges} /> : null}
       </div>
-    </div>
+    </article>
   );
 }

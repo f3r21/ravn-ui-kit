@@ -20,6 +20,7 @@ export * from './utils/cn';
 // urgency), so a consumer can tell which system a prop belongs to. See the
 // module doc comment for why `Button`'s `variant` is deliberately not here.
 export * from './types/color-variants';
+export * from './types/heading-level';
 
 // ─── Icons ────────────────────────────────────────────────────────
 export * from './components/icons/icons';
