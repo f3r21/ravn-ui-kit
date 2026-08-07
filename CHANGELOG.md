@@ -39,6 +39,27 @@ that. It surfaced only when a dependency bump (#32) supplied the missing API.
   switches, clicking an open chip still closes it, and a click outside the row still dismisses.
   **Minor** — `dismissExemptRef` is additive and optional.
 
+- **`TaskMetaBadges` was silent to screen readers** (#19). Attachment, subtask and comment
+  counts contributed nothing to the accessibility tree at all.
+
+  Each badge was `<span aria-label={label}>` with **both** children `aria-hidden`. `aria-label`
+  is prohibited on the implicit `generic` role of a bare `<span>`, so it was dropped — and with
+  the icon and the count both hidden, no accessible text remained. The badge announced nothing.
+
+  The label is now real text hidden with `sr-only`, and the wrapper carries no ARIA. That is the
+  house pattern rather than an invention (`FormField`, `Input`, `DatePicker`), and it keeps the
+  announced text and the visible content as one thing so they cannot drift — `role="img"` would
+  also have permitted a name but reintroduces that gap.
+
+  **Four `a11y-allowlist` entries deleted, not two.** #12 removed `TaskCard`'s container
+  `role="button"`, and a button's descendants are presentational children in ARIA — so while that
+  role was there axe never evaluated the roles beneath it, and the bad container role was masking
+  a genuine bug underneath. Both `taskcard` stories reported the same root cause once it lifted.
+
+  No API change: `label` still carries the count, as its doc specified. Composing
+  `${count} ${label}` would make every caller already passing `"3 comments"` announce
+  `"3 3 comments"`. **Patch** — behaviour is additive to assistive tech only.
+
 - **`figure-audit.mjs` counted command internals as claims, and penalised `pipefail`**
   (#69, #70, #78). Three defects in one family, fixed together because they are one file and
   each one's corpus pass invalidates the next.
