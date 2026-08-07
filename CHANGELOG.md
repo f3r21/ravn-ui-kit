@@ -12,13 +12,13 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 - **`figure-audit.mjs` no longer credits a command that cannot detect a failing run** (#53). It
   taught `npm run gate 2>&1 | tail -6` as its own exemplar and scored it as valid provenance. A
-  pipeline's `$?` is the *last* command's status, and `tail` succeeds on empty input, so that
+  pipeline's `$?` is the _last_ command's status, and `tail` succeeds on empty input, so that
   command cannot tell a passing gate from a failing one — while the coverage summary prints its
   percentages identically either way, so there is no visual cue either.
 
   The rule is **narrow on purpose**: the hazard is not a pipe, it is a pipe that discards a
   status the figure depends on. `grep -rn foo src/ | wc -l` stays credited, because the figure
-  *is* the output and grep's status carries no claim. What is refused is piping a **verification**
+  _is_ the output and grep's status carries no claim. What is refused is piping a **verification**
   — a gate, test, build or typecheck — where the figure means nothing unless the thing passed.
   Blind lines are reported separately from unsourced ones, since the fix differs: "add a command"
   versus "that command cannot fail".
