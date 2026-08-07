@@ -827,8 +827,8 @@ function St({ badges: t, className: n }) {
       "span",
       {
         className: "inline-flex items-center gap-1 text-body-m font-normal font-sans text-main",
-        "aria-label": l.label,
         children: [
+          /* @__PURE__ */ e("span", { className: "sr-only", children: l.label }),
           l.count !== void 0 ? /* @__PURE__ */ e("span", { className: "tabular-nums", "aria-hidden": !0, children: l.count }) : null,
           /* @__PURE__ */ e("span", { className: "w-6 h-6 shrink-0", "aria-hidden": !0, children: l.icon })
         ]
