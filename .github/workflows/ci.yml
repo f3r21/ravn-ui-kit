@@ -103,10 +103,27 @@ jobs:
       # differ" rather than a 100 KB patch. The exit code is still non-zero and the
       # guard still works — do not "fix" the output by dropping the attribute, which
       # exists so a generated file does not drown out real changes in review.
+      # `git diff HEAD`, not `git diff` (#33). The `--intent-to-add` line above is what lets an
+      # unstaged diff see a NEWLY EMITTED file — and it is also what blinded this check to a
+      # DELETED one, because `--intent-to-add` on a directory *stages* the deletion, after which
+      # an unstaged diff compares worktree to index and finds them in agreement. Diffing against
+      # HEAD sees both. Measured, all four states:
+      #
+      #   state      git diff   git diff HEAD
+      #   clean         0            0
+      #   deleted       0  <-- bug   1
+      #   new file      1            1
+      #   modified      1            1
+      #
+      # Re-derive:
+      #   rm dist/ui-kit.css
+      #   git add --intent-to-add dist/ && git diff      --exit-code dist/ ; echo $?   # 0
+      #   git reset dist/ && git checkout -- dist/ && rm dist/ui-kit.css
+      #   git add --intent-to-add dist/ && git diff HEAD --exit-code dist/ ; echo $?   # 1
       - name: Check committed dist/ is fresh
         run: |
           git add --intent-to-add dist/
-          git diff --exit-code dist/ || {
+          git diff HEAD --exit-code dist/ || {
             echo "::error::dist/ is stale. Run 'npm run build' and commit the result."
             exit 1
           }

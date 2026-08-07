@@ -10,6 +10,24 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **The `dist/` freshness guard now catches a deleted file** (#33). One word:
+  `git diff --exit-code dist/` → `git diff HEAD --exit-code dist/`.
+
+  The mechanism is worth knowing, because the two halves of that check pull in opposite
+  directions. `git add --intent-to-add dist/` is what lets an unstaged diff see a _newly
+  emitted_ file — and it is also what blinded the check to a _deleted_ one, since
+  `--intent-to-add` on a directory **stages** the deletion, after which the unstaged diff
+  compares worktree to index and finds them agreeing. Measured across all four states: on a
+  deletion the old form exits 0 and the new exits 1; on clean, new-file and modified both agree.
+  `CLAUDE.md` is corrected to say so. CI only; `dist/` is untouched.
+
+- **The release and tag-check jobs now fail if `release-checks.mjs` printed nothing.** That
+  script decides whether to run by testing whether `argv[1]` ends with its own filename, so a
+  **rename makes it exit 0 having checked nothing** — the one silent failure mode in the release
+  path, where the other three call sites break loudly. Demonstrated: on `v0.5.1`'s tree the
+  script emits 18801 bytes and a renamed copy emits 0, both exiting 0. Since a real pass always
+  prints the changelog section, empty output is proof it did not run.
+
 - **`npm run test:a11y:ci` no longer serves a stale Storybook.** `http-server` defaults to
   `Cache-Control: max-age=3600`, so a rebuilt story could keep reading stale for an hour — a
   stale page and a broken component are indistinguishable. This cost three rebuild cycles during

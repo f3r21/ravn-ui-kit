@@ -127,10 +127,18 @@ jobs:
       - name: Verify release metadata, and capture the tag message
         id: notes
         run: |
+          NOTES=$(node scripts/release-checks.mjs '${{ steps.v.outputs.bare }}')
+          # A pass that printed nothing means the script did not run. Its entry-point guard
+          # tests whether argv[1] ends with its own filename, so a RENAME makes that false and
+          # it exits 0 having checked nothing — the only silent failure mode in this path, and
+          # it would ship a tag with an empty message and no verification behind it.
+          if [ -z "$NOTES" ]; then
+            echo "::error::release-checks.mjs exited 0 but printed nothing, so it did not run. Check the call sites: grep -rn 'release-checks' .github/ scripts/"
+            exit 1
+          fi
           {
             echo 'text<<RELEASE_NOTES_EOF'
-            node scripts/release-checks.mjs '${{ steps.v.outputs.bare }}'
-            echo
+            printf '%s\n' "$NOTES"
             echo 'RELEASE_NOTES_EOF'
           } >> "$GITHUB_OUTPUT"
 
