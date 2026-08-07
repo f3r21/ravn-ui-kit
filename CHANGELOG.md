@@ -8,6 +8,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.5.3] — 2026-08-07
+
+Two consumer-facing fixes and two to the repo's own tooling.
+
+The one to read is **#82**: switching between `AddTaskModal`'s chips took two clicks and the
+first silently did nothing — a defect that was live in every browser and invisible to the test
+suite, because jsdom 26 does not implement `PointerEvent` and react-aria branches on exactly
+that. It surfaced only when a dependency bump (#32) supplied the missing API.
+
 ### Fixed
 
 - **Switching between `AddTaskModal`'s chips took two clicks, and the first did nothing** (#82).
@@ -45,6 +54,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Corpus-wide: substantive 6609 → 6066, sourced 155 → 93, ratio **2.3% → 1.5%** — so the repo's
   provenance rate is _worse_ than reported, and every percentage quoted from this tool before
   today was measured with an inflated instrument.
+
+  **The falling ratio is the fix working, and it is the one direction nobody reads correctly.**
+  Both numerator and denominator were inflated: before, the unsourced list was `2>&1` fragments
+  and counts quoted inside prose; after, it is real claims that genuinely carry no command. A
+  number going down here means the instrument stopped flattering the thing it measures. Do not
+  "restore" it — re-derive it: `node scripts/figure-audit.mjs <bodies>`.
 
   Separately, `set -o pipefail` is now recognised as status-preserving (#78). It is a different
   mechanism rather than a fourth spelling — it makes a pipeline's status the first non-zero
