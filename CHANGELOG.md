@@ -27,6 +27,26 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   path, where the other three call sites break loudly. Demonstrated: on `v0.5.1`'s tree the
   script emits 18801 bytes and a renamed copy emits 0, both exiting 0. Since a real pass always
   prints the changelog section, empty output is proof it did not run.
+- **`CLAUDE.md`'s provenance exemplar taught a command that cannot detect a failing gate** (#61).
+  It read `npm run gate 2>&1 | grep -E 'Test Files|Tests  '`, and a pipeline's `$?` is the _last_
+  command's status — so it reported `grep`'s. It is now command substitution
+  (`out=$(npm run gate 2>&1); rc=$?`), which sidesteps the problem rather than papering over it,
+  with both shell spellings given for the piped form because lanes run **zsh**, where the bash
+  `${PIPESTATUS[0]}` prints an empty string that looks like provenance and is not.
+
+  This line specifically, because it is the **exemplar** — the thing lanes copy, in the file that
+  mandates the convention. Proved on a genuinely failing gate rather than a toy: with
+  `statements` set to `99.99`, the old form printed `Tests 595 passed` and `exit=0`, and the new
+  form printed the same table and `exit=1`.
+
+  The demonstration in the docs uses a grep that **matches**, which is the real case — a failing
+  gate still prints its summary, so the grep succeeds and hides the failure. The obvious
+  `( exit 1 ) | grep 'x'` reports `1` on zsh for the wrong reason (grep found nothing) and would
+  tell a reader there is no problem.
+
+- **`CLAUDE.md` said tagging is a checklist, not a command.** True until #57/#58 landed the
+  Release workflow; the section now describes the workflow, what it verifies rather than
+  performs, and what `tag-check.yml` does about a hand-cut tag.
 
 - **`npm run test:a11y:ci` no longer serves a stale Storybook.** `http-server` defaults to
   `Cache-Control: max-age=3600`, so a rebuilt story could keep reading stale for an hour — a
