@@ -50,3 +50,19 @@ export const NoUser: Story = {
     searchPlaceholder: 'Search...',
   },
 };
+
+/**
+ * Given `onNotificationsClick`, the bell becomes a real button — focusable, activatable and
+ * named. Without it the icon stays decorative, which is what every story above renders.
+ * Tab to it to see the focus ring; the name carries the unread count, since a bare bell tells
+ * a screen-reader user nothing about whether it is worth opening.
+ */
+export const InteractiveNotifications: Story = {
+  args: {
+    searchPlaceholder: 'Search tasks, projects...',
+    searchLabel: 'Search tasks',
+    userName: 'Jerome Bell',
+    onNotificationsClick: fn(),
+    notificationsLabel: 'Notifications, 3 unread',
+  },
+};

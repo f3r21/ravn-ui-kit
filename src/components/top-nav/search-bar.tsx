@@ -15,6 +15,22 @@ export interface SearchBarProps {
   onChange?: (value: string) => void;
   /** Called when user submits (Enter). */
   onSubmit?: (value: string) => void;
+  /**
+   * Accessible name for the input. Was hardcoded to `'Search'` with no way past it, so a
+   * consumer whose page holds more than one search — or which simply says something more
+   * specific, e.g. `'Search tasks'` — could not name its own field.
+   * @default 'Search'
+   */
+  label?: string;
+  /**
+   * `id` for the input element. Only needed when something outside this component has to
+   * point at the field — an external `<label htmlFor>`, an `aria-controls` on a results
+   * region. Left off, React Aria generates one.
+   *
+   * Note that `label` above still wins as the accessible name: an `aria-label` overrides a
+   * `<label>` element. Pass one or the other, not both.
+   */
+  id?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -37,6 +53,8 @@ export function SearchBar({
   value: controlledValue,
   onChange,
   onSubmit,
+  label = 'Search',
+  id,
   className,
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState('');
@@ -55,7 +73,13 @@ export function SearchBar({
       onKeyDown: (e) => {
         if (e.key === 'Enter') onSubmit?.(value);
       },
-      'aria-label': 'Search',
+      'aria-label': label,
+      id,
+      // Makes the element a `searchbox` rather than a `textbox`, which is what a screen
+      // reader announces and what a consumer's `getByRole('searchbox')` finds. It also
+      // opts the field into the platform's search affordances — including WebKit's native
+      // clear button, suppressed below because `TopNav` renders its own.
+      type: 'search',
       placeholder,
     },
     ref,
@@ -73,7 +97,11 @@ export function SearchBar({
         // whatever contains it. Inside `TopNav` that is `surface-panel` (4.58:1), but the
         // component is exported on its own and `neutral-2` is 3.73:1 on an overlay. The
         // leading icon keeps `text-muted` — non-text, so 3:1 applies and 3.73 clears it.
-        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted-on-dark font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+        // `[&::-webkit-search-cancel-button]:appearance-none` — `type="search"` gives WebKit
+        // a built-in clear glyph inside the field, and `TopNav` already renders a real
+        // "Clear search" button beside it. Two clear controls, one of them unlabelled and
+        // unstyled, is worse than the one that was there before.
+        className="flex-1 bg-transparent text-body-m text-main placeholder:text-muted-on-dark font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 [&::-webkit-search-cancel-button]:appearance-none"
       />
     </div>
   );

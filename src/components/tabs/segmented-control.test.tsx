@@ -74,4 +74,14 @@ describe('SegmentedControl Component', () => {
     expect(handleChange).toHaveBeenLastCalledWith('board');
     expect(screen.getByRole('radio', { name: 'Board' })).toBe(document.activeElement);
   });
+
+  it('names the group "View" by default, and lets a consumer override it', () => {
+    // The name was hardcoded, which is right for a view switcher and wrong for every other
+    // use of a segmented control. The default is unchanged so existing callers are not.
+    const { rerender } = render(<SegmentedControl options={OPTIONS} />);
+    expect(screen.getByRole('radiogroup', { name: 'View' })).toBeDefined();
+
+    rerender(<SegmentedControl options={OPTIONS} label="Density" />);
+    expect(screen.getByRole('radiogroup', { name: 'Density' })).toBeDefined();
+  });
 });

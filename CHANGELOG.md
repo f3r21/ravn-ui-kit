@@ -10,6 +10,48 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **`ViewSwitcher` is a real radiogroup** (#9). It was two independent buttons: no group, no
+  selection state, no keyboard model — which side was active was carried by border colour
+  alone, and nothing in the accessibility tree said the two were even related. It now renders
+  `role="radiogroup"` over `role="radio"` buttons with `aria-checked`, a roving tabindex (the
+  group is one tab stop) and arrow/Home/End navigation, following `SegmentedControl`'s existing
+  hand-rolled pattern rather than `useRadio`/`useRadioGroup` — see that component's doc comment
+  for why those hooks do not fit an icon-button shape. New `label` prop names the group,
+  `@default 'View'`. First test file for this component, which had none: 13 cases,
+  `npx vitest run src/components/layout/view-switcher.test.tsx`. **Minor** — additive.
+
+- **`Button` can carry radio semantics** (#9), via `role="radio"` and `aria-checked`, applied
+  after `useButton`'s props because `useButton` drops both — passed through it they arrive on
+  the element as `null`. `button.test.tsx` pins that, and pins that `excludeFromTabOrder` is the
+  only route to `tabIndex="-1"` (`useButton` hardcodes `0`). `isSelected` stays visual-only and
+  must not reach the accessibility tree. **Minor** — additive, and a plain `Button` is unchanged.
+
+- **`SegmentedControl` and `TopNav` gained the labels they hardcoded** (#9). `SegmentedControl`'s
+  group name was fixed at `"View"` — right for a view switcher, wrong for anything else — and is
+  now the `label` prop, defaulting to that same string so no existing caller changes. `TopNav`
+  gained `searchLabel`, forwarded to `SearchBar`. **Minor** — additive.
+
+- **`TopNav`'s notifications bell can be a real button** (#9), via `onNotificationsClick` and
+  `notificationsLabel` (`@default 'Notifications'`). It was a bare `<span>`: not focusable, not
+  activatable, no accessible name — the shell's only notifications affordance, absent from the
+  accessibility tree entirely. It becomes a button only when given a handler, so a consumer that
+  passes none keeps today's decorative icon; it carries the same focus ring as "Clear search",
+  since a new keyboard-reachable control without one trades one barrier for another. **Minor**.
+
+- **`SearchBar` gained `label` and `id`** (#9). `aria-label` was hardcoded to `'Search'` with no
+  prop past it, so an app whose own field reads "Search tasks" could not say so. The default is
+  unchanged. **Minor** — additive.
+
+### Changed
+
+- **`SearchBar` is a `searchbox`, not a `textbox`** (#9). `type="search"` was never set, so the
+  input took the default role and `getByRole('searchbox')` found nothing. This is a **behavioural
+  break for any consumer querying the old role** — the kit's own suites had six such assertions
+  and all six had to change — and it lands as a minor bump under SemVer's pre-1.0 carve-out
+  (`CONTRIBUTING.md`). `type="search"` also opts into WebKit's native clear glyph, suppressed
+  with `[&::-webkit-search-cancel-button]:appearance-none` because `TopNav` renders its own
+  labelled clear button and two of them — one unlabelled — is worse than the one that was there.
+
 - **Every figure now carries the command that re-derives it.** A number in an issue, commit, PR
   body or `CLAUDE.md` is written once and read by sessions that cannot check it, so the command
   ships beside it. `.github/ISSUE_TEMPLATE/lane-task.md` (new — the repo had no issue template)

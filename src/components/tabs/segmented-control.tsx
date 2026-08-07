@@ -19,6 +19,14 @@ export interface SegmentedControlProps {
   defaultValue?: string;
   /** Called with the newly selected option's `id` whenever the user picks a segment. */
   onChange?: (value: string) => void;
+  /**
+   * Accessible name for the group as a whole, announced before the selected segment.
+   * Was hardcoded to `'View'`, which is right for a view switcher and wrong for every
+   * other use of a segmented control; that string stays the default so existing callers
+   * are unaffected.
+   * @default 'View'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -63,6 +71,7 @@ export function SegmentedControl({
   value: controlledValue,
   defaultValue,
   onChange,
+  label = 'View',
   className,
 }: SegmentedControlProps) {
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? options[0]?.id ?? '');
@@ -108,7 +117,7 @@ export function SegmentedControl({
   return (
     <div
       role="radiogroup"
-      aria-label="View"
+      aria-label={label}
       className={cn('inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10', className)}
     >
       {options.map((opt, index) => {
