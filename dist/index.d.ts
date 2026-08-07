@@ -2179,7 +2179,13 @@ export declare interface TaskMetaBadge {
     icon: React.ReactNode;
     /** Count value shown next to the icon. Omitted entirely for an icon-only badge (e.g. a plain attachment indicator). */
     count?: number;
-    /** Accessible label describing what this badge represents (e.g. "3 comments"). Used as its React key and announced to screen readers in place of the visual count+icon. */
+    /**
+     * What this badge means, announced to screen readers and used as its React key.
+     *
+     * **It must include the count** — "3 comments", not "comments". The visible count and icon
+     * are `aria-hidden`, so this string is the entire accessible content of the badge; a label
+     * without the number announces that there are comments but not how many.
+     */
     label: string;
 }
 
