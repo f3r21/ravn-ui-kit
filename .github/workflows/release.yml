@@ -1,6 +1,14 @@
 name: Release
 
-# Cuts the tag itself, so there is no hand path to skip (#57).
+# Cuts the tag itself, so nobody NEEDS to cut one by hand (#57).
+#
+# It removes the need, not the ability. `git tag v0.6.0 && git push origin v0.6.0` still works
+# and always will — this repo has no tag protection and no rulesets:
+#   gh api repos/f3r21/ravn-ui-kit/tags/protection   -> "Not Found"
+#   gh api repos/f3r21/ravn-ui-kit/rulesets -q length -> 0
+#   (control: the consuming app returns 1, so the query works rather than silently finding
+#    nothing everywhere)
+# A ruleset on `v*` allowing only the Actions identity is what would close that, and is #59.
 #
 # `v0.5.0` is why this exists. Its `package.json` still read `0.4.0` and its `[Unreleased]` was
 # never rolled, because `CLAUDE.md`'s tagging checklist is a checklist — steps a person performs
@@ -15,17 +23,24 @@ name: Release
 #   - A git hook is weaker still: `.git/hooks` is not cloned, so it protects one machine, and
 #     this repo has a documented case of hooks installed, running, and inert (`CLAUDE.md`).
 #
-# `#56`'s tag-push job is the backstop, not the alternative: it catches anyone who tags by hand
-# anyway, including tags cut before this workflow existed. The two compose.
+# **A hand-cut tag is currently checked by nothing.** #56 will add a tag-push job as the
+# backstop — it is an open issue and NOT built yet, so until it lands the true state after this
+# workflow merges is: a dispatched tag is fully checked, and `git push origin v0.6.0` from a
+# laptop is checked by nothing at all. Re-derive rather than assume it has landed:
+#   git ls-tree -r origin/main --name-only | grep '^\.github/workflows/'
 #
-# **They compose by not overlapping, and that is worth knowing before anyone "fixes" it.** A ref
-# pushed using the default `GITHUB_TOKEN` does not trigger further workflow runs — GitHub
-# suppresses that to prevent recursion — so a tag cut *here* will NOT fire #56's `on: push:
-# tags:` job. That is the correct division rather than a hole: every check #56 would run has
-# already run below, on the same commit, before the tag existed. #56's job is the hand-cut tag
-# this workflow cannot intercept. Do not "fix" the non-firing by switching this to a PAT; that
-# would buy a duplicate run and hand a longer-lived credential to the one job in the repo with
-# write scope.
+# **When #56 exists, the two will compose by NOT overlapping, and that is worth knowing before
+# anyone "fixes" it.** A ref pushed using the default `GITHUB_TOKEN` does not trigger further
+# workflow runs — GitHub suppresses that to prevent recursion — so a tag cut *here* will not
+# fire #56's `on: push: tags:` job. That is the correct division rather than a hole: every check
+# #56 specifies has already run below, on the same commit, before the tag existed. #56's job is
+# for the hand-cut tag this workflow cannot intercept.
+#
+# So do not "fix" the non-firing by switching this to a PAT. That buys a duplicate run and hands
+# a longer-lived credential to the only job in the repo with write scope. The reason to spell
+# this out: someone who follows the reasoning above, goes looking for the backstop, and finds no
+# such workflow will most naturally conclude the non-firing *is* the hole — and make exactly
+# that change.
 #
 # Every check runs before anything is written: the tag push is step 12 of 13, and steps 2-11 are
 # all read-only. Re-derive with
