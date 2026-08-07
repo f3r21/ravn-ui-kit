@@ -20,6 +20,11 @@ export interface LabelModalProps {
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
   triggerRef?: PopoverProps['triggerRef'];
+  /**
+   * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+   * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+   */
+  dismissExemptRef?: PopoverProps['dismissExemptRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -42,12 +47,20 @@ export interface LabelModalProps {
  * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
  * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export function LabelModal({ labels, onSelect, onClose, triggerRef, className }: LabelModalProps) {
+export function LabelModal({
+  labels,
+  onSelect,
+  onClose,
+  triggerRef,
+  dismissExemptRef,
+  className,
+}: LabelModalProps) {
   return (
     <Popover
       isOpen
       onClose={onClose}
       triggerRef={triggerRef}
+      dismissExemptRef={dismissExemptRef}
       aria-label="Label"
       className={cn(
         'flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm',

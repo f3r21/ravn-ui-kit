@@ -108,8 +108,25 @@ export function AddTaskModal({
   >(null);
   const togglePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
     setOpenPopover((prev) => (prev === name ? null : name));
-  const closePopover = () => setOpenPopover(null);
 
+  // Identity-aware, and that is the whole fix (#82). Switching chips fires two things: the new
+  // chip's `onClick` sets its own name, and the OLD popover's interact-outside handler calls
+  // this. An unconditional `setOpenPopover(null)` meant whichever ran second won — and when it
+  // was the close, the click opened a popover and then immediately shut it, so the first click
+  // on a different chip silently did nothing and it took two.
+  //
+  // Comparing against `prev` makes the order irrelevant: a popover may only close ITSELF, so a
+  // stale one cannot clear a newer one. Close-then-open and open-then-close both end with the
+  // new popover open.
+  //
+  // This was invisible under jsdom 26, which does not implement `PointerEvent` — react-aria's
+  // `useInteractOutside` takes a different path without it, so the outside-close never ran and
+  // the test passed through a branch no browser executes. jsdom 30 provides `PointerEvent`
+  // (#32), which is how it surfaced. The defect was always live in the browser.
+  const closePopover = (name: 'estimate' | 'assignee' | 'label' | 'date') =>
+    setOpenPopover((prev) => (prev === name ? null : prev));
+
+  const chipRowRef = React.useRef<HTMLDivElement>(null);
   const estimateTriggerRef = React.useRef<HTMLButtonElement>(null);
   const assigneeTriggerRef = React.useRef<HTMLButtonElement>(null);
   const labelTriggerRef = React.useRef<HTMLButtonElement>(null);
@@ -184,7 +201,10 @@ export function AddTaskModal({
         className="w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
       />
 
-      <div className="flex items-center gap-4 w-full">
+      {/* The whole chip row is exempt from every popover's outside-dismiss (#82). Without it,
+          clicking a sibling chip is consumed by the open popover's capture-phase dismiss and
+          never reaches that chip, so the first click does nothing and it takes two. */}
+      <div ref={chipRowRef} className="flex items-center gap-4 w-full">
         {/* Estimate trigger */}
         <div className="relative">
           {points === undefined ? (
@@ -222,7 +242,8 @@ export function AddTaskModal({
                 setPoints(p);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('estimate')}
               triggerRef={estimateTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -263,7 +284,8 @@ export function AddTaskModal({
                 setAssignee(a);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('assignee')}
               triggerRef={assigneeTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -302,7 +324,8 @@ export function AddTaskModal({
                 setLabel(l);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('label')}
               triggerRef={labelTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />
@@ -330,7 +353,8 @@ export function AddTaskModal({
                 setDueDate(d);
                 setOpenPopover(null);
               }}
-              onClose={closePopover}
+              dismissExemptRef={chipRowRef}
+              onClose={() => closePopover('date')}
               triggerRef={dateTriggerRef}
               className="absolute top-full left-0 mt-1 z-nested"
             />

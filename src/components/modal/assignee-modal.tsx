@@ -22,6 +22,11 @@ export interface AssigneeModalProps {
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
   triggerRef?: PopoverProps['triggerRef'];
+  /**
+   * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+   * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+   */
+  dismissExemptRef?: PopoverProps['dismissExemptRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -46,6 +51,7 @@ export function AssigneeModal({
   onSelect,
   onClose,
   triggerRef,
+  dismissExemptRef,
   className,
 }: AssigneeModalProps) {
   return (
@@ -53,6 +59,7 @@ export function AssigneeModal({
       isOpen
       onClose={onClose}
       triggerRef={triggerRef}
+      dismissExemptRef={dismissExemptRef}
       aria-label="Assignee"
       className={cn(
         'flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm',

@@ -10,6 +10,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Switching between `AddTaskModal`'s chips took two clicks, and the first did nothing** (#82).
+  A shipping defect in a browser, not a test problem.
+
+  react-aria's outside-click handling registers a **capture-phase** `click` listener and calls
+  `stopPropagation()` on it. Only the popover's own trigger was exempt, so clicking a _sibling_
+  chip dismissed the open popover and that same click never reached the sibling — the user saw
+  nothing happen and clicked again.
+
+  `Popover` gains `dismissExemptRef`, a region that does not count as "outside", forwarded by
+  `EstimateModal`, `AssigneeModal`, `LabelModal` and `DatePickerMenu`. `AddTaskModal` exempts its
+  whole chip row, which makes switching purely state-driven: the sibling's `onClick` runs and the
+  previous popover unmounts because its `isOpen` went false. `closePopover` is also identity-aware
+  now, so a stale popover cannot clear a newer one whichever order the handlers run in.
+
+  **Invisible under jsdom 26**, which does not implement `PointerEvent`: react-aria takes a
+  `NODE_ENV === 'test'` branch without it, so the test passed through a path no browser executes.
+  jsdom 30 (#32) provides it. Verified in real Chrome in all three directions — one click
+  switches, clicking an open chip still closes it, and a click outside the row still dismisses.
+  **Minor** — `dismissExemptRef` is additive and optional.
+
+### Fixed
+
 - **`figure-audit.mjs` no longer flags a pipe that is downstream of a command substitution**
   (#71). `isBlindPipe` tested "contains a verification AND contains a pipe", so
   `out=$(npm run gate 2>&1); echo "$out" | grep 'Tests  '` was reported blind — but that pipe

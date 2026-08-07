@@ -15,6 +15,20 @@ export interface PopoverProps {
    */
   triggerRef?: React.RefObject<HTMLElement | null>;
   /**
+   * A region that does not count as "outside" for dismissal, beyond `triggerRef` itself — for a
+   * group of sibling triggers that share one popover slot (#82).
+   *
+   * The reason is the same one `triggerRef` exists for, one step wider. Outside-click handling
+   * runs in the capture phase and **consumes the click**, so with only the popover's own trigger
+   * exempt, clicking a *sibling* trigger dismisses the open popover and that click never reaches
+   * the sibling. The user sees the first click do nothing and has to click again.
+   *
+   * Exempting the whole group makes switching purely state-driven: the sibling's `onClick` runs,
+   * selects itself, and the previously-open popover unmounts because its `isOpen` went false.
+   * Clicking genuinely outside the group still dismisses normally.
+   */
+  dismissExemptRef?: React.RefObject<HTMLElement | null>;
+  /**
    * ARIA role for the popover surface. `'dialog'` fits every current consumer:
    * `DatePickerMenu` (a calendar grid — `role="grid"` — inside a dialog
    * popover, the same composition a native date input's popup uses) and the
@@ -63,6 +77,7 @@ export function Popover({
   isOpen,
   onClose,
   triggerRef,
+  dismissExemptRef,
   role = 'dialog',
   children,
   className,
@@ -75,7 +90,8 @@ export function Popover({
       isOpen,
       onClose,
       isDismissable: true,
-      shouldCloseOnInteractOutside: (element) => !triggerRef?.current?.contains(element),
+      shouldCloseOnInteractOutside: (element) =>
+        !triggerRef?.current?.contains(element) && !dismissExemptRef?.current?.contains(element),
     },
     overlayRef,
   );

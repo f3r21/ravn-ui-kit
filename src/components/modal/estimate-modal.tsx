@@ -17,6 +17,11 @@ export interface EstimateModalProps {
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
   triggerRef?: PopoverProps['triggerRef'];
+  /**
+   * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+   * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
+   */
+  dismissExemptRef?: PopoverProps['dismissExemptRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -39,6 +44,7 @@ export function EstimateModal({
   onSelect,
   onClose,
   triggerRef,
+  dismissExemptRef,
   className,
 }: EstimateModalProps) {
   return (
@@ -46,6 +52,7 @@ export function EstimateModal({
       isOpen
       onClose={onClose}
       triggerRef={triggerRef}
+      dismissExemptRef={dismissExemptRef}
       aria-label="Estimate"
       className={cn(
         'flex flex-col w-[122px] py-2 bg-surface-overlay border border-subtle rounded-sm',

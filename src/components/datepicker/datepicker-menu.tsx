@@ -59,6 +59,11 @@ export interface DatePickerMenuProps {
   timeZone?: string;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
   triggerRef?: PopoverProps['triggerRef'];
+  /**
+   * A region that does not count as "outside" for dismissal — forwarded to `Popover` (#82).
+   * Needed when this menu is one of several sibling triggers, e.g. `AddTaskModal`'s chip row.
+   */
+  dismissExemptRef?: PopoverProps['dismissExemptRef'];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -127,6 +132,7 @@ export function DatePickerMenu({
   onChange,
   onClose,
   triggerRef,
+  dismissExemptRef,
   timeZone = getLocalTimeZone(),
   className,
 }: DatePickerMenuProps) {
@@ -169,6 +175,7 @@ export function DatePickerMenu({
       isOpen
       onClose={onClose}
       triggerRef={triggerRef}
+      dismissExemptRef={dismissExemptRef}
       aria-label="Date picker"
       className={cn(
         'flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none',
