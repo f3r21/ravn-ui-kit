@@ -436,19 +436,28 @@ function Pt({
     )
   ] });
 }
-function A({ src: t, name: n, size: l = "md", className: r }) {
-  const i = {
+function A({
+  src: t,
+  name: n,
+  fallbackLabel: l = "Unassigned",
+  size: r = "md",
+  className: i
+}) {
+  const s = {
     sm: "w-8 h-8 text-xs font-semibold",
     md: "w-10 h-10 text-sm font-semibold",
     lg: "w-12 h-12 text-base font-bold"
-  }, s = (a) => {
-    if (!a) return "?";
-    const o = a.trim().split(" ");
-    return o.length >= 2 ? `${o[0][0]}${o[1][0]}`.toUpperCase() : o[0].substring(0, 2).toUpperCase();
-  };
+  }, a = (u) => {
+    if (!u) return "?";
+    const f = u.trim().split(" ");
+    return f.length >= 2 ? `${f[0][0]}${f[1][0]}`.toUpperCase() : f[0].substring(0, 2).toUpperCase();
+  }, o = n || l;
   return /* @__PURE__ */ e(
     "div",
     {
+      role: "img",
+      "aria-label": o,
+      title: o,
       className: d(
         // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
         // they used to be. That pairing measured 2.61:1 and was the single largest
@@ -467,10 +476,14 @@ function A({ src: t, name: n, size: l = "md", className: r }) {
         // `text-neutral-5` stays a raw ramp class rather than `text-surface-shell`: that
         // alias names a *background* role, and this is a foreground.
         "relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-1 text-neutral-5 select-none shrink-0",
-        i[l],
-        r
+        s[r],
+        i
       ),
-      children: t ? /* @__PURE__ */ e("img", { src: t, alt: n || "User avatar", className: "w-full h-full object-cover" }) : /* @__PURE__ */ e("span", { children: s(n) })
+      children: t ? (
+        // `alt=""`, deliberately. The wrapper above already carries the name; an `alt` here
+        // would have the avatar announced twice, and as "image, Alice" rather than "Alice".
+        /* @__PURE__ */ e("img", { src: t, alt: "", className: "w-full h-full object-cover" })
+      ) : /* @__PURE__ */ e("span", { children: a(n) })
     }
   );
 }

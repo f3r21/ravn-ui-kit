@@ -8,6 +8,26 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Avatar` has an accessible name in both states** (#47). The name moves onto the wrapper as
+  `role="img"` + `aria-label`, and the inner `<img>` becomes `alt=""`.
+
+  Two gaps, and the second is what blocked the consumer's migration. With an image, the name was
+  on the `<img>`, so a screen reader announced "image, Alice" — an avatar conveys _who_, not what
+  a picture looks like. **Without** an image there is no `<img>` at all, so there was no `alt`
+  and nothing else carried a name: a `<div>` holding two letters, with no role and no accessible
+  name of any kind. That is not an edge case — `User.avatar` and `Task.assignee` are both
+  nullable in the API the consumer talks to, which is exactly why the initials fallback exists.
+
+  New `fallbackLabel` prop, `@default 'Unassigned'`, overridable for the same reason
+  `TaskListView`'s `emptyTitle` is: the kit cannot know the consumer's language or domain. The
+  visible fallback is still `?` — this names it, it does not relabel it.
+
+  **Breaking for anyone querying the avatar image by its `alt` text**, which the kit's own suite
+  did (`getByAltText('User')`); query by `role="img"` and the accessible name instead. Minor bump
+  under SemVer's pre-1.0 carve-out.
+
 ### Added
 
 - **`ViewSwitcher` is a real radiogroup** (#9). It was two independent buttons: no group, no

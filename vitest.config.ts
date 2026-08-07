@@ -63,14 +63,24 @@ export default defineConfig({
       // first test file at all, and added cases to `Button`, `SegmentedControl`,
       // `SearchBar` and `TopNav`. 88.76 -> 90.18.
       //
-      // Then the board-readiness pass (this one) added `task-list-view.test.tsx`
-      // and `skeleton.test.tsx`, and extended `ProjectInfo`, `TaskCard`,
-      // `TaskTable` and `DatePickerMenu`. 90.18 -> 90.68.
+      // Then the board-readiness pass (#9's board half, #48) added
+      // `task-list-view.test.tsx` and `skeleton.test.tsx`, and extended
+      // `ProjectInfo`, `TaskCard`, `TaskTable` and `DatePickerMenu`. 90.18 -> 90.68.
+      //
+      // Then `Avatar`'s accessible name (#47) replaced the `getByAltText` case with
+      // role-based ones and added the fallback-state and unassigned cases.
+      // 90.68 -> 90.71, branches 89.44 -> 89.69.
+      //
+      // Branches is set from three consecutive runs, not one. A single run here read
+      // 89.72% (358/399) and every run since reads 89.69% (357/398) — note the
+      // *denominator* moves, so it is v8 instrumentation variance rather than a test
+      // that sometimes covers more. A threshold taken from the lucky run fails the
+      // gate on the next commit for a reason that has nothing to do with the change.
       thresholds: {
-        statements: 90.68,
-        branches: 89.44,
+        statements: 90.71,
+        branches: 89.69,
         functions: 84.89,
-        lines: 90.68,
+        lines: 90.71,
       },
     },
   },
