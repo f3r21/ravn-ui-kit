@@ -8,7 +8,33 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`npm run test:a11y:ci` no longer serves a stale Storybook.** `http-server` defaults to
+  `Cache-Control: max-age=3600`, so a rebuilt story could keep reading stale for an hour — a
+  stale page and a broken component are indistinguishable. This cost three rebuild cycles during
+  #47 and produced a _false_ technical conclusion about Storybook arg merging that was about to
+  ship as a code comment. `-c-1` closes it. Repository tooling only; `dist/` is untouched.
+
 ### Added
+
+- **A tag-push job checks any tag nobody dispatched** (#56).
+  `.github/workflows/tag-check.yml` fires `on: push: tags: ['v*']` — the only trigger that
+  cannot be skipped, because it fires on the ref existing rather than on someone remembering to
+  invoke it. It runs the same two checks as the release job, from the same
+  `scripts/release-checks.mjs`, so there is one behaviour with two triggers rather than two
+  copies that drift.
+
+  It needs no `npm ci` and no build: that script imports only `node:fs` and `node:path`, and
+  reads two files from the tagged tree. It takes the checker from the default branch rather than
+  from the tag, so a tag cut on an older commit gets an answer instead of "module not found",
+  and a fix to the checker does not need a re-tag.
+
+  It deliberately does **not** fire for tags cut by `release.yml` — a ref pushed with the default
+  `GITHUB_TOKEN` triggers no further runs — and that silence is correct rather than a gap, since
+  every check here already ran there before the tag existed. Proved to discriminate against the
+  real history: it fails on `v0.5.0`'s actual commit and passes on `v0.5.1`'s. Repository
+  tooling only; `dist/` is untouched.
 
 - **Tags are cut by a `workflow_dispatch` release job, not by hand** (#57).
   `.github/workflows/release.yml` verifies that `package.json` matches the tag, that
