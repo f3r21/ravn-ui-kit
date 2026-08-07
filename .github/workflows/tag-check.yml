@@ -63,6 +63,13 @@ jobs:
       # No `npm ci`. `scripts/release-checks.mjs` imports only `node:fs` and `node:path`, which
       # is what lets this job answer in seconds and read nothing but two files from the tagged
       # tree. Re-derive: `grep '^import' scripts/release-checks.mjs`.
+      # RENAMING `scripts/release-checks.mjs` MUST UPDATE THREE SITES. Two fail loudly at PR
+      # time — `.github/workflows/release.yml`'s `node scripts/release-checks.mjs`, and
+      # `scripts/release-checks.test.mjs`'s `join(ROOT, 'scripts', …)`. The third is the
+      # `git show` below, where the path is a **string inside a shell command**: a rename sails
+      # through CI green, merges, and breaks at the next tag push with a raw git error, which is
+      # the worst place to find out. Re-derive the three:
+      #   grep -rn 'release-checks' .github/ scripts/
       - name: Take the checker from the default branch, not from the tag
         run: |
           git fetch --no-tags origin '+refs/heads/${{ github.event.repository.default_branch }}:refs/remotes/origin/default'
@@ -71,6 +78,13 @@ jobs:
         # commit predating this script fails with "module not found" instead of a useful answer,
         # and a bug fixed in the checker would need a re-tag to take effect. The tag supplies the
         # facts; `main` supplies the judgement.
+        #
+        # The cost of that call, stated rather than discovered: `main` can move between the tag
+        # push and this job running, so the judgement is "whatever `main` says now", not what it
+        # said at tag time. For these two checks that is the behaviour you want — a fix to the
+        # checker applies retroactively to a tag pushed a minute earlier. It would stop being
+        # what you want if the checks ever became version-specific, at which point read the
+        # script from the tag and accept the "module not found" case instead.
 
       # The same two checks `release.yml` runs, from the same implementation — one behaviour with
       # two triggers rather than two copies that can drift. They are proved to fail
@@ -79,8 +93,18 @@ jobs:
       - name: Verify the tag against package.json and CHANGELOG.md
         run: |
           TAG='${{ github.ref_name }}'
-          node /tmp/release-checks.mjs "$TAG" "$GITHUB_WORKSPACE" > /dev/null || {
+          NOTES=$(node /tmp/release-checks.mjs "$TAG" "$GITHUB_WORKSPACE") || {
             echo "::error::$TAG does not describe its own commit. This tag is NOT a release — do not pin it. See the errors above, fix on main, and cut a new tag; published tags are never moved or deleted (#54)."
             exit 1
           }
+          # Output must be non-empty, and this is a real guard rather than belt-and-braces.
+          # `release-checks.mjs` decides whether to run `main()` by testing whether argv[1]
+          # ends with its own filename — so a RENAME makes that false, the script exits 0
+          # having checked nothing, and this job goes green on an unchecked tag. That is the
+          # one failure mode here that is silent rather than loud. A pass with no notes is
+          # impossible when the script actually ran: it prints the CHANGELOG section.
+          if [ -z "$NOTES" ]; then
+            echo "::error::release-checks.mjs exited 0 but printed nothing. It almost certainly did not run — its entry-point guard tests its own filename, so a rename turns it into a no-op. Check the three call sites: grep -rn 'release-checks' .github/ scripts/"
+            exit 1
+          fi
           echo "::notice::$TAG checks out: package.json and CHANGELOG.md agree with the tag."

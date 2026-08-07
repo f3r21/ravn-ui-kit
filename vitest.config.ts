@@ -71,11 +71,21 @@ export default defineConfig({
       // role-based ones and added the fallback-state and unassigned cases.
       // 90.68 -> 90.71, branches 89.44 -> 89.69.
       //
-      // Branches is set from three consecutive runs, not one. A single run here read
-      // 89.72% (358/399) and every run since reads 89.69% (357/398) — note the
-      // *denominator* moves, so it is v8 instrumentation variance rather than a test
-      // that sometimes covers more. A threshold taken from the lucky run fails the
-      // gate on the next commit for a reason that has nothing to do with the change.
+      // Branches is set from three consecutive runs, not one. A single run read
+      // 89.72% (358/399); roughly ten runs since have all read 89.69% (357/398), and the
+      // outlier has never reproduced.
+      //
+      // An earlier version of this comment called that v8 instrumentation variance. That
+      // was a guess stated as a cause and it is withdrawn: the outlier came immediately
+      // after a rebase, so a stale Vitest cache is at least as likely, and nothing here
+      // distinguishes them. What is measured is that the *denominator* moved; what is not
+      // measured is why.
+      //
+      // The operating rule survives either way, and it is the point: take a ratchet number
+      // from three runs rather than one, because a threshold set from the lucky run fails
+      // the gate on the next commit for a reason that has nothing to do with that change.
+      // And check the exit status — `out=$(npm run gate 2>&1); rc=$?` — because the
+      // coverage summary prints identical percentages whether or not the thresholds passed.
       thresholds: {
         statements: 90.71,
         branches: 89.69,

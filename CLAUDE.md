@@ -81,8 +81,13 @@ build — so `dist/` has to exist in the repo. A `permissions.deny` entry of `Re
 types, never worth reading. Change the source and rebuild.
 
 CI now fails when it is stale (`Check committed dist/ is fresh`, straight after the build
-step). That check is `git add --intent-to-add dist/ && git diff --exit-code dist/` — the
-`--intent-to-add` half is what lets it see a _newly emitted_ file, which a bare diff cannot.
+step). That check is `git add --intent-to-add dist/ && git diff HEAD --exit-code dist/`, and both
+halves are load-bearing in opposite directions. `--intent-to-add` is what lets it see a _newly
+emitted_ file, which a bare diff cannot. It is also what used to blind it to a _deleted_ one
+(#33): `--intent-to-add` on a directory **stages** the deletion, after which an unstaged diff
+compares worktree to index and finds them agreeing. `git diff HEAD` sees both —
+`rm dist/ui-kit.css && git add --intent-to-add dist/ && git diff --exit-code dist/` exits 0 where
+the `HEAD` form exits 1.
 `.gitattributes` marks `dist/**` as `-diff`, so a failure prints "Binary files differ" rather
 than a 100 KB patch; the exit code is still non-zero, so do not "fix" that by removing the
 attribute.
