@@ -24,6 +24,21 @@ import { readFileSync } from 'node:fs';
 // would penalise exactly the behaviour this is meant to reward.
 const FENCE = /```[\s\S]*?```/g;
 
+// Inline code, for the same reason as `FENCE` and it was missed (#69). `FENCE` strips fenced
+// blocks; a command written inline — `npm run gate 2>&1 | tail -6` — kept its internals, so
+// `6` counted as a claim the author never made. Every well-sourced line was penalised in
+// proportion to how specific its command was, which is backwards.
+//
+// Stripped only from the copy used to COUNT figures, never from the copy used to detect
+// sourcing: `SOURCED` and `isBlindPipe` both match on backticks and would see nothing.
+const INLINE_CODE = /`[^`]*`/g;
+
+// `2>&1`, `>&2`, `1>&2` — a redirection, not a quantity (#70). It appears in almost every
+// gate-sourced line, so reading it as the figures 2 and 1 diluted exactly the claims that
+// carried the best provenance. Handled separately from INLINE_CODE because a redirection is
+// also written outside backticks in prose.
+const REDIRECT = /\d*>&\d/g;
+
 // `card.tsx:13`, `select.tsx:66,72` — a pointer to a location, not a quantity.
 // #23 counts these separately because they are trivially checkable by opening
 // the file, so they neither need a command nor say anything about rigour.
@@ -80,7 +95,13 @@ const VERIFICATION =
 
 // Either shell's spelling, or command substitution (`out=$(…); rc=$?`), which has no
 // pipeline at all and is why it is the exemplar above rather than a suffix to memorise.
-const STATUS_ECHO = /PIPESTATUS|pipestatus|\brc=\$\?/;
+//
+// `pipefail` is here too (#78), and it is a different mechanism rather than a fourth spelling:
+// `set -o pipefail` makes the pipeline's own status the first non-zero of its members, so the
+// failure is no longer discarded and no echo is needed. Without it this tool penalised a
+// correct form — and the consuming app's `figures.md` ships `pipefail` as one of its three
+// recommended spellings, so the two repos would have disagreed in writing.
+const STATUS_ECHO = /PIPESTATUS|pipestatus|\brc=\$\?|pipefail/;
 
 /**
  * True when `text` sources a figure with a verification whose exit status it throws away.
@@ -126,6 +147,9 @@ export function auditText(raw) {
     // `card.tsx:13` contributes a "13" and `#23` contributes a "23".
     const stripped = line
       .replace(LIST_ORDINAL, ' ')
+      // Before FILE_LINE: an inline command can contain a path that looks like one.
+      .replace(INLINE_CODE, ' ')
+      .replace(REDIRECT, ' ')
       .replace(FILE_LINE, ' ')
       .replace(ISO_DATE, ' ')
       .replace(SEMVER, ' ')
