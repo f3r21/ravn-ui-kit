@@ -5,6 +5,7 @@ import { ViewSwitcher } from './view-switcher';
 
 const GridIcon = () => (
   <svg
+    className="size-[18px]"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -22,6 +23,7 @@ const GridIcon = () => (
 
 const ListIcon = () => (
   <svg
+    className="size-[18px]"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"

@@ -81,4 +81,38 @@ describe('Button Component', () => {
     // `isSelected` is visual only — it must not leak into the accessibility tree.
     expect(button.getAttribute('aria-checked')).toBeNull();
   });
+
+  it('keeps the 24px frame but does not stretch the glyph to fill it', () => {
+    // #46. Figma's "Icon Placeholder" is inset 20% of the 40px button — 24px, identical on
+    // every variant — while "Vector" inside it is 14px on Primary, 18px on Secondary, and
+    // 18×16 on one ViewSwitcher glyph. `[&>svg]:w-full [&>svg]:h-full` collapsed all three
+    // to 24px and stretched the non-square one.
+    //
+    // Asserting the frame exists is NOT enough — it existed on the broken code too. What
+    // has teeth is the absence of the stretch utilities: restore either one and this fails.
+    // jsdom applies no stylesheet, so the rendered pixel sizes are proved in a browser
+    // against the built Storybook instead; see the PR body.
+    const { container } = render(
+      <Button aria-label="Add">
+        <svg data-testid="glyph" className="size-3.5" />
+      </Button>,
+    );
+    const frame = container.querySelector('span');
+
+    expect(frame?.className).toContain('w-6');
+    expect(frame?.className).toContain('h-6');
+    expect(frame?.className).not.toContain('[&>svg]:w-full');
+    expect(frame?.className).not.toContain('[&>svg]:h-full');
+  });
+
+  it('lets a consumer’s own size class reach the glyph', () => {
+    // The descendant selector `[&>svg]:w-full` outranked a plain `.size-3.5` utility on
+    // specificity, so the app passing `<PlusIcon className="size-3.5" />` had no effect.
+    render(
+      <Button aria-label="Add">
+        <svg data-testid="glyph" className="size-3.5" />
+      </Button>,
+    );
+    expect([...screen.getByTestId('glyph').classList]).toContain('size-3.5');
+  });
 });

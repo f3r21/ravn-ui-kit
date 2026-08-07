@@ -94,6 +94,20 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`Button` no longer stretches its glyph to fill the icon frame** (#46). Figma's "Icon
+  Placeholder" is inset 20% of the 40px button — exactly 24px, and identical on every variant —
+  while the "Vector" inside it is inset 20.83% on Primary (**14px**), 12.5% on Secondary
+  (**18px**), and 12.5%/16.67% on one `ViewSwitcher` glyph (**18×16, non-square**) —
+  `grep -n 'Icon Placeholder' -A6 'UI-Kit/Components/Button, Switch Button01.md'`.
+  `[&>svg]:w-full [&>svg]:h-full` flattened all three to 24×24 and distorted the non-square one.
+
+  It also made the frame unarguable: a descendant selector outranks a plain utility, so a
+  consumer passing `<PlusIcon className="size-3.5" />` — the spec size — was silently
+  overridden. The 24px frame stays and now centres its child; the glyph carries its own size.
+  **Breaking for anything that relied on the stretch**, which is any icon passed without a size
+  class; the kit's own story fixtures are updated to the spec sizes. Minor bump under SemVer's
+  pre-1.0 carve-out.
+
 - **`Skeleton`'s pulse is guarded by `prefers-reduced-motion`** (#45). `animate-pulse` was
   unconditional, so the placeholder kept pulsing for a user who had asked their OS to reduce
   motion — an indefinite looping animation is the central case WCAG 2.2.2 exists for. Now
