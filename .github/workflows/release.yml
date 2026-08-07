@@ -1,0 +1,163 @@
+name: Release
+
+# Cuts the tag itself, so there is no hand path to skip (#57).
+#
+# `v0.5.0` is why this exists. Its `package.json` still read `0.4.0` and its `[Unreleased]` was
+# never rolled, because `CLAUDE.md`'s tagging checklist is a checklist — steps a person performs
+# under release pressure, in the order they remember them.
+#
+# The shape matters, and two nearer shapes were rejected:
+#
+#   - A pre-tag script is the same shape as the step that was skipped. The check that would have
+#     caught `v0.5.0` already existed — the consuming app's `ui-kit-smoke.test.tsx`, whose own
+#     comment names this gap verbatim. It was not run. Adding a second thing to remember repeats
+#     the error while feeling like a fix.
+#   - A git hook is weaker still: `.git/hooks` is not cloned, so it protects one machine, and
+#     this repo has a documented case of hooks installed, running, and inert (`CLAUDE.md`).
+#
+# `#56`'s tag-push job is the backstop, not the alternative: it catches anyone who tags by hand
+# anyway, including tags cut before this workflow existed. The two compose.
+#
+# **They compose by not overlapping, and that is worth knowing before anyone "fixes" it.** A ref
+# pushed using the default `GITHUB_TOKEN` does not trigger further workflow runs — GitHub
+# suppresses that to prevent recursion — so a tag cut *here* will NOT fire #56's `on: push:
+# tags:` job. That is the correct division rather than a hole: every check #56 would run has
+# already run below, on the same commit, before the tag existed. #56's job is the hand-cut tag
+# this workflow cannot intercept. Do not "fix" the non-firing by switching this to a PAT; that
+# would buy a duplicate run and hand a longer-lived credential to the one job in the repo with
+# write scope.
+#
+# Every check runs before anything is written: the tag push is step 12 of 13, and steps 2-11 are
+# all read-only. Re-derive with
+#   python3 -c "import yaml;d=yaml.safe_load(open('.github/workflows/release.yml'));print([s['name'] for s in d['jobs']['release']['steps']])"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to tag, e.g. 0.6.0 or v0.6.0. Must already match package.json.'
+        required: true
+        type: string
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The only job in either repo that writes to the repository. Scoped here rather than at the
+    # workflow level so the privilege belongs to the job that needs it.
+    permissions:
+      contents: write
+    steps:
+      # `fetch-depth: 0` for the tags: the duplicate-tag check below cannot see a tag that was
+      # never fetched, and a shallow clone fetches none.
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # A release tag must be cut on `main`. `CLAUDE.md`: a tag on an integration branch is
+      # orphaned by the squash merge that lands it, leaving the version reachable only via the
+      # tag and `git describe` on `main` broken permanently. `workflow_dispatch` lets the caller
+      # pick any ref, so this is a real input to validate rather than a formality.
+      - name: Refuse to release from anything but main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Release must be dispatched on main, got ${{ github.ref }}. A tag cut on an integration branch is orphaned by its squash merge."
+          exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Normalise once, so every later step and the tag itself agree on the spelling.
+      - name: Resolve version
+        id: v
+        run: |
+          RAW='${{ inputs.version }}'
+          BARE="${RAW#v}"
+          echo "bare=$BARE" >> "$GITHUB_OUTPUT"
+          echo "tag=v$BARE" >> "$GITHUB_OUTPUT"
+
+      # Before anything expensive, and before anything that writes. A tag is not moved or
+      # deleted in this project (`v0.5.0` is left in place precisely so #54 can point at it), so
+      # a duplicate is a hard stop rather than something to force past.
+      - name: Refuse to overwrite an existing tag
+        run: |
+          if git rev-parse -q --verify "refs/tags/${{ steps.v.outputs.tag }}" >/dev/null; then
+            echo "::error::${{ steps.v.outputs.tag }} already exists. Published tags are never moved or deleted — pick the next patch version."
+            exit 1
+          fi
+
+      # `package.json` matches the tag, the changelog has a section for it, and `[Unreleased]`
+      # was rolled. Each of the three fails independently and names itself — proved by
+      # `scripts/release-checks.test.mjs`, which Vitest collects, so `npm run gate` runs it.
+      #
+      # Deliberately does NOT bump `package.json`: a version bump is a change to a tracked file
+      # and belongs in a reviewed PR, which is where v0.5.1's came from. That leaves the bump as
+      # a step a release could be attempted without — which is exactly what this catches, so the
+      # omission fails safe.
+      - name: Verify release metadata, and capture the tag message
+        id: notes
+        run: |
+          {
+            echo 'text<<RELEASE_NOTES_EOF'
+            node scripts/release-checks.mjs '${{ steps.v.outputs.bare }}'
+            echo
+            echo 'RELEASE_NOTES_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # Checklist step 1. `CI` already ran on this commit when it merged, but a release is cut
+      # from a ref rather than from a PR, and "it was green when it merged" is not the same
+      # claim as "it is green now".
+      - name: Gate
+        run: npm run gate
+
+      # Checklist step 2, and the check whose absence would be catastrophic rather than
+      # embarrassing. This is not what broke on `v0.5.0` — that bundle was correct and two greps
+      # misread it (#54) — but it is already written and costs one build.
+      - name: Build library
+        run: npm run build
+
+      - name: Check committed dist/ is fresh
+        run: |
+          git add --intent-to-add dist/
+          git diff --exit-code dist/ || {
+            echo "::error::dist/ is stale at the commit being tagged. Run 'npm run build', commit the result, and release again."
+            exit 1
+          }
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      # Everything above passed, so this is the first step that writes anything.
+      - name: Create and push the annotated tag
+        env:
+          TAG: ${{ steps.v.outputs.tag }}
+          NOTES: ${{ steps.notes.outputs.text }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          printf '%s\n\n%s\n' "$TAG" "$NOTES" > /tmp/tagmsg
+          git tag -a "$TAG" -F /tmp/tagmsg
+          git push origin "$TAG"
+          echo "::notice::Tagged $TAG at $(git rev-parse --short HEAD)"
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+          NOTES: ${{ steps.notes.outputs.text }}
+        run: gh release create "$TAG" --title "$TAG" --notes "$NOTES" --verify-tag

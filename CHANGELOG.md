@@ -8,6 +8,27 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **Tags are cut by a `workflow_dispatch` release job, not by hand** (#57).
+  `.github/workflows/release.yml` verifies that `package.json` matches the tag, that
+  `CHANGELOG.md` has a section for it, that `[Unreleased]` was rolled, that the gate is green
+  and that `dist/` reproduces — and only then creates the annotated tag and the GitHub release.
+  The tag message is the changelog section for that version.
+
+  `v0.5.0` is why. Its `package.json` still read `0.4.0` and its `[Unreleased]` was never
+  rolled. The check that would have caught it already existed — the app's
+  `ui-kit-smoke.test.tsx` — and was not run, so a _detective_ fix would have added a second
+  thing to remember. This removes the hand path instead. #56's tag-push job remains the
+  backstop for anyone who tags manually anyway; the two compose by not overlapping, since a ref
+  pushed with the default `GITHUB_TOKEN` does not trigger further workflows.
+
+  The verification lives in `scripts/release-checks.mjs` with `scripts/release-checks.test.mjs`
+  beside it rather than inline in YAML, for the reason this repo already learned about its
+  Claude Code hooks: an integration point nobody can run is one nobody notices is inert. Each
+  of the three checks is proved to fail _independently_ — three checks that only ever fail
+  together are one check wearing a costume. Repository tooling only; `dist/` is untouched.
+
 ## [0.5.1] — 2026-08-07
 
 **Supersedes `v0.5.0`, which must not be pinned** (#54). That tag's `package.json` still read
