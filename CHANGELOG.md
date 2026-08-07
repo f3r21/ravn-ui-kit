@@ -23,6 +23,17 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   re-reading it: both sabotages tested the _rule_ and passed, and only the corpus tested the
   _implementation_ of the rule. Corpus effect measured, not asserted — sourced 149 → 155 across
   68 documents, with exactly one document moving. Repository tooling only; `dist/` is untouched.
+- **`CLAUDE.md` contradicted itself about who cuts tags** (#76). #61 rewrote the top of that file
+  for the Release workflow and left the "Who cuts which tag" section describing the pre-workflow
+  regime — so `:113` said "Do not cut tags by hand" while `:124` still said "the reviewer who
+  merges the PR cuts the real `vX.Y.Z` on the merge commit", which _is_ cutting one by hand. A
+  consistent document became a contradictory one, and the contradiction was mine.
+
+  The section now says the workflow cuts tags on `main`, that the orphaned-tag hazard is
+  structural rather than remembered because the workflow refuses any other ref, and — the real
+  consequence, stated rather than left to be discovered — that **the prerelease-at-a-branch-tip
+  escape hatch is gone**. A lane needing to give a downstream consumer unmerged work installs
+  from the branch; a tag is a promise about `main`.
 
 ## [0.5.2] — 2026-08-07
 

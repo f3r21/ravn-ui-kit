@@ -117,13 +117,24 @@ on the tag push and re-checks facts 1 and 3; a tag it fails is **not a release**
 it. It deliberately does not fire for tags the Release workflow cut, since those were checked
 before the tag existed.
 
-**Who cuts which tag.** A tag points at a commit, so a release tag must not be cut on an
-integration branch: a squash merge orphans that commit, leaving the version reachable only via
-the tag and `git describe` on `main` broken permanently. So a lane cuts a **prerelease**
-(`vX.Y.Z-rc.N`) at its branch tip when something downstream needs to install the work before it
-merges, and says in the release notes that it came from unmerged history. **The reviewer who
-merges the PR cuts the real `vX.Y.Z` on the merge commit** and the downstream consumer re-pins
-to it. Both are annotated tags with a matching GitHub release.
+**Who cuts which tag: the workflow does, on `main`.** Nobody cuts one by hand, including the
+reviewer who merges the PR — that used to be the rule and it is not any more.
+
+A tag points at a commit, so a release tag must not be cut on an integration branch: a squash
+merge orphans that commit, leaving the version reachable only via the tag and `git describe` on
+`main` broken permanently. That hazard is now **structural rather than remembered** — the Release
+workflow refuses any ref but `main` (`release.yml`, "Refuse to release from anything but main"),
+so the orphaning case cannot be reached through the supported path.
+
+Which removes the old escape hatch, and that is a real consequence rather than an oversight: a
+lane can no longer cut a **prerelease at its branch tip** for a downstream consumer that needs
+the work before it merges. The workflow will still cut `v0.6.0-rc.1` — it puts no constraint on
+the version's shape — but only on `main`, with `package.json` and `CHANGELOG.md` already
+agreeing. If something downstream needs unmerged work, install it from the branch
+(`github:f3r21/ravn-ui-kit#<branch>`) rather than tagging it; a tag is a promise about `main`.
+
+Tags are annotated with a matching GitHub release, both created by the workflow from the
+changelog section for that version.
 
 ## The Claude Code hooks are tested, because they were inert
 
