@@ -430,7 +430,15 @@ export declare interface ButtonProps extends AriaButtonProps {
      * @default false
      */
     isSelected?: boolean;
-    /** 24×24 icon content. Should use `currentColor` so it inherits the button's icon color. */
+    /**
+     * Icon content, rendered centred inside the 24×24 "Icon Placeholder" frame. Should use
+     * `currentColor` so it inherits the button's icon colour.
+     *
+     * **Size the glyph yourself** — the frame is 24px, the glyph inside it is not (#46). Figma
+     * draws `size-3.5` (14px) for `variant="primary"` and `size-[18px]` for `secondary`; one
+     * `ViewSwitcher` glyph is 18×16, non-square. This used to force `w-full h-full` onto the
+     * child, which collapsed all three to 24×24 and stretched the non-square one.
+     */
     children: React.ReactNode;
     /** Required — icon-only buttons need an accessible name. */
     'aria-label': string;
@@ -610,7 +618,7 @@ export declare function Datepicker({ label, isLabelVisible, error, description, 
  * correct, standard grid semantics is a net accessibility improvement, not a regression against
  * verified spec.
  */
-export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, className, }: DatePickerMenuProps): JSX.Element;
+export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, timeZone, className, }: DatePickerMenuProps): JSX.Element;
 
 export declare interface DatePickerMenuProps {
     /**
@@ -624,6 +632,18 @@ export declare interface DatePickerMenuProps {
     onChange?: (date: Date) => void;
     /** Called when the popover should close without a selection — Escape or an outside click. */
     onClose: () => void;
+    /**
+     * IANA time zone used to read `value`/`defaultValue` into calendar days and to build the
+     * `Date` handed back to `onChange` — e.g. `'UTC'`, `'America/New_York'`.
+     *
+     * Defaults to the machine's zone, which is the behaviour this component always had, so
+     * nothing changes for an existing consumer. Set it to whatever zone your app *formats*
+     * dates in: a `Date` is an absolute instant, and reading its day in one zone while
+     * displaying it in another is how a picker ends up highlighting the day before the one on
+     * screen. An app that renders with `timeZone: 'UTC'` should pass `'UTC'` here.
+     * @default getLocalTimeZone()
+     */
+    timeZone?: string;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
     triggerRef?: PopoverProps['triggerRef'];
     /** Additional class names, merged last via `cn()` so they can override defaults. */
@@ -986,6 +1006,21 @@ export declare interface FormFieldProps extends Omit<AriaFieldProps, 'errorMessa
  * Tier 1 (verbatim export).
  */
 export declare function GridViewIcon(props: IconProps): JSX.Element;
+
+/**
+ * Which `<h*>` element a component renders its title as.
+ *
+ * Heading level is a property of the *document* a component is dropped into, not of the
+ * component — a card's title is an `<h3>` under an `<h2>` section and an `<h4>` under an
+ * `<h3>` one, and only the consumer knows which. Components here hardcoded `<h3>`, so a
+ * board rendering column headers and card titles emitted both at level 3 and
+ * `getAllByRole('heading', { level: 3 })` returned the header interleaved with its own
+ * cards.
+ *
+ * `1` is deliberately absent: a design-system component cannot know it owns the page's
+ * single top-level heading, and a kit that can emit `<h1>` invites two of them.
+ */
+export declare type HeadingLevel = 2 | 3 | 4 | 5 | 6;
 
 /**
  * The kit's icon vocabulary.
@@ -1480,11 +1515,25 @@ export declare interface PopoverProps {
  * clickable card or row gets a keyboard path: one real control named by the title, with the
  * container's own click handler left as a redundant pointer target beside it.
  */
-export declare function ProjectInfo({ title, icon, onTitleClick, className }: ProjectInfoProps): JSX.Element;
+export declare function ProjectInfo({ title, icon, onTitleClick, headingLevel, titleId, className, }: ProjectInfoProps): JSX.Element;
 
 export declare interface ProjectInfoProps {
     /** Task/project title. Grows to fill the row and truncates to a single line. */
     title: string;
+    /**
+     * Which `<h*>` the title renders as. Was hardcoded to `3`, which is why a board's column
+     * headers and its card titles were both level 3 and could not be told apart by
+     * `getAllByRole('heading', { level: 3 })` — give the header a `2` and its cards the
+     * default `3` and the outline nests properly.
+     * @default 3
+     */
+    headingLevel?: HeadingLevel;
+    /**
+     * `id` placed on the heading element, so something outside can point at it — chiefly a
+     * containing `<article aria-labelledby>` (which is exactly what `TaskCard` does). The
+     * heading carried no `id`, so that reference was impossible to write.
+     */
+    titleId?: string;
     /**
      * Turns the title into the row's activation affordance: it renders as a real `<button>`
      * whose accessible name is `title`, so it is tabbable and Enter/Space-activatable with no
@@ -1769,9 +1818,19 @@ export declare interface SidebarItemProps {
  * loading state) — this is a standalone, non-contradicted utility primitive
  * in the same vein as `switch.tsx`/`datepicker.tsx` (Chunks 5/16): genuinely
  * useful, and nothing in the exported specs contradicts it existing. A simple
- * `animate-pulse` block on the kit's own neutral-3 surface tone, matching the
- * pattern used by comparable production design systems for loading
- * placeholders (pulsing muted block, no skeleton-specific token needed).
+ * pulsing block on the kit's own neutral-3 surface tone, matching the pattern
+ * used by comparable production design systems for loading placeholders
+ * (pulsing muted block, no skeleton-specific token needed).
+ *
+ * The pulse is `motion-safe:` guarded (#45). An indefinite looping animation is the
+ * central example WCAG 2.2.2 (Pause, Stop, Hide) exists for, and `prefers-reduced-motion`
+ * is how a user's request for less of it reaches the browser. `motion-safe:animate-pulse`
+ * rather than `animate-pulse motion-reduce:animate-none` because it fails *safe*: a browser
+ * that does not support the query gets no animation, instead of an unguarded one.
+ *
+ * Keeping the guard in the primitive is the point — the alternative, a
+ * `motion-reduce:animate-none` on each call site, moves an accessibility property out into
+ * every future caller, where the next one omits it and nothing notices.
  */
 export declare function Skeleton({ className }: SkeletonProps): JSX.Element;
 
@@ -1903,7 +1962,7 @@ export declare interface TagProps {
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, tags, assigneeName, assigneeAvatar, metaBadges, className, onClick, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, tags, assigneeName, assigneeAvatar, metaBadges, actions, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
 
 export declare interface TaskCardProps {
     /** Task title, shown in the header row and truncated to a single line. */
@@ -1942,6 +2001,29 @@ export declare interface TaskCardProps {
      * @default []
      */
     metaBadges?: TaskMetaBadge[];
+    /**
+     * Controls rendered at the end of the header row, beside the title — in practice a
+     * per-card overflow menu (Edit / Delete). Name it for the task it belongs to
+     * (`"Task options for Fix auth bug"`), because a page of cards otherwise offers a
+     * screen-reader user a list of identical "options" buttons.
+     *
+     * This is a slot of its own rather than `ProjectInfo`'s `icon`: that one is specified as
+     * a decorative 24×24 glyph and renders into a fixed `w-6 h-6` box, so a real control
+     * passed through it has nowhere to put padding or a focus ring.
+     */
+    actions?: React.ReactNode;
+    /**
+     * Which `<h*>` the card title renders as, forwarded to `ProjectInfo`. Set it one level
+     * below whatever heading introduces the column the card sits in.
+     * @default 3
+     */
+    headingLevel?: HeadingLevel;
+    /**
+     * `id` for the card's title heading, which the card's own `<article aria-labelledby>`
+     * points at. Generated when omitted; pass one only if something else must reference the
+     * same heading.
+     */
+    titleId?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
     /**
@@ -1965,11 +2047,29 @@ export declare interface TaskCardProps {
  * badge, or "add task" affordance on the frame itself in any real instance
  * across the isolated doc export or the in-context dashboard mockup.
  */
-export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, className, }: TaskListViewProps): JSX.Element;
+export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, headingLevel, label, className, }: TaskListViewProps): JSX.Element;
 
 export declare interface TaskListViewProps {
     /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
     title: string;
+    /**
+     * Which `<h*>` the column title renders as, forwarded to `ProjectInfo`. A board is
+     * usually `2` here so the `TaskCard`s below can keep the default `3` and nest under it —
+     * both were level 3 before, which made the header indistinguishable from its own cards.
+     * @default 3
+     */
+    headingLevel?: HeadingLevel;
+    /**
+     * Renders the column as a labelled `<section>` landmark instead of a plain `<div>`, so a
+     * screen-reader user can jump between columns of a board rather than scrolling through
+     * every card.
+     *
+     * Opt-in, and this is the decision #9 asked for rather than a default: there is no Figma
+     * basis for a landmark, a board of three columns emits three of them, and a consumer that
+     * already wraps this in its own `<section>` would get two nested landmarks with different
+     * names. Pass the column's own name (`"Working"`); omitted, the markup is unchanged.
+     */
+    label?: string;
     /** Optional trailing 24×24 icon forwarded to `ProjectInfo`. */
     icon?: React.ReactNode;
     /** Tasks rendered as a vertical stack below the header, each spread onto a `TaskCard`. Renders an `EmptyState` when the array is empty. */
@@ -2101,7 +2201,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2147,6 +2247,22 @@ export declare interface TaskTableRowProps {
     isSelected?: boolean;
     /** Called with the row's next selected state when the checkbox is toggled. */
     onSelectedChange?: (isSelected: boolean) => void;
+    /**
+     * Whether the row renders its select checkbox at all. The checkbox is `sr-only` and
+     * merely `opacity-0` until hover, so it was always in the accessibility tree even for a
+     * consumer with no bulk-selection feature — one extra checkbox per row, announced,
+     * tabbable, and doing nothing. There was no way to omit it.
+     * @default true
+     */
+    isSelectable?: boolean;
+    /**
+     * Renders the row's title inside an `<h*>` of this level, giving list view the per-task
+     * heading navigation a board of `TaskCard`s has. Omitted, the title stays a plain
+     * `<button>`/`<span>` exactly as before — a heading in every row of a long table is real
+     * noise for a screen reader that already navigates the table as a grid, so this is opt-in
+     * rather than a default. Named to match `ProjectInfo`'s prop of the same name.
+     */
+    headingLevel?: HeadingLevel;
     /**
      * Tags rendered in the Task Tags column.
      * @default []
