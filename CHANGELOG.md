@@ -18,7 +18,11 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   hand-rolled pattern rather than `useRadio`/`useRadioGroup` — see that component's doc comment
   for why those hooks do not fit an icon-button shape. New `label` prop names the group,
   `@default 'View'`. First test file for this component, which had none: 13 cases,
-  `npx vitest run src/components/layout/view-switcher.test.tsx`. **Minor** — additive.
+  `npx vitest run src/components/layout/view-switcher.test.tsx`. **Minor** — a behavioural break
+  for any consumer querying the old `button` role, under the pre-1.0 carve-out. The two controls
+  answered `getByRole('button', { name })` before and answer `getByRole('radio')` now; the
+  `SearchBar` textbox→searchbox change below is called a break on the same standard. No consumer
+  is affected today — the app has its own `useRadioGroup` switcher and does not import this one.
 
 - **`Button` can carry radio semantics** (#9), via `role="radio"` and `aria-checked`, applied
   after `useButton`'s props because `useButton` drops both — passed through it they arrive on

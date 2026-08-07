@@ -105,9 +105,21 @@ describe('Button Component', () => {
     expect(frame?.className).not.toContain('[&>svg]:h-full');
   });
 
-  it('lets a consumer’s own size class reach the glyph', () => {
-    // The descendant selector `[&>svg]:w-full` outranked a plain `.size-3.5` utility on
-    // specificity, so the app passing `<PlusIcon className="size-3.5" />` had no effect.
+  it('passes a consumer’s size class through to the glyph element', () => {
+    // NOT the guard for #46, despite reading like one — do not delete the assertion above as
+    // redundant to this. The class was always *on* the element; what the bug took away was the
+    // CASCADE, because `[&>svg]:w-full` compiles to a descendant selector at (0,2,0) and a
+    // plain `.size-3.5` is (0,1,0). This suite runs on jsdom with no stylesheet imported, so
+    // there is no cascade here to observe and this assertion passes unchanged against the
+    // broken button.
+    //
+    // What actually proves the fix: the `not.toContain('[&>svg]:w-full')` assertion above,
+    // which fails the moment the stretch returns, and a real browser against the built
+    // Storybook — `primitives-button--states` reads frame 24px / glyph 14px on primary and
+    // 18px on secondary. See the PR body.
+    //
+    // This case earns its place only by pinning that the child is rendered untouched, i.e.
+    // that no future refactor starts rewriting the consumer's className.
     render(
       <Button aria-label="Add">
         <svg data-testid="glyph" className="size-3.5" />
