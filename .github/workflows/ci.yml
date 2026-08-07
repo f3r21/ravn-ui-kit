@@ -40,10 +40,11 @@ jobs:
       # for that. Nor is `dependency-review-action` between them, for the same reason:
       # it holds no write scope either.
       #
-      # Note checkout and setup-node are currently three majors behind (`@v7` is current
-      # for both) — that is the gap Dependabot is expected to close, not a pin to preserve.
+      # Both are on the current major (`@v7`), and are expected to keep moving there via the
+      # `github-actions` Dependabot ecosystem (`.github/dependabot.yml`) rather than being
+      # held at a version — the pin below records what runs today, it does not preserve it.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Diffs the dependency graph of the base commit against the head commit and fails
       # when the pull request *introduces* a dependency carrying a known advisory. That is
@@ -57,7 +58,7 @@ jobs:
       # acceptable is how a policy stops being one. The action's own default is `low`.
       - name: Dependency review
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
 
@@ -66,7 +67,7 @@ jobs:
       # precondition for verifying a committed `dist/` — a freshness check run on
       # two different majors can disagree about a build that is in fact fine.
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: 'npm'
@@ -158,7 +159,7 @@ jobs:
       # trailing version comment too. Both actions already have a v5 and are expected to
       # arrive that way: the pin records what runs today, it does not hold a version back.
       - name: Package Storybook for Pages
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: storybook-static
 
@@ -225,4 +226,4 @@ jobs:
       # OIDC-authenticated publish to the live documentation site.
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
