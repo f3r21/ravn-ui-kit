@@ -70,6 +70,10 @@ describe('figure-audit', () => {
       ['`npm run coverage | head -3`', true],
       ['`npx vitest run --coverage 2>&1 | grep Tests`', true],
       ['`npm run gate 2>&1 | tail -6 ; echo $pipestatus[1]`', false],
+      // #78: pipefail is a different mechanism, not a fourth spelling — it makes the pipeline's
+      // own status the first non-zero member, so nothing is discarded and no echo is needed.
+      // The consuming app's figures.md ships this as a recommended form.
+      ['`set -o pipefail; npm run gate 2>&1 | tail -6`', false],
       ['`grep -c foo src/x.ts`', false],
       ['`git show v0.5.1:package.json | grep version`', false],
       ['`npm run gate`', false],
@@ -105,6 +109,33 @@ describe('figure-audit', () => {
 
     it('ignores numbers inside fenced blocks', () => {
       expect(auditText('```\n42 tests\n```\n').substantive).toBe(0);
+    });
+
+    /**
+     * #69. `FENCE` stripped fenced blocks and inline code kept its internals, so a command's
+     * own arguments counted as claims the author never made — penalising a line in proportion
+     * to how specific its command was, which is backwards for a tool rewarding provenance.
+     */
+    it('does not count a command’s own arguments as figures', () => {
+      const r = auditText('- 595 tests — `npm run gate 2>&1 | tail -6 ; echo $pipestatus[1]`\n');
+      // Only "595" is a claim. Not the 6 of `tail -6`, nor the 1 of `pipestatus[1]`.
+      expect(r.substantive).toBe(1);
+    });
+
+    /** #70. `2>&1` is a redirection, and it appears in almost every gate-sourced line. */
+    it('does not read a redirection as the figures 2 and 1', () => {
+      // Outside backticks, so this is REDIRECT's job rather than INLINE_CODE's.
+      expect(auditText('Run it with 2>&1 and read 595 tests.\n').substantive).toBe(1);
+    });
+
+    /**
+     * Control for the two above: stripping must not swallow real claims that merely sit near a
+     * command. Without this, "strip the whole line" passes both.
+     */
+    it('control: a claim outside the backticks still counts', () => {
+      const r = auditText('- 595 tests, 39 files — `npm run gate`\n');
+      expect(r.substantive).toBe(2);
+      expect(r.sourced).toBe(2);
     });
 
     it('requires adjacency, not mere co-occurrence', () => {

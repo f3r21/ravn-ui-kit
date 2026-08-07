@@ -30,6 +30,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   switches, clicking an open chip still closes it, and a click outside the row still dismisses.
   **Minor** — `dismissExemptRef` is additive and optional.
 
+- **`figure-audit.mjs` counted command internals as claims, and penalised `pipefail`**
+  (#69, #70, #78). Three defects in one family, fixed together because they are one file and
+  each one's corpus pass invalidates the next.
+
+  `FENCE` stripped fenced blocks but not **inline code** (#69), so a command's own arguments
+  counted as claims the author never made — and `2>&1` parsed as the figures 2 and 1 (#70),
+  which appears in nearly every gate-sourced line. Both now stripped before counting, from the
+  copy used to count only, never from the copy used to detect sourcing.
+
+  **The headline metric was inflated by exactly the thing it rewards.** A line citing
+  `npm run gate 2>&1 | tail -6 ; echo $pipestatus[1]` scored **6** figures where the claim is
+  two; the same claim citing `npm run gate` scored 2. Identical rigour, three times the score.
+  Corpus-wide: substantive 6609 → 6066, sourced 155 → 93, ratio **2.3% → 1.5%** — so the repo's
+  provenance rate is _worse_ than reported, and every percentage quoted from this tool before
+  today was measured with an inflated instrument.
+
+  Separately, `set -o pipefail` is now recognised as status-preserving (#78). It is a different
+  mechanism rather than a fourth spelling — it makes a pipeline's status the first non-zero
+  member, so nothing is discarded. The consuming app's `figures.md` ships it as a recommended
+  form, so without this the two repos disagreed in writing. Repository tooling only; `dist/` is
+  untouched.
+
 ### Fixed
 
 - **`figure-audit.mjs` no longer flags a pipe that is downstream of a command substitution**
