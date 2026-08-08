@@ -197,7 +197,16 @@ export function TaskCard({
     //
     // No `focus-visible:outline-*` anywhere here: the card is not focusable, so those
     // utilities could never match. The ring lives on the title button that replaced them.
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+    //
+    // The `jsx-a11y/click-events-have-key-events` and `no-noninteractive-element-interactions`
+    // disables that used to sit here are **gone, and their absence is not a fix.** jsx-a11y
+    // only lints JSX host elements, so once this became `<Card>` the rules stopped applying —
+    // eslint flagged the directives as unused, which is the only reason this is visible at all.
+    // The `onClick`-on-a-non-interactive-element question did not go away; it moved inside
+    // `Card`, where the element is a dynamic `<Component>` and jsx-a11y cannot see it either.
+    // What actually answers it is unchanged and is the reason the disables were acceptable
+    // before: the keyboard and screen-reader path is the title `<button>` `ProjectInfo`
+    // renders, and this handler is the redundant pointer target beside it.
     <Card
       as="article"
       isInteractive

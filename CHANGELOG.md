@@ -51,6 +51,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   the `dist/` check's documented "the build ran immediately above". A cheap heuristic check
   placed ahead of irreplaceable ones converts its own wrongness into their silence. It stays
   blocking; last-and-blocking costs nothing when right and only itself when wrong.
+
 ### Changed
 
 - **BREAKING: `Card` now renders the kit's own card surface, and gains `Header`/`Body`/`Footer`**
