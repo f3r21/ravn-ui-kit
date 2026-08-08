@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { withSurface } from '../../../.storybook/decorators';
 import { ProjectInfo } from './project-info';
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TaskListView } from './task-list-view';
 import { EmptyState } from '../empty-state/empty-state';
 import { withSurface } from '../../../.storybook/decorators';

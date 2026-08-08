@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AppShell } from './app-shell';
 import { ViewSwitcher } from './view-switcher';
 import { Button } from '../button/button';

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import { Item, type Selection } from 'react-stately';
 import { withSurface } from '../../../.storybook/decorators';
 import { MultiSelect, type MultiSelectProps } from './multi-select';

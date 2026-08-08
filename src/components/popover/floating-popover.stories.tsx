@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useButton } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 import { withSurface } from '../../../.storybook/decorators';

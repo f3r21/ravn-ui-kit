@@ -1,4 +1,4 @@
-import type { Decorator } from '@storybook/react';
+import type { Decorator } from '@storybook/react-vite';
 import { cn } from '../src/utils/cn';
 
 // Literal class map — Tailwind's scanner needs full literal utility strings

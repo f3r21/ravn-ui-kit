@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useListState, Item } from 'react-stately';
 import { withSurface } from '../../../.storybook/decorators';
 import { ListBox } from './list-box';

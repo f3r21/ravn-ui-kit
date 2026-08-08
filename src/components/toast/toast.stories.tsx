@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { withSurface } from '../../../.storybook/decorators';
 import { ToastProvider, useToast, type ToastTone } from './toast';
 import { TextButton } from '../button/text-button';
