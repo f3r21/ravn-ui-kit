@@ -119,19 +119,62 @@ describe('changelog placement (#107)', () => {
       expect(headBranch({ GITHUB_HEAD_REF: 'release/0.7.0' }, ROOT)).toBe('release/0.7.0');
     });
 
+    /**
+     * These build their own repo rather than reading `process.cwd()`.
+     *
+     * The first version of this test did `headBranch({}, ROOT)` and asserted the result was a
+     * string. That passes on a developer's named branch and **fails in CI**, where the checkout
+     * is detached and the answer is correctly `null` — so the fix for a bug caused by assuming a
+     * named branch shipped a test that assumed a named branch. It failed on the first CI run of
+     * its own PR, which is the only reason this reads the way it does now.
+     *
+     * A fixture with a known HEAD state answers the same question in both environments.
+     */
+    function scratchRepo(detach) {
+      const dir = mkdtempSync(join(tmpdir(), 'head-branch-'));
+      const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' });
+      git('init', '-q', '-b', 'main');
+      git('config', 'user.email', 'test@example.com');
+      git('config', 'user.name', 'test');
+      writeFileSync(join(dir, 'f'), 'x');
+      git('add', '-A');
+      git('commit', '-qm', 'base');
+      git('switch', '-qc', 'fix/1-something');
+      if (detach) git('checkout', '-q', '--detach');
+      return dir;
+    }
+
     it('falls back to the local branch when GITHUB_HEAD_REF is absent', () => {
-      // Whatever branch the suite is running on — the assertion is that it is a real name and
-      // not the literal `HEAD`, which is the value that made the exemption inert.
-      const local = headBranch({}, ROOT);
-      expect(local).not.toBe('HEAD');
-      expect(typeof local).toBe('string');
+      const dir = scratchRepo(false);
+      try {
+        expect(headBranch({}, dir)).toBe('fix/1-something');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it('returns null on a detached HEAD rather than the literal string "HEAD"', () => {
+      // `HEAD` is what `rev-parse --abbrev-ref` answers here, and treating it as a branch name
+      // is the whole defect: `'HEAD'.startsWith('release/')` is false, so the exemption could
+      // never fire in CI.
+      const dir = scratchRepo(true);
+      try {
+        expect(headBranch({}, dir)).toBeNull();
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
     });
 
     it('treats an empty GITHUB_HEAD_REF as absent rather than as a branch named ""', () => {
       // `push`-event workflows set it to the empty string rather than leaving it unset, and
       // `''.startsWith('release/')` is false — so this would look correct while skipping the
       // fallback entirely.
-      expect(headBranch({ GITHUB_HEAD_REF: '' }, ROOT)).toBe(headBranch({}, ROOT));
+      const dir = scratchRepo(false);
+      try {
+        expect(headBranch({ GITHUB_HEAD_REF: '' }, dir)).toBe('fix/1-something');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
     });
   });
 });
