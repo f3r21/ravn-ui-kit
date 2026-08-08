@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { TaskTable } from './task-table';
+import { Item } from 'react-stately';
+import { Menu } from '../menu/menu';
+import { MenuDotsIcon } from '../icons/icons';
 import { withSurface } from '../../../.storybook/decorators';
 
 const meta: Meta<typeof TaskTable> = {
@@ -158,4 +161,61 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   args: { groups: [], isLoading: true },
+};
+
+/**
+ * #95. A per-row overflow menu, which is what a list view needs and what `TaskTableRow` had no
+ * slot for — the consuming app could migrate its board onto `TaskCard` and not its list view,
+ * because moving would have deleted Edit and Delete.
+ *
+ * The group header takes `headingLevel: 2` and the rows `3`, so the outline nests rather than
+ * skipping — the other half of #95, and not fixable from outside before this.
+ *
+ * Open a menu and the row behind it does not open: the slot is one of the row's own controls.
+ */
+export const RowActions: Story = {
+  args: {
+    groups: [
+      {
+        title: 'To Do (02)',
+        headingLevel: 2,
+        rows: [
+          {
+            index: 1,
+            title: 'Create wireframe',
+            headingLevel: 3,
+            assigneeName: 'Amelia Nellson',
+            dueDate: '6 July, 2020',
+            onClick: fn(),
+            actions: (
+              <Menu<{ id: string; label: string }>
+                label="Task options for Create wireframe"
+                triggerContent={<MenuDotsIcon className="size-5" />}
+                triggerClassName="w-8 h-8 rounded-sm inline-flex items-center justify-center text-main hover:bg-neutral-3 focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+                items={[
+                  { id: 'edit', label: 'Edit' },
+                  { id: 'delete', label: 'Delete' },
+                ]}
+                onAction={fn()}
+              >
+                {(item) => (
+                  <Item key={item.id} textValue={item.label}>
+                    {item.label}
+                  </Item>
+                )}
+              </Menu>
+            ),
+          },
+          {
+            index: 2,
+            title: 'Slack Logo Design',
+            headingLevel: 3,
+            assigneeName: 'Jonah Doe',
+            dueDate: '6 July, 2020',
+            onClick: fn(),
+          },
+        ],
+      },
+    ],
+  },
 };

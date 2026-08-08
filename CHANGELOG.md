@@ -8,6 +8,31 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **`TaskTableRow.actions`, so a list view keeps its per-row Edit/Delete** (#95). **Minor** —
+  additive and optional.
+
+  `TaskCard` got an actions slot in #9; `TaskTableRow` never did, and had no `ReactNode` slot
+  at all. Migrating a list view onto it therefore _removed_ the per-task overflow menu — a
+  functional regression, not a styling one, which is why the consuming app migrated its board
+  and left its list view on its own markup.
+
+  A click on the slot does **not** open the row, matching the guarantee `TaskCard` already
+  makes: it is one of the row's own controls, like the select checkbox and the "Details" link.
+  That holds from the keyboard too, where activating a control synthesises a click that would
+  otherwise bubble.
+
+  It renders inside the Task Name cell rather than as a sixth column, deliberately: the five
+  column widths sum to the spec's 1108px row, and a new column would break that invariant and
+  the `colgroup` with it. A consumer-defined column set is #97.
+
+- **`TaskTableGroup.headingLevel`** (#95). The group header was a hardcoded `<h3>`, so a
+  consumer running `<h1>` page → `<h2>` status got `h1 → h3` — a skipped level that axe reports
+  as `heading-order`, with no prop able to reach it. Per group, matching where `title` and
+  `actions` already live, so it composes with `TaskTableRow.headingLevel` beneath it.
+  Defaults to `3`, so existing callers are unchanged.
+
 ## [0.6.0] — 2026-08-08
 
 ### Added

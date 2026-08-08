@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { TaskTable, TaskTableRow, DueDateCell, type TaskTableRowProps } from './task-table';
+import type { HeadingLevel } from '../../types/heading-level';
 import { TaskCard } from './task-card';
 import { EmptyState } from '../empty-state/empty-state';
 
@@ -394,5 +395,160 @@ describe('TaskTable empty slot (#15)', () => {
   it('control: the flattened props still work when no slot is given', () => {
     render(<TaskTable groups={[]} emptyTitle="Configured" />);
     expect(screen.getByText('Configured')).toBeDefined();
+  });
+});
+
+/**
+ * #95. `TaskCard` gained an actions slot in #9 for a per-task overflow menu; `TaskTableRow`
+ * never got the equivalent, so a list view built on it loses Edit/Delete entirely — a
+ * functional regression rather than a styling one, which is why the consumer could not migrate
+ * its list half.
+ */
+describe('TaskTableRow actions slot (#95)', () => {
+  const rowWith = (props: Partial<TaskTableRowProps>) => (
+    <table>
+      <tbody>
+        <TaskTableRow index={1} title="Fix auth bug" {...props} />
+      </tbody>
+    </table>
+  );
+
+  it('renders a control passed into the slot', () => {
+    render(
+      rowWith({
+        actions: (
+          <button type="button" aria-label="Task options for Fix auth bug">
+            ⋯
+          </button>
+        ),
+      }),
+    );
+    expect(screen.getByRole('button', { name: 'Task options for Fix auth bug' })).toBeDefined();
+  });
+
+  /**
+   * The control. A slot that always renders its wrapper passes the case above and adds a stray
+   * tab stop to every row of a long table — invisible to a reader, obvious to anyone tabbing.
+   */
+  it('control: a row with no actions renders no extra button', () => {
+    render(rowWith({}));
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  /**
+   * The assertion the issue says will not get written unless it is asked for, and it is the one
+   * that catches a missing `stopPropagation`. Driven with real user input rather than
+   * `element.click()`, which under-reports React Aria press handling.
+   */
+  it('using the slot does not open the row', async () => {
+    const onClick = vi.fn();
+    const onAction = vi.fn();
+    const user = userEvent.setup();
+    render(
+      rowWith({
+        onClick,
+        actions: (
+          <button type="button" aria-label="Task options for Fix auth bug" onClick={onAction}>
+            ⋯
+          </button>
+        ),
+      }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Task options for Fix auth bug' }));
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('and the same holds from the keyboard, where activation synthesises a click', async () => {
+    const onClick = vi.fn();
+    const onAction = vi.fn();
+    const user = userEvent.setup();
+    render(
+      rowWith({
+        onClick,
+        actions: (
+          <button type="button" aria-label="Task options for Fix auth bug" onClick={onAction}>
+            ⋯
+          </button>
+        ),
+      }),
+    );
+
+    screen.getByRole('button', { name: 'Task options for Fix auth bug' }).focus();
+    await user.keyboard('{Enter}');
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('control: the row still opens when the row itself is clicked', async () => {
+    // Otherwise "onClick did not fire" would pass on a row whose onClick never fires at all.
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    render(rowWith({ onClick, actions: <button type="button">⋯</button> }));
+
+    await user.click(screen.getByText('Fix auth bug'));
+    expect(onClick).toHaveBeenCalled();
+  });
+});
+
+/**
+ * #95's second half. The group header was a hardcoded `<h3>`, so a consumer running
+ * `<h1>` page → `<h2>` status got `h1 → h3` — a skipped level axe reports as `heading-order`,
+ * with no prop to reach it.
+ */
+describe('TaskTable group heading level (#95)', () => {
+  // `HeadingLevel` deliberately excludes 1 — a kit component cannot know it owns the page's
+  // single top-level heading. Typing the helper as the real union keeps that true here too.
+  const groups = (headingLevel?: HeadingLevel) => [
+    {
+      title: 'To Do (01)',
+      headingLevel,
+      rows: [{ index: 1, title: 'Fix auth bug', headingLevel: 4 as const }],
+    },
+  ];
+
+  it('defaults to h3, so existing callers are unchanged', () => {
+    render(<TaskTable groups={groups()} />);
+    expect(screen.getByRole('heading', { name: 'To Do (01)' }).tagName).toBe('H3');
+  });
+
+  it('takes a caller-supplied level', () => {
+    render(<TaskTable groups={groups(2)} />);
+    expect(screen.getByRole('heading', { name: 'To Do (01)' }).tagName).toBe('H2');
+  });
+
+  /**
+   * Asserted as the whole outline rather than one level, because a skipped level is a relation
+   * between headings — querying `h2` alone cannot see that the row beneath it is an `h4`.
+   */
+  it('nests with the rows, producing a strictly increasing outline', () => {
+    render(<TaskTable groups={groups(3)} />);
+
+    const levels = screen.getAllByRole('heading').map((h) => Number(h.tagName.slice(1)));
+
+    expect(levels).toEqual([3, 4]);
+    for (let i = 1; i < levels.length; i++) {
+      expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('control: the probe catches a skip, so the case above is not vacuous', () => {
+    // Group h2 with rows at h4 is exactly the defect — one level skipped.
+    render(
+      <TaskTable
+        groups={[
+          {
+            title: 'To Do (01)',
+            headingLevel: 2,
+            rows: [{ index: 1, title: 'Fix auth bug', headingLevel: 4 as const }],
+          },
+        ]}
+      />,
+    );
+
+    const levels = screen.getAllByRole('heading').map((h) => Number(h.tagName.slice(1)));
+    expect(levels).toEqual([2, 4]);
+    expect(levels[1] - levels[0]).toBeGreaterThan(1);
   });
 });

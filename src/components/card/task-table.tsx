@@ -281,6 +281,23 @@ export interface TaskTableRowProps {
    */
   dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
   /**
+   * Controls rendered at the end of the Task Name cell — in practice a per-row overflow menu
+   * (Edit / Delete), which is what `TaskCard.actions` already exists for (#95). Without it a
+   * list view built on this component simply loses those actions.
+   *
+   * Name it for the task it belongs to (`"Task options for Fix auth bug"`), because a table of
+   * rows otherwise offers a screen-reader user a list of identical "options" buttons.
+   *
+   * **A click here does not open the row.** Like the select checkbox and the "Details" link, it
+   * is one of the row's own controls, so `onClick` does not fire — including from the keyboard,
+   * where activating a control synthesises a click that would otherwise bubble.
+   *
+   * It lands in the Task Name cell rather than a sixth column on purpose: the five column widths
+   * sum to the spec's 1108px row, and adding a column would break that invariant and the
+   * `colgroup` with it. A consumer-defined column set is #97.
+   */
+  actions?: React.ReactNode;
+  /**
    * Called when the row is opened. Providing it renders the task title as a real `<button>`
    * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
    * whole row clickable for a pointer user. Fires once either way, and not at all when the
@@ -324,6 +341,7 @@ export function TaskTableRow({
   dueDate,
   dueDateUrgency = 'normal',
   dueDateUrgencyLabel,
+  actions,
   onClick,
   onViewDetails,
 }: TaskTableRowProps) {
@@ -445,6 +463,16 @@ export function TaskTableRow({
               <ChevronRightIcon className="w-4 h-4" />
             </button>
           ) : null}
+          {/* Same propagation guard as the checkbox and the "Details" link above: a click on
+              one of the row's own controls is not a click on the row. Without it, opening the
+              menu also opens the task behind it. The wrapper is a plain `<div>` carrying only
+              the guard — whatever the consumer passes owns its own focus ring and padding. */}
+          {actions ? (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+            <div className="shrink-0" onClick={stopRowOpen}>
+              {actions}
+            </div>
+          ) : null}
         </div>
       </td>
 
@@ -494,6 +522,17 @@ export interface TaskTableGroup {
   title: string;
   /** Rows belonging to this group. */
   rows: TaskTableRowProps[];
+  /**
+   * Which `<h*>` this group's header renders as (#95). It was hardcoded `<h3>`, with no way
+   * past it — so a consumer whose page runs `<h1>` page → `<h2>` status got `h1 → h3`, a
+   * skipped level that axe reports as `heading-order` and that no prop could fix.
+   *
+   * Per group rather than per table, matching where `title` and `actions` already live, and so
+   * it composes with `TaskTableRow.headingLevel` — set this one level above the rows' so the
+   * outline nests instead of colliding.
+   * @default 3
+   */
+  headingLevel?: HeadingLevel;
   /**
    * Trailing action icons for this group's header (Figma shows an "add"/"more" icon pair,
    * `display: none` in most captured groups and visible in exactly one -- no legible glyph or
@@ -570,6 +609,20 @@ function TaskTableRowSkeleton() {
         </div>
       </td>
     </tr>
+  );
+}
+
+/**
+ * A group header's `<h*>`. Split out only so the level is a value rather than a literal tag —
+ * the class list is unchanged from the `<h3>` this replaced, so the typography is identical at
+ * every level and the heading carries semantics rather than size.
+ */
+function GroupHeading({ level, children }: { level: HeadingLevel; children: React.ReactNode }) {
+  const Tag = `h${level}` as const;
+  return (
+    <Tag className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
+      {children}
+    </Tag>
   );
 }
 
@@ -658,9 +711,7 @@ export function TaskTable({
                   <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
                     <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
                       <ChevronDownIcon className="w-6 h-6 shrink-0 text-muted" />
-                      <h3 className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
-                        {group.title}
-                      </h3>
+                      <GroupHeading level={group.headingLevel ?? 3}>{group.title}</GroupHeading>
                       {group.actions}
                     </div>
                   </td>
