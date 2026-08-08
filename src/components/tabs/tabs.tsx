@@ -25,6 +25,16 @@ export interface TabsProps {
   selectedKey?: string;
   /** Called when selected tab changes */
   onSelectionChange?: (key: string) => void;
+  /**
+   * Accessible name for the tab list, announced before the selected tab.
+   *
+   * Override it whenever a page holds more than one set of tabs — two tab lists both
+   * called "Tab navigation" are two things a screen-reader user cannot tell apart, and
+   * the default says what the widget *is* rather than what it switches between. Name the
+   * content: `'Project sections'`, `'Task views'`.
+   * @default 'Tab navigation'
+   */
+  label?: string;
   /** Additional class names applied to the root container, merged last via `cn()`. */
   className?: string;
 }
@@ -60,6 +70,7 @@ export function Tabs({
   defaultSelectedKey,
   selectedKey,
   onSelectionChange,
+  label = 'Tab navigation',
   className,
 }: TabsProps) {
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
@@ -77,11 +88,7 @@ export function Tabs({
   });
 
   const tabListRef = useRef<HTMLDivElement>(null);
-  const { tabListProps } = useTabList<TabItem>(
-    { 'aria-label': 'Tab navigation' },
-    state,
-    tabListRef,
-  );
+  const { tabListProps } = useTabList<TabItem>({ 'aria-label': label }, state, tabListRef);
 
   return (
     <div className={cn('flex flex-col', className)}>

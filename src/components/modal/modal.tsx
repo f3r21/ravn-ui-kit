@@ -37,6 +37,17 @@ export interface ModalProps {
    * @default true
    */
   isDismissable?: boolean;
+  /**
+   * Accessible name for the header's close button.
+   *
+   * Unlike the kit's other name overrides this one is not about collisions — a modal is
+   * modal, so only one is ever in the accessibility tree. It exists because the string was
+   * English and unreachable, which made the shell untranslatable for a consumer whose app
+   * is not. `title` above is already the consumer's; this is the last string in the shell
+   * that was not.
+   * @default 'Close modal'
+   */
+  closeLabel?: string;
 }
 
 /**
@@ -54,6 +65,7 @@ export function Modal({
   width = 'max-w-md',
   role = 'dialog',
   isDismissable = true,
+  closeLabel = 'Close modal',
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -110,7 +122,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close modal"
+                aria-label={closeLabel}
                 className="flex items-center justify-center w-8 h-8 rounded-md text-muted hover:bg-neutral-4 hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
               >
                 <CloseIcon className="w-4 h-4" />

@@ -33,6 +33,21 @@ describe('TopNav Component', () => {
     expect(onSearchChange).toHaveBeenLastCalledWith('');
   });
 
+  it('lets the search field and its clear button be renamed together', async () => {
+    // Renaming one without the other is the failure this pair exists to make avoidable: a
+    // bar announced as "Search tasks" whose only other control says "Clear search" names
+    // two different things.
+    const user = userEvent.setup();
+    render(<TopNav searchLabel="Search tasks" clearSearchLabel="Clear task search" />);
+
+    const input = screen.getByRole('searchbox', { name: 'Search tasks' });
+    await user.type(input, 'auth');
+
+    expect(screen.queryByRole('button', { name: 'Clear search' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Clear task search' }));
+    expect((input as HTMLInputElement).value).toBe('');
+  });
+
   it('leaves the notifications bell decorative when it has nothing to do', () => {
     // A button that does nothing is its own defect, so the non-interactive span stays the
     // default and existing consumers are unchanged.

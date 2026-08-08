@@ -41,6 +41,25 @@ export interface LabelCheckboxProps {
    * @default false
    */
   isRequired?: boolean;
+  /**
+   * Accessible name for the checkbox, overriding the one derived from `children`.
+   *
+   * **Pass this whenever `children` is not a plain string.** The derivation is
+   * `typeof children === 'string' ? children : 'Checkbox'`, so a `<span>`, a fragment, or
+   * a string interleaved with an icon all collapse to the literal word "Checkbox" — a
+   * control that looks correctly labelled on screen and announces nothing useful, silently
+   * and without a type error. That fallback is kept rather than fixed because flattening
+   * arbitrary `ReactNode` children into a name is guesswork; this prop is the way out of it.
+   *
+   * Also the override for the string case: `children` is the *visible* label, and a
+   * checkbox reading "Done" may want to announce "Mark task as done". Note WCAG 2.5.3 —
+   * if you extend the visible text rather than replace it, keep the visible string inside
+   * the accessible name.
+   * Storybook renders the line below verbatim, so it carries no backticks — the default
+   * cell is not markdown, unlike the description above it.
+   * @default children when it is a string, otherwise 'Checkbox'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -68,6 +87,7 @@ export function LabelCheckbox({
   error,
   description,
   isRequired = false,
+  label,
   className,
 }: LabelCheckboxProps) {
   const state = useToggleState({
@@ -91,7 +111,7 @@ export function LabelCheckbox({
       isDisabled,
       isRequired,
       isInvalid: !!error,
-      'aria-label': typeof children === 'string' ? children : 'Checkbox',
+      'aria-label': label ?? (typeof children === 'string' ? children : 'Checkbox'),
     },
     state,
     ref,

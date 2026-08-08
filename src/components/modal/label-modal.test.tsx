@@ -44,4 +44,13 @@ describe('LabelModal Component', () => {
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
+
+  it('renames the header and the popover’s accessible name from one prop', () => {
+    // Both halves asserted for the reason spelled out in `assignee-modal.test.tsx`.
+    render(<LabelModal labels={LABELS} onSelect={vi.fn()} onClose={vi.fn()} label="Category" />);
+
+    expect(screen.getByRole('dialog', { name: 'Category' })).toBeDefined();
+    expect(screen.queryByRole('dialog', { name: 'Label' })).toBeNull();
+    expect(screen.getByText('Category')).toBeDefined();
+  });
 });

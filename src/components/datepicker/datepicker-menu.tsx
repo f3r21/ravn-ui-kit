@@ -64,6 +64,40 @@ export interface DatePickerMenuProps {
    * Needed when this menu is one of several sibling triggers, e.g. `AddTaskModal`'s chip row.
    */
   dismissExemptRef?: PopoverProps['dismissExemptRef'];
+  /**
+   * Accessible name for the popover surface and for the calendar grid inside it, which
+   * were two hardcoded copies of `'Date picker'` before.
+   *
+   * The two land differently and both are intended: the popover takes it verbatim, while
+   * react-aria's `useCalendar` composes the grid's name as `"<label>, <visible month>"` —
+   * so the grid announces "Due date, August 2026" and the month half stays generated.
+   *
+   * Override it when a form holds more than one date field: two calendars both called
+   * "Date picker" are two dialogs a screen-reader user cannot tell apart. Name the field —
+   * `'Due date'`, `'Start date'`.
+   * @default 'Date picker'
+   */
+  label?: string;
+  /**
+   * Accessible name for the double-chevron button that steps back one year.
+   * @default 'Previous year'
+   */
+  previousYearLabel?: string;
+  /**
+   * Accessible name for the single-chevron button that steps back one month.
+   * @default 'Previous month'
+   */
+  previousMonthLabel?: string;
+  /**
+   * Accessible name for the single-chevron button that steps forward one month.
+   * @default 'Next month'
+   */
+  nextMonthLabel?: string;
+  /**
+   * Accessible name for the double-chevron button that steps forward one year.
+   * @default 'Next year'
+   */
+  nextYearLabel?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -134,6 +168,11 @@ export function DatePickerMenu({
   triggerRef,
   dismissExemptRef,
   timeZone = getLocalTimeZone(),
+  label = 'Date picker',
+  previousYearLabel = 'Previous year',
+  previousMonthLabel = 'Previous month',
+  nextMonthLabel = 'Next month',
+  nextYearLabel = 'Next year',
   className,
 }: DatePickerMenuProps) {
   const valueProps =
@@ -155,7 +194,7 @@ export function DatePickerMenu({
   });
 
   const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar(
-    { 'aria-label': 'Date picker' },
+    { 'aria-label': label },
     state,
   );
 
@@ -176,7 +215,7 @@ export function DatePickerMenu({
       onClose={onClose}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
-      aria-label="Date picker"
+      aria-label={label}
       className={cn(
         'flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none',
         className,
@@ -189,7 +228,7 @@ export function DatePickerMenu({
             <button
               type="button"
               onClick={() => state.focusPreviousSection(true)}
-              aria-label="Previous year"
+              aria-label={previousYearLabel}
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
             >
               <ChevronDoubleLeftIcon className="w-4 h-4" />
@@ -197,7 +236,7 @@ export function DatePickerMenu({
             <button
               {...prevMonthProps}
               ref={prevMonthRef}
-              aria-label="Previous month"
+              aria-label={previousMonthLabel}
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
               <ChevronLeftIcon className="w-4 h-4" />
@@ -219,7 +258,7 @@ export function DatePickerMenu({
             <button
               {...nextMonthProps}
               ref={nextMonthRef}
-              aria-label="Next month"
+              aria-label={nextMonthLabel}
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50"
             >
               <ChevronRightIcon className="w-4 h-4" />
@@ -227,7 +266,7 @@ export function DatePickerMenu({
             <button
               type="button"
               onClick={() => state.focusNextSection(true)}
-              aria-label="Next year"
+              aria-label={nextYearLabel}
               className="flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs"
             >
               <ChevronDoubleRightIcon className="w-4 h-4" />

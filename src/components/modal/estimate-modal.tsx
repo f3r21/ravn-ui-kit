@@ -22,6 +22,18 @@ export interface EstimateModalProps {
    * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
    */
   dismissExemptRef?: PopoverProps['dismissExemptRef'];
+  /**
+   * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+   * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
+   * would let the announced name drift from the visible one, which is a WCAG 2.5.3 failure.
+   *
+   * Note the header is a hard `w-[122px]` from Figma with `px-4`, leaving an 88px content
+   * box, and it `truncate`s — see the comment on the header below. A longer translation
+   * clips rather than overflowing, which is the intended behaviour, not a bug to fix by
+   * widening the popover away from its spec.
+   * @default 'Estimate'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -45,6 +57,7 @@ export function EstimateModal({
   onClose,
   triggerRef,
   dismissExemptRef,
+  label = 'Estimate',
   className,
 }: EstimateModalProps) {
   return (
@@ -53,7 +66,7 @@ export function EstimateModal({
       onClose={onClose}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
-      aria-label="Estimate"
+      aria-label={label}
       className={cn(
         'flex flex-col w-[122px] py-2 bg-surface-overlay border border-subtle rounded-sm',
         className,
@@ -85,7 +98,7 @@ export function EstimateModal({
             the label clip rather than push out of the box. `LabelModal` and `AssigneeModal`
             render the same header and already use `truncate`; this one was the outlier. */}
         <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
-          Estimate
+          {label}
         </span>
       </div>
       {POINT_OPTIONS.map((points) => (

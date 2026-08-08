@@ -139,6 +139,74 @@ describe('DatePickerMenu Component', () => {
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
+  describe('accessible names', () => {
+    /**
+     * The string reaches two elements and they are named differently, which is worth
+     * pinning rather than assuming: it goes on the `Popover` surface verbatim, and
+     * react-aria's `useCalendar` composes the grid's name as `"<label>, <visible month>"`.
+     * So a caller who overrides `label` moves both, and the month half stays generated.
+     */
+    it('names the popover verbatim and the grid with the month appended', () => {
+      render(<DatePickerMenu defaultValue={new Date(2026, 7, 15)} onClose={vi.fn()} />);
+      expect(screen.getByRole('dialog', { name: 'Date picker' })).toBeDefined();
+      expect(screen.getByRole('grid', { name: 'Date picker, August 2026' })).toBeDefined();
+    });
+
+    it('lets two calendars in one form be told apart', () => {
+      render(
+        <>
+          <DatePickerMenu
+            defaultValue={new Date(2026, 7, 15)}
+            onClose={vi.fn()}
+            label="Start date"
+          />
+          <DatePickerMenu defaultValue={new Date(2026, 7, 15)} onClose={vi.fn()} label="Due date" />
+        </>,
+      );
+
+      expect(screen.getByRole('dialog', { name: 'Start date' })).toBeDefined();
+      expect(screen.getByRole('dialog', { name: 'Due date' })).toBeDefined();
+      expect(screen.queryByRole('dialog', { name: 'Date picker' })).toBeNull();
+    });
+
+    /**
+     * The four nav buttons are not in #13's table, but they are four fifths of this
+     * component's controls and were hardcoded English exactly like the two strings that
+     * are — a `label` prop alone would leave the calendar unlocalizable while looking
+     * fixed. Each still has to actually navigate, not merely be renamed: the month pair
+     * spreads react-aria's own `prevButtonProps`/`nextButtonProps`, which carry an
+     * `aria-label` of their own, so the override only holds while ours is applied after
+     * the spread.
+     */
+    it('renames the year and month nav buttons without breaking them', async () => {
+      const user = userEvent.setup();
+      render(
+        <DatePickerMenu
+          defaultValue={new Date(2026, 7, 15)}
+          onClose={vi.fn()}
+          previousYearLabel="Back one year"
+          previousMonthLabel="Back one month"
+          nextMonthLabel="Forward one month"
+          nextYearLabel="Forward one year"
+        />,
+      );
+
+      for (const stale of ['Previous year', 'Previous month', 'Next month', 'Next year']) {
+        expect(screen.queryByRole('button', { name: stale })).toBeNull();
+      }
+
+      expect(screen.getByText('August 2026', { selector: 'span' })).toBeDefined();
+      await user.click(screen.getByRole('button', { name: 'Forward one month' }));
+      expect(screen.getByText('September 2026', { selector: 'span' })).toBeDefined();
+      await user.click(screen.getByRole('button', { name: 'Back one month' }));
+      expect(screen.getByText('August 2026', { selector: 'span' })).toBeDefined();
+      await user.click(screen.getByRole('button', { name: 'Forward one year' }));
+      expect(screen.getByText('August 2027', { selector: 'span' })).toBeDefined();
+      await user.click(screen.getByRole('button', { name: 'Back one year' }));
+      expect(screen.getByText('August 2026', { selector: 'span' })).toBeDefined();
+    });
+  });
+
   describe('timeZone', () => {
     // One absolute instant, read in two zones on either side of the date line. This is
     // deliberately independent of the machine's own zone — the old code read the Date's

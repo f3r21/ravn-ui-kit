@@ -50,4 +50,13 @@ describe('EstimateModal Component', () => {
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
+
+  it('renames the header and the popover’s accessible name from one prop', () => {
+    // Both halves asserted for the reason spelled out in `assignee-modal.test.tsx`.
+    render(<EstimateModal onSelect={vi.fn()} onClose={vi.fn()} label="Story points" />);
+
+    expect(screen.getByRole('dialog', { name: 'Story points' })).toBeDefined();
+    expect(screen.queryByRole('dialog', { name: 'Estimate' })).toBeNull();
+    expect(screen.getByText('Story points')).toBeDefined();
+  });
 });

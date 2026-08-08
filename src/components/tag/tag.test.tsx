@@ -100,6 +100,23 @@ describe('Tag', () => {
     await user.click(screen.getByRole('button', { name: 'Remove tag' }));
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
+
+  it('names the remove button per tag, so a row of chips is not five identical buttons', () => {
+    render(
+      <>
+        <Tag onRemove={vi.fn()} removeLabel="Remove Design">
+          Design
+        </Tag>
+        <Tag onRemove={vi.fn()} removeLabel="Remove Backend">
+          Backend
+        </Tag>
+      </>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Remove Design' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Remove Backend' })).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Remove tag' })).toBeNull();
+  });
 });
 
 describe('due-date urgency', () => {

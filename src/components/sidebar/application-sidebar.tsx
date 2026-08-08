@@ -6,6 +6,17 @@ export interface ApplicationSidebarProps {
   logo?: React.ReactNode;
   /** Navigation items to render */
   items: SidebarItemProps[];
+  /**
+   * Accessible name for the `<nav>` landmark.
+   *
+   * Override it whenever a second navigation landmark can be on the page — the consuming
+   * app's own product nav, a secondary sidebar, or simply two of these. A screen reader
+   * offers landmarks as a list, and two entries both called "Main navigation" are two
+   * things that list cannot tell apart. Same reason `ToastProvider.label` exists, and the
+   * same reason `EmptyState.label` does.
+   * @default 'Main navigation'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -39,10 +50,15 @@ export interface ApplicationSidebarProps {
  * codebase — removed as fabricated, same treatment Chunk 4 gave Button's
  * unfounded `size`/`isLoading` props.
  */
-export function ApplicationSidebar({ logo, items, className }: ApplicationSidebarProps) {
+export function ApplicationSidebar({
+  logo,
+  items,
+  label = 'Main navigation',
+  className,
+}: ApplicationSidebarProps) {
   return (
     <nav
-      aria-label="Main navigation"
+      aria-label={label}
       className={cn(
         // 232px / rounded-lg (24px) matches the real "Sidebar" layer (ApplicationSidebar01.md + Dashboard Mockup.md).
         'flex flex-col w-[232px] h-full bg-surface-panel rounded-lg select-none shrink-0',
