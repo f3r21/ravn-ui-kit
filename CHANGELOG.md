@@ -8,6 +8,8 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-08-08
+
 ### Added
 
 - **Two structural checks on `CHANGELOG.md`, because a union merge defeats every other guard
@@ -1778,7 +1780,8 @@ the consuming app pins while the switch-over is verified. See `CLAUDE.md`'s tagg
 checklist.
 -->
 
-[unreleased]: https://github.com/f3r21/ravn-ui-kit/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/f3r21/ravn-ui-kit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/f3r21/ravn-ui-kit/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/f3r21/ravn-ui-kit/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/f3r21/ravn-ui-kit/compare/v0.5.1...v0.5.2
