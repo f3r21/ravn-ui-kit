@@ -4,12 +4,39 @@ import { ApplicationSidebar, type ApplicationSidebarProps } from '../sidebar/app
 import { TopNav, type TopNavProps } from '../top-nav/top-nav';
 
 export interface AppShellProps {
-  /** Forwarded to `ApplicationSidebar`. */
+  /** Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied. */
   logo?: ApplicationSidebarProps['logo'];
-  /** Forwarded to `ApplicationSidebar`. */
-  sidebarItems: ApplicationSidebarProps['items'];
-  /** Forwarded to `TopNav`. */
+  /**
+   * Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied.
+   *
+   * Optional as of #15 — it used to be required, which is why `AppShell` could not be used
+   * with any navigation but this kit's. Widening a required prop to optional is not a
+   * breaking change; every existing caller still typechecks.
+   */
+  sidebarItems?: ApplicationSidebarProps['items'];
+  /**
+   * Replaces the built-in `ApplicationSidebar` entirely — the escape hatch for a consumer
+   * whose navigation is not this kit's (#15).
+   *
+   * `logo` and `sidebarItems` are configuration for a sidebar this component constructs;
+   * this is the slot for one it does not. When both are given **this wins**, rather than
+   * rendering two sidebars or silently dropping yours.
+   *
+   * It is rendered as a direct flex child of the shell row, so it owns its own width — the
+   * kit's own sidebar is a rigid `w-[232px] shrink-0` and yours is under no obligation to
+   * match it. Pass `null` explicitly for a shell with no sidebar at all.
+   */
+  sidebar?: ReactNode;
+  /** Forwarded to the built-in `TopNav`. Ignored when `topNav` is supplied. */
   topNavProps?: Omit<TopNavProps, 'className'>;
+  /**
+   * Replaces the built-in `TopNav` entirely, for the same reason `sidebar` exists (#15).
+   *
+   * `topNavProps` forwards `TopNav`'s whole API as a single prop, which works only for
+   * consumers using `TopNav`. When both are given this wins. Pass `null` for a shell with
+   * no top navigation.
+   */
+  topNav?: ReactNode;
   /**
    * Optional content rendered in the row directly below `TopNav` (the real
    * "Top Bar" — a `ViewSwitcher` on the left, a primary action `Button` on
@@ -52,19 +79,33 @@ export interface AppShellProps {
 export function AppShell({
   logo,
   sidebarItems,
+  sidebar,
   topNavProps,
+  topNav,
   topBar,
   children,
   className,
 }: AppShellProps) {
+  // `undefined` means "not supplied, build the default"; an explicit `null` means "no
+  // sidebar". `??` distinguishes them and `||` would not — `null || fallback` renders the
+  // kit's sidebar for a caller who just asked for none. Same for `topNav` below.
+  const sidebarNode =
+    sidebar !== undefined ? (
+      sidebar
+    ) : sidebarItems ? (
+      <ApplicationSidebar logo={logo} items={sidebarItems} className="self-stretch" />
+    ) : null;
+
+  const topNavNode = topNav !== undefined ? topNav : <TopNav {...topNavProps} />;
+
   return (
     <div
       className={cn('flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8', className)}
     >
-      <ApplicationSidebar logo={logo} items={sidebarItems} className="self-stretch" />
+      {sidebarNode}
 
       <div className="flex flex-col gap-8 flex-1 min-w-0">
-        <TopNav {...topNavProps} />
+        {topNavNode}
 
         <div className="flex flex-col gap-4">
           {topBar ? <div className="flex items-start justify-between gap-6">{topBar}</div> : null}

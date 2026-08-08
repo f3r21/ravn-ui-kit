@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { TaskTable, TaskTableRow, DueDateCell, type TaskTableRowProps } from './task-table';
 import { TaskCard } from './task-card';
+import { EmptyState } from '../empty-state/empty-state';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -363,5 +364,35 @@ describe('TaskCard and DueDateCell say the same thing for the same urgency (#92)
 
     const soon = render(<DueDateCell date="20 July, 2026" urgency="soon" />);
     expect(soon.container.querySelector('.sr-only')?.textContent).toBe(', due soon');
+  });
+});
+
+/** #15, the table half — identical slot and identical reasoning to `TaskListView`'s. */
+describe('TaskTable empty slot (#15)', () => {
+  it('takes a whole EmptyState, reaching props the flattened trio cannot', () => {
+    render(
+      <TaskTable groups={[]} empty={<EmptyState title="All clear" label="No tasks here" />} />,
+    );
+
+    expect(screen.getByRole('group', { name: 'No tasks here' })).toBeDefined();
+    expect(screen.getByText('All clear')).toBeDefined();
+  });
+
+  it('lets the slot win over the flattened props', () => {
+    render(
+      <TaskTable
+        groups={[]}
+        emptyTitle="Configured"
+        empty={<EmptyState title="Composed" label="Composed" />}
+      />,
+    );
+
+    expect(screen.getByText('Composed')).toBeDefined();
+    expect(screen.queryByText('Configured')).toBeNull();
+  });
+
+  it('control: the flattened props still work when no slot is given', () => {
+    render(<TaskTable groups={[]} emptyTitle="Configured" />);
+    expect(screen.getByText('Configured')).toBeDefined();
   });
 });

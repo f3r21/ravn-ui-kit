@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { TaskListView } from './task-list-view';
+import { EmptyState } from '../empty-state/empty-state';
 
 const tasks = [{ title: 'Fix auth bug' }, { title: 'Ship the board' }];
 
@@ -34,5 +35,57 @@ describe('TaskListView Component', () => {
   it('still renders the empty state when there are no tasks', () => {
     render(<TaskListView title="Working (00)" tasks={[]} emptyTitle="Nothing here" />);
     expect(screen.getByText('Nothing here')).toBeDefined();
+  });
+});
+
+/**
+ * #15. `emptyTitle`/`emptyDescription`/`emptyAction` flatten three of `EmptyState`'s five,
+ * which left `icon` and `label` unreachable — and `label` is the one that matters, since two
+ * empty states on one screen otherwise present two identically-named groups.
+ */
+describe('TaskListView empty slot (#15)', () => {
+  it('takes a whole EmptyState, reaching props the flattened trio cannot', () => {
+    render(
+      <TaskListView
+        title="Working"
+        tasks={[]}
+        empty={<EmptyState title="All clear" label="No working tasks" />}
+      />,
+    );
+
+    expect(screen.getByRole('group', { name: 'No working tasks' })).toBeDefined();
+    expect(screen.getByText('All clear')).toBeDefined();
+  });
+
+  it('lets the slot win over the flattened props', () => {
+    render(
+      <TaskListView
+        title="Working"
+        tasks={[]}
+        emptyTitle="Configured"
+        empty={<EmptyState title="Composed" label="Composed" />}
+      />,
+    );
+
+    expect(screen.getByText('Composed')).toBeDefined();
+    expect(screen.queryByText('Configured')).toBeNull();
+  });
+
+  it('control: the flattened props still work when no slot is given', () => {
+    // Additive, not a replacement — every existing caller is unchanged.
+    render(<TaskListView title="Working" tasks={[]} emptyTitle="Configured" />);
+    expect(screen.getByText('Configured')).toBeDefined();
+  });
+
+  it('shows neither when there are tasks to show', () => {
+    render(
+      <TaskListView
+        title="Working"
+        tasks={[{ title: 'A real task' }]}
+        empty={<EmptyState title="Composed" />}
+      />,
+    );
+    expect(screen.queryByText('Composed')).toBeNull();
+    expect(screen.getByText('A real task')).toBeDefined();
   });
 });

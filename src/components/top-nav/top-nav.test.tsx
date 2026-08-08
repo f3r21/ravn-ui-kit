@@ -100,3 +100,50 @@ describe('TopNav Component', () => {
     expect(screen.getByText('JB')).toBeDefined();
   });
 });
+
+/**
+ * #15. The user area was two strings rendering a bare `Avatar`, and a user avatar in a top
+ * nav is an account menu in almost every real application — the kit ships `Menu` and this
+ * component had no way to accept one, so a consumer had to rebuild the bar to attach a
+ * sign-out.
+ */
+describe('TopNav composition slots (#15)', () => {
+  it('takes a real control in the user area, in place of the bare avatar', () => {
+    render(
+      <TopNav
+        userName="Jerome Bell"
+        userSlot={
+          <button type="button" aria-label="Account menu for Jerome Bell">
+            JB
+          </button>
+        }
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Account menu for Jerome Bell' })).toBeDefined();
+  });
+
+  it('lets the slot win over the strings rather than rendering both', () => {
+    // Two user affordances in one bar is a worse answer than either alone.
+    render(<TopNav userName="Jerome Bell" userSlot={<span>Custom</span>} />);
+
+    expect(screen.getByText('Custom')).toBeDefined();
+    expect(screen.queryByRole('img', { name: 'Jerome Bell' })).toBeNull();
+  });
+
+  it('still renders the avatar when no slot is given', () => {
+    render(<TopNav userName="Jerome Bell" />);
+    expect(screen.getByRole('img', { name: 'Jerome Bell' })).toBeDefined();
+  });
+
+  it('renders an actions slot for controls the component cannot anticipate', () => {
+    render(<TopNav actions={<button type="button">Help</button>} />);
+    expect(screen.getByRole('button', { name: 'Help' })).toBeDefined();
+  });
+
+  it('renders no actions and no user area when neither is given', () => {
+    render(<TopNav />);
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+});
