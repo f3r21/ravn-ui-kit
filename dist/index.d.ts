@@ -243,15 +243,42 @@ export declare interface ApplicationSidebarProps {
  * the same "canvas-fit noise, not a real constraint" judgment call Chunk 7
  * made for Tabs' `px-5`.
  */
-export declare function AppShell({ logo, sidebarItems, topNavProps, topBar, children, className, }: AppShellProps): JSX.Element;
+export declare function AppShell({ logo, sidebarItems, sidebar, topNavProps, topNav, topBar, children, className, }: AppShellProps): JSX.Element;
 
 export declare interface AppShellProps {
-    /** Forwarded to `ApplicationSidebar`. */
+    /** Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied. */
     logo?: ApplicationSidebarProps['logo'];
-    /** Forwarded to `ApplicationSidebar`. */
-    sidebarItems: ApplicationSidebarProps['items'];
-    /** Forwarded to `TopNav`. */
+    /**
+     * Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied.
+     *
+     * Optional as of #15 — it used to be required, which is why `AppShell` could not be used
+     * with any navigation but this kit's. Widening a required prop to optional is not a
+     * breaking change; every existing caller still typechecks.
+     */
+    sidebarItems?: ApplicationSidebarProps['items'];
+    /**
+     * Replaces the built-in `ApplicationSidebar` entirely — the escape hatch for a consumer
+     * whose navigation is not this kit's (#15).
+     *
+     * `logo` and `sidebarItems` are configuration for a sidebar this component constructs;
+     * this is the slot for one it does not. When both are given **this wins**, rather than
+     * rendering two sidebars or silently dropping yours.
+     *
+     * It is rendered as a direct flex child of the shell row, so it owns its own width — the
+     * kit's own sidebar is a rigid `w-[232px] shrink-0` and yours is under no obligation to
+     * match it. Pass `null` explicitly for a shell with no sidebar at all.
+     */
+    sidebar?: ReactNode;
+    /** Forwarded to the built-in `TopNav`. Ignored when `topNav` is supplied. */
     topNavProps?: Omit<TopNavProps, 'className'>;
+    /**
+     * Replaces the built-in `TopNav` entirely, for the same reason `sidebar` exists (#15).
+     *
+     * `topNavProps` forwards `TopNav`'s whole API as a single prop, which works only for
+     * consumers using `TopNav`. When both are given this wins. Pass `null` for a shell with
+     * no top navigation.
+     */
+    topNav?: ReactNode;
     /**
      * Optional content rendered in the row directly below `TopNav` (the real
      * "Top Bar" — a `ViewSwitcher` on the left, a primary action `Button` on
@@ -2207,7 +2234,7 @@ export declare interface TagProps {
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
 
 export declare interface TaskCardProps {
     /** Task title, shown in the header row and truncated to a single line. */
@@ -2277,6 +2304,21 @@ export declare interface TaskCardProps {
      */
     actions?: React.ReactNode;
     /**
+     * Decorative 24×24 glyph forwarded to `ProjectInfo`'s own `icon` slot, at the end of the
+     * title row (#15).
+     *
+     * Figma's "Project Info" instance inside a Task Card does include this slot; the card
+     * simply never passed one through, so the kit shipped the slot and blocked it. The glyph
+     * in the export is an unnamed placeholder, which is why nothing is wired up by default —
+     * picking one would be inventing a design value.
+     *
+     * **Not the place for a control.** It renders into a fixed `w-6 h-6` box specified for a
+     * glyph, so a button here has nowhere to put padding or a focus ring — use `actions`,
+     * which sits beside the title row for exactly that reason. When both are given they
+     * render together: `icon` inside the title row, `actions` after it.
+     */
+    icon?: React.ReactNode;
+    /**
      * Which `<h*>` the card title renders as, forwarded to `ProjectInfo`. Set it one level
      * below whatever heading introduces the column the card sits in.
      * @default 3
@@ -2311,7 +2353,7 @@ export declare interface TaskCardProps {
  * badge, or "add task" affordance on the frame itself in any real instance
  * across the isolated doc export or the in-context dashboard mockup.
  */
-export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, headingLevel, label, className, }: TaskListViewProps): JSX.Element;
+export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, empty, headingLevel, label, className, }: TaskListViewProps): JSX.Element;
 
 export declare interface TaskListViewProps {
     /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
@@ -2348,6 +2390,23 @@ export declare interface TaskListViewProps {
     emptyDescription?: string;
     /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
     emptyAction?: React.ReactNode;
+    /**
+     * Replaces the whole empty state, rather than configuring the one this renders (#15).
+     *
+     * The three `empty*` props above flatten exactly three of `EmptyState`'s five, which left
+     * its `icon` and `label` unreachable from here — and `label` is the one that matters,
+     * because two empty states on one screen otherwise present a screen-reader user with two
+     * identically-named groups. Pass an `EmptyState` of your own and every prop is yours:
+     *
+     * ```tsx
+     * <TaskListView title="Working" tasks={[]} empty={<EmptyState title="All clear" label="No working tasks" icon={<InboxIcon />} />} />
+     * ```
+     *
+     * **Additive on purpose.** Replacing the flattened props would be a breaking change for
+     * every existing caller, and they are a genuinely convenient shorthand for the common
+     * case — so they stay, and this wins when both are given. Same slot on `TaskTable`.
+     */
+    empty?: React.ReactNode;
     /**
      * Renders 3 skeleton task-card placeholders instead of `tasks` while data is in flight.
      * No ground-truth basis (static exports have no loading state) — an engineering-only
@@ -2415,7 +2474,7 @@ export declare interface TaskMetaBadgesProps {
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, className, }: TaskTableProps): JSX.Element;
+export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, className, }: TaskTableProps): JSX.Element;
 
 export declare interface TaskTableGroup {
     /** Group/status title, e.g. `"To Do (05)"`. Figma "Task Cell" -- Desktop/Body/L/bold. */
@@ -2451,6 +2510,19 @@ export declare interface TaskTableProps {
     emptyDescription?: string;
     /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
     emptyAction?: React.ReactNode;
+    /**
+     * Replaces the whole empty state, rather than configuring the one this renders (#15).
+     *
+     * The three `empty*` props above flatten three of `EmptyState`'s five, leaving its `icon`
+     * and `label` unreachable — and `label` matters, because a page holding both this and a
+     * `TaskListView` otherwise presents a screen-reader user with two groups called "No
+     * results". Pass an `EmptyState` of your own and every prop is yours.
+     *
+     * **Additive on purpose.** Replacing the flattened props would break every existing
+     * caller, and they are a fine shorthand for the common case — so they stay, and this wins
+     * when both are given. Identical slot on `TaskListView`.
+     */
+    empty?: React.ReactNode;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2727,7 +2799,7 @@ export declare type ToastTone = StatusTone;
  * default, but this is a values-based judgment call, not a confirmed fact. No `title` prop:
  * no title/heading layer exists anywhere in the real component.
  */
-export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, clearSearchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, className, }: TopNavProps): JSX.Element;
+export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, clearSearchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, userSlot, actions, className, }: TopNavProps): JSX.Element;
 
 export declare interface TopNavProps {
     /** Controlled search value. */
@@ -2770,10 +2842,33 @@ export declare interface TopNavProps {
      * @default 'Notifications'
      */
     notificationsLabel?: string;
-    /** Logged-in user's name (used for avatar initials/alt text). */
+    /** Logged-in user's name (used for avatar initials/alt text). Ignored when `userSlot` is supplied. */
     userName?: string;
-    /** Logged-in user's avatar image URL. */
+    /** Logged-in user's avatar image URL. Ignored when `userSlot` is supplied. */
     userAvatar?: string;
+    /**
+     * Replaces the bare `Avatar` that `userName`/`userAvatar` render, for the case those two
+     * strings cannot express (#15).
+     *
+     * A user avatar in a top nav is an account menu in almost every real application — and the
+     * kit ships `Menu` while `TopNav` had no way to accept one, so a consumer had to rebuild
+     * the whole bar to attach a sign-out. Put a `Menu` here whose trigger is an `Avatar`.
+     *
+     * When both are given this wins. Unlike the avatar it replaces, this slot is not wrapped
+     * in a fixed-size box, so a real control has room for its own padding and focus ring.
+     */
+    userSlot?: ReactNode;
+    /**
+     * Extra controls rendered in the trailing group, between the notifications bell and the
+     * user area (#15).
+     *
+     * For the things a real product bar grows that this component cannot anticipate — a help
+     * button, a workspace switcher, a theme toggle. Anything focusable placed here needs its
+     * own accessible name and focus ring; the kit's own controls in this row carry
+     * `focus-visible:outline-2 focus-visible:outline-interactive-text`, and matching that
+     * keeps the row consistent.
+     */
+    actions?: ReactNode;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }

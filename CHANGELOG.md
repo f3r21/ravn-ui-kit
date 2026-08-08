@@ -59,6 +59,37 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - `ApplicationSidebar` gains its first test file. Coverage thresholds ratcheted
   91.77 → 94.02 statements, 90.29 → 90.90 branches, 86.71 → 88.11 functions.
 
+- **Composition slots where configuration had walled consumers out** (#15). All additive and
+  non-breaking. **Minor.**
+
+  | Component      | New prop   | Replaces                                                                  |
+  | -------------- | ---------- | ------------------------------------------------------------------------- |
+  | `AppShell`     | `sidebar`  | the `ApplicationSidebar` built from `logo`/`sidebarItems`                 |
+  | `AppShell`     | `topNav`   | the `TopNav` built from `topNavProps`                                     |
+  | `TopNav`       | `userSlot` | the bare `Avatar` built from `userName`/`userAvatar`                      |
+  | `TopNav`       | `actions`  | — (new trailing-group slot)                                               |
+  | `TaskCard`     | `icon`     | — (forwards to `ProjectInfo`'s existing slot)                             |
+  | `TaskListView` | `empty`    | the `EmptyState` built from `emptyTitle`/`emptyDescription`/`emptyAction` |
+  | `TaskTable`    | `empty`    | the same trio                                                             |
+
+  `AppShell.sidebarItems` becomes **optional**, which is a widening rather than a break —
+  it was required, so the shell was unusable with any navigation but this kit's.
+
+  Where a slot and its configuration are both given, **the slot wins**: rendering both would
+  put two navigation landmarks (or two user affordances) in one bar, and ignoring the slot
+  would discard what the caller explicitly asked for. `null` and `undefined` mean different
+  things on `AppShell.sidebar`/`topNav` — `null` is "none", `undefined` is "build the
+  default".
+
+  The flattened `empty*` props are **kept, not replaced**. Removing them would break every
+  existing caller and they are a fine shorthand; the slot exists because they flatten three
+  of `EmptyState`'s five, leaving `icon` and `label` unreachable — and `label` is the one
+  that matters, since a board of three columns otherwise gives a screen-reader user three
+  groups all called "No results".
+
+  **Scoped deliberately.** #15 lists six areas; this is four of them. `TaskTable`'s frozen
+  column schema and `Card`'s missing sub-components are filed separately — see the PR.
+
 ### Fixed
 
 - **Due-date urgency was conveyed by colour alone** (#92). WCAG 2.2 1.4.1. **Minor** — the
