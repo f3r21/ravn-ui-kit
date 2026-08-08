@@ -187,3 +187,53 @@ export const TaskDefaultView: Story = {
     </AppShell>
   ),
 };
+
+/**
+ * The escape hatch from #15. `sidebarItems` used to be required and `topNavProps` forwarded
+ * `TopNav`'s whole API as one prop, so the shell a consumer most wants to adopt was the one
+ * most welded to the kit's own parts.
+ *
+ * Here both are replaced with plain markup that is not this kit's. The `sidebar` slot owns its
+ * own width — the kit's sidebar is a rigid `w-[232px] shrink-0` and yours need not match.
+ */
+export const WithNonKitNavigation: Story = {
+  args: {
+    sidebar: (
+      <nav
+        aria-label="Product navigation"
+        className="flex flex-col gap-2 w-[200px] shrink-0 self-stretch p-4 bg-surface-panel rounded-lg font-sans text-body-m text-main"
+      >
+        <span className="font-semibold text-muted-on-dark">A consumer’s own nav</span>
+        <a
+          href="#overview"
+          className="rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text"
+        >
+          Overview
+        </a>
+        <a
+          href="#reports"
+          className="rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text"
+        >
+          Reports
+        </a>
+      </nav>
+    ),
+    topNav: (
+      <header className="flex items-center justify-between px-6 py-3 bg-surface-panel rounded-md font-sans text-body-m text-main">
+        <span className="font-semibold">A consumer’s own top bar</span>
+      </header>
+    ),
+    children: <TaskListView title="Working (01)" tasks={[{ title: 'Fix auth bug' }]} />,
+  },
+};
+
+/**
+ * `null` is not the same as omitting the prop: it means "no sidebar", where omitting means
+ * "build the default one". The shell still lays out correctly with only its main column.
+ */
+export const NoSidebar: Story = {
+  args: {
+    sidebar: null,
+    children: <TaskListView title="Working (01)" tasks={[{ title: 'Fix auth bug' }]} />,
+  },
+};

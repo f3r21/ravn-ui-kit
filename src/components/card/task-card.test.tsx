@@ -239,3 +239,41 @@ describe('due-date urgency is not conveyed by colour alone (#92)', () => {
     expect(screen.getByRole('article', { name: 'Fix auth bug' })).toBeDefined();
   });
 });
+
+/**
+ * #15. The kit declared `MenuDotsIcon` as the task-card overflow affordance and `ProjectInfo`
+ * exposed an `icon` slot, and `TaskCard` never forwarded one — it shipped the slot and blocked
+ * it. `actions` covers the *control* case; this is the decorative glyph the Figma instance
+ * actually draws.
+ */
+describe('TaskCard icon slot (#15)', () => {
+  it('forwards a decorative glyph into the title row', () => {
+    const { container } = render(
+      <TaskCard title="Fix auth bug" icon={<svg data-glyph="true" />} />,
+    );
+    expect(container.querySelector('[data-glyph]')).not.toBeNull();
+  });
+
+  it('renders no glyph when none is given', () => {
+    const { container } = render(<TaskCard title="Fix auth bug" />);
+    expect(container.querySelector('[data-glyph]')).toBeNull();
+  });
+
+  it('renders the glyph and a real control together, since they are different slots', () => {
+    const { container } = render(
+      <TaskCard
+        title="Fix auth bug"
+        icon={<svg data-glyph="true" />}
+        actions={<button type="button">Task options for Fix auth bug</button>}
+      />,
+    );
+
+    expect(container.querySelector('[data-glyph]')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Task options for Fix auth bug' })).toBeDefined();
+  });
+
+  it('keeps the glyph out of the card’s accessible name', () => {
+    render(<TaskCard title="Fix auth bug" icon={<svg data-glyph="true" />} />);
+    expect(screen.getByRole('article', { name: 'Fix auth bug' })).toBeDefined();
+  });
+});

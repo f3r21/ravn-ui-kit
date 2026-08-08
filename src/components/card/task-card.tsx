@@ -78,6 +78,21 @@ export interface TaskCardProps {
    */
   actions?: React.ReactNode;
   /**
+   * Decorative 24×24 glyph forwarded to `ProjectInfo`'s own `icon` slot, at the end of the
+   * title row (#15).
+   *
+   * Figma's "Project Info" instance inside a Task Card does include this slot; the card
+   * simply never passed one through, so the kit shipped the slot and blocked it. The glyph
+   * in the export is an unnamed placeholder, which is why nothing is wired up by default —
+   * picking one would be inventing a design value.
+   *
+   * **Not the place for a control.** It renders into a fixed `w-6 h-6` box specified for a
+   * glyph, so a button here has nowhere to put padding or a focus ring — use `actions`,
+   * which sits beside the title row for exactly that reason. When both are given they
+   * render together: `icon` inside the title row, `actions` after it.
+   */
+  icon?: React.ReactNode;
+  /**
    * Which `<h*>` the card title renders as, forwarded to `ProjectInfo`. Set it one level
    * below whatever heading introduces the column the card sits in.
    * @default 3
@@ -118,6 +133,7 @@ export function TaskCard({
   assigneeAvatar,
   metaBadges = [],
   actions,
+  icon,
   headingLevel = 3,
   titleId,
   className,
@@ -182,6 +198,7 @@ export function TaskCard({
         <div className="flex items-start gap-2">
           <ProjectInfo
             title={title}
+            icon={icon}
             onTitleClick={onClick}
             headingLevel={headingLevel}
             titleId={headingId}
@@ -196,6 +213,7 @@ export function TaskCard({
       ) : (
         <ProjectInfo
           title={title}
+          icon={icon}
           onTitleClick={onClick}
           headingLevel={headingLevel}
           titleId={headingId}

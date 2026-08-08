@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { TaskListView } from './task-list-view';
+import { EmptyState } from '../empty-state/empty-state';
 import { withSurface } from '../../../.storybook/decorators';
 
 const sampleTasks = [
@@ -112,4 +113,32 @@ export const BoardWithLandmarks: Story = {
       />
     </div>
   ),
+};
+
+/**
+ * #15. `emptyTitle`/`emptyDescription`/`emptyAction` flatten three of `EmptyState`'s five,
+ * which left `icon` and `label` unreachable from here. `label` is the one that matters: a
+ * board of three columns renders three empty states, and without it a screen-reader user gets
+ * three groups all called "No results".
+ *
+ * The `empty` slot takes a whole `EmptyState`, so every prop is the consumer's.
+ */
+export const ComposedEmptyState: Story = {
+  args: {
+    title: 'Working (00)',
+    tasks: [],
+    empty: (
+      <EmptyState
+        title="Nothing in Working"
+        description="Drag a task here, or create one."
+        label="No tasks in Working"
+        icon={
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="M3 10h18" />
+          </svg>
+        }
+      />
+    ),
+  },
 };
