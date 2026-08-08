@@ -137,3 +137,105 @@ describe('TaskCard Component keyboard accessibility', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Fix auth bug' })).toBeDefined();
   });
 });
+
+/**
+ * #92. Both due-date renderers conveyed urgency by colour alone — a red `Tag` fill on the
+ * card, `text-primary-2` in the table cell — so "overdue" reached neither a screen-reader
+ * user nor a colour-blind sighted one. WCAG 2.2 1.4.1.
+ *
+ * The date text is not a substitute and that is the trap worth naming: `'Yesterday'` reads as
+ * past to a human, so a test written against that string would look like it proved something.
+ * `'20 July, 2026'` is the real case — it requires already knowing today's date, which is the
+ * inference an accessible name exists to remove. These use a bare date for that reason.
+ */
+describe('due-date urgency is not conveyed by colour alone (#92)', () => {
+  it('states that an overdue task is overdue', () => {
+    render(<TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency="overdue" />);
+
+    expect(screen.getByRole('article').textContent).toContain('overdue');
+    // The visible date is untouched — this adds a spoken state, it does not rewrite the pill.
+    expect(screen.getByText(/20 July, 2026/)).toBeDefined();
+  });
+
+  /**
+   * The contradicting half, and the reason it is not optional: a fix that unconditionally
+   * appends a string passes the case above and is wrong. Without this, "announces the state"
+   * and "announces a state regardless" are indistinguishable.
+   */
+  it('control: says nothing when the task is not urgent', () => {
+    render(<TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency="normal" />);
+
+    const text = screen.getByRole('article').textContent ?? '';
+    expect(text).toContain('20 July, 2026');
+    expect(text).not.toContain('overdue');
+    expect(text).not.toContain('due soon');
+  });
+
+  it('defaults to the non-urgent case, so an unspecified due date announces no state', () => {
+    render(<TaskCard title="Fix auth bug" dueDateText="20 July, 2026" />);
+    expect(screen.getByRole('article').textContent).not.toMatch(/overdue|due soon/);
+  });
+
+  it('states the soon case too — yellow is as much a colour-only signal as red', () => {
+    render(<TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency="soon" />);
+    expect(screen.getByRole('article').textContent).toContain('due soon');
+  });
+
+  it('takes a caller-supplied string, so the kit is not hardcoding English', () => {
+    // The same rule #13 settled: a fix for "consumers cannot override our strings" must not
+    // ship a string consumers cannot override.
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        dueDateText="20 July, 2026"
+        dueDateUrgency="overdue"
+        dueDateUrgencyLabel={{ overdue: 'past due' }}
+      />,
+    );
+
+    const text = screen.getByRole('article').textContent ?? '';
+    expect(text).toContain('past due');
+    expect(text).not.toContain('overdue');
+  });
+
+  it('merges over the defaults rather than replacing them', () => {
+    // Overriding `overdue` alone must leave `soon` saying what it said.
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        dueDateText="20 July, 2026"
+        dueDateUrgency="soon"
+        dueDateUrgencyLabel={{ overdue: 'past due' }}
+      />,
+    );
+    expect(screen.getByRole('article').textContent).toContain('due soon');
+  });
+
+  it('lets a consumer silence an urgency with an empty string', () => {
+    render(
+      <TaskCard
+        title="Fix auth bug"
+        dueDateText="20 July, 2026"
+        dueDateUrgency="overdue"
+        dueDateUrgencyLabel={{ overdue: '' }}
+      />,
+    );
+    expect(screen.getByRole('article').textContent).not.toContain('overdue');
+  });
+
+  it('renders no state node at all when there is nothing to say', () => {
+    // Not merely an empty string in the DOM: an empty `sr-only` span is a node a future
+    // refactor can accidentally start filling. Asserted structurally.
+    const { container } = render(
+      <TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency="normal" />,
+    );
+    expect(container.querySelector('.sr-only')).toBeNull();
+  });
+
+  it('keeps the state out of the card’s accessible name', () => {
+    // The card is named by its heading via `aria-labelledby`, so the state must not leak into
+    // the name the way the concatenation bug above once did.
+    render(<TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency="overdue" />);
+    expect(screen.getByRole('article', { name: 'Fix auth bug' })).toBeDefined();
+  });
+});
