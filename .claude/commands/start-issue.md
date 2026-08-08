@@ -9,6 +9,11 @@ Run these in order, in **this worktree only** — never in the primary checkout,
 sessions have open and which `git worktree list` will name for you:
 
 ```bash
+# Is the WORK startable? Everything below this line asks about the branch; this asks about the
+# issue. Any output → STOP, do not continue.
+gh api "repos/$(gh repo view --json nameWithOwner -q .nameWithOwner)/issues/<n>/dependencies/blocked_by" \
+   --jq '[.[] | select(.state == "open") | "#\(.number) \(.title)"] | .[]'
+
 git fetch origin --prune
 git status --porcelain                     # must be clean before anything below
 
@@ -34,7 +39,16 @@ know that before you start attributing it to your own change.
 checked out, and judgement covered the gap every time. The failure it invites: a lane finishes on
 a branch whose PR is open and reviewed, is handed the next issue, and commits it there — the
 reviewer's PR silently grows unrelated work, and repeat it twice more and three issues share one
-PR. Four rules, in the order the commands above apply them:
+PR. Five rules, in the order the commands above apply them:
+
+- **An open blocker on the issue stops the ritual, and it is a different question.** The PR
+  check below asks about the branch you are standing on; this asks about the work you are about to
+  start. Two issues here read as available while the dependency graph said otherwise, and the error
+  was permissive — the direction that gets acted on. `select(.state == "open")` is the whole rule:
+  **a closed blocker is not a blocker**, and filtering on the presence of a dependency rather than
+  its state refuses work that is genuinely ready. If the lookup itself fails, that is not a clear
+  verdict — read the issue before starting. The same check with exit codes, for anything scripted,
+  is `check-blocked.py` in the orchestration toolkit; it reads the identical endpoint and filter.
 
 - **The base is derived, never assumed:** `origin/dev` if this repo has one, otherwise the repo's
   own default branch. This repo has no `dev` (`gh api repos/f3r21/ravn-ui-kit/branches/dev` → 404)
