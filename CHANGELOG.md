@@ -8,6 +8,39 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **`TaskMetaBadge` gains a decorative arm, restoring a capability #19 removed by accident**
+  (#93). **Minor** — additive, and the existing labelled shape is unchanged.
+
+  `#9` closed the consuming app's "render these badges decoratively" requirement as _already
+  met at zero API cost_, on the grounds that `aria-label` on a role-less `<span>` is prohibited
+  and therefore dropped — the counts were silent **by accident**. `#19` replaced that with a
+  real `sr-only` node, which is the correct fix for #19 and simultaneously deleted the silence
+  the requirement rested on. Nothing connected the two records.
+
+  `TaskMetaBadge` is now a union: `{ …, label }` or `{ …, decorative: true }`. A decorative
+  badge renders its icon and count and is `aria-hidden`, so it is drawn and not announced —
+  a property of the markup rather than a coincidence of what is missing.
+
+  **`label` on a decorative badge does not compile.** `label?: never` on that arm makes
+  announced-and-silent unrepresentable rather than merely discouraged, the same habit as
+  `Record<DueDateUrgency, …>`. Pinned by a `@ts-expect-error` case, which fails the build if
+  the combination ever becomes legal again.
+
+  Use it sparingly: a count a sighted user can read and a screen-reader user cannot is a real
+  asymmetry, and it is right only when the alternative is announcing something untrue — which
+  is the consuming app's case, where the design draws counters its API has no fields for.
+
+### Fixed
+
+- **`.storybook/a11y-allowlist.ts` claimed a fixed defect was live** (#93). Its
+  `aria-prohibited-attr` block still read _"Attachment, subtask and comment counts are silent to
+  a screen reader today"_ and described the entries as open debt. The entries were deleted when
+  #19 landed; only the prose survived. Corrected, and kept as a record of the fix rather than
+  removed — both halves of that defect are easy to reintroduce, including the `TaskCard`
+  `role="button"` that used to mask it.
+
 ## [0.7.0] — 2026-08-08
 
 ### Added

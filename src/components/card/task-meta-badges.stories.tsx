@@ -77,3 +77,28 @@ export const CountsOnly: Story = {
     ],
   },
 };
+
+/**
+ * #93. A decorative badge is drawn and **not announced** — for a counter the design draws that
+ * the data cannot support.
+ *
+ * The consuming app's card footer renders attachment / subtask / comment counts its API has no
+ * fields for. It had marked them `aria-hidden`, on the reasoning that *announcing counts that
+ * are not real would be worse than silence*. #19 gave every badge a real `sr-only` label, which
+ * is the correct fix for #19 and removed the accidental silence that requirement rested on — so
+ * the app deleted the counters rather than have a screen reader read fiction aloud.
+ *
+ * Both badges below render identically. Only the second is in the accessibility tree; inspect
+ * with `document.querySelector('[aria-hidden]')` to see which.
+ *
+ * `label` on a decorative badge is a **type error**, not a convention — announced-and-silent is
+ * a contradiction, so it does not compile.
+ */
+export const Decorative: Story = {
+  args: {
+    badges: [
+      { icon: <AttachmentIcon />, count: 4, decorative: true },
+      { icon: <CommentIcon />, count: 12, label: '12 comments' },
+    ],
+  },
+};

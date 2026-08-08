@@ -1,10 +1,14 @@
 import { cn } from '../../utils/cn';
 
-export interface TaskMetaBadge {
+interface TaskMetaBadgeBase {
   /** Icon rendered before the count. Should use `currentColor` so it inherits the badge's text color. */
   icon: React.ReactNode;
   /** Count value shown next to the icon. Omitted entirely for an icon-only badge (e.g. a plain attachment indicator). */
   count?: number;
+}
+
+/** A badge that is announced. The ordinary case. */
+export interface TaskMetaBadgeLabelled extends TaskMetaBadgeBase {
   /**
    * What this badge means, announced to screen readers and used as its React key.
    *
@@ -13,7 +17,41 @@ export interface TaskMetaBadge {
    * without the number announces that there are comments but not how many.
    */
   label: string;
+  /** Absent or `false` here — see `TaskMetaBadgeDecorative` for the other arm. */
+  decorative?: false;
 }
+
+/**
+ * A badge that is drawn and **not** announced (#93).
+ *
+ * For a counter the design draws but the data cannot support. The consuming app's card footer
+ * renders attachment / subtask / comment counts its API has no fields for; announcing invented
+ * numbers is worse than silence, so it had marked them `aria-hidden` — and when #19 gave every
+ * badge a real `sr-only` label, that silence disappeared and the app deleted the counters
+ * rather than have a screen reader read fiction aloud.
+ *
+ * **#9 closed this requirement as already met**, on the grounds that `aria-label` on a role-less
+ * `<span>` is prohibited and therefore dropped. That was true when written; #19's correct fix
+ * removed the accidental silence it rested on. This restores the capability as a property of
+ * the markup rather than a coincidence of what is missing.
+ *
+ * `label` is `never` rather than merely optional, so **"decorative and labelled" does not
+ * compile** — that combination asks for the badge to be announced and hidden at once. Same
+ * habit as `Record<DueDateUrgency, …>`: make the bad state untypable rather than discourage it
+ * in prose.
+ *
+ * Use it sparingly. A count a sighted user can read and a screen-reader user cannot is a real
+ * asymmetry; it is right only when the alternative is announcing something untrue.
+ */
+export interface TaskMetaBadgeDecorative extends TaskMetaBadgeBase {
+  /** Marks the badge decorative: no accessible name, and hidden from assistive tech entirely. */
+  decorative: true;
+  /** Not available on a decorative badge — a silent badge with a label is a contradiction. */
+  label?: never;
+}
+
+/** One badge in the row: announced (`label`) or decorative (`decorative: true`), never both. */
+export type TaskMetaBadge = TaskMetaBadgeLabelled | TaskMetaBadgeDecorative;
 
 export interface TaskMetaBadgesProps {
   /** Ordered list of metadata badges to render (e.g. attachment/subtask/comment counts). */
@@ -47,9 +85,17 @@ export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
   return (
     // gap-4 matches Figma's "Frame 653" gap (16px, Cards01.md L614 / Cards00.md L657).
     <div className={cn('flex flex-wrap items-center gap-4', className)}>
-      {badges.map((b) => (
+      {badges.map((b, i) => (
         <span
-          key={b.label}
+          // Labelled badges keep their label as the key, as before. A decorative badge has none
+          // by construction, so it falls back to its position — the row is static per render
+          // and order-stable, so nothing reorders.
+          key={b.decorative ? `decorative-${i}` : b.label}
+          // `aria-hidden` on the whole badge rather than relying on the children already
+          // carrying it. Without the `sr-only` node a decorative badge would *happen* to be
+          // silent, which is exactly the accidental silence #9 built on and #19 removed — this
+          // makes it a property of the markup instead of a coincidence.
+          aria-hidden={b.decorative || undefined}
           className="inline-flex items-center gap-1 text-body-m font-normal font-sans text-main"
         >
           {/* The badge's accessible name is real text, hidden visually — not an `aria-label`
@@ -62,7 +108,7 @@ export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
               `Input` and `DatePicker` all keep an accessible name this way. Giving the
               wrapper `role="img"` would also have permitted a name, but this keeps the
               announced text and the visible content as one thing, so they cannot drift. */}
-          <span className="sr-only">{b.label}</span>
+          {b.decorative ? null : <span className="sr-only">{b.label}</span>}
           {b.count !== undefined ? (
             <span className="tabular-nums" aria-hidden>
               {b.count}
