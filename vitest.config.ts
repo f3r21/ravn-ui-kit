@@ -108,21 +108,28 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #15's composition slots gave `AppShell` its first test file and added slot cases
+      // to `TopNav`, `TaskCard`, `TaskListView` and `TaskTable`. 94.33 -> 95.29, branches
+      // 91.30 -> 91.75. `functions` did not move: the new slots are props on existing
+      // components, not new functions, so 128/144 is unchanged and stays the tightest of the
+      // four.
+      //
       // These are set exact, with no deliberate headroom. Review on #89 raised this for
       // `branches`; it is true of **all four**, and `functions` is the tightest of them —
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2566/2720  0.000235pp    94.301471     FAIL
-      //   branches      399/437   0.004348pp    91.075515     FAIL
+      //   statements   2611/2740  0.001971pp    95.255474     FAIL
+      //   branches      412/449   0.009465pp    91.536748     FAIL
       //   functions     128/144   0.000889pp    88.194444     FAIL
-      //   lines        2566/2720  0.000235pp    94.301471     FAIL
+      //   lines        2611/2740  0.001971pp    95.255474     FAIL
       //
-      // Note the margins got *tighter*, not looser, as coverage rose — `statements` is now
-      // 0.000235pp, a hundredth of what it was at #89. That is arithmetic rather than
-      // fragility creeping in: a threshold truncated to two decimals sits at most 0.005pp
-      // below the true ratio wherever that ratio happens to land. It does mean the note
-      // below is now more likely to be needed, not less.
+      // The margin does not trend — it wanders, because a threshold truncated to two decimals
+      // sits somewhere in [0, 0.005]pp below the true ratio depending only on where that
+      // ratio lands. `statements` read 0.003756pp at #89, 0.000235pp at #92 and 0.001971pp
+      // here. Do not read a small margin as decay or a larger one as safety: what is
+      // constant, and what actually matters, is that **one uncovered unit fails every one of
+      // the four**.
       //
       // Re-derive with the json-summary command above rather than trusting this table.
       // That tightness is chosen, and it has a consequence somebody will hit — recorded
@@ -144,10 +151,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 94.33,
-        branches: 91.3,
+        statements: 95.29,
+        branches: 91.75,
         functions: 88.88,
-        lines: 94.33,
+        lines: 95.29,
       },
     },
   },
