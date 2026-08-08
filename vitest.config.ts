@@ -108,6 +108,12 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #97 replaced the frozen column schema with a `columns` prop, adding 11 cases. The
+      // jump is large — 95.91 -> 97.56 — and most of it is deletion rather than new tests: five
+      // hardcoded `<td>`s in the row and five more in the skeleton became one map each, so the
+      // denominator fell as the numerator rose. A ratchet reading a big rise should be checked
+      // for exactly that; here it is real, and `npm run gate` on the tree is the check.
+      //
       // Then #90 made the kit's remaining visible copy overridable — `AddTaskModal.copy` and
       // `formatDueDate`, `DatePickerMenu.todayLabel`, `TaskTableRow.detailsLabel`,
       // `TaskTable.columnLabels` — adding 12 cases, on top of #111's 6.
@@ -156,10 +162,10 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2679/2793  0.008367pp    95.882564     FAIL
-      //   branches      435/469   0.000533pp    92.537313     FAIL
-      //   functions     134/148   0.000541pp    89.864865     FAIL
-      //   lines        2679/2793  0.008367pp    95.882564     FAIL
+      //   statements   2766/2835  0.006138pp    97.530864     FAIL
+      //   branches      459/493   0.003448pp    92.900609     FAIL
+      //   functions     137/150   0.003333pp    90.666667     FAIL
+      //   lines        2766/2835  0.006138pp    97.530864     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -198,10 +204,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.91,
-        branches: 92.75,
-        functions: 90.54,
-        lines: 95.91,
+        statements: 97.56,
+        branches: 93.1,
+        functions: 91.33,
+        lines: 97.56,
       },
     },
   },
