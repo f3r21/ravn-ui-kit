@@ -10,6 +10,25 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`release.yml` and `CLAUDE.md` both claimed `v0.5.0` was left in place; it does not exist**
+  (#100). Documentation only; no shipped code, `dist/` byte-identical. **Patch.**
+
+  The tag was pushed — #54 read it over the API and quoted `"version": "0.4.0"` from it — and
+  #54's comment records the decision to keep it. It was deleted anyway, after
+  2026-08-07T19:03Z, by nobody recorded; the events API window has expired, so who and why are
+  not recoverable.
+
+  `release.yml` offered it as the proof of "a tag is not moved or deleted in this project",
+  which made the strongest evidence for that norm an example of the norm being broken. **The
+  rule and the check are unchanged** — what is replaced is the example, with the concrete cost:
+  #54's own re-derivation commands no longer run.
+
+  Also records that **`v0.5.1` has a tag but no GitHub release**. It predates the Release
+  workflow's first run, so it was cut by hand when a matching release was not yet automatic.
+  The app pins tags rather than releases, so nothing consuming this package is affected.
+
+### Fixed
+
 - **The changelog-placement check reported nested bullets as corruption** (#107). Tooling only;
   no shipped code. **Patch.**
 
