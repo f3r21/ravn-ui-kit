@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { TaskTable, TaskTableRow, type TaskTableRowProps } from './task-table';
+import { TaskTable, TaskTableRow, DueDateCell, type TaskTableRowProps } from './task-table';
+import { TaskCard } from './task-card';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -269,5 +270,98 @@ describe('TaskTable Component', () => {
 
     await user.click(screen.getByRole('checkbox', { name: 'Select Fix auth bug in To Do' }));
     expect(onToDo).toHaveBeenCalledWith(true);
+  });
+});
+
+/**
+ * #92, the table half. `DueDateCell` rendered `styles.overdue = 'text-primary-2'` and nothing
+ * else, so the urgency existed only as a colour — the same defect as `TaskCard`'s red `Tag`,
+ * and it has to be fixed in step with it rather than separately.
+ */
+describe('due-date urgency is not conveyed by colour alone (#92)', () => {
+  it('states that an overdue date is overdue', () => {
+    render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    expect(screen.getByText(/20 July, 2026/).textContent).toContain('overdue');
+  });
+
+  it('control: says nothing when the date is not urgent', () => {
+    const { container } = render(<DueDateCell date="20 July, 2026" urgency="normal" />);
+    expect(screen.getByText(/20 July, 2026/).textContent).not.toContain('overdue');
+    expect(container.querySelector('.sr-only')).toBeNull();
+  });
+
+  it('keeps the colour treatment it always had', () => {
+    // The state is additive. If a refactor ever traded the colour for the text, a
+    // colour-blind sighted user would gain nothing and a sighted user would lose the cue.
+    render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    expect(screen.getByText(/20 July, 2026/).className).toContain('text-primary-2');
+  });
+
+  it('reaches a row through TaskTableRow, which is the only way a table renders one', () => {
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow
+            index={1}
+            title="Fix auth bug"
+            dueDate="20 July, 2026"
+            dueDateUrgency="overdue"
+          />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText(/20 July, 2026/).textContent).toContain('overdue');
+  });
+
+  it('forwards a caller-supplied string through the row', () => {
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow
+            index={1}
+            title="Fix auth bug"
+            dueDate="20 July, 2026"
+            dueDateUrgency="overdue"
+            dueDateUrgencyLabel={{ overdue: 'past due' }}
+          />
+        </tbody>
+      </table>,
+    );
+    const cell = screen.getByText(/20 July, 2026/).textContent ?? '';
+    expect(cell).toContain('past due');
+    expect(cell).not.toContain('overdue');
+  });
+});
+
+/**
+ * The requirement #92 states as "TaskCard and DueDateCell should agree, the same way
+ * `DUE_DATE_URGENCY_COLOR` already makes their colours agree."
+ *
+ * Asserted as agreement between the two renderers rather than each against a hardcoded
+ * literal — two tests that each pin `'overdue'` separately pass just as happily after one
+ * component's default is changed and the other's is not, which is the drift this is for.
+ */
+describe('TaskCard and DueDateCell say the same thing for the same urgency (#92)', () => {
+  it.each(['normal', 'soon', 'overdue'] as const)('agree on %s', (urgency) => {
+    const card = render(
+      <TaskCard title="Fix auth bug" dueDateText="20 July, 2026" dueDateUrgency={urgency} />,
+    );
+    const cardState = card.container.querySelector('.sr-only')?.textContent ?? '';
+    card.unmount();
+
+    const cell = render(<DueDateCell date="20 July, 2026" urgency={urgency} />);
+    const cellState = cell.container.querySelector('.sr-only')?.textContent ?? '';
+
+    expect(cardState).toBe(cellState);
+  });
+
+  it('control: the probe can tell them apart, so agreement above is not vacuous', () => {
+    // If the reader returned '' for everything, every case above would pass regardless.
+    const overdue = render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    expect(overdue.container.querySelector('.sr-only')?.textContent).toBe(', overdue');
+    overdue.unmount();
+
+    const soon = render(<DueDateCell date="20 July, 2026" urgency="soon" />);
+    expect(soon.container.querySelector('.sr-only')?.textContent).toBe(', due soon');
   });
 });

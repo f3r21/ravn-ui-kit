@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
 import type { AccentColor, DueDateUrgency } from '../../types/color-variants';
 import type { HeadingLevel } from '../../types/heading-level';
 import { EmptyState } from '../empty-state/empty-state';
+import { DueDateUrgencyState } from './due-date-urgency-state';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -69,10 +70,23 @@ export interface DueDateCellProps {
    * @default 'normal'
    */
   urgency?: DueDateUrgency;
+  /**
+   * What each urgency *says*, announced to assistive tech beside the date. Merged over the
+   * shared `DUE_DATE_URGENCY_LABEL` defaults.
+   *
+   * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Named `urgencyLabel` here and
+   * `dueDateUrgencyLabel` on `TaskCard` to match each component's own prop vocabulary; both
+   * read the same defaults, so the two renderers cannot disagree about what "overdue" says
+   * any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how it looks.
+   *
+   * Pass `''` for an urgency to announce nothing for it; `normal` is already `''`.
+   * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+   */
+  urgencyLabel?: Partial<Record<DueDateUrgency, string>>;
 }
 
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
-export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
+export function DueDateCell({ date, urgency = 'normal', urgencyLabel }: DueDateCellProps) {
   // Same three urgency levels as the due-date Tag, expressed as text colour instead of a
   // chip. Kept in step with DUE_DATE_URGENCY_COLOR by hand rather than derived from it —
   // the Tag maps to a fill+text pair, this is text alone, so there is no shared class to
@@ -94,7 +108,15 @@ export function DueDateCell({ date, urgency = 'normal' }: DueDateCellProps) {
     // different properties so there is no class to share.
     overdue: 'text-primary-2',
   };
-  return <span className={cn(CELL_TEXT, styles[urgency])}>{date}</span>;
+  return (
+    <span className={cn(CELL_TEXT, styles[urgency])}>
+      {date}
+      {/* The state the colour above was carrying alone (#92). Inside the same span as the
+          date so it is announced as one phrase — "6 July, 2020, overdue" — rather than as a
+          loose fragment after it. */}
+      <DueDateUrgencyState urgency={urgency} labels={urgencyLabel} />
+    </span>
+  );
 }
 
 export interface AssigneeNameCellProps {
@@ -253,6 +275,12 @@ export interface TaskTableRowProps {
    */
   dueDateUrgency?: DueDateUrgency;
   /**
+   * What each urgency *says*, forwarded to this row's `DueDateCell` — see
+   * `DueDateCell.urgencyLabel`. Without it a row states its urgency in colour only (#92).
+   * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+   */
+  dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
+  /**
    * Called when the row is opened. Providing it renders the task title as a real `<button>`
    * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
    * whole row clickable for a pointer user. Fires once either way, and not at all when the
@@ -295,6 +323,7 @@ export function TaskTableRow({
   assigneeAvatar,
   dueDate,
   dueDateUrgency = 'normal',
+  dueDateUrgencyLabel,
   onClick,
   onViewDetails,
 }: TaskTableRowProps) {
@@ -445,7 +474,13 @@ export function TaskTableRow({
       {/* Due Date Cell */}
       <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
         <div className="flex items-center gap-2 h-full">
-          {dueDate ? <DueDateCell date={dueDate} urgency={dueDateUrgency} /> : null}
+          {dueDate ? (
+            <DueDateCell
+              date={dueDate}
+              urgency={dueDateUrgency}
+              urgencyLabel={dueDateUrgencyLabel}
+            />
+          ) : null}
         </div>
       </td>
     </tr>

@@ -5,6 +5,7 @@ import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
 import { ProjectInfo } from './project-info';
 import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
+import { DueDateUrgencyState } from './due-date-urgency-state';
 import { AlarmIcon } from '../icons/icons';
 import {
   DUE_DATE_URGENCY_COLOR,
@@ -30,6 +31,25 @@ export interface TaskCardProps {
    * @default 'normal'
    */
   dueDateUrgency?: DueDateUrgency;
+  /**
+   * What each urgency *says*, announced to assistive tech beside the date. Merged over the
+   * shared `DUE_DATE_URGENCY_LABEL` defaults, so passing `{ overdue: 'past due' }` changes
+   * that one and leaves the rest.
+   *
+   * The colour used to be the whole signal (#92) — WCAG 2.2 1.4.1, failing for a
+   * screen-reader user and a colour-blind sighted user alike. The state is now rendered as
+   * an `sr-only` node inside the Tag, after the date: "Yesterday, overdue".
+   *
+   * **The visible text is untouched.** `dueDateText` stays exactly what you passed — this
+   * adds a spoken state, it does not rewrite the pill. A *visible* affix would serve
+   * colour-blind sighted users too, and is deliberately not done here: no Figma export draws
+   * one, and inventing a design value is forbidden by this repo's first rule.
+   *
+   * Pass `''` for an urgency to announce nothing for it. `normal` is already `''`, because
+   * "not urgent" is the absence of a state rather than a state worth repeating on every card.
+   * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+   */
+  dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
   /**
    * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to `'neutral'` when omitted.
    * @default []
@@ -92,6 +112,7 @@ export function TaskCard({
   points,
   dueDateText,
   dueDateUrgency = 'normal',
+  dueDateUrgencyLabel,
   tags = [],
   assigneeName,
   assigneeAvatar,
@@ -199,6 +220,14 @@ export function TaskCard({
               icon={<AlarmIcon className="size-6" />}
             >
               {dueDateText}
+              {/* The state the colour was carrying alone (#92). Inside the Tag rather than
+                  beside it so it lands in the same reading order as the date it qualifies,
+                  and `sr-only` rather than visible because no Figma export draws an affix —
+                  see `dueDateUrgencyLabel`. The leading ", " is punctuation for speech
+                  pacing and belongs to the rendering; the label itself is the consumer's,
+                  announced verbatim. Empty label renders nothing at all, which is what keeps
+                  `normal` silent structurally rather than by a condition written twice. */}
+              <DueDateUrgencyState urgency={dueDateUrgency} labels={dueDateUrgencyLabel} />
             </Tag>
           ) : null}
         </div>

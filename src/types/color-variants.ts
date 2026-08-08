@@ -104,3 +104,35 @@ export const DUE_DATE_URGENCY_COLOR: Record<DueDateUrgency, AccentColor> = {
   soon: 'yellow',
   overdue: 'red',
 };
+
+/**
+ * Shared mapping from due-date urgency onto the text that states it, announced to assistive
+ * tech beside the date. The counterpart to `DUE_DATE_URGENCY_COLOR` above, and paired with it
+ * for the same reason: `TaskCard` and `DueDateCell` must not drift on what "overdue" *says*
+ * any more than on what it looks like.
+ *
+ * **This exists because the colour was the whole signal** (#92). Both renderers took an
+ * urgency and rendered it as `text-primary-2` / a red `Tag` fill and nothing else, so the
+ * state reached neither a screen-reader user nor a colour-blind sighted one — WCAG 2.2 1.4.1.
+ * The date text is not a substitute: `'Yesterday'` reads as past to a human, but
+ * `'20 July, 2026'` requires already knowing today's date, which is the inference an
+ * accessible name exists to remove.
+ *
+ * `normal` is deliberately **empty, and that is load-bearing rather than a placeholder.**
+ * "Not urgent" is the absence of a state, so announcing it would add noise to every ordinary
+ * task on the board — and an empty string is what makes "announce nothing when there is
+ * nothing to announce" structural instead of a condition each renderer re-implements. A
+ * consumer can silence `soon`/`overdue` the same way, by passing `''`.
+ *
+ * `soon` is included even though #92 is written about `overdue`: yellow-versus-neutral is
+ * exactly as much a colour-only signal as red-versus-neutral, so fixing only the red half
+ * would leave 1.4.1 failing for the other one.
+ *
+ * English by default and overridable per renderer — a hardcoded string here would rebuild
+ * #13's defect in a new place. See `TaskCard.dueDateUrgencyLabel` / `DueDateCell.urgencyLabel`.
+ */
+export const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string> = {
+  normal: '',
+  soon: 'due soon',
+  overdue: 'overdue',
+};

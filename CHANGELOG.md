@@ -59,6 +59,48 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - `ApplicationSidebar` gains its first test file. Coverage thresholds ratcheted
   91.77 → 94.02 statements, 90.29 → 90.90 branches, 86.71 → 88.11 functions.
 
+### Fixed
+
+- **Due-date urgency was conveyed by colour alone** (#92). WCAG 2.2 1.4.1. **Minor** — the
+  new props are additive and the fix is on by default.
+
+  `TaskCard` rendered its due date as a red `Tag` and `DueDateCell` as `text-primary-2`, and
+  that was the entire signal. Nothing in the accessibility tree and nothing in the visible
+  text said a task was overdue, so it failed for a screen-reader user and a colour-blind
+  sighted user alike. The word never reached the DOM at all — `grep -c '"overdue"'` over
+  `dist/index.js` at `v0.5.3` returned **0**, against `grep -c 'jsx-runtime'` → 1 as the
+  positive control.
+
+  Both renderers now emit an `sr-only` state node after the date, so a screen reader reads
+  "20 July, 2026, overdue". The strings come from a shared `DUE_DATE_URGENCY_LABEL` map
+  exported alongside the existing `DUE_DATE_URGENCY_COLOR`, which is what stops the card and
+  the table cell drifting on what "overdue" _says_ the same way they cannot drift on what it
+  looks like.
+
+  | Component      | New prop                          |
+  | -------------- | --------------------------------- |
+  | `TaskCard`     | `dueDateUrgencyLabel`             |
+  | `TaskTableRow` | `dueDateUrgencyLabel` (forwarded) |
+  | `DueDateCell`  | `urgencyLabel`                    |
+
+  Each takes a `Partial<Record<DueDateUrgency, string>>` merged over the defaults, so
+  `{ overdue: 'past due' }` changes one and leaves the rest. English defaults are
+  overridable rather than baked in — shipping the fix for "consumers cannot override our
+  strings" with a string consumers cannot override would have rebuilt #13's defect in a new
+  place.
+
+  **`soon` is fixed too**, though the issue is written about `overdue`: yellow-versus-neutral
+  is exactly as much a colour-only signal as red-versus-neutral. **`normal` announces
+  nothing** and renders no node at all — "not urgent" is the absence of a state, and an empty
+  string is what makes that structural rather than a condition each renderer re-implements.
+
+  **The visible text is untouched.** `dueDateText` renders exactly as passed. A _visible_
+  affix would additionally serve colour-blind sighted users and is deliberately not done: no
+  Figma export draws one, and inventing a design value is forbidden. Measured in a real
+  browser rather than reasoned about — the state node computes `position: absolute`,
+  `1px × 1px`, `overflow: hidden`, `clip-path: inset(50%)`, and the `Tag` measures 140px wide
+  with it and 140px without, so it costs no layout.
+
 ## [0.5.3] — 2026-08-07
 
 Two consumer-facing fixes and two to the repo's own tooling.
