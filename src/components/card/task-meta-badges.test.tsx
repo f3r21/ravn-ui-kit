@@ -15,6 +15,23 @@ import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
  * Querying the rendered text is what makes these fail if that shape comes back: the attribute
  * would return, and the text would not.
  */
+/**
+ * The badges, as the row's own element children.
+ *
+ * Deliberately **not** `querySelector('span.inline-flex')`, which is what these cases used
+ * first: that makes a Tailwind styling class the handle for an accessibility assertion, so a
+ * class rename would turn an a11y test into a test of nothing. Raised in review on #109, and it
+ * is this issue's own subject arriving one level up — a probe that stops testing what it claims
+ * while still passing.
+ *
+ * "A badge is a direct child of the row" is a structural contract rather than a presentational
+ * one, and if it stops holding, the length assertions below fail loudly.
+ */
+function badgesIn(container: HTMLElement): Element[] {
+  const row = container.firstElementChild;
+  return row ? [...row.children] : [];
+}
+
 describe('TaskMetaBadges', () => {
   const icon = <svg />;
 
@@ -90,7 +107,8 @@ describe('decorative badges (#93)', () => {
       />,
     );
 
-    expect(isInaccessible(container.querySelector('span.inline-flex')!)).toBe(true);
+    const [badge] = badgesIn(container);
+    expect(isInaccessible(badge)).toBe(true);
   });
 
   /**
@@ -103,7 +121,8 @@ describe('decorative badges (#93)', () => {
       <TaskMetaBadges badges={[{ icon: <svg />, count: 12, label: '12 comments' }]} />,
     );
 
-    expect(isInaccessible(container.querySelector('span.inline-flex')!)).toBe(false);
+    const [badge] = badgesIn(container);
+    expect(isInaccessible(badge)).toBe(false);
     expect(screen.getByText('12 comments')).toBeDefined();
   });
 
@@ -121,7 +140,7 @@ describe('decorative badges (#93)', () => {
       />,
     );
 
-    const rendered = [...container.querySelectorAll('span.inline-flex')];
+    const rendered = badgesIn(container);
     expect(rendered).toHaveLength(2);
     expect(isInaccessible(rendered[0])).toBe(true); // decorative
     expect(isInaccessible(rendered[1])).toBe(false); // labelled
