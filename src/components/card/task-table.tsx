@@ -359,6 +359,21 @@ export interface TaskTableRowProps {
    */
   actions?: React.ReactNode;
   /**
+   * Which columns this row draws, and in what order (#97).
+   *
+   * Rendering a row directly is rare — `TaskTable` passes its own resolved list down, so a
+   * consumer using `TaskTable.columns` never sets this. It exists because `TaskTableRow` is
+   * exported, and a row that ignored the table's column set would produce cells that do not
+   * line up with the header above them.
+   * @default DEFAULT_COLUMNS
+   */
+  columns?: readonly TaskTableColumn[];
+  /**
+   * Column header text, used only to resolve `columns` when this row is rendered directly.
+   * Ignored for anything a row draws, since a row draws no headers.
+   */
+  columnLabels?: Partial<TaskTableColumnLabels>;
+  /**
    * Called when the row is opened. Providing it renders the task title as a real `<button>`
    * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
    * whole row clickable for a pointer user. Fires once either way, and not at all when the
@@ -406,9 +421,42 @@ export function TaskTableRow({
   dueDateUrgency = 'normal',
   dueDateUrgencyLabel,
   actions,
+  columns,
+  columnLabels,
   onClick,
   onViewDetails,
 }: TaskTableRowProps) {
+  // The row reads the same resolver the header, the colgroup and the skeleton read. That shared
+  // resolution is what replaces the shared constants they all used to read directly (#97).
+  const resolved = resolveColumns(columns, columnLabels);
+
+  // The row's own props, rebuilt for `TaskTableCustomColumn.renderCell`. Explicit rather than a
+  // rest-capture because every field above is destructured with its default applied, and a
+  // custom cell should see the same values the built-in cells do.
+  const rowProps: TaskTableRowProps = {
+    index,
+    title,
+    indicatorColor,
+    reactions,
+    isSelected,
+    onSelectedChange,
+    isSelectable,
+    selectLabel,
+    detailsLabel,
+    headingLevel,
+    tags,
+    estimationPoints,
+    formatPoints,
+    assigneeName,
+    assigneeAvatar,
+    unassignedLabel,
+    dueDate,
+    dueDateUrgency,
+    dueDateUrgencyLabel,
+    actions,
+    onClick,
+    onViewDetails,
+  };
   // A click on one of the row's own controls is not a click on the row. Without this, ticking
   // the select checkbox or following the "Details" link also fired `onClick` and opened the
   // task — including from the keyboard, where activating a control synthesises a click that
@@ -438,6 +486,133 @@ export function TaskTableRow({
     <span className={cn(CELL_TEXT, titleSizing, 'truncate')}>{title}</span>
   );
 
+  /**
+   * The five cell bodies, keyed. Split out of the `<tr>` so the row can render whichever
+   * columns it was given, in whatever order — the `<td>` chrome is written once below and
+   * the body is looked up, rather than five `<td>`s hardcoding a sequence (#97).
+   */
+  const cellBody: Record<TaskTableColumnKey, React.ReactNode> = {
+    name: (
+      <div className="flex items-center gap-2 h-full">
+        <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
+        {/* `has-[:focus-visible]:outline-solid` is load-bearing — see `LabelCheckbox`
+            for the full reasoning. The row-select checkbox is `sr-only`, so its ring is
+            drawn on this label via `:has()`, and under that variant `outline-2` alone
+            leaves `outline-style` unresolved: the ring computed a width and a colour and
+            painted nothing. Verified by counting pixels in a real browser, 0 -> 291. */}
+        {/* The handler below is a propagation guard, not an activation path — what a
+            keyboard operates here is the real `<input type="checkbox">` this label wraps,
+            which is exactly what the two suppressed rules exist to require. */}
+        {isSelectable ? (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+          <label
+            onClick={stopRowOpen}
+            className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1"
+          >
+            <input
+              type="checkbox"
+              className="sr-only"
+              checked={isSelected}
+              onChange={(e) => onSelectedChange?.(e.target.checked)}
+              aria-label={selectLabel ?? `Select ${title}`}
+            />
+            <CheckboxBoxIcon
+              className={cn(
+                'w-6 h-6 text-main transition-opacity',
+                isSelected
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
+              )}
+            />
+          </label>
+        ) : null}
+        <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>
+          {String(index).padStart(2, '0')}
+        </span>
+        {/* The row's opener. A real `<button>` rather than a `role`/`tabIndex`/`onKeyDown`
+            trio on some wrapper: its accessible name is the task title, and focus, Enter
+            and Space come from the platform. It carries `truncate` itself so a long title
+            still clips at the column edge. */}
+        {/* Under a `headingLevel`, the sizing moves to the heading and the control keeps
+            only `max-w-full truncate` — same reason as `ProjectInfo`: `truncate` sets
+            `overflow: hidden`, and a focus ring is painted outside the box, so a
+            truncating ancestor would clip the ring away on all four sides. */}
+        {TitleHeading ? (
+          <TitleHeading className={cn(CELL_TEXT, 'flex-1 min-w-0')}>{titleControl}</TitleHeading>
+        ) : (
+          titleControl
+        )}
+        {reactions.map((r) => (
+          <span key={r.emoji} className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}>
+            <span className="tabular-nums">{r.count}</span>
+            <span>{r.emoji}</span>
+          </span>
+        ))}
+        {onViewDetails ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              stopRowOpen(e);
+              onViewDetails();
+            }}
+            className={cn(
+              CELL_TEXT,
+              // `hover:text-interactive-text`, not `hover:text-interactive`: this is a
+              // text label, and hovering it used to drop it to 3.51:1 on the panel it
+              // sits on. A hover state is invisible to a static-story axe pass, so this
+              // one was found by reading rather than by measuring.
+              'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs',
+            )}
+          >
+            <span>{detailsLabel}</span>
+            <ChevronRightIcon className="w-4 h-4" />
+          </button>
+        ) : null}
+        {/* Same propagation guard as the checkbox and the "Details" link above: a click on
+            one of the row's own controls is not a click on the row. Without it, opening the
+            menu also opens the task behind it. The wrapper is a plain `<div>` carrying only
+            the guard — whatever the consumer passes owns its own focus ring and padding. */}
+        {actions ? (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          <div className="shrink-0" onClick={stopRowOpen}>
+            {actions}
+          </div>
+        ) : null}
+      </div>
+    ),
+    tags: (
+      <div className="flex items-center gap-2 h-full">
+        {tags.length > 0 ? <TagCell labels={tags} /> : null}
+      </div>
+    ),
+    estimation: (
+      <div className="flex items-center gap-2 h-full">
+        {estimationPoints !== undefined ? (
+          <EstimationCell points={estimationPoints} formatPoints={formatPoints} />
+        ) : null}
+      </div>
+    ),
+    assignee: (
+      <div className="flex items-center gap-2 h-full">
+        {/* Unconditional (#111). The card renders its `Avatar` whether or not there is an
+            assignee, and this cell did not — so the same task announced "Unassigned" on a
+            board and nothing at all in a table. */}
+        <AssigneeNameCell
+          name={assigneeName}
+          avatarSrc={assigneeAvatar}
+          unassignedLabel={unassignedLabel}
+        />
+      </div>
+    ),
+    dueDate: (
+      <div className="flex items-center gap-2 h-full">
+        {dueDate ? (
+          <DueDateCell date={dueDate} urgency={dueDateUrgency} urgencyLabel={dueDateUrgencyLabel} />
+        ) : null}
+      </div>
+    ),
+  };
+
   return (
     // The row-wide handler is a pointer convenience only. A `<tr>` cannot be the control
     // itself — giving it `role="button"` would strip its `row` role and break the table it
@@ -446,142 +621,24 @@ export function TaskTableRow({
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
     <tr onClick={onClick} className={cn('group', onClick && 'cursor-pointer')}>
-      {/* Task Name Cell: padding 4px 16px 4px 0px -- the left edge is 0 so the accent stripe
-          sits flush against it. */}
-      <td className={cn(CELL_BASE, 'pl-0 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
-        <div className="flex items-center gap-2 h-full">
-          <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
-          {/* `has-[:focus-visible]:outline-solid` is load-bearing — see `LabelCheckbox`
-              for the full reasoning. The row-select checkbox is `sr-only`, so its ring is
-              drawn on this label via `:has()`, and under that variant `outline-2` alone
-              leaves `outline-style` unresolved: the ring computed a width and a colour and
-              painted nothing. Verified by counting pixels in a real browser, 0 -> 291. */}
-          {/* The handler below is a propagation guard, not an activation path — what a
-              keyboard operates here is the real `<input type="checkbox">` this label wraps,
-              which is exactly what the two suppressed rules exist to require. */}
-          {isSelectable ? (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-            <label
-              onClick={stopRowOpen}
-              className="w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1"
-            >
-              <input
-                type="checkbox"
-                className="sr-only"
-                checked={isSelected}
-                onChange={(e) => onSelectedChange?.(e.target.checked)}
-                aria-label={selectLabel ?? `Select ${title}`}
-              />
-              <CheckboxBoxIcon
-                className={cn(
-                  'w-6 h-6 text-main transition-opacity',
-                  isSelected
-                    ? 'opacity-100'
-                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
-                )}
-              />
-            </label>
-          ) : null}
-          <span className={cn(CELL_TEXT, 'shrink-0 tabular-nums')}>
-            {String(index).padStart(2, '0')}
-          </span>
-          {/* The row's opener. A real `<button>` rather than a `role`/`tabIndex`/`onKeyDown`
-              trio on some wrapper: its accessible name is the task title, and focus, Enter
-              and Space come from the platform. It carries `truncate` itself so a long title
-              still clips at the column edge. */}
-          {/* Under a `headingLevel`, the sizing moves to the heading and the control keeps
-              only `max-w-full truncate` — same reason as `ProjectInfo`: `truncate` sets
-              `overflow: hidden`, and a focus ring is painted outside the box, so a
-              truncating ancestor would clip the ring away on all four sides. */}
-          {TitleHeading ? (
-            <TitleHeading className={cn(CELL_TEXT, 'flex-1 min-w-0')}>{titleControl}</TitleHeading>
-          ) : (
-            titleControl
+      {resolved.map((col, i) => (
+        <td
+          key={col.key}
+          className={cn(
+            CELL_BASE,
+            // Task Name's left padding is 0 so the accent stripe sits flush against the edge
+            // (Figma: padding 4px 16px 4px 0px); every other cell takes pl-2.
+            col.key === 'name' ? 'pl-0 pr-4' : 'pl-2 pr-4',
+            // `border-l` belongs to whichever column is FIRST, not to `name`. Those were the
+            // same thing while the order was fixed, and a consumer who reorders is exactly the
+            // case where they stop being.
+            i === 0 && 'border-l',
           )}
-          {reactions.map((r) => (
-            <span
-              key={r.emoji}
-              className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}
-            >
-              <span className="tabular-nums">{r.count}</span>
-              <span>{r.emoji}</span>
-            </span>
-          ))}
-          {onViewDetails ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                stopRowOpen(e);
-                onViewDetails();
-              }}
-              className={cn(
-                CELL_TEXT,
-                // `hover:text-interactive-text`, not `hover:text-interactive`: this is a
-                // text label, and hovering it used to drop it to 3.51:1 on the panel it
-                // sits on. A hover state is invisible to a static-story axe pass, so this
-                // one was found by reading rather than by measuring.
-                'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs',
-              )}
-            >
-              <span>{detailsLabel}</span>
-              <ChevronRightIcon className="w-4 h-4" />
-            </button>
-          ) : null}
-          {/* Same propagation guard as the checkbox and the "Details" link above: a click on
-              one of the row's own controls is not a click on the row. Without it, opening the
-              menu also opens the task behind it. The wrapper is a plain `<div>` carrying only
-              the guard — whatever the consumer passes owns its own focus ring and padding. */}
-          {actions ? (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div className="shrink-0" onClick={stopRowOpen}>
-              {actions}
-            </div>
-          ) : null}
-        </div>
-      </td>
-
-      {/* Task Tag Cell */}
-      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
-        <div className="flex items-center gap-2 h-full">
-          {tags.length > 0 ? <TagCell labels={tags} /> : null}
-        </div>
-      </td>
-
-      {/* Estimation Cell */}
-      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
-        <div className="flex items-center gap-2 h-full">
-          {estimationPoints !== undefined ? (
-            <EstimationCell points={estimationPoints} formatPoints={formatPoints} />
-          ) : null}
-        </div>
-      </td>
-
-      {/* Task Assign Name Cell */}
-      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
-        <div className="flex items-center gap-2 h-full">
-          {/* Unconditional (#111). The card renders its `Avatar` whether or not there is an
-              assignee, and this cell did not — so the same task announced "Unassigned" on a
-              board and nothing at all in a table. */}
-          <AssigneeNameCell
-            name={assigneeName}
-            avatarSrc={assigneeAvatar}
-            unassignedLabel={unassignedLabel}
-          />
-        </div>
-      </td>
-
-      {/* Due Date Cell */}
-      <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
-        <div className="flex items-center gap-2 h-full">
-          {dueDate ? (
-            <DueDateCell
-              date={dueDate}
-              urgency={dueDateUrgency}
-              urgencyLabel={dueDateUrgencyLabel}
-            />
-          ) : null}
-        </div>
-      </td>
+          style={{ width: col.width }}
+        >
+          {col.renderCell ? col.renderCell(rowProps) : cellBody[col.key as TaskTableColumnKey]}
+        </td>
+      ))}
     </tr>
   );
 }
@@ -651,46 +708,70 @@ export interface TaskTableProps {
    * constant with no way past them, so a consumer could not translate the one row of this
    * component that is pure prose.
    *
-   * This names the five columns the table draws today. **#97 proposes a `columns` prop** that
-   * would let a consumer add, remove or reorder them, and would supersede this — that is a
-   * larger redesign with an unresolved question inside it (the five widths sum to the spec's
-   * 1108px row), so this is the small fix rather than a down-payment on that shape.
+   * **`columns` (#97) does not replace this.** Setting a header's words is the common case and
+   * should not require restating the column set to do it. When both are given, `columns[].label`
+   * wins — the precedence is stated on `resolveColumns` rather than left to be discovered.
    * @default { name: '# Task Name', tags: 'Task Tags', estimation: 'Estimate', assignee: 'Task Assign Name', dueDate: 'Due Date' }
    */
   columnLabels?: Partial<TaskTableColumnLabels>;
+  /**
+   * Which columns the table draws, in what order, at what width (#97).
+   *
+   * Additive: omitted, the table renders `DEFAULT_COLUMNS` exactly as before. The `key` set is
+   * closed — a column selects one of the five cells this component knows how to draw, so this
+   * reorders and omits rather than letting a consumer define arbitrary cells. Rendering
+   * something the kit has no cell for is `TaskTableGroup.actions` or a component of your own,
+   * not a sixth column here.
+   *
+   * **Supplying a `width` opts out of the 1108px total**, and that is the trade this prop
+   * makes. The five default widths sum to the spec's "Task Table Row" width, which
+   * `src/styles/decisions.mdx` quotes and which `min-w-[1108px]` used to hardcode — that
+   * minimum is now computed from whatever columns are in play, so a narrower set no longer
+   * forces a scrollbar for space it does not use. The default set still sums to 1108, and a
+   * test pins it: the invariant stopped being emergent and became asserted, because an
+   * override path is exactly what kills a property nobody checks.
+   *
+   * Omitting a column removes its cell from every row, the header and the `colgroup` together
+   * — all four read `resolveColumns`, so they cannot disagree.
+   * @default DEFAULT_COLUMNS
+   */
+  columns?: readonly TaskTableColumn[];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
-function TaskTableRowSkeleton() {
+function TaskTableRowSkeleton({ columns }: { columns: ResolvedTaskTableColumn[] }) {
+  // The fourth renderer, and the one most likely to be forgotten — a skeleton nobody looks at
+  // closely can hold a stale column set for a long time. It reads the same resolved list as the
+  // header, the colgroup and the real row, so it cannot (#97).
+  const placeholder: Record<TaskTableColumnKey, React.ReactNode> = {
+    name: <Skeleton className="h-4 w-full" />,
+    tags: <Skeleton className="h-6 w-16 rounded" />,
+    estimation: <Skeleton className="h-4 w-16" />,
+    assignee: (
+      <>
+        <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+        <Skeleton className="h-4 w-20" />
+      </>
+    ),
+    dueDate: <Skeleton className="h-4 w-20" />,
+  };
+
   return (
     <tr>
-      <td className={cn(CELL_BASE, 'pl-4 pr-4 border-l')} style={{ width: COLUMN_WIDTHS.name }}>
-        <div className="flex items-center gap-2 h-full">
-          <Skeleton className="h-4 w-full" />
-        </div>
-      </td>
-      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.tags }}>
-        <div className="flex items-center gap-2 h-full">
-          <Skeleton className="h-6 w-16 rounded" />
-        </div>
-      </td>
-      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
-        <div className="flex items-center gap-2 h-full">
-          <Skeleton className="h-4 w-16" />
-        </div>
-      </td>
-      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
-        <div className="flex items-center gap-2 h-full">
-          <Skeleton className="w-8 h-8 rounded-full shrink-0" />
-          <Skeleton className="h-4 w-20" />
-        </div>
-      </td>
-      <td className={cn(CELL_BASE, 'pl-4 pr-4')} style={{ width: COLUMN_WIDTHS.dueDate }}>
-        <div className="flex items-center gap-2 h-full">
-          <Skeleton className="h-4 w-20" />
-        </div>
-      </td>
+      {columns.map((col, i) => (
+        <td
+          key={col.key}
+          className={cn(CELL_BASE, 'pl-4 pr-4', i === 0 && 'border-l')}
+          style={{ width: col.width }}
+        >
+          <div className="flex items-center gap-2 h-full">
+            {/* A custom column has no bespoke placeholder — a generic bar is right, and is
+                better than an empty cell that reads as a rendering bug while loading. */}
+            {placeholder[col.key as TaskTableColumnKey] ?? <Skeleton className="h-4 w-16" />}
+          </div>
+        </td>
+      ))}
     </tr>
   );
 }
@@ -733,6 +814,106 @@ const DEFAULT_COLUMN_LABELS: TaskTableColumnLabels = {
 
 const COLUMN_ORDER = ['name', 'tags', 'estimation', 'assignee', 'dueDate'] as const;
 
+/** Which of the five cells a column draws. Closed on purpose — see `TaskTableProps.columns`. */
+export type TaskTableColumnKey = (typeof COLUMN_ORDER)[number];
+
+/** One of the five cells this component knows how to draw. */
+export interface TaskTableBuiltInColumn {
+  /** Which of the five cells this column draws. */
+  key: TaskTableColumnKey;
+  /**
+   * Header text. Falls back to `columnLabels[key]`, then to the default.
+   * @default DEFAULT_COLUMN_LABELS[key]
+   */
+  label?: string;
+  /**
+   * Width in pixels. **Supplying one opts out of the 1108px total** — see
+   * `TaskTableProps.columns`.
+   * @default COLUMN_WIDTHS[key]
+   */
+  width?: number;
+}
+
+/**
+ * A column the kit does not know about — the Status column #97 names in its first sentence.
+ *
+ * `label` and `width` are **required** here and optional on a built-in, and that asymmetry is
+ * the point: there is no default for a column this component never drew. A width is what keeps
+ * the header, the `colgroup` and the body cells aligned, and guessing one would misalign the
+ * table rather than fail.
+ *
+ * `renderCell` receives the row's own props, so a custom column reads the same typed row data
+ * as every other cell. That is what keeps this **additive**: `TaskTableRowProps` stays typed
+ * field-by-field and does not become a generic bag, so nothing existing breaks.
+ */
+export interface TaskTableCustomColumn {
+  /** Identifier for this column. Must not collide with a built-in key. */
+  key: string;
+  /** Header text. Required — the kit has no name for a column it did not draw. */
+  label: string;
+  /** Width in pixels. Required, for the same reason. */
+  width: number;
+  /** Draws the cell for one row. */
+  renderCell: (row: TaskTableRowProps) => React.ReactNode;
+}
+
+/** One column in `TaskTableProps.columns` (#97). */
+export type TaskTableColumn = TaskTableBuiltInColumn | TaskTableCustomColumn;
+
+function isCustom(col: TaskTableColumn): col is TaskTableCustomColumn {
+  return 'renderCell' in col;
+}
+
+/**
+ * The five columns as the design draws them, in order.
+ *
+ * Deliberately carries **only keys**. Baking `label` and `width` in here looks tidier and
+ * silently breaks `columnLabels`: `resolveColumns` falls back with `??`, so a label present on
+ * the column always wins and the `columnLabels` argument can never be reached. #90's existing
+ * tests caught exactly that — the defaults belong in the resolver, where the fallback chain
+ * can see them.
+ */
+export const DEFAULT_COLUMNS: readonly TaskTableColumn[] = COLUMN_ORDER.map((key) => ({ key }));
+
+/** A column with every fallback applied — what the four renderers actually iterate. */
+export interface ResolvedTaskTableColumn {
+  key: string;
+  label: string;
+  width: number;
+  /** Present only for a custom column; built-ins are drawn from the keyed cell bodies. */
+  renderCell?: (row: TaskTableRowProps) => React.ReactNode;
+}
+
+/**
+ * The one place a column list becomes concrete, and the reason the four renderers cannot drift.
+ *
+ * The header row, the `<colgroup>`, `TaskTableRow` and `TaskTableRowSkeleton` must agree on
+ * which columns exist, in what order, at what width. Before `columns` they agreed because all
+ * four read `COLUMN_WIDTHS` and `COLUMN_ORDER` directly — agreement by shared constant, which
+ * an override path destroys. It is replaced by agreement through shared *resolution*: all four
+ * iterate the output of this function. Teaching the table a new column is one entry in
+ * `COLUMN_ORDER` plus one cell body in each of the two row renderers, and the header and
+ * colgroup follow for free — rather than four edits a reviewer has to notice are missing.
+ *
+ * **Label precedence is `columns[].label` → `columnLabels[key]` → the default**, stated here
+ * because two ways to set one string is how an API rots. `columnLabels` (#90) predates this and
+ * keeps working: translating headers should not require restating the column set.
+ */
+export function resolveColumns(
+  columns: readonly TaskTableColumn[] | undefined,
+  columnLabels: Partial<TaskTableColumnLabels> | undefined,
+): ResolvedTaskTableColumn[] {
+  return (columns ?? DEFAULT_COLUMNS).map((col) =>
+    isCustom(col)
+      ? { key: col.key, label: col.label, width: col.width, renderCell: col.renderCell }
+      : {
+          key: col.key,
+          label: col.label ?? columnLabels?.[col.key] ?? DEFAULT_COLUMN_LABELS[col.key],
+          width: col.width ?? COLUMN_WIDTHS[col.key],
+        },
+  );
+}
+
 /**
  * TaskTable
  *
@@ -752,14 +933,18 @@ export function TaskTable({
   emptyAction,
   empty,
   columnLabels,
+  columns,
   className,
 }: TaskTableProps) {
-  // Built here rather than at module scope so `columnLabels` can reach it. `COLUMN_ORDER` keeps
-  // the column sequence a single source of truth; only the words are overridable (#90).
-  const headerCells = COLUMN_ORDER.map((key) => ({
-    key,
-    label: { ...DEFAULT_COLUMN_LABELS, ...columnLabels }[key],
-  }));
+  // Resolved once, here, and handed to all four renderers below — the header row, the
+  // `<colgroup>`, `TaskTableRow` and `TaskTableRowSkeleton`. They used to agree because they
+  // each read `COLUMN_WIDTHS` and `COLUMN_ORDER`; now they agree because they read this (#97).
+  const resolved = resolveColumns(columns, columnLabels);
+
+  // Was `min-w-[1108px]`, the sum of the five default widths. Computed now, because a consumer
+  // who drops a column should not be forced to scroll for space it no longer occupies. The
+  // default set still comes out at 1108 and a test pins that.
+  const minWidth = resolved.reduce((sum, col) => sum + col.width, 0);
 
   return (
     <div
@@ -769,19 +954,19 @@ export function TaskTable({
         className,
       )}
     >
-      <div className="flex flex-col gap-4 min-w-[1108px]">
+      <div className="flex flex-col gap-4" style={{ minWidth }}>
         {/* Shared column header row */}
         <div className="flex">
-          {headerCells.map(({ key, label }, i) => (
+          {resolved.map(({ key, label, width }, i) => (
             <div
               key={key}
               className={cn(
                 CELL_BASE,
                 'px-4',
                 i === 0 && 'border-l rounded-l-4',
-                i === headerCells.length - 1 && 'rounded-r-4',
+                i === resolved.length - 1 && 'rounded-r-4',
               )}
-              style={{ width: COLUMN_WIDTHS[key] }}
+              style={{ width }}
             >
               <span className={CELL_TEXT}>{label}</span>
             </div>
@@ -791,13 +976,13 @@ export function TaskTable({
         {isLoading ? (
           <table className="border-collapse table-fixed">
             <colgroup>
-              {headerCells.map(({ key }) => (
-                <col key={key} style={{ width: COLUMN_WIDTHS[key] }} />
+              {resolved.map(({ key, width }) => (
+                <col key={key} style={{ width }} />
               ))}
             </colgroup>
             <tbody>
               {Array.from({ length: 5 }).map((_, i) => (
-                <TaskTableRowSkeleton key={i} />
+                <TaskTableRowSkeleton key={i} columns={resolved} />
               ))}
             </tbody>
           </table>
@@ -809,13 +994,13 @@ export function TaskTable({
           groups.map((group, gi) => (
             <table key={gi} className="border-collapse table-fixed">
               <colgroup>
-                {headerCells.map(({ key }) => (
-                  <col key={key} style={{ width: COLUMN_WIDTHS[key] }} />
+                {resolved.map(({ key, width }) => (
+                  <col key={key} style={{ width }} />
                 ))}
               </colgroup>
               <tbody>
                 <tr>
-                  <td colSpan={headerCells.length} className="p-0 border border-neutral-3">
+                  <td colSpan={resolved.length} className="p-0 border border-neutral-3">
                     <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
                       <ChevronDownIcon className="w-6 h-6 shrink-0 text-muted" />
                       <GroupHeading level={group.headingLevel ?? 3}>{group.title}</GroupHeading>
@@ -824,7 +1009,11 @@ export function TaskTable({
                   </td>
                 </tr>
                 {group.rows.map((row, ri) => (
-                  <TaskTableRow key={ri} {...row} />
+                  // The table's column set wins over anything on the row: a row inside a
+                  // table that disagreed with its own header is not a configuration worth
+                  // supporting, and spreading `row` first would allow exactly that. Both go
+                  // through `resolveColumns`, so the row cannot resolve them differently.
+                  <TaskTableRow key={ri} {...row} columns={columns} columnLabels={columnLabels} />
                 ))}
               </tbody>
             </table>

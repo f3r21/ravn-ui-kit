@@ -35,6 +35,35 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **`TaskTable.columns` — the column schema is no longer frozen** (#97). Additive; omitted, the
+  table renders exactly what it did before. **Minor.**
+
+  The schema lived in two module constants, so a consumer could not add a Status column, drop
+  Estimation, reorder any of it, or set a width. `columns` takes a list of built-in keys —
+  `name`, `tags`, `estimation`, `assignee`, `dueDate` — each with an optional `label` and
+  `width`, or a **custom column** supplying its own `label`, `width` and
+  `renderCell(row)`.
+
+  **`renderCell` receives the row's own typed props**, which is what keeps this additive:
+  `TaskTableRowProps` stays typed field-by-field rather than becoming a generic bag, so nothing
+  existing breaks and `columnLabels` (#90) keeps working. Precedence is `columns[].label` →
+  `columnLabels[key]` → the default.
+
+  **Two properties an override path would otherwise have destroyed, both now enforced:**
+
+  - **The four renderers still agree.** The header row, the `<colgroup>`, `TaskTableRow` and
+    `TaskTableRowSkeleton` used to agree because all four read the same two constants. They now
+    all iterate `resolveColumns`, so agreement is structural rather than remembered. Proven by
+    sabotage: drifting the skeleton, and drifting the `colgroup`, each go red.
+  - **The 1108px width sum stopped being emergent.** It was a property of two constants that
+    nothing asserted, and `width` becoming settable is exactly what kills that. A test pins the
+    default set to 1108; changing a default width now fails rather than drifts.
+
+  `min-w-[1108px]` is now computed from the columns in play, so dropping a column no longer
+  forces a scrollbar for space it does not use.
+
+### Added
+
 - **The kit's remaining visible English copy is now overridable** (#90). Additive; every default
   is the exact string it replaced. **Minor.**
 
