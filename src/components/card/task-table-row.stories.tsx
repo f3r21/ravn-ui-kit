@@ -1,6 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
-import type { Decorator } from '@storybook/react';
+import type { Meta, StoryObj, Decorator } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { Item } from 'react-stately';
 import { TaskTableRow } from './task-table';
 import { Menu } from '../menu/menu';
