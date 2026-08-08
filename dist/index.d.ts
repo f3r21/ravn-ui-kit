@@ -195,13 +195,24 @@ export declare function AlarmIcon(props: IconProps): JSX.Element;
  * codebase — removed as fabricated, same treatment Chunk 4 gave Button's
  * unfounded `size`/`isLoading` props.
  */
-export declare function ApplicationSidebar({ logo, items, className }: ApplicationSidebarProps): JSX.Element;
+export declare function ApplicationSidebar({ logo, items, label, className, }: ApplicationSidebarProps): JSX.Element;
 
 export declare interface ApplicationSidebarProps {
     /** Logo / brand element shown at the top */
     logo?: React.ReactNode;
     /** Navigation items to render */
     items: SidebarItemProps[];
+    /**
+     * Accessible name for the `<nav>` landmark.
+     *
+     * Override it whenever a second navigation landmark can be on the page — the consuming
+     * app's own product nav, a secondary sidebar, or simply two of these. A screen reader
+     * offers landmarks as a list, and two entries both called "Main navigation" are two
+     * things that list cannot tell apart. Same reason `ToastProvider.label` exists, and the
+     * same reason `EmptyState.label` does.
+     * @default 'Main navigation'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -287,7 +298,7 @@ export declare function AssigneeIcon(props: IconProps): JSX.Element;
  * action (every real "User" row instance renders identically, with no highlighted/selected
  * variant anywhere in the export).
  */
-export declare function AssigneeModal({ assignees, onSelect, onClose, triggerRef, dismissExemptRef, className, }: AssigneeModalProps): JSX.Element;
+export declare function AssigneeModal({ assignees, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: AssigneeModalProps): JSX.Element;
 
 export declare interface AssigneeModalProps {
     /** Full list of assignable people shown as rows. */
@@ -303,6 +314,17 @@ export declare interface AssigneeModalProps {
      * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
      */
     dismissExemptRef?: PopoverProps['dismissExemptRef'];
+    /**
+     * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+     *
+     * One prop drives both on purpose. They were two copies of the same hardcoded `'Assignee'`,
+     * and splitting them into two props would let a consumer set an accessible name that
+     * disagrees with the visible one, which is the WCAG 2.5.3 (Label in Name) failure this
+     * component currently avoids only by accident. Overriding it translates the header and the
+     * announced name together.
+     * @default 'Assignee'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -652,7 +674,7 @@ export declare function Datepicker({ label, isLabelVisible, error, description, 
  * correct, standard grid semantics is a net accessibility improvement, not a regression against
  * verified spec.
  */
-export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, className, }: DatePickerMenuProps): JSX.Element;
+export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, label, previousYearLabel, previousMonthLabel, nextMonthLabel, nextYearLabel, className, }: DatePickerMenuProps): JSX.Element;
 
 export declare interface DatePickerMenuProps {
     /**
@@ -685,6 +707,40 @@ export declare interface DatePickerMenuProps {
      * Needed when this menu is one of several sibling triggers, e.g. `AddTaskModal`'s chip row.
      */
     dismissExemptRef?: PopoverProps['dismissExemptRef'];
+    /**
+     * Accessible name for the popover surface and for the calendar grid inside it, which
+     * were two hardcoded copies of `'Date picker'` before.
+     *
+     * The two land differently and both are intended: the popover takes it verbatim, while
+     * react-aria's `useCalendar` composes the grid's name as `"<label>, <visible month>"` —
+     * so the grid announces "Due date, August 2026" and the month half stays generated.
+     *
+     * Override it when a form holds more than one date field: two calendars both called
+     * "Date picker" are two dialogs a screen-reader user cannot tell apart. Name the field —
+     * `'Due date'`, `'Start date'`.
+     * @default 'Date picker'
+     */
+    label?: string;
+    /**
+     * Accessible name for the double-chevron button that steps back one year.
+     * @default 'Previous year'
+     */
+    previousYearLabel?: string;
+    /**
+     * Accessible name for the single-chevron button that steps back one month.
+     * @default 'Previous month'
+     */
+    previousMonthLabel?: string;
+    /**
+     * Accessible name for the single-chevron button that steps forward one month.
+     * @default 'Next month'
+     */
+    nextMonthLabel?: string;
+    /**
+     * Accessible name for the double-chevron button that steps forward one year.
+     * @default 'Next year'
+     */
+    nextYearLabel?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -803,7 +859,7 @@ export declare interface EmptyStateProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, className, }: EstimateModalProps): JSX.Element;
+export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: EstimateModalProps): JSX.Element;
 
 export declare interface EstimateModalProps {
     /** Currently selected point value, if any — highlights the matching row. */
@@ -819,6 +875,18 @@ export declare interface EstimateModalProps {
      * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
      */
     dismissExemptRef?: PopoverProps['dismissExemptRef'];
+    /**
+     * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+     * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
+     * would let the announced name drift from the visible one, which is a WCAG 2.5.3 failure.
+     *
+     * Note the header is a hard `w-[122px]` from Figma with `px-4`, leaving an 88px content
+     * box, and it `truncate`s — see the comment on the header below. A longer translation
+     * clips rather than overflowing, which is the intended behaviour, not a bug to fix by
+     * widening the popover away from its spec.
+     * @default 'Estimate'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -1187,7 +1255,7 @@ export declare interface Label {
  * like the two vector states a real checkbox input would render.
  * Uses react-aria useCheckbox for full accessibility.
  */
-export declare function LabelCheckbox({ children, isSelected, defaultSelected, onChange, isDisabled, isIndeterminate, error, description, isRequired, className, }: LabelCheckboxProps): JSX.Element;
+export declare function LabelCheckbox({ children, isSelected, defaultSelected, onChange, isDisabled, isIndeterminate, error, description, isRequired, label, className, }: LabelCheckboxProps): JSX.Element;
 
 export declare interface LabelCheckboxProps {
     /** Label content rendered next to the checkbox. */
@@ -1226,6 +1294,25 @@ export declare interface LabelCheckboxProps {
      * @default false
      */
     isRequired?: boolean;
+    /**
+     * Accessible name for the checkbox, overriding the one derived from `children`.
+     *
+     * **Pass this whenever `children` is not a plain string.** The derivation is
+     * `typeof children === 'string' ? children : 'Checkbox'`, so a `<span>`, a fragment, or
+     * a string interleaved with an icon all collapse to the literal word "Checkbox" — a
+     * control that looks correctly labelled on screen and announces nothing useful, silently
+     * and without a type error. That fallback is kept rather than fixed because flattening
+     * arbitrary `ReactNode` children into a name is guesswork; this prop is the way out of it.
+     *
+     * Also the override for the string case: `children` is the *visible* label, and a
+     * checkbox reading "Done" may want to announce "Mark task as done". Note WCAG 2.5.3 —
+     * if you extend the visible text rather than replace it, keep the visible string inside
+     * the accessible name.
+     * Storybook renders the line below verbatim, so it carries no backticks — the default
+     * cell is not markdown, unlike the description above it.
+     * @default children when it is a string, otherwise 'Checkbox'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -1256,7 +1343,7 @@ export declare function LabelIcon(props: IconProps): JSX.Element;
  * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
  * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export declare function LabelModal({ labels, onSelect, onClose, triggerRef, dismissExemptRef, className, }: LabelModalProps): JSX.Element;
+export declare function LabelModal({ labels, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: LabelModalProps): JSX.Element;
 
 export declare interface LabelModalProps {
     /** Full list of selectable labels shown as rows. */
@@ -1272,6 +1359,13 @@ export declare interface LabelModalProps {
      * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
      */
     dismissExemptRef?: PopoverProps['dismissExemptRef'];
+    /**
+     * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+     * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
+     * would let the announced name drift from the visible one, which is a WCAG 2.5.3 failure.
+     * @default 'Label'
+     */
+    label?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
     className?: string;
 }
@@ -1397,7 +1491,7 @@ export declare interface MenuProps<T extends object> extends Omit<AriaMenuProps<
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export declare function Modal({ title, isOpen, onClose, children, width, role, isDismissable, }: ModalProps): default_2.JSX.Element | null;
+export declare function Modal({ title, isOpen, onClose, children, width, role, isDismissable, closeLabel, }: ModalProps): default_2.JSX.Element | null;
 
 export declare interface ModalProps {
     /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
@@ -1430,6 +1524,17 @@ export declare interface ModalProps {
      * @default true
      */
     isDismissable?: boolean;
+    /**
+     * Accessible name for the header's close button.
+     *
+     * Unlike the kit's other name overrides this one is not about collisions — a modal is
+     * modal, so only one is ever in the accessibility tree. It exists because the string was
+     * English and unreachable, which made the shell untranslatable for a consumer whose app
+     * is not. `title` above is already the consumer's; this is the last string in the shell
+     * that was not.
+     * @default 'Close modal'
+     */
+    closeLabel?: string;
 }
 
 /**
@@ -1975,7 +2080,7 @@ export declare interface TabItem {
  * than hand-rolled ARIA. Previously this was a hand-rolled, click-only
  * implementation with no arrow-key support.
  */
-export declare function Tabs({ items, panels, defaultSelectedKey, selectedKey, onSelectionChange, className, }: TabsProps): default_2.JSX.Element;
+export declare function Tabs({ items, panels, defaultSelectedKey, selectedKey, onSelectionChange, label, className, }: TabsProps): default_2.JSX.Element;
 
 export declare interface TabsProps {
     /** Tab item definitions */
@@ -1988,12 +2093,22 @@ export declare interface TabsProps {
     selectedKey?: string;
     /** Called when selected tab changes */
     onSelectionChange?: (key: string) => void;
+    /**
+     * Accessible name for the tab list, announced before the selected tab.
+     *
+     * Override it whenever a page holds more than one set of tabs — two tab lists both
+     * called "Tab navigation" are two things a screen-reader user cannot tell apart, and
+     * the default says what the widget *is* rather than what it switches between. Name the
+     * content: `'Project sections'`, `'Task views'`.
+     * @default 'Tab navigation'
+     */
+    label?: string;
     /** Additional class names applied to the root container, merged last via `cn()`. */
     className?: string;
 }
 
 /** Compact labeled pill (Style=Solid/Outline × Icon=None/Left × Type=General/Green/Blue/Yellow/Red), optionally removable via a trailing "×" button. */
-export declare function Tag({ variant, outline, icon, children, onRemove, className, }: TagProps): JSX.Element;
+export declare function Tag({ variant, outline, icon, children, onRemove, removeLabel, className, }: TagProps): JSX.Element;
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
 export declare function TagCell({ labels }: TagCellProps): JSX.Element;
@@ -2029,6 +2144,16 @@ export declare interface TagProps {
     children: React.ReactNode;
     /** Called when the remove (×) button is pressed. When provided, a remove button is rendered. */
     onRemove?: () => void;
+    /**
+     * Accessible name for the remove (×) button. Ignored unless `onRemove` is set.
+     *
+     * Override it whenever more than one removable tag can be on screen — a filter bar of
+     * five chips otherwise offers five buttons a screen-reader user cannot tell apart, every
+     * one of them called "Remove tag". Name what is being removed: `` `Remove ${text}` ``.
+     * The glyph itself stays "×"; this names it, it does not relabel it.
+     * @default 'Remove tag'
+     */
+    removeLabel?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2286,7 +2411,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2340,6 +2465,17 @@ export declare interface TaskTableRowProps {
      * @default true
      */
     isSelectable?: boolean;
+    /**
+     * Accessible name for the row's select checkbox. Ignored unless `isSelectable`.
+     *
+     * The default interpolates the row's own `title`, so within one table the checkboxes are
+     * already distinct. What it cannot survive is **two tables on one page** — a "To Do" and
+     * a "Done" table that both contain "Design the empty state" produce two checkboxes with
+     * one name, and the word "Select" is English regardless. Qualify it with whatever
+     * distinguishes the tables: `` `Select ${title} in To Do` ``.
+     * @default Select ${title}
+     */
+    selectLabel?: string;
     /**
      * Renders the row's title inside an `<h*>` of this level, giving list view the per-task
      * heading navigation a board of `TaskCard`s has. Omitted, the title stays a plain
@@ -2525,7 +2661,7 @@ export declare type ToastTone = StatusTone;
  * default, but this is a values-based judgment call, not a confirmed fact. No `title` prop:
  * no title/heading layer exists anywhere in the real component.
  */
-export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, className, }: TopNavProps): JSX.Element;
+export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, clearSearchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, className, }: TopNavProps): JSX.Element;
 
 export declare interface TopNavProps {
     /** Controlled search value. */
@@ -2541,6 +2677,13 @@ export declare interface TopNavProps {
      * @default 'Search'
      */
     searchLabel?: string;
+    /**
+     * Accessible name for the clear-search button, which is rendered only while the search
+     * has a value. Pair it with `searchLabel` when you override that — a bar named "Search
+     * tasks" whose clear button says "Clear search" names two different things.
+     * @default 'Clear search'
+     */
+    clearSearchLabel?: string;
     /** Trailing 24x24 icon (Figma "Icon Placeholder", `currentColor`). Defaults to a bell/notifications glyph. */
     icon?: ReactNode;
     /**
