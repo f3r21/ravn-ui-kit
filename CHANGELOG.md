@@ -8,6 +8,31 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The changelog-placement check reported nested bullets as corruption** (#107). Tooling only;
+  no shipped code. **Patch.**
+
+  `entrySections` tests a line unindented, so a nested bullet is never recorded as an entry.
+  `misplacedEntries` trimmed first and then tested, which promotes the same line to a top-level
+  entry — one it then could not find in the file it came from, reported as "the diff and the
+  file disagree". They agreed. The two halves of one check disagreed about what an entry is.
+
+  It fired on #97's PR, the first to _add_ a nested bullet since the check shipped. Nine already
+  sit in this file untouched (`grep -c '^  - ' CHANGELOG.md`), so the shape is ordinary here and
+  only an added one reaches that code path.
+
+  Both directions are pinned now: a nested bullet is not an added entry in either half, and a
+  top-level entry that really did relocate into a released section is still caught.
+
+  **The step also moved to last in the CI job**, which is worth more than the predicate fix. It
+  sat between "Build library" and the `dist/` freshness check, so a failure ended the job and
+  `dist/` freshness, the Storybook build and the axe pass never ran — a PR tripping it got a red
+  tick and no coverage of the two checks `npm run gate` structurally cannot do. It also broke
+  the `dist/` check's documented "the build ran immediately above". A cheap heuristic check
+  placed ahead of irreplaceable ones converts its own wrongness into their silence. It stays
+  blocking; last-and-blocking costs nothing when right and only itself when wrong.
+
 ### Added
 
 - **The kit's remaining visible English copy is now overridable** (#90). Additive; every default

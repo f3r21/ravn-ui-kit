@@ -87,8 +87,15 @@ export function misplacedEntries(addedEntries, changelog) {
   const unlocatable = [];
 
   for (const raw of addedEntries) {
+    // Tested **unindented**, exactly as `entrySections` tests it. Trimming first and then
+    // testing promotes a nested bullet — `  - **The four renderers still agree.**` — into a
+    // top-level entry, which `entrySections` never recorded because it tests the raw line. The
+    // two halves of one check then disagree about what an entry is, and every such bullet is
+    // reported as `unlocatable`: "the diff and the file disagree", when they agree perfectly
+    // and the check is what is wrong. It fired on #97's PR, the first to *add* a nested bullet
+    // since this landed; nine already sit in `CHANGELOG.md` untouched — `grep -c '^  - '`.
+    if (!ENTRY.test(raw)) continue;
     const entry = raw.trim();
-    if (!ENTRY.test(entry)) continue;
     const section = sections.get(entry);
     if (section === undefined) unlocatable.push(entry);
     else if (section !== 'Unreleased') misplaced.push({ entry, section });

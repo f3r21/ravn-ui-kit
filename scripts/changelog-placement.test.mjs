@@ -108,6 +108,55 @@ describe('changelog placement (#107)', () => {
     it('ignores anything before the first heading', () => {
       expect(entrySections('- stray bullet above every heading\n').size).toBe(0);
     });
+
+    /**
+     * The two halves of this check have to agree on what an entry *is*, and they did not.
+     *
+     * `entrySections` tests the raw line, so a nested bullet is never recorded.
+     * `misplacedEntries` trimmed first and then tested, promoting the same line to a top-level
+     * entry — which then could not be found in the file it came from, and was reported as
+     * "the diff and the file disagree". They agreed; the check did not agree with itself.
+     *
+     * It fired on #97's PR, the first to add a nested bullet since this shipped. Nine already
+     * sit in `CHANGELOG.md` — `grep -c '^  - ' CHANGELOG.md` — so the shape is ordinary here
+     * and only an *added* one reaches this code path.
+     */
+    it('a nested bullet is not an added entry, in both halves of the check', () => {
+      const changelog = `## [Unreleased]
+
+- **A real entry** (#1).
+  - **A nested bullet under it.**
+`;
+      const added = ['- **A real entry** (#1).', '  - **A nested bullet under it.**'];
+      const { misplaced, unlocatable } = misplacedEntries(added, changelog);
+
+      expect(unlocatable).toEqual([]);
+      expect(misplaced).toEqual([]);
+      // Control: the two halves are looking at the same thing — the top-level entry IS seen,
+      // so the empty results above are not an empty input.
+      expect([...entrySections(changelog).keys()]).toEqual(['- **A real entry** (#1).']);
+    });
+
+    /**
+     * Control in the other direction: the fix must not make the check blind. A nested bullet
+     * that really did relocate into a released section is still not an entry — but its
+     * top-level parent is, and that is what the check is for.
+     */
+    it('control: a top-level entry in a released section is still caught', () => {
+      const changelog = `## [Unreleased]
+
+## [0.6.0] — 2026-08-08
+
+- **A real entry** (#1).
+  - **A nested bullet under it.**
+`;
+      const { misplaced } = misplacedEntries(
+        ['- **A real entry** (#1).', '  - **A nested bullet under it.**'],
+        changelog,
+      );
+      expect(misplaced).toHaveLength(1);
+      expect(misplaced[0].section).toBe('0.6.0');
+    });
   });
 
   /**
