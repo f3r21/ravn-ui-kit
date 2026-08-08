@@ -2429,11 +2429,47 @@ export declare interface TaskListViewProps {
     className?: string;
 }
 
-export declare interface TaskMetaBadge {
+/** One badge in the row: announced (`label`) or decorative (`decorative: true`), never both. */
+export declare type TaskMetaBadge = TaskMetaBadgeLabelled | TaskMetaBadgeDecorative;
+
+declare interface TaskMetaBadgeBase {
     /** Icon rendered before the count. Should use `currentColor` so it inherits the badge's text color. */
     icon: React.ReactNode;
     /** Count value shown next to the icon. Omitted entirely for an icon-only badge (e.g. a plain attachment indicator). */
     count?: number;
+}
+
+/**
+ * A badge that is drawn and **not** announced (#93).
+ *
+ * For a counter the design draws but the data cannot support. The consuming app's card footer
+ * renders attachment / subtask / comment counts its API has no fields for; announcing invented
+ * numbers is worse than silence, so it had marked them `aria-hidden` — and when #19 gave every
+ * badge a real `sr-only` label, that silence disappeared and the app deleted the counters
+ * rather than have a screen reader read fiction aloud.
+ *
+ * **#9 closed this requirement as already met**, on the grounds that `aria-label` on a role-less
+ * `<span>` is prohibited and therefore dropped. That was true when written; #19's correct fix
+ * removed the accidental silence it rested on. This restores the capability as a property of
+ * the markup rather than a coincidence of what is missing.
+ *
+ * `label` is `never` rather than merely optional, so **"decorative and labelled" does not
+ * compile** — that combination asks for the badge to be announced and hidden at once. Same
+ * habit as `Record<DueDateUrgency, …>`: make the bad state untypable rather than discourage it
+ * in prose.
+ *
+ * Use it sparingly. A count a sighted user can read and a screen-reader user cannot is a real
+ * asymmetry; it is right only when the alternative is announcing something untrue.
+ */
+export declare interface TaskMetaBadgeDecorative extends TaskMetaBadgeBase {
+    /** Marks the badge decorative: no accessible name, and hidden from assistive tech entirely. */
+    decorative: true;
+    /** Not available on a decorative badge — a silent badge with a label is a contradiction. */
+    label?: never;
+}
+
+/** A badge that is announced. The ordinary case. */
+export declare interface TaskMetaBadgeLabelled extends TaskMetaBadgeBase {
     /**
      * What this badge means, announced to screen readers and used as its React key.
      *
@@ -2442,6 +2478,8 @@ export declare interface TaskMetaBadge {
      * without the number announces that there are comments but not how many.
      */
     label: string;
+    /** Absent or `false` here — see `TaskMetaBadgeDecorative` for the other arm. */
+    decorative?: false;
 }
 
 /**

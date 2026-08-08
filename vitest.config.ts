@@ -108,6 +108,10 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #93 gave `TaskMetaBadge` a decorative arm, adding 7 cases. Only `branches`
+      // moves — 91.86 -> 91.95; the others were already at their ceiling for this tree, so
+      // they hold rather than rise. Holding is not lowering.
+      //
       // Then #95 gave `TaskTableRow` an actions slot and `TaskTableGroup` a heading level,
       // adding 9 cases, and #102 gave the tag chips their casing and a styling channel, adding
       // 5 more. They were cut from the same commit and merged back to back.
@@ -135,10 +139,10 @@ export default defineConfig({
       //
       //   metric       covered    margin        one fewer     verdict
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2634/2754  0.002702pp    95.606391     FAIL
-      //   branches      418/455   0.008132pp    91.648352     FAIL
+      //   statements   2635/2755  0.004283pp    95.607985     FAIL
+      //   branches      423/460   0.006522pp    91.739130     FAIL
       //   functions     130/145   0.005172pp    88.965517     FAIL
-      //   lines        2634/2754  0.002702pp    95.606391     FAIL
+      //   lines        2635/2755  0.004283pp    95.607985     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -178,7 +182,7 @@ export default defineConfig({
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
         statements: 95.64,
-        branches: 91.86,
+        branches: 91.95,
         functions: 89.65,
         lines: 95.64,
       },

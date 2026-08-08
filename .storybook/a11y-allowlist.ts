@@ -112,27 +112,26 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
     violations: ['color-contrast'],
   },
 
-  // --- OPEN DEBT: `aria-prohibited-attr` on `TaskMetaBadges` ---------------------------
-  // 8 nodes across 4 stories, and **not an accepted deviation** — this is a real defect
-  // that no previous audit had found, because every previous audit looked only at colour.
+  // --- CLOSED: `aria-prohibited-attr` on `TaskMetaBadges` and `TaskCard` ----------------
+  // 8 nodes across 4 stories, plus 3 on the two `TaskCard` stories that render badges.
+  // **Fixed in #19 and the entries are gone** — this block is kept as a record of why,
+  // because both halves are easy to reintroduce.
   //
-  // `task-meta-badges.tsx` renders each badge as `<span aria-label={label}>` with both of
-  // its children `aria-hidden`. A `<span>` with no role has the implicit role `generic`,
-  // on which `aria-label` is prohibited and therefore dropped — so the badge contributes
-  // *nothing* to the accessibility tree: not the label, and not the count or icon either.
-  // Attachment, subtask and comment counts are silent to a screen reader today.
+  // The defect: each badge was `<span aria-label={label}>` with both children `aria-hidden`.
+  // A `<span>` with no role is `generic`, `aria-label` is prohibited there and dropped, so
+  // the badge contributed nothing to the accessibility tree — not the label, and not the
+  // count or icon either. The fix is a real `sr-only` text node; do not "simplify" it back
+  // to an attribute.
   //
-  // Recorded here rather than fixed because this issue's job is to install the gate and
-  // baseline it honestly; the fix is a component change that needs its own test and
-  // coverage ratchet. It is issue #19, and these four lines go with it.
-
-  // The same defect, on the two `TaskCard` stories that render badges — 3 nodes. These
-  // stories used to pass, and the reason they did is worth keeping: the card carried
-  // `role="button"`, and a button's descendants are *presentational children* in ARIA, so
-  // axe stopped evaluating roles inside it and never reached the badges. Removing that role
-  // (the card's keyboard affordance is now a real button on the title) did not introduce a
-  // finding, it stopped one being masked — which is what a container-wide `role="button"`
-  // does to everything it wraps. Same fix, same issue #19, delete all four together.
+  // The `TaskCard` half is the subtler one. Those two stories used to pass, and the reason
+  // is worth keeping: the card carried `role="button"`, whose descendants are presentational
+  // children in ARIA, so axe stopped evaluating roles inside it and never reached the
+  // badges. Removing that role did not introduce a finding, it stopped one being masked.
+  //
+  // An earlier version of this comment said the counts "are silent to a screen reader
+  // today". That stopped being true when #19 landed and the prose was not updated —
+  // corrected in #93, which is the issue that noticed, because #9 had closed a separate
+  // requirement on exactly that silence being permanent.
 
   // --- `incomplete` — `SidebarItem`'s selected gradient --------------------------------
   // 5 nodes across 5 stories, all one element: the active item's label, which sits on
