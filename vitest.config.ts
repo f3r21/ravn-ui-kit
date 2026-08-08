@@ -38,10 +38,11 @@ export default defineConfig({
       // 85% would have failed on day one and made the honest move — writing the
       // missing tests — look like a config problem.
       //
-      // What is holding them down is known and specific: 6 of 40 component files
-      // ship no test of their own — `UserRow`, `Card`, `TaskMetaBadges`,
-      // `AppShell`, `ApplicationSidebar` and `SidebarItem`. Re-derive rather than
-      // trust this list, which ages every time one gains a test:
+      // What is holding them down is known and specific: 4 of 40 component files
+      // ship no test of their own — `UserRow`, `Card`, `AppShell` and
+      // `SidebarItem`. Re-derive rather than trust this list, which ages every
+      // time one gains a test, and had already aged twice by #13 — it still named
+      // `TaskMetaBadges` and `ApplicationSidebar` after both had gained one:
       //
       //   T=$(git ls-tree -r HEAD --name-only)
       //   for f in $(echo "$T" | grep -E '^src/components/.*\.tsx$' \
@@ -86,11 +87,25 @@ export default defineConfig({
       // the gate on the next commit for a reason that has nothing to do with that change.
       // And check the exit status — `out=$(npm run gate 2>&1); rc=$?` — because the
       // coverage summary prints identical percentages whether or not the thresholds passed.
+      // Then #13's overridable accessible names gave `ApplicationSidebar` its first
+      // test file at all, and added override cases to `Tag`, `Modal`, `TopNav`,
+      // `Tabs`, `DatePickerMenu`, the three anchored pick-one popovers,
+      // `TaskTableRow` and `LabelCheckbox`. 91.77 -> 94.02, branches 90.29 -> 90.90.
+      //
+      // Set from the exact ratios rather than the printed table, which rounds to one
+      // decimal: branches reads "90.9" and is 390/429 = 90.909091, so a threshold of
+      // 90.91 would fail the run that produced it. Three consecutive runs were
+      // byte-identical on all four metrics, denominators included.
+      //
+      //   npx vitest run --coverage --coverage.reporter=json-summary
+      //   node -e "const t=require('./coverage/coverage-summary.json').total;
+      //     for (const k of ['statements','branches','functions','lines'])
+      //       console.log(k, t[k].covered+'/'+t[k].total, (t[k].covered/t[k].total*100).toFixed(6))"
       thresholds: {
-        statements: 91.77,
-        branches: 90.29,
-        functions: 86.71,
-        lines: 91.77,
+        statements: 94.02,
+        branches: 90.9,
+        functions: 88.11,
+        lines: 94.02,
       },
     },
   },
