@@ -8,6 +8,57 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **Every hardcoded English `aria-label` in the kit is now an overridable prop** (#13).
+  Eleven components baked in an accessible name a consumer could not reach, which made the
+  kit unlocalizable and — where two instances can share a page — produced controls a screen
+  reader cannot tell apart. All additive, all defaulting to the exact string they replaced.
+  **Minor.**
+
+  | Component            | New prop                                                                        | Default                                                                 |
+  | -------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+  | `Tag`                | `removeLabel`                                                                   | `'Remove tag'`                                                          |
+  | `Modal`              | `closeLabel`                                                                    | `'Close modal'`                                                         |
+  | `TopNav`             | `clearSearchLabel`                                                              | `'Clear search'`                                                        |
+  | `Tabs`               | `label`                                                                         | `'Tab navigation'`                                                      |
+  | `ApplicationSidebar` | `label`                                                                         | `'Main navigation'`                                                     |
+  | `DatePickerMenu`     | `label`                                                                         | `'Date picker'`                                                         |
+  | `DatePickerMenu`     | `previousYearLabel` / `previousMonthLabel` / `nextMonthLabel` / `nextYearLabel` | `'Previous year'` / `'Previous month'` / `'Next month'` / `'Next year'` |
+  | `AssigneeModal`      | `label`                                                                         | `'Assignee'`                                                            |
+  | `EstimateModal`      | `label`                                                                         | `'Estimate'`                                                            |
+  | `LabelModal`         | `label`                                                                         | `'Label'`                                                               |
+  | `TaskTableRow`       | `selectLabel`                                                                   | `` `Select ${title}` ``                                                 |
+  | `LabelCheckbox`      | `label`                                                                         | `children` when a string, else `'Checkbox'`                             |
+
+  The collision half is the sharper one. Two `ApplicationSidebar`s — or the kit's plus a
+  consuming app's own nav — were two `nav` landmarks both called "Main navigation", which a
+  screen-reader user's landmark list cannot separate. Same for two `Tabs`, two
+  `DatePickerMenu`s in one form, and two `TaskTable`s holding a task of the same name. This
+  is the pattern `EmptyState.label` and `ToastProvider.label` already applied, extended to
+  the rest of the kit.
+
+  **On the three anchored popovers, one prop drives two things.** `AssigneeModal`,
+  `EstimateModal` and `LabelModal` each rendered their string twice — as the popover's
+  `aria-label` _and_ as its visible header. Splitting those into two props would let the
+  announced name drift from the visible one, which is a WCAG 2.5.3 (Label in Name) failure
+  the components currently avoid only by accident, so `label` moves both together.
+
+  **`LabelCheckbox` keeps its `'Checkbox'` fallback**, now documented rather than silent:
+  the name is derived as `typeof children === 'string' ? children : 'Checkbox'`, so any
+  non-string child collapses the accessible name to the literal word "Checkbox" with no
+  type error and nothing visibly wrong. Flattening arbitrary `ReactNode` into a name is
+  guesswork; `label` is the way out of it, and a test now pins the fallback so a future
+  change to it is deliberate.
+
+  Three of the thirteen rows in #13's table were **already fixed** before this work —
+  `SearchBar.label`, `SegmentedControl.label` and `Avatar` (whose name moved to the wrapper
+  in #47). The issue's line numbers had gone stale; the table above is what the tree
+  actually needed.
+
+- `ApplicationSidebar` gains its first test file. Coverage thresholds ratcheted
+  91.77 → 94.02 statements, 90.29 → 90.90 branches, 86.71 → 88.11 functions.
+
 ## [0.5.3] — 2026-08-07
 
 Two consumer-facing fixes and two to the repo's own tooling.
