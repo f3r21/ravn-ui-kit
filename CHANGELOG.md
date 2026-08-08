@@ -70,6 +70,25 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   a formatter rather than a string, because `points === 1` is English's rule and not every
   language's.
 
+- **`TaskTableRow`'s props now appear in the published API reference** (#91). Documentation only
+  — no source change, `dist/` byte-identical. **Patch.**
+
+  `task-table.stories.tsx` registers `component: TaskTable` only, so autodocs generated a table
+  for `TaskTableProps` and nothing else. A row is only ever constructed through
+  `TaskTable`'s `groups[].rows`, typed `TaskTableRowProps[]`, so **all 22 of its props are part
+  of `TaskTable`'s public surface** — and a consumer's only way to discover them was to read the
+  source of a package installed from git.
+
+  `TaskTableRow` now has its own `Meta` with `tags: ['autodocs']` and a decorator supplying the
+  `<table><colgroup><tbody>` a `<tr>` needs to be valid DOM at its real column widths.
+
+  **`subcomponents: { TaskTableRow }` is still not the fix**, and this is now measured rather
+  than remembered: it renders no second prop table under Storybook 10.5.7 either, verified by
+  building and rendering with and without it (#113).
+
+  7 new stories, **0 new `.storybook/a11y-allowlist.ts` entries** — axe goes 161 → 168 tests,
+  all passing.
+
 ### Fixed
 
 - **An unassigned task announced "Unassigned" on a card and nothing at all in a table row**
