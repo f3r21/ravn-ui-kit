@@ -62,6 +62,8 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   its own. Existing callers passing already-capitalised labels see no visual change, since
   `uppercase` on `"IOS APP"` is a no-op.
 
+## [0.6.0] — 2026-08-08
+
 ### Added
 
 - **Every hardcoded English `aria-label` in the kit is now an overridable prop** (#13).
