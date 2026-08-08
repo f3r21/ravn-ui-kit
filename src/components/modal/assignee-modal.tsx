@@ -27,6 +27,17 @@ export interface AssigneeModalProps {
    * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
    */
   dismissExemptRef?: PopoverProps['dismissExemptRef'];
+  /**
+   * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+   *
+   * One prop drives both on purpose. They were two copies of the same hardcoded `'Assignee'`,
+   * and splitting them into two props would let a consumer set an accessible name that
+   * disagrees with the visible one, which is the WCAG 2.5.3 (Label in Name) failure this
+   * component currently avoids only by accident. Overriding it translates the header and the
+   * announced name together.
+   * @default 'Assignee'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -52,6 +63,7 @@ export function AssigneeModal({
   onClose,
   triggerRef,
   dismissExemptRef,
+  label = 'Assignee',
   className,
 }: AssigneeModalProps) {
   return (
@@ -60,7 +72,7 @@ export function AssigneeModal({
       onClose={onClose}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
-      aria-label="Assignee"
+      aria-label={label}
       className={cn(
         'flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm',
         className,
@@ -70,7 +82,7 @@ export function AssigneeModal({
         {/* `--color-muted-on-dark`, not `--color-muted`: this popover is `surface-overlay`,
             where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. */}
         <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
-          Assignee
+          {label}
         </span>
       </div>
       {assignees.map((a) => (

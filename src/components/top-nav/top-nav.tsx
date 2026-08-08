@@ -18,6 +18,13 @@ export interface TopNavProps {
    * @default 'Search'
    */
   searchLabel?: string;
+  /**
+   * Accessible name for the clear-search button, which is rendered only while the search
+   * has a value. Pair it with `searchLabel` when you override that — a bar named "Search
+   * tasks" whose clear button says "Clear search" names two different things.
+   * @default 'Clear search'
+   */
+  clearSearchLabel?: string;
   /** Trailing 24x24 icon (Figma "Icon Placeholder", `currentColor`). Defaults to a bell/notifications glyph. */
   icon?: ReactNode;
   /**
@@ -77,6 +84,7 @@ export function TopNav({
   onSearchChange,
   onSearchSubmit,
   searchLabel,
+  clearSearchLabel = 'Clear search',
   icon,
   onNotificationsClick,
   notificationsLabel = 'Notifications',
@@ -119,7 +127,7 @@ export function TopNav({
           <button
             type="button"
             onClick={clearSearch}
-            aria-label="Clear search"
+            aria-label={clearSearchLabel}
             className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full"
           >
             <CloseIcon />

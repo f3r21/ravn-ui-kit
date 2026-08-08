@@ -25,6 +25,13 @@ export interface LabelModalProps {
    * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
    */
   dismissExemptRef?: PopoverProps['dismissExemptRef'];
+  /**
+   * The popover's heading — rendered visibly **and** used as the surface's accessible name.
+   * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
+   * would let the announced name drift from the visible one, which is a WCAG 2.5.3 failure.
+   * @default 'Label'
+   */
+  label?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults (e.g. absolute positioning). */
   className?: string;
 }
@@ -53,6 +60,7 @@ export function LabelModal({
   onClose,
   triggerRef,
   dismissExemptRef,
+  label = 'Label',
   className,
 }: LabelModalProps) {
   return (
@@ -61,7 +69,7 @@ export function LabelModal({
       onClose={onClose}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
-      aria-label="Label"
+      aria-label={label}
       className={cn(
         'flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm',
         className,
@@ -71,7 +79,7 @@ export function LabelModal({
         {/* `--color-muted-on-dark`, not `--color-muted`: this popover is `surface-overlay`,
             where neutral-2 measures 3.73:1. Same call as FIELD_DESCRIPTION_CLASS. */}
         <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
-          Label
+          {label}
         </span>
       </div>
       {labels.map((l) => (

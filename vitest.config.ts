@@ -38,10 +38,14 @@ export default defineConfig({
       // 85% would have failed on day one and made the honest move — writing the
       // missing tests — look like a config problem.
       //
-      // What is holding them down is known and specific: 6 of 40 component files
-      // ship no test of their own — `UserRow`, `Card`, `TaskMetaBadges`,
-      // `AppShell`, `ApplicationSidebar` and `SidebarItem`. Re-derive rather than
-      // trust this list, which ages every time one gains a test:
+      // What is holding them down is known and specific: 4 of 40 component files
+      // ship no test of their own — `UserRow`, `Card`, `AppShell` and
+      // `SidebarItem`. Re-derive rather than trust this list, which ages every
+      // time one gains a test and had already aged before #13 read it: it said
+      // "6 of 40" and named `TaskMetaBadges`, which by then had a test, so the
+      // true count on `main` was 5. #13 gave `ApplicationSidebar` its first, which
+      // is the step from 5 to the 4 above. Run the loop rather than trusting
+      // either number — including this one:
       //
       //   T=$(git ls-tree -r HEAD --name-only)
       //   for f in $(echo "$T" | grep -E '^src/components/.*\.tsx$' \
@@ -86,11 +90,55 @@ export default defineConfig({
       // the gate on the next commit for a reason that has nothing to do with that change.
       // And check the exit status — `out=$(npm run gate 2>&1); rc=$?` — because the
       // coverage summary prints identical percentages whether or not the thresholds passed.
+      // Then #13's overridable accessible names gave `ApplicationSidebar` its first
+      // test file at all, and added override cases to `Tag`, `Modal`, `TopNav`,
+      // `Tabs`, `DatePickerMenu`, the three anchored pick-one popovers,
+      // `TaskTableRow` and `LabelCheckbox`. 91.77 -> 94.02, branches 90.29 -> 90.90.
+      //
+      // Set from the exact ratios rather than the printed table, which rounds to one
+      // decimal: branches reads "90.9" and is 390/429 = 90.909091, so a threshold of
+      // 90.91 would fail the run that produced it. Three consecutive runs were
+      // byte-identical on all four metrics, denominators included.
+      //
+      //   npx vitest run --coverage --coverage.reporter=json-summary
+      //   node -e "const t=require('./coverage/coverage-summary.json').total;
+      //     for (const k of ['statements','branches','functions','lines'])
+      //       console.log(k, t[k].covered+'/'+t[k].total, (t[k].covered/t[k].total*100).toFixed(6))"
+      //
+      // These are set exact, with no deliberate headroom. Review on #89 raised this for
+      // `branches`; it is true of **all four**, and `functions` is the tightest of them —
+      // losing a single covered unit fails every one:
+      //
+      //   metric       covered    margin        one fewer     verdict
+      //   statements   2533/2694  0.003756pp    93.986637     FAIL
+      //   branches      390/429   0.009091pp    90.675991     FAIL
+      //   functions     126/143   0.001888pp    87.412587     FAIL
+      //   lines        2533/2694  0.003756pp    93.986637     FAIL
+      //
+      // Re-derive with the json-summary command above rather than trusting this table.
+      // That tightness is chosen, and it has a consequence somebody will hit — recorded
+      // here rather than in a PR thread that will be hard to find.
+      //
+      // **A dependency bump can move the denominator without anyone's coverage regressing.**
+      // Open right now: #32 bumps jsdom 26 -> 30, a major. This repo already knows that bump
+      // changes which code runs — #82's CHANGELOG entry says jsdom 26 lacks `PointerEvent`,
+      // so react-aria takes a `NODE_ENV === 'test'` branch without it and jsdom 30 supplies
+      // it. Per-branch CI cannot see the interaction: #32 is green alone, this was green
+      // alone, and `main` goes red only once both land, with `git bisect` pointing at
+      // dependabot.
+      //
+      // So, for the lane that meets that red `main`: **re-derive before you conclude
+      // anything.** If the denominator moved, the measurement basis changed and the honest
+      // response is to set the new exact value — even when it is a lower number. That is not
+      // the "lowering to go green" `CLAUDE.md` forbids, which means slackening a threshold to
+      // hide tests you did not write. Distinguish them by the denominator: same denominator
+      // and fewer covered is a real regression, so write the test. Different denominator is a
+      // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 91.77,
-        branches: 90.29,
-        functions: 86.71,
-        lines: 91.77,
+        statements: 94.02,
+        branches: 90.9,
+        functions: 88.11,
+        lines: 94.02,
       },
     },
   },

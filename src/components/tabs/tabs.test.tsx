@@ -75,4 +75,22 @@ describe('Tabs Component', () => {
     expect(screen.getByRole('tab', { name: 'Tab A' }).getAttribute('tabindex')).toBe('-1');
     expect(screen.getByRole('tab', { name: 'Tab B' }).getAttribute('tabindex')).toBe('0');
   });
+
+  it('names the tablist, defaulting to the string it used to hardcode', () => {
+    render(<Tabs items={ITEMS} />);
+    expect(screen.getByRole('tablist', { name: 'Tab navigation' })).toBeDefined();
+  });
+
+  it('lets two tab lists on one page be told apart by name', () => {
+    render(
+      <>
+        <Tabs items={ITEMS} label="Project sections" />
+        <Tabs items={ITEMS} label="Task views" />
+      </>,
+    );
+
+    expect(screen.getByRole('tablist', { name: 'Project sections' })).toBeDefined();
+    expect(screen.getByRole('tablist', { name: 'Task views' })).toBeDefined();
+    expect(screen.queryByRole('tablist', { name: 'Tab navigation' })).toBeNull();
+  });
 });

@@ -216,6 +216,17 @@ export interface TaskTableRowProps {
    */
   isSelectable?: boolean;
   /**
+   * Accessible name for the row's select checkbox. Ignored unless `isSelectable`.
+   *
+   * The default interpolates the row's own `title`, so within one table the checkboxes are
+   * already distinct. What it cannot survive is **two tables on one page** — a "To Do" and
+   * a "Done" table that both contain "Design the empty state" produce two checkboxes with
+   * one name, and the word "Select" is English regardless. Qualify it with whatever
+   * distinguishes the tables: `` `Select ${title} in To Do` ``.
+   * @default Select ${title}
+   */
+  selectLabel?: string;
+  /**
    * Renders the row's title inside an `<h*>` of this level, giving list view the per-task
    * heading navigation a board of `TaskCard`s has. Omitted, the title stays a plain
    * `<button>`/`<span>` exactly as before — a heading in every row of a long table is real
@@ -276,6 +287,7 @@ export function TaskTableRow({
   isSelected = false,
   onSelectedChange,
   isSelectable = true,
+  selectLabel,
   headingLevel,
   tags = [],
   estimationPoints,
@@ -347,7 +359,7 @@ export function TaskTableRow({
                 className="sr-only"
                 checked={isSelected}
                 onChange={(e) => onSelectedChange?.(e.target.checked)}
-                aria-label={`Select ${title}`}
+                aria-label={selectLabel ?? `Select ${title}`}
               />
               <CheckboxBoxIcon
                 className={cn(

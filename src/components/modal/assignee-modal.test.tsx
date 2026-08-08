@@ -44,4 +44,21 @@ describe('AssigneeModal Component', () => {
     await user.click(screen.getByRole('button', { name: 'Outside' }));
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
+
+  /**
+   * One prop drives the visible header and the accessible name together (#13). Asserting
+   * both halves is the point: a `label` wired only to `aria-label` would pass a
+   * `getByRole(… { name })` check while leaving the header reading "Assignee", which is
+   * the WCAG 2.5.3 mismatch the single prop exists to prevent.
+   */
+  it('renames the header and the popover’s accessible name from one prop', () => {
+    render(
+      <AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={vi.fn()} label="Owner" />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Owner' })).toBeDefined();
+    expect(screen.queryByRole('dialog', { name: 'Assignee' })).toBeNull();
+    expect(screen.getByText('Owner')).toBeDefined();
+    expect(screen.queryByText('Assignee')).toBeNull();
+  });
 });

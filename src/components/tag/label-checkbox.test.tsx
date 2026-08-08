@@ -63,3 +63,46 @@ describe('LabelCheckbox Component', () => {
     expect(label.className).not.toContain('outline-none');
   });
 });
+
+/**
+ * #13. The accessible name is derived as
+ * `typeof children === 'string' ? children : 'Checkbox'`, so any non-string child — an
+ * icon beside the text, a `<span>`, a fragment — silently collapses the name to the
+ * literal word "Checkbox". No type error, and the label still reads correctly on screen,
+ * so nothing about the component looks wrong.
+ */
+describe('LabelCheckbox accessible name', () => {
+  it('still collapses a non-string child to the literal word "Checkbox"', () => {
+    // Pinned as the *documented* behaviour, not as desirable: flattening arbitrary
+    // ReactNode children into a name is guesswork, so the fallback stays and `label` is
+    // the way out. If this ever starts deriving a real name, this case should change
+    // deliberately rather than by accident.
+    render(
+      <LabelCheckbox>
+        <span>Remember me</span>
+      </LabelCheckbox>,
+    );
+
+    expect(screen.getByRole('checkbox', { name: 'Checkbox' })).toBeDefined();
+    expect(screen.queryByRole('checkbox', { name: 'Remember me' })).toBeNull();
+  });
+
+  it('takes a caller-supplied name for exactly that case', () => {
+    render(
+      <LabelCheckbox label="Remember me">
+        <span>Remember me</span>
+      </LabelCheckbox>,
+    );
+
+    expect(screen.getByRole('checkbox', { name: 'Remember me' })).toBeDefined();
+    expect(screen.queryByRole('checkbox', { name: 'Checkbox' })).toBeNull();
+  });
+
+  it('overrides the string-child derivation too', () => {
+    render(<LabelCheckbox label="Mark task as done">Done</LabelCheckbox>);
+
+    expect(screen.getByRole('checkbox', { name: 'Mark task as done' })).toBeDefined();
+    // The visible label is untouched — this names the control, it does not relabel it.
+    expect(screen.getByText('Done')).toBeDefined();
+  });
+});

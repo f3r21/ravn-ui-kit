@@ -230,4 +230,44 @@ describe('TaskTable Component', () => {
     expect(button.className).toContain('focus-visible:outline-2');
     expect(button.className).not.toContain('outline-none');
   });
+
+  /**
+   * #13. The default interpolates the row's `title`, so within one table the checkboxes
+   * are already distinct — what it cannot survive is two tables on one page holding a task
+   * of the same name, which is what this renders.
+   */
+  it('lets two same-named rows in different tables carry distinct checkbox names', async () => {
+    const onToDo = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <>
+        <table>
+          <tbody>
+            <TaskTableRow
+              index={1}
+              title="Fix auth bug"
+              selectLabel="Select Fix auth bug in To Do"
+              onSelectedChange={onToDo}
+            />
+          </tbody>
+        </table>
+        <table>
+          <tbody>
+            <TaskTableRow
+              index={1}
+              title="Fix auth bug"
+              selectLabel="Select Fix auth bug in Done"
+            />
+          </tbody>
+        </table>
+      </>,
+    );
+
+    // The default name is now claimed by neither row, so it cannot be ambiguous.
+    expect(screen.queryByRole('checkbox', { name: 'Select Fix auth bug' })).toBeNull();
+    expect(screen.getByRole('checkbox', { name: 'Select Fix auth bug in Done' })).toBeDefined();
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select Fix auth bug in To Do' }));
+    expect(onToDo).toHaveBeenCalledWith(true);
+  });
 });

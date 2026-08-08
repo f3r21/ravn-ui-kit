@@ -24,6 +24,16 @@ export interface TagProps {
   children: React.ReactNode;
   /** Called when the remove (×) button is pressed. When provided, a remove button is rendered. */
   onRemove?: () => void;
+  /**
+   * Accessible name for the remove (×) button. Ignored unless `onRemove` is set.
+   *
+   * Override it whenever more than one removable tag can be on screen — a filter bar of
+   * five chips otherwise offers five buttons a screen-reader user cannot tell apart, every
+   * one of them called "Remove tag". Name what is being removed: `` `Remove ${text}` ``.
+   * The glyph itself stays "×"; this names it, it does not relabel it.
+   * @default 'Remove tag'
+   */
+  removeLabel?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -35,6 +45,7 @@ export function Tag({
   icon,
   children,
   onRemove,
+  removeLabel = 'Remove tag',
   className,
 }: TagProps) {
   // Style=Solid: 10%-alpha fill, no border. Style=Outline: 1px border, transparent
@@ -125,7 +136,7 @@ export function Tag({
         <button
           type="button"
           onClick={onRemove}
-          aria-label="Remove tag"
+          aria-label={removeLabel}
           // The hover cue darkens the glyph's background instead of dimming the glyph.
           // `hover:opacity-75` composited the "×" at 75% over its own chip and pushed it
           // under AA — yellow measured 3.39 / 3.97 / 4.43:1 over overlay / panel / shell,

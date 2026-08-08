@@ -213,4 +213,25 @@ describe('Modal accessible description (#64)', () => {
     await user.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('names the close button, and lets a caller translate that name', async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Modal title="Add Task" isOpen onClose={onClose}>
+        <p>Content</p>
+      </Modal>,
+    );
+    expect(screen.getByRole('button', { name: 'Close modal' })).toBeDefined();
+
+    rerender(
+      <Modal title="Add Task" isOpen onClose={onClose} closeLabel="Dismiss">
+        <p>Content</p>
+      </Modal>,
+    );
+    expect(screen.queryByRole('button', { name: 'Close modal' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });
