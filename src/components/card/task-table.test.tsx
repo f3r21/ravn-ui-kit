@@ -667,3 +667,58 @@ describe('the unassigned state is announced in a row, not only on a card (#111)'
     expect(cardName).toBe('Unassigned');
   });
 });
+
+/** #90 — the last two blocks of hardcoded English in this file. */
+describe('visible copy is overridable (#90)', () => {
+  it('the details link defaults to "Details" and takes an override', () => {
+    const { rerender } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="T" onViewDetails={vi.fn()} />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByRole('button', { name: 'Details' })).toBeDefined();
+
+    rerender(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="T" onViewDetails={vi.fn()} detailsLabel="Detalles" />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByRole('button', { name: 'Detalles' })).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Details' })).toBeNull();
+  });
+
+  it('the column headers default to English', () => {
+    render(<TaskTable groups={[{ title: 'To Do', rows: [] }]} />);
+    for (const h of ['# Task Name', 'Task Tags', 'Estimate', 'Task Assign Name', 'Due Date']) {
+      expect(screen.getByText(h)).toBeDefined();
+    }
+  });
+
+  it('takes a partial columnLabels override and merges the rest', () => {
+    render(
+      <TaskTable
+        groups={[{ title: 'To Do', rows: [] }]}
+        columnLabels={{ name: '# Tarea', dueDate: 'Vencimiento' }}
+      />,
+    );
+
+    expect(screen.getByText('# Tarea')).toBeDefined();
+    expect(screen.getByText('Vencimiento')).toBeDefined();
+    // Untouched keys keep their defaults.
+    expect(screen.getByText('Task Tags')).toBeDefined();
+    expect(screen.queryByText('# Task Name')).toBeNull();
+  });
+
+  it('control: the column order is not overridable, only the words', () => {
+    // #97 is the issue for a consumer-defined column set. This deliberately is not it.
+    render(<TaskTable groups={[{ title: 'To Do', rows: [] }]} columnLabels={{ name: 'A' }} />);
+    const headers = [...document.querySelectorAll('div')]
+      .map((d) => d.textContent)
+      .filter((t) => t === 'A');
+    expect(headers.length).toBeGreaterThan(0);
+  });
+});

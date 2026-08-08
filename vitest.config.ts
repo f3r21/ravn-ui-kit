@@ -108,9 +108,18 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #90 made the kit's remaining visible copy overridable — `AddTaskModal.copy` and
+      // `formatDueDate`, `DatePickerMenu.todayLabel`, `TaskTableRow.detailsLabel`,
+      // `TaskTable.columnLabels` — adding 12 cases, on top of #111's 6.
+      //
+      // **The values below are re-derived on the tree that has both**, for the reason #95/#102
+      // are recorded below: #111 alone measured 95.88/92.50/90.47 and #90 alone measured
+      // 95.90/92.75/90.54, and neither is the merged truth. Taking a side — or the per-column
+      // maximum — passes the gate while quietly leaving the ratchet slack.
+      //
       // Then #111 made the assignee cell render unconditionally so an unassigned row announces
-      // the state, adding 6 cases. 95.87 -> 95.88 statements; branches and functions hold —
-      // the change removes a conditional rather than adding one.
+      // the state, adding 6 cases. Branches and functions held on that branch — the change
+      // removes a conditional rather than adding one.
       //
       // Then #94 moved the points wording into shared formatters, adding 11 cases across
       // `format-points`, `TaskCard` and `TaskTable`. 95.64 -> 95.87, branches 91.95 -> 92.50,
@@ -147,11 +156,10 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   metric       covered    margin        one fewer     verdict
-      //   statements   2657/2771  0.005962pp    95.849874     FAIL
-      //   branches      432/467   0.005353pp    92.291221     FAIL
-      //   functions     133/147   0.006190pp    89.795918     FAIL
-      //   lines        2657/2771  0.005962pp    95.849874     FAIL
+      //   statements   2679/2793  0.008367pp    95.882564     FAIL
+      //   branches      435/469   0.000533pp    92.537313     FAIL
+      //   functions     134/148   0.000541pp    89.864865     FAIL
+      //   lines        2679/2793  0.008367pp    95.882564     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -190,10 +198,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.88,
-        branches: 92.5,
-        functions: 90.47,
-        lines: 95.88,
+        statements: 95.91,
+        branches: 92.75,
+        functions: 90.54,
+        lines: 95.91,
       },
     },
   },

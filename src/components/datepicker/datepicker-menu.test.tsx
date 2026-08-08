@@ -243,3 +243,29 @@ describe('DatePickerMenu Component', () => {
     });
   });
 });
+
+/** #90 — the footer action's text was hardcoded English with no way past it. */
+describe('todayLabel (#90)', () => {
+  it('defaults to "Today"', () => {
+    render(<DatePickerMenu defaultValue={new Date(2026, 7, 15)} onClose={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Today' })).toBeDefined();
+  });
+
+  it('takes a caller-supplied string, and still jumps to today', async () => {
+    const handleChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <DatePickerMenu
+        defaultValue={new Date(2020, 0, 1)}
+        onChange={handleChange}
+        onClose={vi.fn()}
+        todayLabel="Hoy"
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Today' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Hoy' }));
+    // Renaming it must not stop it working — the control that a label change is only a label.
+    expect(handleChange).toHaveBeenCalledTimes(1);
+  });
+});
