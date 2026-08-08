@@ -42,6 +42,30 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **A CI check that a branch's changelog entries land in `[Unreleased]`** (#107). Repo tooling —
+  no consumer-facing change.
+
+  #74 shipped two checks over `CHANGELOG.md` itself and neither catches the case that started
+  it: `merge=union` relocates an entry from `[Unreleased]` into a released section during a
+  rebase, with no conflict and no warning. The result is unique, well-formed, and in exactly one
+  section — so counting inside the file cannot see it. **Whether the entry belongs there is a
+  fact about the diff**, and a branch that adds an entry has work that is not released yet.
+
+  `scripts/changelog-placement.mjs` runs on pull requests, with `release/*` branches exempt —
+  keyed on the branch name rather than the diff shape, because a union merge produces the same
+  shape and would otherwise exempt itself.
+
+  **`ci.yml` gains `fetch-depth: 0`, and that is part of the fix rather than housekeeping.**
+  `actions/checkout` defaults to depth 1, where the base ref does not exist; a diff against a
+  missing ref is empty, and an empty diff passes. The check would have succeeded silently on
+  every PR. The script refuses an unresolvable base rather than returning nothing, so the two
+  can never be separated quietly.
+
+  Deletes `release-checks.test.mjs`'s `documents the gap` case, which asserted the blindness
+  this closes. A gap pinned by a passing test reads as a live limitation forever.
+
+### Added
+
 - **`TaskMetaBadge` gains a decorative arm, restoring a capability #19 removed by accident**
   (#93). **Minor** — additive, and the existing labelled shape is unchanged.
 
