@@ -6,7 +6,10 @@ import {
   TaskTableRow,
   DueDateCell,
   EstimationCell,
+  DEFAULT_COLUMNS,
+  resolveColumns,
   type TaskTableRowProps,
+  type TaskTableColumn,
 } from './task-table';
 import type { HeadingLevel } from '../../types/heading-level';
 import { TaskCard } from './task-card';
@@ -720,5 +723,145 @@ describe('visible copy is overridable (#90)', () => {
       .map((d) => d.textContent)
       .filter((t) => t === 'A');
     expect(headers.length).toBeGreaterThan(0);
+  });
+});
+
+/**
+ * #97. The column schema was frozen in two module constants, so a consumer could not add a
+ * Status column, drop Estimation, reorder any of it, or set a width. `columns` is the fix, and
+ * it is **additive** — omitted, the table renders exactly what it always did.
+ *
+ * The interesting assertions are not "the prop works". They are the two properties that
+ * override paths destroy: that the four renderers still agree, and that the width invariant
+ * survived becoming settable.
+ */
+describe('consumer-defined columns (#97)', () => {
+  const row: TaskTableRowProps = {
+    index: 1,
+    title: 'Fix auth bug',
+    estimationPoints: 4,
+    assigneeName: 'Jerome Bell',
+    dueDate: 'Tomorrow',
+  };
+  const table = (columns?: readonly TaskTableColumn[]) =>
+    render(<TaskTable groups={[{ title: 'To Do', rows: [row] }]} columns={columns} />);
+
+  /**
+   * The invariant that used to be emergent. 500 + 168 + 140 + 168 + 132 = 1108, the spec's
+   * "Task Table Row" width — a property of two constants that nothing asserted. `width` being
+   * settable is exactly what kills that kind of property, so it is pinned here rather than
+   * left to be rediscovered when it drifts.
+   */
+  it('the default column set still sums to the spec 1108px', () => {
+    const total = resolveColumns(undefined, undefined).reduce((n, c) => n + c.width, 0);
+    expect(total).toBe(1108);
+  });
+
+  it('the default set is what renders when `columns` is omitted', () => {
+    table();
+    for (const label of ['# Task Name', 'Task Tags', 'Estimate', 'Task Assign Name', 'Due Date']) {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('reorders', () => {
+    table([{ key: 'dueDate' }, { key: 'name' }]);
+    const headers = [...document.querySelectorAll('div')]
+      .map((d) => d.textContent)
+      .filter((t) => t === 'Due Date' || t === '# Task Name');
+    expect(headers[0]).toBe('Due Date');
+  });
+
+  /**
+   * The agreement claim, and the reason it is asserted through the DOM rather than through the
+   * resolver. Dropping a column has to remove it from the header, the `<colgroup>` and every
+   * body row **together** — those are four renderers that used to agree only because they read
+   * the same two constants.
+   */
+  it('dropping a column removes it from the header, the colgroup and the rows together', () => {
+    const { container } = table([{ key: 'name' }, { key: 'dueDate' }]);
+
+    expect(screen.queryByText('Estimate')).toBeNull();
+    expect(screen.queryByText('4 Points')).toBeNull();
+    expect(container.querySelectorAll('colgroup col')).toHaveLength(2);
+    expect(container.querySelectorAll('tbody tr:last-child td')).toHaveLength(2);
+  });
+
+  /**
+   * Control for the case above: with the column present, every one of those four probes returns
+   * the opposite answer. Without this, "the estimate is gone" would be equally consistent with
+   * a query that never matched anything.
+   */
+  it('control: with Estimation present, all four probes find it', () => {
+    const { container } = table([{ key: 'name' }, { key: 'estimation' }, { key: 'dueDate' }]);
+
+    expect(screen.getAllByText('Estimate').length).toBeGreaterThan(0);
+    expect(screen.getByText('4 Points')).toBeDefined();
+    expect(container.querySelectorAll('colgroup col')).toHaveLength(3);
+    expect(container.querySelectorAll('tbody tr:last-child td')).toHaveLength(3);
+  });
+
+  it('the skeleton follows the same column set', () => {
+    const { container } = render(
+      <TaskTable groups={[]} isLoading columns={[{ key: 'name' }, { key: 'dueDate' }]} />,
+    );
+    // Every skeleton row, not just the first — the loading state renders five.
+    for (const tr of container.querySelectorAll('tbody tr')) {
+      expect(tr.querySelectorAll('td')).toHaveLength(2);
+    }
+  });
+
+  it('a custom column renders its own cell from the row data', () => {
+    table([
+      { key: 'name' },
+      {
+        key: 'status',
+        label: 'Status',
+        width: 120,
+        renderCell: (r) => <span>{r.title === 'Fix auth bug' ? 'Blocked' : 'Open'}</span>,
+      },
+    ]);
+    expect(screen.getAllByText('Status').length).toBeGreaterThan(0);
+    expect(screen.getByText('Blocked')).toBeDefined();
+  });
+
+  it('a custom width changes the rendered width, and the total with it', () => {
+    const resolved = resolveColumns([{ key: 'name', width: 200 }, { key: 'dueDate' }], undefined);
+    expect(resolved[0].width).toBe(200);
+    expect(resolved.reduce((n, c) => n + c.width, 0)).toBe(332);
+  });
+
+  /**
+   * Precedence, stated in the JSDoc and pinned here because two ways to set one string is how an
+   * API rots. `columns[].label` wins; `columnLabels` still reaches a column that sets no label.
+   */
+  it('columns[].label beats columnLabels, and columnLabels still reaches the rest', () => {
+    render(
+      <TaskTable
+        groups={[{ title: 'To Do', rows: [row] }]}
+        columnLabels={{ name: 'FROM LABELS', dueDate: 'ALSO FROM LABELS' }}
+        columns={[{ key: 'name', label: 'FROM COLUMNS' }, { key: 'dueDate' }]}
+      />,
+    );
+    expect(screen.getAllByText('FROM COLUMNS').length).toBeGreaterThan(0);
+    expect(screen.queryByText('FROM LABELS')).toBeNull();
+    expect(screen.getAllByText('ALSO FROM LABELS').length).toBeGreaterThan(0);
+  });
+
+  /**
+   * `DEFAULT_COLUMNS` carries keys only. Baking labels into it looks tidier and silently breaks
+   * `columnLabels`, because `resolveColumns` falls back with `??` and a label on the column
+   * always wins. That is not hypothetical — it is what the first version of this did, and #90's
+   * existing tests caught it.
+   */
+  it('DEFAULT_COLUMNS carries keys only, so columnLabels can still be reached', () => {
+    expect(DEFAULT_COLUMNS.every((c) => !('label' in c) && !('width' in c))).toBe(true);
+  });
+
+  it('the first column carries the left border wherever it is', () => {
+    const { container } = table([{ key: 'dueDate' }, { key: 'name' }]);
+    const cells = container.querySelectorAll('tbody tr:last-child td');
+    expect(cells[0].className).toContain('border-l');
+    expect(cells[1].className).not.toContain('border-l');
   });
 });

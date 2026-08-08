@@ -691,6 +691,8 @@ export declare function CloseIcon(props: IconProps): JSX.Element;
 
 export declare function cn(...inputs: ClassValue[]): string;
 
+declare const COLUMN_ORDER: readonly ["name", "tags", "estimation", "assignee", "dueDate"];
+
 /**
  * Comment count — third counter in a task card's footer.
  *
@@ -856,6 +858,17 @@ export declare interface DatepickerProps extends AriaTextFieldProps {
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
+
+/**
+ * The five columns as the design draws them, in order.
+ *
+ * Deliberately carries **only keys**. Baking `label` and `width` in here looks tidier and
+ * silently breaks `columnLabels`: `resolveColumns` falls back with `??`, so a label present on
+ * the column always wins and the `columnLabels` argument can never be reached. #90's existing
+ * tests caught exactly that — the defaults belong in the resolver, where the fallback chain
+ * can see them.
+ */
+export declare const DEFAULT_COLUMNS: readonly TaskTableColumn[];
 
 /**
  * Shared mapping from due-date urgency onto the accent palette, so the card, the table
@@ -1972,6 +1985,32 @@ export declare interface ProjectInfoProps {
 export declare function RequiredIndicator(): JSX.Element;
 
 /**
+ * The one place a column list becomes concrete, and the reason the four renderers cannot drift.
+ *
+ * The header row, the `<colgroup>`, `TaskTableRow` and `TaskTableRowSkeleton` must agree on
+ * which columns exist, in what order, at what width. Before `columns` they agreed because all
+ * four read `COLUMN_WIDTHS` and `COLUMN_ORDER` directly — agreement by shared constant, which
+ * an override path destroys. It is replaced by agreement through shared *resolution*: all four
+ * iterate the output of this function. Teaching the table a new column is one entry in
+ * `COLUMN_ORDER` plus one cell body in each of the two row renderers, and the header and
+ * colgroup follow for free — rather than four edits a reviewer has to notice are missing.
+ *
+ * **Label precedence is `columns[].label` → `columnLabels[key]` → the default**, stated here
+ * because two ways to set one string is how an API rots. `columnLabels` (#90) predates this and
+ * keeps working: translating headers should not require restating the column set.
+ */
+export declare function resolveColumns(columns: readonly TaskTableColumn[] | undefined, columnLabels: Partial<TaskTableColumnLabels> | undefined): ResolvedTaskTableColumn[];
+
+/** A column with every fallback applied — what the four renderers actually iterate. */
+export declare interface ResolvedTaskTableColumn {
+    key: string;
+    label: string;
+    width: number;
+    /** Present only for a custom column; built-ins are drawn from the keyed cell bodies. */
+    renderCell?: (row: TaskTableRowProps) => React.ReactNode;
+}
+
+/**
  * SearchBar
  *
  * Figma: "Frame 649" inside the "Search Bar" component (Top Navigation Bar00/01.md,
@@ -2679,7 +2718,30 @@ export declare interface TaskMetaBadgesProps {
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, columnLabels, className, }: TaskTableProps): JSX.Element;
+export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, columnLabels, columns, className, }: TaskTableProps): JSX.Element;
+
+/** One of the five cells this component knows how to draw. */
+export declare interface TaskTableBuiltInColumn {
+    /** Which of the five cells this column draws. */
+    key: TaskTableColumnKey;
+    /**
+     * Header text. Falls back to `columnLabels[key]`, then to the default.
+     * @default DEFAULT_COLUMN_LABELS[key]
+     */
+    label?: string;
+    /**
+     * Width in pixels. **Supplying one opts out of the 1108px total** — see
+     * `TaskTableProps.columns`.
+     * @default COLUMN_WIDTHS[key]
+     */
+    width?: number;
+}
+
+/** One column in `TaskTableProps.columns` (#97). */
+export declare type TaskTableColumn = TaskTableBuiltInColumn | TaskTableCustomColumn;
+
+/** Which of the five cells a column draws. Closed on purpose — see `TaskTableProps.columns`. */
+export declare type TaskTableColumnKey = (typeof COLUMN_ORDER)[number];
 
 /** The column headers this table draws, per `Task Column02.md`'s "Table Header Cell". */
 export declare interface TaskTableColumnLabels {
@@ -2693,6 +2755,29 @@ export declare interface TaskTableColumnLabels {
     assignee: string;
     /** The due-date column. */
     dueDate: string;
+}
+
+/**
+ * A column the kit does not know about — the Status column #97 names in its first sentence.
+ *
+ * `label` and `width` are **required** here and optional on a built-in, and that asymmetry is
+ * the point: there is no default for a column this component never drew. A width is what keeps
+ * the header, the `colgroup` and the body cells aligned, and guessing one would misalign the
+ * table rather than fail.
+ *
+ * `renderCell` receives the row's own props, so a custom column reads the same typed row data
+ * as every other cell. That is what keeps this **additive**: `TaskTableRowProps` stays typed
+ * field-by-field and does not become a generic bag, so nothing existing breaks.
+ */
+export declare interface TaskTableCustomColumn {
+    /** Identifier for this column. Must not collide with a built-in key. */
+    key: string;
+    /** Header text. Required — the kit has no name for a column it did not draw. */
+    label: string;
+    /** Width in pixels. Required, for the same reason. */
+    width: number;
+    /** Draws the cell for one row. */
+    renderCell: (row: TaskTableRowProps) => React.ReactNode;
 }
 
 export declare interface TaskTableGroup {
@@ -2758,13 +2843,34 @@ export declare interface TaskTableProps {
      * constant with no way past them, so a consumer could not translate the one row of this
      * component that is pure prose.
      *
-     * This names the five columns the table draws today. **#97 proposes a `columns` prop** that
-     * would let a consumer add, remove or reorder them, and would supersede this — that is a
-     * larger redesign with an unresolved question inside it (the five widths sum to the spec's
-     * 1108px row), so this is the small fix rather than a down-payment on that shape.
+     * **`columns` (#97) does not replace this.** Setting a header's words is the common case and
+     * should not require restating the column set to do it. When both are given, `columns[].label`
+     * wins — the precedence is stated on `resolveColumns` rather than left to be discovered.
      * @default { name: '# Task Name', tags: 'Task Tags', estimation: 'Estimate', assignee: 'Task Assign Name', dueDate: 'Due Date' }
      */
     columnLabels?: Partial<TaskTableColumnLabels>;
+    /**
+     * Which columns the table draws, in what order, at what width (#97).
+     *
+     * Additive: omitted, the table renders `DEFAULT_COLUMNS` exactly as before. The `key` set is
+     * closed — a column selects one of the five cells this component knows how to draw, so this
+     * reorders and omits rather than letting a consumer define arbitrary cells. Rendering
+     * something the kit has no cell for is `TaskTableGroup.actions` or a component of your own,
+     * not a sixth column here.
+     *
+     * **Supplying a `width` opts out of the 1108px total**, and that is the trade this prop
+     * makes. The five default widths sum to the spec's "Task Table Row" width, which
+     * `src/styles/decisions.mdx` quotes and which `min-w-[1108px]` used to hardcode — that
+     * minimum is now computed from whatever columns are in play, so a narrower set no longer
+     * forces a scrollbar for space it does not use. The default set still sums to 1108, and a
+     * test pins it: the invariant stopped being emergent and became asserted, because an
+     * override path is exactly what kills a property nobody checks.
+     *
+     * Omitting a column removes its cell from every row, the header and the `colgroup` together
+     * — all four read `resolveColumns`, so they cannot disagree.
+     * @default DEFAULT_COLUMNS
+     */
+    columns?: readonly TaskTableColumn[];
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2785,7 +2891,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, columns, columnLabels, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2916,6 +3022,21 @@ export declare interface TaskTableRowProps {
      * `colgroup` with it. A consumer-defined column set is #97.
      */
     actions?: React.ReactNode;
+    /**
+     * Which columns this row draws, and in what order (#97).
+     *
+     * Rendering a row directly is rare — `TaskTable` passes its own resolved list down, so a
+     * consumer using `TaskTable.columns` never sets this. It exists because `TaskTableRow` is
+     * exported, and a row that ignored the table's column set would produce cells that do not
+     * line up with the header above them.
+     * @default DEFAULT_COLUMNS
+     */
+    columns?: readonly TaskTableColumn[];
+    /**
+     * Column header text, used only to resolve `columns` when this row is rendered directly.
+     * Ignored for anything a row draws, since a row draws no headers.
+     */
+    columnLabels?: Partial<TaskTableColumnLabels>;
     /**
      * Called when the row is opened. Providing it renders the task title as a real `<button>`
      * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
