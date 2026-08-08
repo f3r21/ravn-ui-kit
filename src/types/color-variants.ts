@@ -67,6 +67,32 @@
 export type AccentColor = 'neutral' | 'red' | 'green' | 'yellow' | 'blue';
 
 /**
+ * One chip in a card's or a table row's tag list.
+ *
+ * Shared by `TaskCard.tags` and `TagCell.labels` so the two renderers cannot drift on what a
+ * tag *is* — the same reason `DUE_DATE_URGENCY_COLOR` and `DUE_DATE_URGENCY_LABEL` are shared.
+ */
+export interface TaskTag {
+  /** The chip's text. Rendered verbatim — see `className` for why it is never transformed. */
+  label: string;
+  /**
+   * Which accent colour the chip is painted in.
+   * @default 'neutral'
+   */
+  variant?: AccentColor;
+  /**
+   * Extra classes for this one chip, merged last so they override the defaults (#102).
+   *
+   * The reason this exists: `TaskCard` and `TagCell` render their chips `uppercase`, matching
+   * how the design draws them, and before this there was no channel to say otherwise — a
+   * consumer's only routes were to bake caps into `label` or to aim a Tailwind arbitrary
+   * variant at the kit's internal DOM, and both are worse than the gap. Pass
+   * `className: 'normal-case'` to opt out; `cn()` is `twMerge`, so the later class wins.
+   */
+  className?: string;
+}
+
+/**
  * A semantic status: what a state *means*, rather than which colour it is.
  *
  * Deliberately kept separate from `AccentColor`, because it resolves to a different set

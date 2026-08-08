@@ -955,7 +955,22 @@ function It({
               )
             ) : null
           ] }) : null,
-          i.length > 0 ? /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: i.map((N, k) => /* @__PURE__ */ e(j, { variant: N.variant || "neutral", children: N.label }, k)) }) : null,
+          i.length > 0 ? /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: i.map((N, k) => (
+            // `uppercase` as a class, never `t.label.toUpperCase()` (#102). A screen reader
+            // spells out a string that is literally capitalised and reads a CSS-uppercased one
+            // normally, so transforming the string would trade an accessibility property for a
+            // visual one. `t.className` is merged last, and `cn()` is `twMerge`, so
+            // `normal-case` from a consumer wins.
+            /* @__PURE__ */ e(
+              j,
+              {
+                variant: N.variant || "neutral",
+                className: f("uppercase", N.className),
+                children: N.label
+              },
+              k
+            )
+          )) }) : null,
           /* @__PURE__ */ c("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ c("div", { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ e(F, { src: r, name: a, size: "sm" }),
@@ -1092,7 +1107,10 @@ function Zt({ points: t }) {
   ] });
 }
 function Et({ labels: t }) {
-  return /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: t.map((n, l) => /* @__PURE__ */ e(j, { variant: n.variant ?? "neutral", children: n.label }, l)) });
+  return /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: t.map((n, l) => (
+    // Same class, same reason, same override as `TaskCard` — see `TaskTag.className`.
+    /* @__PURE__ */ e(j, { variant: n.variant ?? "neutral", className: f("uppercase", n.className), children: n.label }, l)
+  )) });
 }
 const Ot = {
   neutral: "bg-neutral-2",

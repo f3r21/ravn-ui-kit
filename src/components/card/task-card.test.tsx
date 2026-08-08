@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { TaskCard } from './task-card';
+import { Tag } from '../tag/tag';
+import { TagCell } from './task-table';
 
 describe('TaskCard Component keyboard accessibility', () => {
   it('exposes the title as a real button, not the whole card as an ARIA one', () => {
@@ -275,5 +277,76 @@ describe('TaskCard icon slot (#15)', () => {
   it('keeps the glyph out of the card’s accessible name', () => {
     render(<TaskCard title="Fix auth bug" icon={<svg data-glyph="true" />} />);
     expect(screen.getByRole('article', { name: 'Fix auth bug' })).toBeDefined();
+  });
+});
+
+/**
+ * #102. The board lost its tag caps when it migrated onto `TaskCard`: the design draws these
+ * chips in caps, `Tag` applies no `text-transform`, and `tags` had no styling channel — so a
+ * consumer storing "iOS app" rendered "iOS app" with no supported way to say otherwise.
+ *
+ * **jsdom cannot discriminate this defect**, which is the trap worth naming. The test
+ * environment loads no Tailwind, so `getComputedStyle(el).textTransform` answers `none` for a
+ * correct build and a broken one alike — a test written that way passes either way. What jsdom
+ * *can* see is the class, so that is what these assert; the rendered pixels are verified in a
+ * real browser and recorded in the PR body.
+ */
+describe('tag chips are cased by CSS, not by mutating the label (#102)', () => {
+  it('applies uppercase to the chip', () => {
+    render(<TaskCard title="Fix auth bug" tags={[{ label: 'iOS app' }]} />);
+    expect(screen.getByText('iOS app').className).toContain('uppercase');
+  });
+
+  /**
+   * The control, and the reason the fix is a class rather than `label.toUpperCase()`. A screen
+   * reader spells out a string that is literally capitalised and reads a CSS-uppercased one
+   * normally — so mutating the string would pass a "renders caps" check and trade an
+   * accessibility property for a visual one. The consumer's own tests query natural case too.
+   */
+  it('control: the label string is untouched, so it is not announced letter by letter', () => {
+    render(<TaskCard title="Fix auth bug" tags={[{ label: 'iOS app' }]} />);
+
+    expect(screen.getByText('iOS app')).toBeDefined();
+    expect(screen.queryByText('IOS APP')).toBeNull();
+    expect(screen.getByRole('article').textContent).toContain('iOS app');
+  });
+
+  it('lets a consumer opt out per chip, because twMerge makes the later class win', () => {
+    render(
+      <TaskCard title="Fix auth bug" tags={[{ label: 'iOS app', className: 'normal-case' }]} />,
+    );
+
+    const chip = screen.getByText('iOS app').className;
+    expect(chip).toContain('normal-case');
+    expect(chip).not.toContain('uppercase');
+  });
+
+  it('leaves standalone Tag alone — the casing belongs to the card, not the chip', () => {
+    // Otherwise every existing `Tag` consumer silently gains caps.
+    render(<Tag>iOS app</Tag>);
+    expect(screen.getByText('iOS app').className).not.toContain('uppercase');
+  });
+});
+
+/**
+ * The card and the table render the same chips, so they must not disagree about casing any
+ * more than about colour. Asserted against each other rather than each against `'uppercase'` —
+ * two separate literal pins pass happily after one renderer changes and the other does not.
+ */
+describe('TaskCard and TagCell case their chips identically (#102)', () => {
+  it('agree, for the same label', () => {
+    // Both sides queried identically — a comparison between two different probes tests the
+    // probes as much as the components.
+    const card = render(<TaskCard title="Fix auth bug" tags={[{ label: 'iOS app' }]} />);
+    const cardHasCaps = /(^|\s)uppercase(\s|$)/.test(card.getByText('iOS app').className);
+    card.unmount();
+
+    const cell = render(<TagCell labels={[{ label: 'iOS app' }]} />);
+    const cellChip = cell.getByText('iOS app').className;
+    const cellHasCaps = /(^|\s)uppercase(\s|$)/.test(cellChip);
+
+    expect(cardHasCaps).toBe(cellHasCaps);
+    // Control: the probe reports true here rather than agreeing on false for both.
+    expect(cellHasCaps).toBe(true);
   });
 });

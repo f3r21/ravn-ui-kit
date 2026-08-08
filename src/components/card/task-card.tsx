@@ -9,8 +9,8 @@ import { DueDateUrgencyState } from './due-date-urgency-state';
 import { AlarmIcon } from '../icons/icons';
 import {
   DUE_DATE_URGENCY_COLOR,
-  type AccentColor,
   type DueDateUrgency,
+  type TaskTag,
 } from '../../types/color-variants';
 
 export interface TaskCardProps {
@@ -51,10 +51,19 @@ export interface TaskCardProps {
    */
   dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
   /**
-   * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to `'neutral'` when omitted.
+   * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to
+   * `'neutral'` when omitted.
+   *
+   * **Rendered `uppercase`, and the label string is never touched** (#102). The design draws
+   * these chips in caps; applying that as a class rather than transforming `label` is the
+   * whole point, because the two differ for a screen reader — it spells out a string that is
+   * literally capitalised, and reads a CSS-uppercased one normally. So a consumer keeps
+   * storing "iOS app", queries it in tests as "iOS app", and it renders "IOS APP".
+   *
+   * Per-tag `className` overrides it: `{ label: 'iOS app', className: 'normal-case' }`.
    * @default []
    */
-  tags?: { label: string; variant?: AccentColor }[];
+  tags?: TaskTag[];
   /** Name of the assignee, shown next to the avatar and used by `Avatar` as the initials fallback. */
   assigneeName?: string;
   /** Avatar image URL for the assignee, forwarded to `Avatar`. */
@@ -255,7 +264,16 @@ export function TaskCard({
       {tags.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {tags.map((t, idx) => (
-            <Tag key={idx} variant={t.variant || 'neutral'}>
+            // `uppercase` as a class, never `t.label.toUpperCase()` (#102). A screen reader
+            // spells out a string that is literally capitalised and reads a CSS-uppercased one
+            // normally, so transforming the string would trade an accessibility property for a
+            // visual one. `t.className` is merged last, and `cn()` is `twMerge`, so
+            // `normal-case` from a consumer wins.
+            <Tag
+              key={idx}
+              variant={t.variant || 'neutral'}
+              className={cn('uppercase', t.className)}
+            >
               {t.label}
             </Tag>
           ))}

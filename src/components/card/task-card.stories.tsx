@@ -159,3 +159,25 @@ export const WithIconAndMenu: Story = {
     ),
   },
 };
+
+/**
+ * #102. Every other story here passes labels that are already capitalised (`'BUG'`,
+ * `'BACKEND'`), which cannot show whether the caps come from the component or from the string
+ * — so this one passes natural case deliberately.
+ *
+ * `Design system` and `iOS app` render as `DESIGN SYSTEM` and `IOS APP`, while the third chip
+ * opts out via `className: 'normal-case'`. The DOM text is unchanged in all three: inspect
+ * with `document.querySelector('article').textContent` and you get the strings as passed,
+ * which is what a screen reader announces and what a consumer's tests query.
+ */
+export const TagCasing: Story = {
+  args: {
+    title: 'Fix Critical GraphQL Bug',
+    tags: [
+      { label: 'Design system', variant: 'green' },
+      { label: 'iOS app', variant: 'blue' },
+      { label: 'left as typed', variant: 'neutral', className: 'normal-case' },
+    ],
+    assigneeName: 'Fernando Ramirez',
+  },
+};

@@ -2182,11 +2182,16 @@ export declare function Tag({ variant, outline, icon, children, onRemove, remove
 export declare function TagCell({ labels }: TagCellProps): JSX.Element;
 
 export declare interface TagCellProps {
-    /** Tags to render, each with its own label text and optional color variant (defaults to `'neutral'` per tag). */
-    labels: {
-        label: string;
-        variant?: AccentColor;
-    }[];
+    /**
+     * Tags to render, each with its own label text and optional color variant (defaults to
+     * `'neutral'` per tag).
+     *
+     * **Rendered `uppercase`, with the label string untouched** (#102) — identical treatment and
+     * identical reasoning to `TaskCard.tags`, and shared deliberately: the card and the table
+     * render the same chips, so they must not disagree about their casing any more than about
+     * their colour. Per-tag `className` overrides it.
+     */
+    labels: TaskTag[];
 }
 
 export declare interface TagProps {
@@ -2274,13 +2279,19 @@ export declare interface TaskCardProps {
      */
     dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
     /**
-     * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to `'neutral'` when omitted.
+     * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to
+     * `'neutral'` when omitted.
+     *
+     * **Rendered `uppercase`, and the label string is never touched** (#102). The design draws
+     * these chips in caps; applying that as a class rather than transforming `label` is the
+     * whole point, because the two differ for a screen reader — it spells out a string that is
+     * literally capitalised, and reads a CSS-uppercased one normally. So a consumer keeps
+     * storing "iOS app", queries it in tests as "iOS app", and it renders "IOS APP".
+     *
+     * Per-tag `className` overrides it: `{ label: 'iOS app', className: 'normal-case' }`.
      * @default []
      */
-    tags?: {
-        label: string;
-        variant?: AccentColor;
-    }[];
+    tags?: TaskTag[];
     /** Name of the assignee, shown next to the avatar and used by `Avatar` as the initials fallback. */
     assigneeName?: string;
     /** Avatar image URL for the assignee, forwarded to `Avatar`. */
@@ -2628,13 +2639,11 @@ export declare interface TaskTableRowProps {
      */
     headingLevel?: HeadingLevel;
     /**
-     * Tags rendered in the Task Tags column.
+     * Tags rendered in the Task Tags column, forwarded to `TagCell` — rendered `uppercase` with
+     * the label string untouched (#102). See `TaskTag.className` to opt out per chip.
      * @default []
      */
-    tags?: {
-        label: string;
-        variant?: AccentColor;
-    }[];
+    tags?: TaskTag[];
     /** Estimation points. Column renders empty when omitted. */
     estimationPoints?: number;
     /** Assignee's full name. Column renders empty when omitted. */
@@ -2678,6 +2687,32 @@ export declare interface TaskTableRowProps {
      * row's own controls — the select checkbox, the "Details" link — are used.
      */
     onClick?: () => void;
+}
+
+/**
+ * One chip in a card's or a table row's tag list.
+ *
+ * Shared by `TaskCard.tags` and `TagCell.labels` so the two renderers cannot drift on what a
+ * tag *is* — the same reason `DUE_DATE_URGENCY_COLOR` and `DUE_DATE_URGENCY_LABEL` are shared.
+ */
+export declare interface TaskTag {
+    /** The chip's text. Rendered verbatim — see `className` for why it is never transformed. */
+    label: string;
+    /**
+     * Which accent colour the chip is painted in.
+     * @default 'neutral'
+     */
+    variant?: AccentColor;
+    /**
+     * Extra classes for this one chip, merged last so they override the defaults (#102).
+     *
+     * The reason this exists: `TaskCard` and `TagCell` render their chips `uppercase`, matching
+     * how the design draws them, and before this there was no channel to say otherwise — a
+     * consumer's only routes were to bake caps into `label` or to aim a Tailwind arbitrary
+     * variant at the kit's internal DOM, and both are worse than the gap. Pass
+     * `className: 'normal-case'` to opt out; `cn()` is `twMerge`, so the later class wins.
+     */
+    className?: string;
 }
 
 /**
