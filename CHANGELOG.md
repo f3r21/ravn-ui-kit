@@ -86,6 +86,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   its own. Existing callers passing already-capitalised labels see no visual change, since
   `uppercase` on `"IOS APP"` is a no-op.
 
+  **If you pass natural-case labels, your chips change appearance and you must add code to keep
+  the old output.** `CONTRIBUTING.md`'s major line covers a changed prop's default behaviour;
+  this ships as minor under the pre-1.0 carve-out, which requires saying so explicitly, so:
+  `tags={[{ label: 'Android' }]}` rendered `Android` before and renders `ANDROID` now. Pass
+  `className: 'normal-case'` on the chip to keep the previous rendering. This is not a
+  hypothetical group — storing labels in natural case and uppercasing them in CSS is exactly
+  the pattern #102 was filed about, so a consumer doing the accessible thing is the one
+  affected.
+
 ## [0.6.0] — 2026-08-08
 
 ### Added
