@@ -104,6 +104,27 @@ export default defineConfig({
       //   node -e "const t=require('./coverage/coverage-summary.json').total;
       //     for (const k of ['statements','branches','functions','lines'])
       //       console.log(k, t[k].covered+'/'+t[k].total, (t[k].covered/t[k].total*100).toFixed(6))"
+      //
+      // These are set exact, with no deliberate headroom, and `branches` is one branch
+      // wide: 390/429 = 90.909091 passes, 389/429 = 90.675991 does not. That is chosen, and
+      // it has a consequence somebody will hit — raised in review on #89, recorded here
+      // rather than in the PR that will be hard to find.
+      //
+      // **A dependency bump can move the denominator without anyone's coverage regressing.**
+      // Open right now: #32 bumps jsdom 26 -> 30, a major. This repo already knows that bump
+      // changes which code runs — #82's CHANGELOG entry says jsdom 26 lacks `PointerEvent`,
+      // so react-aria takes a `NODE_ENV === 'test'` branch without it and jsdom 30 supplies
+      // it. Per-branch CI cannot see the interaction: #32 is green alone, this was green
+      // alone, and `main` goes red only once both land, with `git bisect` pointing at
+      // dependabot.
+      //
+      // So, for the lane that meets that red `main`: **re-derive before you conclude
+      // anything.** If the denominator moved, the measurement basis changed and the honest
+      // response is to set the new exact value — even when it is a lower number. That is not
+      // the "lowering to go green" `CLAUDE.md` forbids, which means slackening a threshold to
+      // hide tests you did not write. Distinguish them by the denominator: same denominator
+      // and fewer covered is a real regression, so write the test. Different denominator is a
+      // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
         statements: 94.02,
         branches: 90.9,
