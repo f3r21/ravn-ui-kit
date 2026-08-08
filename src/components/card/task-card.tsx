@@ -4,6 +4,7 @@ import { formatPointsShort, type PointsFormatter } from '../../utils/format-poin
 import type { HeadingLevel } from '../../types/heading-level';
 import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
+import { Card } from './card';
 import { ProjectInfo } from './project-info';
 import { TaskMetaBadges, type TaskMetaBadge } from './task-meta-badges';
 import { DueDateUrgencyState } from './due-date-urgency-state';
@@ -183,22 +184,26 @@ export function TaskCard({
     // points at the title heading `ProjectInfo` renders, which is why that component gained
     // a `titleId`.
     //
+    // The chrome now comes from `Card` rather than being restated here (#98). It was
+    // `p-4 bg-surface-panel rounded-sm border-transparent shadow-xs hover:border-subtle` —
+    // the same string `Card` now carries, which is the point: two card surfaces that could
+    // drift apart independently was #15's actual complaint, and a component cannot drift from
+    // a constant it reads. `card.test.tsx` asserts the two compute the same background and
+    // radius, so a change to one that does not reach the other fails.
+    //
+    // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
+    // `rounded-lg` here previously resolved to this project's --radius-lg (24px), far too
+    // round. That evidence is what settled #98 in this direction rather than the other.
+    //
+    // No `focus-visible:outline-*` anywhere here: the card is not focusable, so those
+    // utilities could never match. The ring lives on the title button that replaced them.
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-    <article
+    <Card
+      as="article"
+      isInteractive
       aria-labelledby={headingId}
       onClick={onClick}
-      className={cn(
-        // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
-        // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
-        // No border is ever rendered on the card in the export, so the resting border is transparent
-        // (kept as a real border utility, not removed, so the hover reveal below still works).
-        //
-        // No `focus-visible:outline-*` here any more: the card is not focusable, so those
-        // utilities could never match. The ring lives on the title button that replaced them.
-        'flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all select-none',
-        onClick && 'cursor-pointer',
-        className,
-      )}
+      className={cn(onClick && 'cursor-pointer', className)}
     >
       {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317) — same real component
           as the standalone `ProjectInfo`, reused here rather than duplicated. Figma's "Project
@@ -313,6 +318,6 @@ export function TaskCard({
             icon-only leading slot is just a badge with `count` omitted, not a special case. */}
         {metaBadges.length > 0 ? <TaskMetaBadges badges={metaBadges} /> : null}
       </div>
-    </article>
+    </Card>
   );
 }

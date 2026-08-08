@@ -615,11 +615,51 @@ export declare interface ButtonProps extends AriaButtonProps {
  */
 export declare function CalendarIcon(props: IconProps): JSX.Element;
 
-export declare function Card({ children, className, ...props }: CardProps): JSX.Element;
+/**
+ * The kit's card surface: panel fill, 8px radius, 16px padding.
+ *
+ * `TaskCard` renders through this rather than restating it, which is #15's actual complaint —
+ * two card surfaces that could drift apart independently. They now cannot: there is one
+ * `CARD_SURFACE`, and a test asserts the two components compute the same background and radius.
+ */
+export declare function Card({ children, as: Component, isInteractive, className, ...props }: CardProps): JSX.Element;
 
-export declare interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-    /** Card content. */
+export declare namespace Card {
+    var Header: typeof CardHeader;
+    var Body: typeof CardBody;
+    var Footer: typeof CardFooter;
+}
+
+/** The card's main content, taking the remaining height. */
+export declare function CardBody({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+
+/**
+ * The card's bottom row. `mt-auto` so a footer sits at the bottom of a card that has been given
+ * a height, rather than floating directly under short content.
+ */
+export declare function CardFooter({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+
+/**
+ * The card's top row. A plain layout slot — it carries the rhythm, not a heading: a card's
+ * heading level depends on the page it sits in, so it stays the caller's to choose (the same
+ * reason `ProjectInfo` and `TaskTableGroup` take a `headingLevel`).
+ */
+export declare function CardHeader({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+
+export declare interface CardProps extends React.HTMLAttributes<HTMLElement> {
+    /** Card content. Compose it with `Card.Header`, `Card.Body` and `Card.Footer`. */
     children: React.ReactNode;
+    /**
+     * The element to render. `article` when the card is a self-contained item a screen reader
+     * should be able to navigate to — which is what `TaskCard` is, and why it needs this.
+     * @default 'div'
+     */
+    as?: 'div' | 'article' | 'section' | 'li';
+    /**
+     * Reveals a border on hover, for a card that is clickable as a whole.
+     * @default false
+     */
+    isInteractive?: boolean;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
