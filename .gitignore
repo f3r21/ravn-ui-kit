@@ -67,3 +67,8 @@ MIGRATION_GAPS.md
 .claude/skills/tech-vitest/
 .claude/skills/agent-pr-creator/
 # end corvus
+
+# Vitest coverage output. Untracked by luck until now — nothing ignored it, so a `git add -A`
+# during a rebase swept `coverage-summary.json` into a commit (#98). The reporter is invoked by
+# hand when re-deriving numerators for the ratchet, so the directory appears and disappears.
+coverage/
