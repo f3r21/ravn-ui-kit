@@ -1,7 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { TaskTable, TaskTableRow, DueDateCell, type TaskTableRowProps } from './task-table';
+import {
+  TaskTable,
+  TaskTableRow,
+  DueDateCell,
+  EstimationCell,
+  type TaskTableRowProps,
+} from './task-table';
 import type { HeadingLevel } from '../../types/heading-level';
 import { TaskCard } from './task-card';
 import { EmptyState } from '../empty-state/empty-state';
@@ -550,5 +556,43 @@ describe('TaskTable group heading level (#95)', () => {
     const levels = screen.getAllByRole('heading').map((h) => Number(h.tagName.slice(1)));
     expect(levels).toEqual([2, 4]);
     expect(levels[1] - levels[0]).toBeGreaterThan(1);
+  });
+});
+
+/** #94 — the cell and the card share the rule while keeping their own words. */
+describe('points wording (#94)', () => {
+  it('the cell pluralises, including zero', () => {
+    const { rerender } = render(<EstimationCell points={1} />);
+    expect(screen.getByText('1 Point')).toBeDefined();
+
+    rerender(<EstimationCell points={0} />);
+    expect(screen.getByText('0 Points')).toBeDefined();
+  });
+
+  it('the card and the cell disagree on the word and agree on the rule', () => {
+    // Deliberate: each wording carries its own Figma citation, neither re-derivable. What must
+    // not drift is where the singular breaks.
+    const card = render(<TaskCard title="T" points={1} />);
+    expect(card.getByText('1 Pt')).toBeDefined();
+    card.unmount();
+
+    render(<EstimationCell points={1} />);
+    expect(screen.getByText('1 Point')).toBeDefined();
+  });
+
+  it('a row forwards its formatter to the cell', () => {
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow
+            index={1}
+            title="Fix auth bug"
+            estimationPoints={1}
+            formatPoints={(n) => `${n} punto`}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText('1 punto')).toBeDefined();
   });
 });

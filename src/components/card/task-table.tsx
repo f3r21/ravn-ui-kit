@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
 import type { AccentColor, DueDateUrgency, TaskTag } from '../../types/color-variants';
 import type { HeadingLevel } from '../../types/heading-level';
 import { EmptyState } from '../empty-state/empty-state';
+import { formatPointsLong, type PointsFormatter } from '../../utils/format-points';
 import { DueDateUrgencyState } from './due-date-urgency-state';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
@@ -143,6 +144,16 @@ export function AssigneeNameCell({ name, avatarSrc }: AssigneeNameCellProps) {
 export interface EstimationCellProps {
   /** Numeric estimation (story points) rendered as `"N Points"` / `"1 Point"`. */
   points: number;
+  /**
+   * How `points` is written. Defaults to `formatPointsLong` — `"1 Point"` / `"4 Points"`.
+   *
+   * This cell already pluralised correctly; `TaskCard` did not, and rendered "1 Pts" (#94).
+   * Both now read the rule from one place. The **words** still differ deliberately — the
+   * card's `"Pts"` cites `Cards01.md L340-359` and this cell's `"Points"` cites
+   * `Task Column02.md`, and neither could be re-derived against Figma, so unifying them would
+   * override a citation on no evidence.
+   */
+  formatPoints?: PointsFormatter;
 }
 
 /**
@@ -150,12 +161,8 @@ export interface EstimationCellProps {
  * "3 Days" sample text; the real in-context "Task Default View" mockup renders it as
  * "N Points") is plain Desktop/Body/M/regular text directly in the cell, no badge/pill chrome.
  */
-export function EstimationCell({ points }: EstimationCellProps) {
-  return (
-    <span className={cn(CELL_TEXT, 'tabular-nums')}>
-      {points} {points === 1 ? 'Point' : 'Points'}
-    </span>
-  );
+export function EstimationCell({ points, formatPoints = formatPointsLong }: EstimationCellProps) {
+  return <span className={cn(CELL_TEXT, 'tabular-nums')}>{formatPoints(points)}</span>;
 }
 
 export interface TagCellProps {
@@ -273,6 +280,8 @@ export interface TaskTableRowProps {
   tags?: TaskTag[];
   /** Estimation points. Column renders empty when omitted. */
   estimationPoints?: number;
+  /** How `estimationPoints` is written, forwarded to `EstimationCell` (#94). */
+  formatPoints?: PointsFormatter;
   /** Assignee's full name. Column renders empty when omitted. */
   assigneeName?: string;
   /** Assignee's avatar image URL, passed through to `AssigneeNameCell`. */
@@ -346,6 +355,7 @@ export function TaskTableRow({
   headingLevel,
   tags = [],
   estimationPoints,
+  formatPoints,
   assigneeName,
   assigneeAvatar,
   dueDate,
@@ -496,7 +506,9 @@ export function TaskTableRow({
       {/* Estimation Cell */}
       <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.estimation }}>
         <div className="flex items-center gap-2 h-full">
-          {estimationPoints !== undefined ? <EstimationCell points={estimationPoints} /> : null}
+          {estimationPoints !== undefined ? (
+            <EstimationCell points={estimationPoints} formatPoints={formatPoints} />
+          ) : null}
         </div>
       </td>
 

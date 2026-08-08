@@ -350,3 +350,22 @@ describe('TaskCard and TagCell case their chips identically (#102)', () => {
     expect(cellHasCaps).toBe(true);
   });
 });
+
+/** #94 — the card reads the shared rule, so `points={1}` is no longer "1 Pts". */
+describe('points wording (#94)', () => {
+  it('renders a singular point correctly', () => {
+    render(<TaskCard title="Fix auth bug" points={1} />);
+    expect(screen.getByText('1 Pt')).toBeDefined();
+    expect(screen.queryByText('1 Pts')).toBeNull();
+  });
+
+  it('control: the plural still renders', () => {
+    render(<TaskCard title="Fix auth bug" points={4} />);
+    expect(screen.getByText('4 Pts')).toBeDefined();
+  });
+
+  it('takes a caller-supplied formatter, so the wording is not baked in', () => {
+    render(<TaskCard title="Fix auth bug" points={1} formatPoints={(n) => `${n} punto`} />);
+    expect(screen.getByText('1 punto')).toBeDefined();
+  });
+});

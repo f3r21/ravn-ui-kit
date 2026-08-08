@@ -927,7 +927,7 @@ export declare interface EmptyStateProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: EstimateModalProps): JSX.Element;
+export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, formatPoints, label, className, }: EstimateModalProps): JSX.Element;
 
 export declare interface EstimateModalProps {
     /** Currently selected point value, if any — highlights the matching row. */
@@ -943,6 +943,16 @@ export declare interface EstimateModalProps {
      * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
      */
     dismissExemptRef?: PopoverProps['dismissExemptRef'];
+    /**
+     * How each row's point value is written. Defaults to `formatPointsLong` — `"1 Point"` /
+     * `"4 Points"`, which is what this menu already rendered.
+     *
+     * Shares the rule with `TaskCard` and `EstimationCell` (#94) so the three cannot drift, and
+     * it is the third site of the same English pluralisation that #90 has to decide about — a
+     * `points === 1` ternary is English's rule, not every language's, and a formatter is the
+     * seam a consumer needs to replace it.
+     */
+    formatPoints?: PointsFormatter;
     /**
      * The popover's heading — rendered visibly **and** used as the surface's accessible name.
      * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
@@ -964,11 +974,21 @@ export declare interface EstimateModalProps {
  * "3 Days" sample text; the real in-context "Task Default View" mockup renders it as
  * "N Points") is plain Desktop/Body/M/regular text directly in the cell, no badge/pill chrome.
  */
-export declare function EstimationCell({ points }: EstimationCellProps): JSX.Element;
+export declare function EstimationCell({ points, formatPoints }: EstimationCellProps): JSX.Element;
 
 export declare interface EstimationCellProps {
     /** Numeric estimation (story points) rendered as `"N Points"` / `"1 Point"`. */
     points: number;
+    /**
+     * How `points` is written. Defaults to `formatPointsLong` — `"1 Point"` / `"4 Points"`.
+     *
+     * This cell already pluralised correctly; `TaskCard` did not, and rendered "1 Pts" (#94).
+     * Both now read the rule from one place. The **words** still differ deliberately — the
+     * card's `"Pts"` cites `Cards01.md L340-359` and this cell's `"Points"` cites
+     * `Task Column02.md`, and neither could be re-derived against Figma, so unifying them would
+     * override a citation on no evidence.
+     */
+    formatPoints?: PointsFormatter;
 }
 
 /**
@@ -1130,6 +1150,12 @@ export declare interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'po
     /** Additional class names applied to the popover surface, merged last via `cn()`. */
     className?: string;
 }
+
+/** `"1 Point"` / `"4 Points"` — the table and the estimate menu, per `Task Column01.md` (19x). */
+export declare const formatPointsLong: PointsFormatter;
+
+/** `"1 Pt"` / `"4 Pts"` — the card's abbreviation, per `Cards01.md L340-359`. */
+export declare const formatPointsShort: PointsFormatter;
 
 /**
  * Wraps an arbitrary control in the kit's label / required / description / error surface.
@@ -1665,6 +1691,62 @@ export declare interface MultiSelectProps<T extends object> extends Omit<ListPro
  * Figma: 14x14 glyph inside the 40x40 create button. Tier 1 (verbatim export).
  */
 export declare function PlusIcon(props: IconProps): JSX.Element;
+
+/**
+ * How a story-point estimate is written.
+ *
+ * ## Why this is shared, and why the two wordings still differ
+ *
+ * `TaskCard` and `EstimationCell` render the same datum and disagreed about it (#94): the card
+ * said `"N Pts"` with **no singular at all**, so `points={1}` rendered **"1 Pts"**, while the
+ * cell already said `"1 Point"`. The same task read two different ways on one screen, and one
+ * of them was ungrammatical.
+ *
+ * What is shared here is the **pluralisation rule**, not the words, and the corpus supports
+ * keeping them apart. The exports are **not** in this repo but they are reachable, one level up
+ * at `RAVN/Coding Challenge/UI-Kit/` — which is why they read as untracked from a lane
+ * worktree. The Figma API's `403` was never the only route to the question, and an earlier
+ * version of this comment treated it as though it were.
+ *
+ * Counted in `Components/`:
+ *
+ *     Cards00.md          Pts=2  Points=0
+ *     Cards01.md          Pts=1  Points=0    :340 is `3 Pts`, the card's cited line
+ *     Task Column01.md    Pts=0  Points=19   <- the cell's real support
+ *     Task Column02.md    Pts=0  Points=0    <- cited previously; contains NEITHER
+ *     Task Column03.md    Pts=3  Points=0
+ *     controls: ZZNOTPRESENT -> 0, background -> 14
+ *
+ * **No file in `Components/` mixes the two**, so this is contrary evidence rather than absence
+ * of evidence: unifying them would contradict the corpus, not merely lack support for it.
+ *
+ * **The mockups do mix, and that is not hidden here.** Six files tree-wide carry both, all of
+ * them full-screen mockups and none in `Components/`. In the one traced, the `Pts` sits under a
+ * `Timer` layer — the card's own points text — and the `Points` under an `Icon Placeholder`
+ * with no Timer, which reads as an estimate *chip* nested inside the card frame rather than the
+ * card's own text. **That attribution is inference.** These exports are CSS dumps: they attest
+ * strings within frames, not component boundaries. So the split is well supported at component
+ * level and ambiguous at screen level, and if anyone establishes that a card itself renders
+ * "Points", this file is where to unify.
+ *
+ * That is the same move `DUE_DATE_URGENCY_COLOR` makes: share the thing that must agree, keep
+ * the thing the design distinguishes.
+ *
+ * ## **Both** singulars are invented, not only `Pt`
+ *
+ * `grep -rinE '\b1 (Pts?|Points?)\b'` over the whole export tree returns **0**, so `"1 Point"`
+ * is exactly as unattested as `"1 Pt"` — the design never shows a single point anywhere.
+ * Flagging only the abbreviation would read as *"the long form is sourced"*, and it is not.
+ *
+ * Both are the English singular of an attested plural rather than new design values — no
+ * colour, radius, shadow or spacing is being guessed — and the alternative is shipping `"1 Pts"`.
+ *
+ * The plurals are the opposite case, and `formatPointsLong(0)` is the strongest of them:
+ * **`"0 Points"` is the best-attested string in the corpus**, 13 occurrences in `Components/`
+ * and 105 tree-wide. That case was written from English's rule and lands on the most-supported
+ * value in the design — design conformance, not a defensive test.
+ */
+export declare type PointsFormatter = (points: number) => string;
 
 /**
  * Estimate / story points — marks the points control in the task modal and the filter bar.
@@ -2239,7 +2321,7 @@ export declare interface TagProps {
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, formatPoints, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
 
 export declare interface TaskCardProps {
     /** Task title, shown in the header row and truncated to a single line. */
@@ -2250,6 +2332,17 @@ export declare interface TaskCardProps {
      * pill/background behind the "N Pts" text — see Cards01.md L340-359).
      */
     points?: number;
+    /**
+     * How `points` is written. Defaults to `formatPointsShort` — `"1 Pt"` / `"4 Pts"`.
+     *
+     * This card used to render `` `${points} Pts` `` with no singular at all, so `points={1}`
+     * produced **"1 Pts"** while the table cell beside it said "1 Point" (#94). The two still use
+     * different words — each is cited to its own Figma frame and neither could be re-derived —
+     * but they now share the rule that decides singular from plural, so they cannot drift again.
+     *
+     * Pass your own to translate it, or to match a table you render alongside.
+     */
+    formatPoints?: PointsFormatter;
     /** Due date label rendered inside the due-date Tag (e.g. `'3 DAYS'`). The Tag is hidden when not provided. */
     dueDateText?: string;
     /**
@@ -2603,7 +2696,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2684,6 +2777,8 @@ export declare interface TaskTableRowProps {
     tags?: TaskTag[];
     /** Estimation points. Column renders empty when omitted. */
     estimationPoints?: number;
+    /** How `estimationPoints` is written, forwarded to `EstimationCell` (#94). */
+    formatPoints?: PointsFormatter;
     /** Assignee's full name. Column renders empty when omitted. */
     assigneeName?: string;
     /** Assignee's avatar image URL, passed through to `AssigneeNameCell`. */

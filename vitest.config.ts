@@ -108,6 +108,11 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #94 moved the points wording into shared formatters, adding 11 cases across
+      // `format-points`, `TaskCard` and `TaskTable`. 95.64 -> 95.87, branches 91.95 -> 92.50,
+      // functions 89.65 -> 90.47. The branch count rose because three inline ternaries became
+      // two formatters that the tests exercise on 0, 1 and 4.
+      //
       // Then #93 gave `TaskMetaBadge` a decorative arm, adding 7 cases. Only `branches`
       // moves — 91.86 -> 91.95; the others were already at their ceiling for this tree, so
       // they hold rather than rise. Holding is not lowering.
@@ -139,10 +144,10 @@ export default defineConfig({
       //
       //   metric       covered    margin        one fewer     verdict
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2635/2755  0.004283pp    95.607985     FAIL
-      //   branches      423/460   0.006522pp    91.739130     FAIL
-      //   functions     130/145   0.005172pp    88.965517     FAIL
-      //   lines        2635/2755  0.004283pp    95.607985     FAIL
+      //   statements   2650/2764  0.005543pp    95.839363     FAIL
+      //   branches      432/467   0.005353pp    92.291221     FAIL
+      //   functions     133/147   0.006190pp    89.795918     FAIL
+      //   lines        2650/2764  0.005543pp    95.839363     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -181,10 +186,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.64,
-        branches: 91.95,
-        functions: 89.65,
-        lines: 95.64,
+        statements: 95.87,
+        branches: 92.5,
+        functions: 90.47,
+        lines: 95.87,
       },
     },
   },

@@ -8,6 +8,38 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`TaskCard` rendered "1 Pts"** (#94). The card wrote `` `${points} Pts` `` with no singular
+  at all, while `EstimationCell` beside it already said "1 Point" — the same datum, two
+  spellings, one ungrammatical. **Minor**: new optional props, and the default output changes
+  only for `points === 1`.
+
+  Both now read a shared rule. New exports `formatPointsShort` (`"1 Pt"` / `"4 Pts"`) and
+  `formatPointsLong` (`"1 Point"` / `"4 Points"`), plus a `formatPoints` prop on `TaskCard`,
+  `EstimationCell`, `TaskTableRow` and `EstimateModal`.
+
+  **The two wordings still differ, and the corpus supports that.** The design exports are not in
+  this repo but are reachable one level up, so the question was answerable after all. In
+  `Components/`: `Cards00/01` and `Task Column03` carry `Pts` and no `Points`; `Task Column01`
+  carries `Points` 19 times and no `Pts`; **no file mixes them**. So keeping them apart is
+  contrary evidence, not absence of evidence. What is shared is the rule that decides singular
+  from plural, so they cannot drift again.
+
+  Two corrections to what an earlier draft of this entry said. The cell's support is
+  **`Task Column01.md`, not `Task Column02.md`** — that file contains neither wording, and a
+  reader who checked it would have concluded the wording was unsourced. And **both singulars are
+  invented**: `1 Pt` and `1 Point` are each absent from the entire export tree, so flagging only
+  the abbreviation implied the long form was sourced.
+
+  The mockups _do_ mix — six files, none in `Components/` — and attributing those occurrences to
+  components is inference rather than evidence, since the exports attest strings within frames
+  rather than component boundaries. Recorded in `format-points.ts` as the thing that would
+  overturn this.
+
+  `formatPoints` is also the seam #90 needs: `points === 1` is English's rule, not every
+  language's, and this is the third call site of it.
+
 ### Added
 
 - **`TaskMetaBadge` gains a decorative arm, restoring a capability #19 removed by accident**
