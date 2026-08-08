@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { check, section } from './release-checks.mjs';
+import { check, section, duplicateHeadings, duplicateEntries } from './release-checks.mjs';
 
 // `process.cwd()`, not `import.meta.url` — the suite runs in the jsdom environment where
 // `import.meta.url` is an http:// URL and `fileURLToPath` throws. Same note as
@@ -130,6 +130,143 @@ describe('release-checks', () => {
     expect(stderr).toContain('[Unreleased] empty');
   });
 
+  /**
+   * #74. Four separate firings in one day, and the fourth is why these exist as checks rather
+   * than as care: the commit whose entire purpose was fixing the third occurrence
+   * **reintroduced it** when replayed onto a moved `main`. Vigilance was applied deliberately,
+   * by the participant who had written the issue two hours earlier, and it recurred anyway.
+   *
+   * `CHANGELOG.md` is `merge=union` in `.gitattributes`, so parallel branches append without
+   * conflicting — and also relocate, duplicate and re-head without conflicting. Every other
+   * guard in this pipeline is aimed at *under*-documentation; union never loses anything, so
+   * none of them fire.
+   *
+   * The failing cases come first, deliberately. `main` satisfies both rules today, so a suite
+   * written the other way round would pass without either check being able to fail.
+   */
+  describe('structural checks that a union merge defeats (#74)', () => {
+    describe('duplicate version headings', () => {
+      const DUPLICATED = `# Changelog
+
+## [Unreleased]
+
+## [0.5.1] — 2026-08-07
+
+### Fixed
+
+- A relocated entry, alone in the first block.
+
+## [0.5.1] — 2026-08-07
+
+### Fixed
+
+- Something worth reading in a tag message.
+`;
+
+      it('fails the release, naming the version', () => {
+        const { code, stderr } = run('0.5.1', { changelog: DUPLICATED });
+        expect(code).toBe(1);
+        expect(stderr).toContain('CHANGELOG headings unique');
+        expect(stderr).toContain('0.5.1');
+      });
+
+      /**
+       * The damage this prevents, stated as the assertion. Without the check the release
+       * *passes* — `[Unreleased]` is empty and `[0.5.1]` is non-empty — and publishes the first
+       * block alone. This pins the truncation itself, so the case still means something if the
+       * error message is ever reworded.
+       */
+      it('control: without the check, the notes would be the wrong block entirely', () => {
+        const notes = section(DUPLICATED, '0.5.1');
+        expect(notes).toContain('A relocated entry');
+        expect(notes).not.toContain('Something worth reading in a tag message.');
+      });
+
+      it('reports nothing on a changelog whose headings are unique', () => {
+        expect(duplicateHeadings(GOOD_CHANGELOG)).toEqual([]);
+      });
+
+      it('catches a duplicated [Unreleased] too, which is the same parsing hazard', () => {
+        expect(duplicateHeadings(`## [Unreleased]\n\n## [Unreleased]\n`)).toEqual(['Unreleased']);
+      });
+    });
+
+    describe('entries duplicated inside one section', () => {
+      const DOUBLED = GOOD_CHANGELOG.replace(
+        '- Something worth reading in a tag message.',
+        '- Something worth reading in a tag message.\n- Something worth reading in a tag message.',
+      );
+
+      it('fails the release, quoting the repeated entry', () => {
+        const { code, stderr } = run('0.5.1', { changelog: DOUBLED });
+        expect(code).toBe(1);
+        expect(stderr).toContain('CHANGELOG entries unique');
+        expect(stderr).toContain('Something worth reading');
+      });
+
+      it('control: without the check, the release passes and publishes it twice', () => {
+        const notes = section(DOUBLED, '0.5.1');
+        expect(notes.split('Something worth reading').length - 1).toBe(2);
+      });
+
+      /**
+       * The rule is exact repeated text, **not** repeated `(#N)` references, and the real
+       * corpus is why: `[0.5.1]` cites `#9` ten times and `[Unreleased]` cites `#95` twice,
+       * every one a distinct bullet. A reference-counting rule would have failed on `main` the
+       * day it was written, and a check that cries wolf gets deleted.
+       */
+      it('does not flag distinct entries that cite the same issue', () => {
+        const shared = `## [0.5.1] — 2026-08-07
+
+- **First thing** (#9). One bullet.
+- **Second thing** (#9). A different bullet, same issue.
+`;
+        expect(duplicateEntries(shared)).toEqual([]);
+      });
+
+      it('does not flag identical continuation text under different entries', () => {
+        // "**Minor** — additive and optional." is not a defect the second time.
+        const cont = `## [0.5.1] — 2026-08-07
+
+- **First thing** (#1).
+  **Minor** — additive and optional.
+- **Second thing** (#2).
+  **Minor** — additive and optional.
+`;
+        expect(duplicateEntries(cont)).toEqual([]);
+      });
+
+      it('reports nothing on a changelog with no repeats', () => {
+        expect(duplicateEntries(GOOD_CHANGELOG)).toEqual([]);
+      });
+    });
+
+    /**
+     * What these two do **not** catch, stated so nobody reads #74 as closed by them.
+     *
+     * The first firing moved `#102`'s entry from `[Unreleased]` into `[0.6.0]` with the heading
+     * still unique and nothing duplicated. Counting cannot see it: the entry is well-formed and
+     * in exactly one section, and whether it *belongs* there is a fact about which commits are
+     * in the tag, which the file does not contain. Catching that needs the branch diff — every
+     * changelog line a PR adds should land in `[Unreleased]` — which is a CI-level check, not a
+     * file-level one, and is left as follow-up work rather than half-built here.
+     */
+    it('documents the gap: relocation alone leaves both checks silent', () => {
+      const relocated = `# Changelog
+
+## [Unreleased]
+
+## [0.5.1] — 2026-08-07
+
+### Fixed
+
+- An entry that belongs in [Unreleased] but was replayed into a released section.
+`;
+      expect(duplicateHeadings(relocated)).toEqual([]);
+      expect(duplicateEntries(relocated)).toEqual([]);
+    });
+  });
+
   it('reports usage rather than crashing when given no version', () => {
     const { code, stderr } = run('');
     expect(code).toBe(2);
@@ -170,5 +307,25 @@ describe('release-checks', () => {
       name: 'package.json version',
       ok: true,
     });
+  });
+
+  /**
+   * The two structural rules against the real file, which is where they earn their place — at
+   * release time the bad merge is already in `main`, and this runs on every commit.
+   *
+   * Both are true at every point in the cycle, unlike `[Unreleased]` being empty, so neither
+   * goes red for doing the right thing. That property is why they can be asserted here at all.
+   */
+  it('this repo’s own CHANGELOG has unique headings and no duplicated entries', () => {
+    const changelog = readFileSync(join(ROOT, 'CHANGELOG.md'), 'utf8');
+
+    expect(
+      duplicateHeadings(changelog),
+      'duplicate "## [version]" heading in CHANGELOG.md',
+    ).toEqual([]);
+    expect(
+      duplicateEntries(changelog).map((d) => `[${d.section}] ${d.entry.slice(0, 60)}`),
+      'an entry appears verbatim twice in one section',
+    ).toEqual([]);
   });
 });

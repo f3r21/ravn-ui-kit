@@ -47,6 +47,65 @@ export function section(changelog, name) {
 }
 
 /**
+ * Version names with more than one `## [name]` heading.
+ *
+ * **This is the check that catches a truncated release body** (#74, finding 4). `section()`
+ * above finds the *first* matching heading and reads to the next `## ` — so with two
+ * `## [0.6.0]` headings, "the next heading" is the second one and the extracted notes are the
+ * first block alone. A union merge produced exactly that on a rebase, and with an empty
+ * `[Unreleased]` the whole release passed and would have published two lines in place of the
+ * real section. Same class of failure as `v0.5.0`'s empty body, reached with the guard green.
+ *
+ * `[Unreleased]` is included rather than exempted: two of those is the same parsing hazard.
+ */
+export function duplicateHeadings(changelog) {
+  const seen = new Set();
+  const dupes = new Set();
+  for (const line of changelog.split('\n')) {
+    const m = HEADING.exec(line);
+    if (!m) continue;
+    if (seen.has(m[1])) dupes.add(m[1]);
+    seen.add(m[1]);
+  }
+  return [...dupes];
+}
+
+/**
+ * Top-level entries that appear verbatim more than once inside one section, as
+ * `{ section, entry, count }` (#74, finding 3). Nothing else notices: `check()` tests a section
+ * for content, never for repetition, so a doubled entry extracts, passes, and publishes twice.
+ *
+ * **Exact text, not the `(#N)` reference**, and the corpus is why. Counting references would
+ * report `#9` ten times in `[0.5.1]` and `#95` twice in `[Unreleased]` — all legitimate, each a
+ * distinct bullet about the same issue. Only an identical repeated line is evidence of a merge
+ * having duplicated something rather than of an issue being discussed twice.
+ *
+ * Top-level `- ` only. Continuation lines and nested bullets repeat legitimately across
+ * entries ("**Minor** — additive and optional." is not a defect the second time).
+ */
+export function duplicateEntries(changelog) {
+  const out = [];
+  let current = null;
+  let seen = new Map();
+  const flush = () => {
+    for (const [entry, count] of seen) if (count > 1) out.push({ section: current, entry, count });
+  };
+  for (const line of changelog.split('\n')) {
+    const m = HEADING.exec(line);
+    if (m) {
+      if (current !== null) flush();
+      current = m[1];
+      seen = new Map();
+      continue;
+    }
+    if (current === null) continue;
+    if (/^- /.test(line)) seen.set(line.trim(), (seen.get(line.trim()) ?? 0) + 1);
+  }
+  if (current !== null) flush();
+  return out;
+}
+
+/**
  * Every precondition, as data rather than as control flow, so a caller can report which one
  * failed rather than only that something did. `ok: false` entries carry the reason.
  */
@@ -88,6 +147,35 @@ export function check(version, { pkg, changelog }) {
           name: 'CHANGELOG [Unreleased] empty',
           ok: false,
           reason: `CHANGELOG.md's [Unreleased] still has content, so ${version} would ship changes it does not document. Move them into the [${version}] section.`,
+        },
+  );
+
+  // The two structural checks below are about the file rather than about this version, and
+  // they run at release time because that is where the consequence lands — a duplicate heading
+  // silently truncates the published body. They also run on every commit via
+  // `release-checks.test.mjs`, which is where they will actually catch a bad merge: at release
+  // time the damage is already in `main`.
+  const dupeHeadings = duplicateHeadings(changelog);
+  results.push(
+    dupeHeadings.length === 0
+      ? { name: 'CHANGELOG headings unique', ok: true }
+      : {
+          name: 'CHANGELOG headings unique',
+          ok: false,
+          reason: `CHANGELOG.md has more than one heading for: ${dupeHeadings.join(', ')}. The section reader stops at the next "## ", so a duplicate heading truncates the release notes to the first block. Merge them into one section.`,
+        },
+  );
+
+  const dupeEntries = duplicateEntries(changelog);
+  results.push(
+    dupeEntries.length === 0
+      ? { name: 'CHANGELOG entries unique', ok: true }
+      : {
+          name: 'CHANGELOG entries unique',
+          ok: false,
+          reason: `CHANGELOG.md repeats an entry verbatim inside one section: ${dupeEntries
+            .map((d) => `[${d.section}] ×${d.count} — ${d.entry.slice(0, 60)}`)
+            .join('; ')}. A union merge duplicates rather than conflicts; delete the copy.`,
         },
   );
 

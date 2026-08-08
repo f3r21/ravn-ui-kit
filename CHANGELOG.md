@@ -10,6 +10,29 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Added
 
+- **Two structural checks on `CHANGELOG.md`, because a union merge defeats every other guard
+  in the release path** (#74). Repo tooling only — no consumer-facing change.
+
+  `.gitattributes` sets `merge=union` on this file so parallel branches append without
+  conflicting. It also lets them **relocate, duplicate and re-head** without conflicting, and
+  every existing guard is aimed at _under_-documentation — union never loses anything, so none
+  of them fire. Four separate firings in one day, two of which nearly shipped a bad release.
+
+  `release-checks.mjs` gains `duplicateHeadings()` and `duplicateEntries()`, wired into the
+  release preconditions _and_ asserted against the real file by
+  `scripts/release-checks.test.mjs`, which Vitest collects — so the gate catches a bad merge on
+  the commit that introduces it rather than at release time, when it is already in `main`.
+
+  The severe one is the duplicate heading. `section()` reads to the next `## `, so two
+  `## [0.6.0]` headings truncate the published release body to the first block — verified to
+  pass the old checks and publish two lines in place of the real section, which is the `v0.5.0`
+  empty-body failure reached with the guard green.
+
+  Scope stated honestly: **neither check catches relocation alone.** An entry replayed from
+  `[Unreleased]` into a released section is well-formed, unique, and in exactly one place;
+  whether it _belongs_ there is a fact about which commits are in the tag, which the file does
+  not contain. That needs a branch-diff check and is left as follow-up.
+
 - **`TaskTableRow.actions`, so a list view keeps its per-row Edit/Delete** (#95). **Minor** —
   additive and optional.
 
