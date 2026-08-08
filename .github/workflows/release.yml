@@ -157,7 +157,12 @@ jobs:
       - name: Check committed dist/ is fresh
         run: |
           git add --intent-to-add dist/
-          git diff --exit-code dist/ || {
+          # `git diff HEAD`, not a bare `git diff` — #33's fix reached ci.yml and not this file.
+          # `--intent-to-add` on a directory *stages* a deletion, after which an unstaged diff
+          # compares worktree to index and finds them agreeing, so the bare form cannot see a
+          # deleted file. Reproduced on this branch: with dist/ui-kit.css removed, the bare form
+          # exits 0 and this form exits 1.
+          git diff HEAD --exit-code dist/ || {
             echo "::error::dist/ is stale at the commit being tagged. Run 'npm run build', commit the result, and release again."
             exit 1
           }
