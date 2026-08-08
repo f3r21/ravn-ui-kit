@@ -34,6 +34,33 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Defaults to `3`, so existing callers are unchanged.
 
 ## [0.6.0] — 2026-08-08
+### Fixed
+
+- **Tag chips on `TaskCard` and in `TaskTable` render in caps again, without mutating the
+  label** (#102). A live visual regression on the consuming app's board, filed against the kit.
+  **Minor** — the new `className` channel is additive and the casing is a class, not a string
+  change.
+
+  `Tag` applies no `text-transform` and `tags` had no styling channel, so a consumer storing
+  `"iOS app"` rendered `"iOS app"` with no supported way to say otherwise. The app had been
+  passing `uppercase` via `className` to its own chips; migrating onto `TaskCard` dropped that,
+  because the prop shape had nowhere to put it.
+
+  `TaskCard` and `TagCell` now render their chips `uppercase`. **The label string is never
+  touched**, and that distinction is the entire point: a screen reader spells out a string that
+  is literally capitalised and reads a CSS-uppercased one normally, so `label.toUpperCase()`
+  would have traded an accessibility property for a visual one. `textContent` is unchanged, so
+  a consumer keeps storing and querying natural case.
+
+  New shared `TaskTag` type — `{ label, variant?, className? }` — replacing the inline shape on
+  `TaskCard.tags`, `TaskTableRow.tags` and `TagCell.labels`. The per-chip `className` is the
+  opt-out (`className: 'normal-case'`; `cn()` is `twMerge`, so the later class wins) and the
+  styling channel whose absence made this unfixable from the consumer side.
+
+  **Standalone `Tag` is unchanged** — the casing belongs to the card and the table, which
+  reproduce specific designs, not to the chip, which is documented as carrying no meaning of
+  its own. Existing callers passing already-capitalised labels see no visual change, since
+  `uppercase` on `"IOS APP"` is a no-op.
 
 ### Added
 
