@@ -41,8 +41,11 @@ export default defineConfig({
       // What is holding them down is known and specific: 4 of 40 component files
       // ship no test of their own — `UserRow`, `Card`, `AppShell` and
       // `SidebarItem`. Re-derive rather than trust this list, which ages every
-      // time one gains a test, and had already aged twice by #13 — it still named
-      // `TaskMetaBadges` and `ApplicationSidebar` after both had gained one:
+      // time one gains a test and had already aged before #13 read it: it said
+      // "6 of 40" and named `TaskMetaBadges`, which by then had a test, so the
+      // true count on `main` was 5. #13 gave `ApplicationSidebar` its first, which
+      // is the step from 5 to the 4 above. Run the loop rather than trusting
+      // either number — including this one:
       //
       //   T=$(git ls-tree -r HEAD --name-only)
       //   for f in $(echo "$T" | grep -E '^src/components/.*\.tsx$' \
