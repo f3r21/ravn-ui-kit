@@ -596,3 +596,74 @@ describe('points wording (#94)', () => {
     expect(screen.getByText('1 punto')).toBeDefined();
   });
 });
+
+/**
+ * #111. `TaskCard` announced "Unassigned" for a task with no assignee — `Avatar` is
+ * unconditional there and carries the state via `fallbackLabel` (#47). `TaskTableRow` rendered
+ * the whole cell conditionally, so the same task announced **nothing**: an empty cell with no
+ * indication in the accessibility tree that the column was even about an assignee.
+ *
+ * The design settles the direction rather than symmetry doing it: both `Task Assign Name Cell`
+ * instances in `Task Column02.md` carry an Avatar, and no export anywhere draws an unassigned
+ * state — so there is no basis for an empty cell.
+ */
+describe('the unassigned state is announced in a row, not only on a card (#111)', () => {
+  const row = (props: Partial<TaskTableRowProps>) => (
+    <table>
+      <tbody>
+        <TaskTableRow index={1} title="Fix auth bug" {...props} />
+      </tbody>
+    </table>
+  );
+
+  it('announces the fallback when there is no assignee', () => {
+    render(row({}));
+    expect(screen.getByRole('img', { name: 'Unassigned' })).toBeDefined();
+  });
+
+  /**
+   * The control. A fix that renders the fallback unconditionally passes the case above and is
+   * wrong — the row would announce "Unassigned" for a task that has an assignee.
+   */
+  it('control: a row with an assignee announces the person, not the fallback', () => {
+    render(row({ assigneeName: 'Jerome Bell' }));
+
+    expect(screen.getByRole('img', { name: 'Jerome Bell' })).toBeDefined();
+    expect(screen.queryByRole('img', { name: 'Unassigned' })).toBeNull();
+  });
+
+  it('leaves textContent alone for the assigned case, so name queries keep working', () => {
+    render(row({ assigneeName: 'Jerome Bell' }));
+    expect(screen.getByText('Jerome Bell')).toBeDefined();
+  });
+
+  it('does not repeat the fallback as visible text', () => {
+    // `Avatar` already carries it. A second copy in the name span would announce it twice.
+    render(row({}));
+    expect(screen.queryByText('Unassigned')).toBeNull();
+  });
+
+  it('takes a caller-supplied label', () => {
+    render(row({ unassignedLabel: 'Nobody yet' }));
+    expect(screen.getByRole('img', { name: 'Nobody yet' })).toBeDefined();
+  });
+
+  /**
+   * The assertion that catches future drift, and the one whose absence let this arise: the card
+   * and the row are compared **against each other** for the same input, rather than each being
+   * pinned to the literal 'Unassigned' separately. Two separate literal pins pass happily after
+   * one component changes and the other does not.
+   */
+  it('the card and the row announce the same thing for the same absent assignee', () => {
+    const card = render(<TaskCard title="Fix auth bug" />);
+    const cardName = card.getByRole('img').getAttribute('aria-label');
+    card.unmount();
+
+    render(row({}));
+    const rowName = screen.getByRole('img').getAttribute('aria-label');
+
+    expect(rowName).toBe(cardName);
+    // Control: the probe reads a real name rather than agreeing on null for both.
+    expect(cardName).toBe('Unassigned');
+  });
+});

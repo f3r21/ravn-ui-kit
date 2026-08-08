@@ -108,6 +108,10 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #111 made the assignee cell render unconditionally so an unassigned row announces
+      // the state, adding 6 cases. 95.87 -> 95.88 statements; branches and functions hold —
+      // the change removes a conditional rather than adding one.
+      //
       // Then #94 moved the points wording into shared formatters, adding 11 cases across
       // `format-points`, `TaskCard` and `TaskTable`. 95.64 -> 95.87, branches 91.95 -> 92.50,
       // functions 89.65 -> 90.47. The branch count rose because three inline ternaries became
@@ -144,10 +148,10 @@ export default defineConfig({
       //
       //   metric       covered    margin        one fewer     verdict
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2650/2764  0.005543pp    95.839363     FAIL
+      //   statements   2657/2771  0.005962pp    95.849874     FAIL
       //   branches      432/467   0.005353pp    92.291221     FAIL
       //   functions     133/147   0.006190pp    89.795918     FAIL
-      //   lines        2650/2764  0.005543pp    95.839363     FAIL
+      //   lines        2657/2771  0.005962pp    95.849874     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -186,10 +190,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.87,
+        statements: 95.88,
         branches: 92.5,
         functions: 90.47,
-        lines: 95.87,
+        lines: 95.88,
       },
     },
   },

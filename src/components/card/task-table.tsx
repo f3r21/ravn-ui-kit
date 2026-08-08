@@ -121,10 +121,27 @@ export function DueDateCell({ date, urgency = 'normal', urgencyLabel }: DueDateC
 }
 
 export interface AssigneeNameCellProps {
-  /** Assignee's full name, shown next to the avatar and used for initials fallback. */
-  name: string;
+  /**
+   * Assignee's full name, shown next to the avatar and used for initials fallback.
+   *
+   * Optional as of #111. Omitted, the cell still renders its `Avatar`, which carries the
+   * unassigned state — the same thing `TaskCard` has done since #47, and which this cell used
+   * to skip by not rendering at all.
+   */
+  name?: string;
   /** Avatar image URL. Falls back to initials derived from `name` when omitted. */
   avatarSrc?: string;
+  /**
+   * Accessible name for the avatar when there is no assignee (#111), forwarded to
+   * `Avatar.fallbackLabel`.
+   *
+   * `TaskCard` announced "Unassigned" for this state and a table row announced **nothing** — an
+   * empty cell with no indication in the accessibility tree that the column was even about an
+   * assignee. A consumer could not fix it: passing `assigneeName: 'Unassigned'` puts a false
+   * name into the data, and the row then reads as assigned to a person called Unassigned.
+   * @default 'Unassigned'
+   */
+  unassignedLabel?: string;
 }
 
 /**
@@ -132,11 +149,22 @@ export interface AssigneeNameCellProps {
  * Figma "Task Assign Name Cell" (Task Column02.md): Avatar (32x32, matches `Avatar` `size="sm"`)
  * + name text, Desktop/Body/M/regular, neutral.1.
  */
-export function AssigneeNameCell({ name, avatarSrc }: AssigneeNameCellProps) {
+export function AssigneeNameCell({
+  name,
+  avatarSrc,
+  unassignedLabel = 'Unassigned',
+}: AssigneeNameCellProps) {
   return (
     <div className="flex items-center gap-2 min-w-0">
-      <Avatar src={avatarSrc} name={name} size="sm" />
-      <span className={cn(CELL_TEXT, 'truncate')}>{name}</span>
+      {/* The `Avatar` is unconditional, exactly as `TaskCard` renders it — and the design draws
+          it that way: both `Task Assign Name Cell` instances in `Task Column02.md` carry an
+          Avatar, and no export anywhere draws an unassigned state, so there is no basis for an
+          empty cell. `Avatar` owns the no-person case via `fallbackLabel` (#47); this cell used
+          to sidestep that by not rendering at all. */}
+      <Avatar src={avatarSrc} name={name} fallbackLabel={unassignedLabel} size="sm" />
+      {/* The name text stays conditional. There is no person to name, and repeating the
+          fallback here would announce it twice — `Avatar` already carries it. */}
+      {name ? <span className={cn(CELL_TEXT, 'truncate')}>{name}</span> : null}
     </div>
   );
 }
@@ -282,8 +310,17 @@ export interface TaskTableRowProps {
   estimationPoints?: number;
   /** How `estimationPoints` is written, forwarded to `EstimationCell` (#94). */
   formatPoints?: PointsFormatter;
-  /** Assignee's full name. Column renders empty when omitted. */
+  /**
+   * Assignee's full name. When omitted the cell still renders, showing the unassigned avatar —
+   * it used to render nothing at all, so an unassigned row was silent to assistive tech (#111).
+   */
   assigneeName?: string;
+  /**
+   * Accessible name for the unassigned state, forwarded to `AssigneeNameCell` and on to
+   * `Avatar.fallbackLabel`. Matches `TaskCard`'s behaviour, which has announced this since #47.
+   * @default 'Unassigned'
+   */
+  unassignedLabel?: string;
   /** Assignee's avatar image URL, passed through to `AssigneeNameCell`. */
   assigneeAvatar?: string;
   /** Due date text (already formatted). Column renders empty when omitted. */
@@ -358,6 +395,7 @@ export function TaskTableRow({
   formatPoints,
   assigneeName,
   assigneeAvatar,
+  unassignedLabel,
   dueDate,
   dueDateUrgency = 'normal',
   dueDateUrgencyLabel,
@@ -515,9 +553,14 @@ export function TaskTableRow({
       {/* Task Assign Name Cell */}
       <td className={cn(CELL_BASE, 'pl-2 pr-4')} style={{ width: COLUMN_WIDTHS.assignee }}>
         <div className="flex items-center gap-2 h-full">
-          {assigneeName ? (
-            <AssigneeNameCell name={assigneeName} avatarSrc={assigneeAvatar} />
-          ) : null}
+          {/* Unconditional (#111). The card renders its `Avatar` whether or not there is an
+              assignee, and this cell did not — so the same task announced "Unassigned" on a
+              board and nothing at all in a table. */}
+          <AssigneeNameCell
+            name={assigneeName}
+            avatarSrc={assigneeAvatar}
+            unassignedLabel={unassignedLabel}
+          />
         </div>
       </td>
 

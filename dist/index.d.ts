@@ -361,13 +361,30 @@ export declare interface AssigneeModalProps {
  * Figma "Task Assign Name Cell" (Task Column02.md): Avatar (32x32, matches `Avatar` `size="sm"`)
  * + name text, Desktop/Body/M/regular, neutral.1.
  */
-export declare function AssigneeNameCell({ name, avatarSrc }: AssigneeNameCellProps): JSX.Element;
+export declare function AssigneeNameCell({ name, avatarSrc, unassignedLabel, }: AssigneeNameCellProps): JSX.Element;
 
 export declare interface AssigneeNameCellProps {
-    /** Assignee's full name, shown next to the avatar and used for initials fallback. */
-    name: string;
+    /**
+     * Assignee's full name, shown next to the avatar and used for initials fallback.
+     *
+     * Optional as of #111. Omitted, the cell still renders its `Avatar`, which carries the
+     * unassigned state — the same thing `TaskCard` has done since #47, and which this cell used
+     * to skip by not rendering at all.
+     */
+    name?: string;
     /** Avatar image URL. Falls back to initials derived from `name` when omitted. */
     avatarSrc?: string;
+    /**
+     * Accessible name for the avatar when there is no assignee (#111), forwarded to
+     * `Avatar.fallbackLabel`.
+     *
+     * `TaskCard` announced "Unassigned" for this state and a table row announced **nothing** — an
+     * empty cell with no indication in the accessibility tree that the column was even about an
+     * assignee. A consumer could not fix it: passing `assigneeName: 'Unassigned'` puts a false
+     * name into the data, and the row then reads as assigned to a person called Unassigned.
+     * @default 'Unassigned'
+     */
+    unassignedLabel?: string;
 }
 
 /**
@@ -2696,7 +2713,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2779,8 +2796,17 @@ export declare interface TaskTableRowProps {
     estimationPoints?: number;
     /** How `estimationPoints` is written, forwarded to `EstimationCell` (#94). */
     formatPoints?: PointsFormatter;
-    /** Assignee's full name. Column renders empty when omitted. */
+    /**
+     * Assignee's full name. When omitted the cell still renders, showing the unassigned avatar —
+     * it used to render nothing at all, so an unassigned row was silent to assistive tech (#111).
+     */
     assigneeName?: string;
+    /**
+     * Accessible name for the unassigned state, forwarded to `AssigneeNameCell` and on to
+     * `Avatar.fallbackLabel`. Matches `TaskCard`'s behaviour, which has announced this since #47.
+     * @default 'Unassigned'
+     */
+    unassignedLabel?: string;
     /** Assignee's avatar image URL, passed through to `AssigneeNameCell`. */
     assigneeAvatar?: string;
     /** Due date text (already formatted). Column renders empty when omitted. */
