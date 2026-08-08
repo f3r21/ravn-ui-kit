@@ -71,6 +71,31 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   where it previously showed an empty cell. That is the same rendering a board card has always
   used for this state. Rows _with_ an assignee are unchanged, and no `textContent` moves, so a
   consumer querying by person name keeps working.
+### Changed
+
+- **Storybook 8.5 → 10.5** (#113). Tooling only; no runtime, published API or `dist/` change.
+  **Patch.**
+
+  Storybook 10 deleted `@storybook/addon-essentials`, `@storybook/addon-interactions` and
+  `@storybook/test`. This is the half of #28 that could not be a version bump — dependabot's
+  group matched the packages that still exist at 10.x and left the removed ones at 8.x, the one
+  combination npm cannot install.
+
+  Two mechanical import moves: `@storybook/test` → `storybook/test` (25 files), and
+  `@storybook/react` → `@storybook/react-vite` for `Meta`/`StoryObj` (41 files, driven by
+  `storybook/no-renderer-packages`: 39 errors before, 0 after). `@storybook/blocks` →
+  `@storybook/addon-docs/blocks` in the 4 MDX pages.
+
+  **The `@storybook/addon-docs` exact pin at `8.6.14` is gone, and its reason went with it.**
+  383b6d4 recorded why it was exact rather than caret — `addon-essentials` pinned its own
+  `addon-docs` exactly, so a caret installed a second copy. Essentials does not exist at 10.x.
+
+  **Rendered and compared against the 8.5 build, not just built.** Table counts, prop-table rows
+  and names, and `AppShell`'s `scrollWidth` are all identical; the only thing that moved is the
+  `storybook-addon-pseudo-states` CSS-injection errors, **9 across four pages → 0**.
+
+  **`subcomponents` still renders no second prop table** — measured with and without it under
+  10.5.7, byte-identical. #91 does not close for free.
 
 ### Fixed
 
