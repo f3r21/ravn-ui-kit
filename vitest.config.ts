@@ -121,15 +121,25 @@ export default defineConfig({
       //   metric       covered    margin        one fewer     verdict
       //   statements   2611/2740  0.001971pp    95.255474     FAIL
       //   branches      412/449   0.009465pp    91.536748     FAIL
-      //   functions     128/144   0.000889pp    88.194444     FAIL
+      //   functions     128/144   0.008889pp    88.194444     FAIL
       //   lines        2611/2740  0.001971pp    95.255474     FAIL
       //
+      // Compute that table, do not transcribe it. Three of these margins were hand-copied
+      // from a terminal across #92 and #15 and three were wrong the same way — a dropped
+      // leading 8, turning 0.008889 into 0.000889. Review on #99 caught one; recomputing
+      // caught the rest:
+      //
+      //   node -e "for (const [n,c,t,thr] of [['statements',2611,2740,95.29],
+      //     ['branches',412,449,91.75],['functions',128,144,88.88]])
+      //     console.log(n, (c/t*100-thr).toFixed(6))"
+      //
       // The margin does not trend — it wanders, because a threshold truncated to two decimals
-      // sits somewhere in [0, 0.005]pp below the true ratio depending only on where that
-      // ratio lands. `statements` read 0.003756pp at #89, 0.000235pp at #92 and 0.001971pp
-      // here. Do not read a small margin as decay or a larger one as safety: what is
-      // constant, and what actually matters, is that **one uncovered unit fails every one of
-      // the four**.
+      // sits somewhere in **[0, 0.01)pp** below the true ratio depending only on where that
+      // ratio lands. `statements` read 0.003756pp at #89, 0.008235pp at #92 and 0.001971pp
+      // here: up, then back down. Do not read a small margin as decay or a larger one as
+      // safety. What is constant, and what actually matters, is that **one uncovered unit
+      // fails every one of the four** — `functions` included, where 127/144 reads 88.194
+      // against a threshold of 88.88.
       //
       // Re-derive with the json-summary command above rather than trusting this table.
       // That tightness is chosen, and it has a consequence somebody will hit — recorded
