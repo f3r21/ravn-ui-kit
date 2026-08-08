@@ -3,7 +3,7 @@ import { Avatar } from '../avatar/avatar';
 import { Tag } from '../tag/tag';
 import { Skeleton } from '../skeleton/skeleton';
 import { ChevronDownIcon, ChevronRightIcon } from '../icons/icons';
-import type { AccentColor, DueDateUrgency } from '../../types/color-variants';
+import type { AccentColor, DueDateUrgency, TaskTag } from '../../types/color-variants';
 import type { HeadingLevel } from '../../types/heading-level';
 import { EmptyState } from '../empty-state/empty-state';
 import { DueDateUrgencyState } from './due-date-urgency-state';
@@ -159,8 +159,16 @@ export function EstimationCell({ points }: EstimationCellProps) {
 }
 
 export interface TagCellProps {
-  /** Tags to render, each with its own label text and optional color variant (defaults to `'neutral'` per tag). */
-  labels: { label: string; variant?: AccentColor }[];
+  /**
+   * Tags to render, each with its own label text and optional color variant (defaults to
+   * `'neutral'` per tag).
+   *
+   * **Rendered `uppercase`, with the label string untouched** (#102) — identical treatment and
+   * identical reasoning to `TaskCard.tags`, and shared deliberately: the card and the table
+   * render the same chips, so they must not disagree about their casing any more than about
+   * their colour. Per-tag `className` overrides it.
+   */
+  labels: TaskTag[];
 }
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
@@ -168,7 +176,8 @@ export function TagCell({ labels }: TagCellProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {labels.map((t, i) => (
-        <Tag key={i} variant={t.variant ?? 'neutral'}>
+        // Same class, same reason, same override as `TaskCard` — see `TaskTag.className`.
+        <Tag key={i} variant={t.variant ?? 'neutral'} className={cn('uppercase', t.className)}>
           {t.label}
         </Tag>
       ))}
@@ -257,10 +266,11 @@ export interface TaskTableRowProps {
    */
   headingLevel?: HeadingLevel;
   /**
-   * Tags rendered in the Task Tags column.
+   * Tags rendered in the Task Tags column, forwarded to `TagCell` — rendered `uppercase` with
+   * the label string untouched (#102). See `TaskTag.className` to opt out per chip.
    * @default []
    */
-  tags?: { label: string; variant?: AccentColor }[];
+  tags?: TaskTag[];
   /** Estimation points. Column renders empty when omitted. */
   estimationPoints?: number;
   /** Assignee's full name. Column renders empty when omitted. */
