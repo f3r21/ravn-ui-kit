@@ -33,6 +33,10 @@
  * this exists to catch, because a union merge produces the same shape. A branch name is
  * something a merge cannot fabricate.
  *
+ * Reading that name is `headBranch` below, and it is not `git rev-parse --abbrev-ref HEAD` —
+ * that answers `HEAD` under the detached checkout CI performs, which made this exemption inert
+ * on every pull request until #112 caught it.
+ *
  * ## This check is worthless without `fetch-depth: 0`
  *
  * `actions/checkout` defaults to a depth-1 clone, where the base ref does not exist. A diff
@@ -118,21 +122,63 @@ export function resolveAddedEntries(baseRef, rootDir) {
     .map((l) => l.slice(1));
 }
 
-function main(argv) {
+/**
+ * The name of the branch this run is *about*, or `null` when that cannot be known.
+ *
+ * **`git rev-parse --abbrev-ref HEAD` is the wrong question in CI**, and getting this wrong made
+ * the release exemption inert everywhere it actually runs. `actions/checkout` on a
+ * `pull_request` event checks out the *merge commit* in detached HEAD, where that command
+ * returns the literal string `HEAD` — so `'HEAD'.startsWith('release/')` is false and a release
+ * branch was never exempted. The repo's own test missed it by doing `git switch -qc release/0.7.0`
+ * first: a guard exercised under a condition it never meets in production, which is the same
+ * class as the hooks that read `$1` and exited 0.
+ *
+ * `GITHUB_HEAD_REF` is the head *branch name* on a `pull_request` event and is empty otherwise,
+ * so it is checked first and the local `rev-parse` remains the answer for a developer running
+ * this by hand.
+ *
+ * Returning `null` on a detached HEAD with no `GITHUB_HEAD_REF` is deliberate, and it fails
+ * **closed** — see `main`. There is no branch name to test, and inventing "probably not a
+ * release" is how the exemption became inert in the first place.
+ */
+export function headBranch(env, rootDir) {
+  const fromEvent = (env.GITHUB_HEAD_REF ?? '').trim();
+  if (fromEvent) return fromEvent;
+
+  let local;
+  try {
+    local = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+      cwd: rootDir,
+      encoding: 'utf8',
+    }).trim();
+  } catch {
+    return null;
+  }
+  return local === 'HEAD' ? null : local;
+}
+
+function main(argv, env = process.env) {
   const [baseRef, rootDir = process.cwd()] = argv;
   if (!baseRef) {
     process.stderr.write('usage: changelog-placement.mjs <baseRef> [rootDir]\n');
     return 2;
   }
 
-  const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
-    cwd: rootDir,
-    encoding: 'utf8',
-  }).trim();
+  const branch = headBranch(env, rootDir);
 
-  if (branch.startsWith('release/')) {
+  if (branch?.startsWith('release/')) {
     process.stdout.write(`skipped: ${branch} is a release branch, which relocates by design\n`);
     return 0;
+  }
+
+  // A detached HEAD with no `GITHUB_HEAD_REF` cannot be identified, so the check runs rather
+  // than skipping. That direction is chosen: a release PR wrongly blocked is one loud failure
+  // somebody fixes, while a check that skips when it cannot tell is a check that does nothing
+  // and reports success — exactly the defect being repaired here.
+  if (branch === null) {
+    process.stdout.write(
+      'note: head branch unknown (detached HEAD); checking rather than skipping\n',
+    );
   }
 
   let added;

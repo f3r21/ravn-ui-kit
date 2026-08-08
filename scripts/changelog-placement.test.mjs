@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { entrySections, misplacedEntries } from './changelog-placement.mjs';
+import { entrySections, misplacedEntries, headBranch } from './changelog-placement.mjs';
 
 const ROOT = process.cwd();
 const SCRIPT = join(ROOT, 'scripts', 'changelog-placement.mjs');
@@ -109,6 +109,31 @@ describe('changelog placement (#107)', () => {
       expect(entrySections('- stray bullet above every heading\n').size).toBe(0);
     });
   });
+
+  /**
+   * `headBranch` exists because `git rev-parse --abbrev-ref HEAD` answers the wrong question in
+   * the only environment that matters. These pin the three inputs it has to tell apart.
+   */
+  describe('headBranch', () => {
+    it('prefers GITHUB_HEAD_REF, which is the head branch on a pull_request event', () => {
+      expect(headBranch({ GITHUB_HEAD_REF: 'release/0.7.0' }, ROOT)).toBe('release/0.7.0');
+    });
+
+    it('falls back to the local branch when GITHUB_HEAD_REF is absent', () => {
+      // Whatever branch the suite is running on — the assertion is that it is a real name and
+      // not the literal `HEAD`, which is the value that made the exemption inert.
+      const local = headBranch({}, ROOT);
+      expect(local).not.toBe('HEAD');
+      expect(typeof local).toBe('string');
+    });
+
+    it('treats an empty GITHUB_HEAD_REF as absent rather than as a branch named ""', () => {
+      // `push`-event workflows set it to the empty string rather than leaving it unset, and
+      // `''.startsWith('release/')` is false — so this would look correct while skipping the
+      // fallback entirely.
+      expect(headBranch({ GITHUB_HEAD_REF: '' }, ROOT)).toBe(headBranch({}, ROOT));
+    });
+  });
 });
 
 /**
@@ -130,11 +155,21 @@ describe('changelog placement CLI (#107)', () => {
     return dir;
   }
 
-  function run(dir, baseRef) {
+  /**
+   * `env` overrides matter here rather than being a convenience. CI runs this with
+   * `GITHUB_HEAD_REF` set and a detached HEAD, and the inherited environment of a local test run
+   * has neither — so a case that does not set them is not testing what production does.
+   *
+   * `GITHUB_HEAD_REF: ''` is passed explicitly by default so these cases stay deterministic if
+   * the suite itself is ever run inside a GitHub Action, where the real variable would otherwise
+   * leak in and quietly exempt everything.
+   */
+  function run(dir, baseRef, env = {}) {
     try {
       const stdout = execFileSync('node', [SCRIPT, baseRef, dir], {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
+        env: { ...process.env, GITHUB_HEAD_REF: '', ...env },
       });
       return { code: 0, stdout, stderr: '' };
     } catch (e) {
@@ -188,6 +223,73 @@ describe('changelog placement CLI (#107)', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  /**
+   * ## The condition CI actually presents, which the case above does not
+   *
+   * `actions/checkout` on a `pull_request` event checks out the **merge commit in detached
+   * HEAD**. `git rev-parse --abbrev-ref HEAD` returns the literal `HEAD` there, and
+   * `'HEAD'.startsWith('release/')` is false — so the exemption above passed in this suite while
+   * being **inert in CI**, the only place it runs. It was green because `git switch -qc
+   * release/0.7.0` gave it a named branch that production never has.
+   *
+   * These three cases are the repair, and all three detach first.
+   */
+  describe('under a detached HEAD, which is what CI checks out', () => {
+    const releaseRepo = () =>
+      repo(({ dir, git }) => {
+        git('switch', '-qc', 'release/0.7.0');
+        writeFileSync(join(dir, 'CHANGELOG.md'), RELOCATED);
+        git('commit', '-qam', 'roll');
+        git('checkout', '-q', '--detach');
+      });
+
+    it('exempts a release branch when GITHUB_HEAD_REF names one', () => {
+      const dir = releaseRepo();
+      try {
+        const { code, stdout } = run(dir, 'main', { GITHUB_HEAD_REF: 'release/0.7.0' });
+        expect(code).toBe(0);
+        expect(stdout).toContain('release branch');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    /**
+     * The regression pin. Without `GITHUB_HEAD_REF` there is no branch name to read, and the old
+     * code silently answered `HEAD` — which is not a release, so it fell through to checking.
+     * That is the behaviour kept, but it must be kept *deliberately*: the check runs, and says
+     * why. A future edit that "fixes" this by skipping when the branch is unknown turns the
+     * check off for every detached checkout, so this asserts it does not skip.
+     */
+    it('does not skip when the branch cannot be identified — it checks, and says so', () => {
+      const dir = releaseRepo();
+      try {
+        const { code, stdout, stderr } = run(dir, 'main');
+        expect(stdout).toContain('head branch unknown');
+        expect(code).toBe(1);
+        expect(stderr).toContain('landed in [0.6.0]');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    /**
+     * Control: the exemption is not "anything in `GITHUB_HEAD_REF` passes". A non-release head
+     * ref on the identical tree still fails, so the case above is testing the name and not the
+     * mere presence of the variable.
+     */
+    it('control: a non-release GITHUB_HEAD_REF on the same tree still fails', () => {
+      const dir = releaseRepo();
+      try {
+        const { code, stderr } = run(dir, 'main', { GITHUB_HEAD_REF: 'fix/102-something' });
+        expect(code).toBe(1);
+        expect(stderr).toContain('landed in [0.6.0]');
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
   });
 
   /**

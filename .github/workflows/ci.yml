@@ -139,6 +139,12 @@ jobs:
       #
       # Release branches are exempt, keyed on the branch name rather than the diff shape — a
       # union merge produces the same shape and would otherwise exempt itself.
+      #
+      # That exemption reads `GITHUB_HEAD_REF`, which this event provides and which the `if:`
+      # above is what guarantees. It is not `git rev-parse --abbrev-ref HEAD`: `checkout` on a
+      # `pull_request` builds the merge commit in **detached HEAD**, where that returns the
+      # literal `HEAD`, so the exemption never fired here at all (#112). Widening the `if:` to
+      # another event without checking that the same variable is set puts it straight back.
       - name: Check changelog entries land in [Unreleased]
         if: github.event_name == 'pull_request'
         run: node scripts/changelog-placement.mjs "origin/${{ github.base_ref }}"
