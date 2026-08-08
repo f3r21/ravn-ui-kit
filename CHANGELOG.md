@@ -10,6 +10,33 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **An unassigned task announced "Unassigned" on a card and nothing at all in a table row**
+  (#111). **Minor** — one new optional prop, and one visual change described below.
+
+  `TaskCard` renders its `Avatar` unconditionally, so `fallbackLabel` carries the no-assignee
+  state — the behaviour #47 established. `TaskTableRow` rendered the whole assignee cell
+  conditionally, so the same task produced an empty cell with **no indication in the
+  accessibility tree that the column was even about an assignee**.
+
+  A consumer could not fix it: passing `assigneeName: 'Unassigned'` puts a false name into the
+  data, and the row then reads as assigned to a person called Unassigned — with the consumer's
+  own filtering and sorting on that field wrong too.
+
+  `AssigneeNameCell` now renders unconditionally and `name` is optional, with a new
+  `unassignedLabel` on it and on `TaskTableRow`, defaulting to `'Unassigned'` to match
+  `Avatar.fallbackLabel`.
+
+  **The design decided this rather than symmetry.** Both `Task Assign Name Cell` instances in
+  `Task Column02.md` carry an `Avatar`, and no export anywhere draws an unassigned state — so an
+  empty cell has no basis, while an always-present avatar does.
+
+  **Visual change:** a table row with no assignee now shows the initials-fallback avatar (`?`)
+  where it previously showed an empty cell. That is the same rendering a board card has always
+  used for this state. Rows _with_ an assignee are unchanged, and no `textContent` moves, so a
+  consumer querying by person name keeps working.
+
+### Fixed
+
 - **`TaskCard` rendered "1 Pts"** (#94). The card wrote `` `${points} Pts` `` with no singular
   at all, while `EstimationCell` beside it already said "1 Point" — the same datum, two
   spellings, one ungrammatical. **Minor**: new optional props, and the default output changes
