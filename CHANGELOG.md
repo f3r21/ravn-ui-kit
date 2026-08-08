@@ -8,6 +8,30 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`TaskCard` rendered "1 Pts"** (#94). The card wrote `` `${points} Pts` `` with no singular
+  at all, while `EstimationCell` beside it already said "1 Point" — the same datum, two
+  spellings, one ungrammatical. **Minor**: new optional props, and the default output changes
+  only for `points === 1`.
+
+  Both now read a shared rule. New exports `formatPointsShort` (`"1 Pt"` / `"4 Pts"`) and
+  `formatPointsLong` (`"1 Point"` / `"4 Points"`), plus a `formatPoints` prop on `TaskCard`,
+  `EstimationCell`, `TaskTableRow` and `EstimateModal`.
+
+  **The two wordings still differ, deliberately.** The card's `"Pts"` cites
+  `Cards01.md L340-359` and the cell's `"Points"` cites `Task Column02.md`, and neither could be
+  re-derived — the design exports are untracked here and the Figma API returns
+  `403 Invalid token`. Unifying them would override a citation on no evidence. What is shared is
+  the rule that decides singular from plural, so they cannot drift again.
+
+  `"Pt"` is the one token here with no design source. It is the English singular of an attested
+  abbreviation rather than a new design value, and the alternative was shipping `"1 Pts"` —
+  flagged in `format-points.ts` as the line to change if a source ever says otherwise.
+
+  `formatPoints` is also the seam #90 needs: `points === 1` is English's rule, not every
+  language's, and this is the third call site of it.
+
 ### Added
 
 - **`TaskMetaBadge` gains a decorative arm, restoring a capability #19 removed by accident**

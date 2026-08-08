@@ -1,6 +1,7 @@
 import { cn } from '../../utils/cn';
 import { Popover, type PopoverProps } from '../popover/popover';
 import { PointsIcon } from '../icons/icons';
+import { formatPointsLong, type PointsFormatter } from '../../utils/format-points';
 
 // Figma "Estimate Modal" (Task Column01.md L1800-2231) shows exactly 5 rows, all sharing the
 // literal placeholder text "0 Points" but with 5 distinct widths (57/54/56/57/57px) — read as 5
@@ -22,6 +23,16 @@ export interface EstimateModalProps {
    * Needed when this sits among sibling triggers, e.g. `AddTaskModal`'s chip row.
    */
   dismissExemptRef?: PopoverProps['dismissExemptRef'];
+  /**
+   * How each row's point value is written. Defaults to `formatPointsLong` — `"1 Point"` /
+   * `"4 Points"`, which is what this menu already rendered.
+   *
+   * Shares the rule with `TaskCard` and `EstimationCell` (#94) so the three cannot drift, and
+   * it is the third site of the same English pluralisation that #90 has to decide about — a
+   * `points === 1` ternary is English's rule, not every language's, and a formatter is the
+   * seam a consumer needs to replace it.
+   */
+  formatPoints?: PointsFormatter;
   /**
    * The popover's heading — rendered visibly **and** used as the surface's accessible name.
    * One prop drives both for the reason spelled out on `AssigneeModal.label`: two props
@@ -57,6 +68,7 @@ export function EstimateModal({
   onClose,
   triggerRef,
   dismissExemptRef,
+  formatPoints = formatPointsLong,
   label = 'Estimate',
   className,
 }: EstimateModalProps) {
@@ -121,9 +133,7 @@ export function EstimateModal({
           <span className="w-6 h-6 shrink-0">
             <PointsIcon className="size-6" />
           </span>
-          <span className="whitespace-nowrap">
-            {points} Point{points !== 1 ? 's' : ''}
-          </span>
+          <span className="whitespace-nowrap">{formatPoints(points)}</span>
         </button>
       ))}
     </Popover>

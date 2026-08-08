@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { cn } from '../../utils/cn';
+import { formatPointsShort, type PointsFormatter } from '../../utils/format-points';
 import type { HeadingLevel } from '../../types/heading-level';
 import { Tag } from '../tag/tag';
 import { Avatar } from '../avatar/avatar';
@@ -22,6 +23,17 @@ export interface TaskCardProps {
    * pill/background behind the "N Pts" text — see Cards01.md L340-359).
    */
   points?: number;
+  /**
+   * How `points` is written. Defaults to `formatPointsShort` — `"1 Pt"` / `"4 Pts"`.
+   *
+   * This card used to render `` `${points} Pts` `` with no singular at all, so `points={1}`
+   * produced **"1 Pts"** while the table cell beside it said "1 Point" (#94). The two still use
+   * different words — each is cited to its own Figma frame and neither could be re-derived —
+   * but they now share the rule that decides singular from plural, so they cannot drift again.
+   *
+   * Pass your own to translate it, or to match a table you render alongside.
+   */
+  formatPoints?: PointsFormatter;
   /** Due date label rendered inside the due-date Tag (e.g. `'3 DAYS'`). The Tag is hidden when not provided. */
   dueDateText?: string;
   /**
@@ -134,6 +146,7 @@ export interface TaskCardProps {
 export function TaskCard({
   title,
   points,
+  formatPoints = formatPointsShort,
   dueDateText,
   dueDateUrgency = 'normal',
   dueDateUrgencyLabel,
@@ -236,7 +249,9 @@ export function TaskCard({
           {points !== undefined ? (
             // Desktop/Body/M/bold: SF Pro Display, 15px/24px, weight 600, letter-spacing 0.75px
             // (tracking-wider, exact at this size). Was previously `text-sm font-bold` (14px/700).
-            <span className="text-body-m font-semibold text-main font-sans">{points} Pts</span>
+            <span className="text-body-m font-semibold text-main font-sans">
+              {formatPoints(points)}
+            </span>
           ) : null}
           {dueDateText ? (
             // The due-date pill IS a real "Tag" instance per spec (padding 4px 16px, gap 8px,

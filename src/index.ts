@@ -14,6 +14,7 @@ import './styles/theme.css';
 
 // ─── Utilities ────────────────────────────────────────────────────
 export * from './utils/cn';
+export * from './utils/format-points';
 
 // ─── Shared colour vocabularies ───────────────────────────────────
 // One named type per axis (categorical accent / semantic status / due-date
