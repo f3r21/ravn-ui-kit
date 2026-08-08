@@ -31,7 +31,7 @@ function w({ children: t, ...n }) {
     }
   );
 }
-function bn(t) {
+function hn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 18 4", ...t, children: /* @__PURE__ */ e(
     "path",
     {
@@ -49,7 +49,7 @@ function ht(t) {
     }
   ) });
 }
-function hn(t) {
+function xn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 11.7382 12.6733", ...t, children: /* @__PURE__ */ e(
     "path",
     {
@@ -58,7 +58,7 @@ function hn(t) {
     }
   ) });
 }
-function xn(t) {
+function vn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 12 13.3333", ...t, children: /* @__PURE__ */ e(
     "path",
     {
@@ -67,7 +67,7 @@ function xn(t) {
     }
   ) });
 }
-function vn(t) {
+function gn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 13.3333 13.3333", ...t, children: /* @__PURE__ */ e(
     "path",
     {
@@ -76,7 +76,7 @@ function vn(t) {
     }
   ) });
 }
-function gn(t) {
+function yn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 18 18", ...t, children: /* @__PURE__ */ e(
     "path",
     {
@@ -85,10 +85,10 @@ function gn(t) {
     }
   ) });
 }
-function yn(t) {
+function Nn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 18 16", ...t, children: /* @__PURE__ */ e("path", { d: "M0 0H18V2H0V0ZM0 7H18V9H0V7ZM0 14H18V16H0V14Z", fill: "currentColor" }) });
 }
-function Nn(t) {
+function Cn(t) {
   return /* @__PURE__ */ e(w, { viewBox: "0 0 14 14", ...t, children: /* @__PURE__ */ e("path", { d: "M6 6V0H8V6H14V8H8V14H6V8H0V6H6Z", fill: "currentColor" }) });
 }
 function xt(t) {
@@ -145,7 +145,7 @@ function yt(t) {
     }
   ) });
 }
-function Cn(t) {
+function wn(t) {
   return /* @__PURE__ */ c(w, { viewBox: "0 0 40 40", ...t, children: [
     /* @__PURE__ */ e("g", { transform: "translate(0 2)", children: /* @__PURE__ */ e(
       "path",
@@ -321,7 +321,7 @@ function Z({
 }) {
   return n ? /* @__PURE__ */ e("span", { ...s, className: Mt, children: n }) : t ? /* @__PURE__ */ e("span", { ...l, className: Lt, children: t }) : null;
 }
-function wn({
+function kn({
   label: t,
   isLabelVisible: n = !1,
   description: l,
@@ -359,7 +359,7 @@ function wn({
     )
   ] });
 }
-function kn({
+function Pn({
   label: t,
   isLabelVisible: n = !1,
   error: l,
@@ -507,9 +507,9 @@ function Ht({
   actions: b,
   className: x
 }) {
-  const [h, g] = pe(""), v = t !== void 0, N = v ? t : h, k = (I) => {
-    v || g(I), l == null || l(I);
-  }, M = () => {
+  const [h, g] = pe(""), v = t !== void 0, N = v ? t : h, k = (T) => {
+    v || g(T), l == null || l(T);
+  }, P = () => {
     v || g(""), l == null || l("");
   };
   return /* @__PURE__ */ c(
@@ -536,7 +536,7 @@ function Ht({
             "button",
             {
               type: "button",
-              onClick: M,
+              onClick: P,
               "aria-label": i,
               className: "w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full",
               children: /* @__PURE__ */ e(re, {})
@@ -559,7 +559,7 @@ function Ht({
     }
   );
 }
-function Pn({
+function Ln({
   items: t,
   panels: n,
   defaultSelectedKey: l,
@@ -633,7 +633,7 @@ function Tt({ state: t, panels: n }) {
   const l = y(null), { tabPanelProps: s } = Ie({}, t, l), o = t.selectedKey != null ? String(t.selectedKey) : "";
   return /* @__PURE__ */ e("div", { ...s, ref: l, className: "flex-1", children: n[o] ?? null });
 }
-function Ln({
+function Mn({
   options: t,
   value: n,
   defaultValue: l,
@@ -646,7 +646,7 @@ function Ln({
     u || r(h), s == null || s(h);
   }, b = (h) => {
     var k;
-    const g = t.findIndex((M) => M.id === d);
+    const g = t.findIndex((P) => P.id === d);
     if (g === -1) return;
     let v = null;
     switch (h.key) {
@@ -716,7 +716,7 @@ function Ln({
     }
   );
 }
-function Mn({ children: t, className: n, ...l }) {
+function Vn({ children: t, className: n, ...l }) {
   return /* @__PURE__ */ e(
     "div",
     {
@@ -968,7 +968,7 @@ function It({
     )
   );
 }
-function T({ className: t }) {
+function D({ className: t }) {
   return /* @__PURE__ */ e(
     "div",
     {
@@ -1006,18 +1006,18 @@ function ve({
 }
 function X() {
   return /* @__PURE__ */ c("div", { className: "flex flex-col gap-4 p-4 bg-surface-panel rounded-sm border border-transparent", children: [
-    /* @__PURE__ */ e(T, { className: "h-6 w-3/4" }),
+    /* @__PURE__ */ e(D, { className: "h-6 w-3/4" }),
     /* @__PURE__ */ c("div", { className: "flex items-center justify-between gap-2", children: [
-      /* @__PURE__ */ e(T, { className: "h-6 w-16" }),
-      /* @__PURE__ */ e(T, { className: "h-6 w-20 rounded" })
+      /* @__PURE__ */ e(D, { className: "h-6 w-16" }),
+      /* @__PURE__ */ e(D, { className: "h-6 w-20 rounded" })
     ] }),
     /* @__PURE__ */ e("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ e(T, { className: "w-8 h-8 rounded-full" }),
-      /* @__PURE__ */ e(T, { className: "h-3 w-20" })
+      /* @__PURE__ */ e(D, { className: "w-8 h-8 rounded-full" }),
+      /* @__PURE__ */ e(D, { className: "h-3 w-20" })
     ] }) })
   ] });
 }
-function Vn({
+function Hn({
   title: t,
   icon: n,
   tasks: l,
@@ -1056,7 +1056,7 @@ const H = {
     "aria-hidden": !0,
     children: /* @__PURE__ */ e("rect", { x: "4", y: "4", width: "16", height: "16", rx: "3" })
   }
-), R = "text-body-m font-normal text-main font-sans", D = "h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3";
+), R = "text-body-m font-normal text-main font-sans", I = "h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3";
 function jt({ date: t, urgency: n = "normal", urgencyLabel: l }) {
   return /* @__PURE__ */ c("span", { className: f(R, {
     normal: "text-main",
@@ -1118,24 +1118,25 @@ function At({
   dueDate: x,
   dueDateUrgency: h = "normal",
   dueDateUrgencyLabel: g,
-  onClick: v,
-  onViewDetails: N
+  actions: v,
+  onClick: N,
+  onViewDetails: k
 }) {
-  const k = (C) => C.stopPropagation(), M = u ? `h${u}` : null, I = M ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", P = v ? /* @__PURE__ */ e(
+  const P = (C) => C.stopPropagation(), T = u ? `h${u}` : null, L = T ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", S = N ? /* @__PURE__ */ e(
     "button",
     {
       type: "button",
       onClick: (C) => {
-        k(C), v();
+        P(C), N();
       },
       className: f(
         R,
-        I,
+        L,
         "truncate text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1"
       ),
       children: n
     }
-  ) : /* @__PURE__ */ e("span", { className: f(R, I, "truncate"), children: n });
+  ) : /* @__PURE__ */ e("span", { className: f(R, L, "truncate"), children: n });
   return (
     // The row-wide handler is a pointer convenience only. A `<tr>` cannot be the control
     // itself — giving it `role="button"` would strip its `row` role and break the table it
@@ -1143,15 +1144,15 @@ function At({
     // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
-    /* @__PURE__ */ c("tr", { onClick: v, className: f("group", v && "cursor-pointer"), children: [
-      /* @__PURE__ */ e("td", { className: f(D, "pl-0 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
+    /* @__PURE__ */ c("tr", { onClick: N, className: f("group", N && "cursor-pointer"), children: [
+      /* @__PURE__ */ e("td", { className: f(I, "pl-0 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
         /* @__PURE__ */ e("span", { className: f("w-1 h-full shrink-0", Ot[l]) }),
         a ? (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
           /* @__PURE__ */ c(
             "label",
             {
-              onClick: k,
+              onClick: P,
               className: "w-6 h-6 shrink-0 flex items-center justify-center cursor-pointer rounded-xs has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-1",
               children: [
                 /* @__PURE__ */ e(
@@ -1178,7 +1179,7 @@ function At({
           )
         ) : null,
         /* @__PURE__ */ e("span", { className: f(R, "shrink-0 tabular-nums"), children: String(t).padStart(2, "0") }),
-        M ? /* @__PURE__ */ e(M, { className: f(R, "flex-1 min-w-0"), children: P }) : P,
+        T ? /* @__PURE__ */ e(T, { className: f(R, "flex-1 min-w-0"), children: S }) : S,
         s.map((C) => /* @__PURE__ */ c(
           "span",
           {
@@ -1190,12 +1191,12 @@ function At({
           },
           C.emoji
         )),
-        N ? /* @__PURE__ */ c(
+        k ? /* @__PURE__ */ c(
           "button",
           {
             type: "button",
             onClick: (C) => {
-              k(C), N();
+              P(C), k();
             },
             className: f(
               R,
@@ -1210,12 +1211,16 @@ function At({
               /* @__PURE__ */ e(he, { className: "w-4 h-4" })
             ]
           }
+        ) : null,
+        v ? (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          /* @__PURE__ */ e("div", { className: "shrink-0", onClick: P, children: v })
         ) : null
       ] }) }),
-      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: d.length > 0 ? /* @__PURE__ */ e(Et, { labels: d }) : null }) }),
-      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: p !== void 0 ? /* @__PURE__ */ e(Zt, { points: p }) : null }) }),
-      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: m ? /* @__PURE__ */ e(Bt, { name: m, avatarSrc: b }) : null }) }),
-      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: x ? /* @__PURE__ */ e(
+      /* @__PURE__ */ e("td", { className: f(I, "pl-2 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: d.length > 0 ? /* @__PURE__ */ e(Et, { labels: d }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(I, "pl-2 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: p !== void 0 ? /* @__PURE__ */ e(Zt, { points: p }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(I, "pl-2 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: m ? /* @__PURE__ */ e(Bt, { name: m, avatarSrc: b }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(I, "pl-2 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: x ? /* @__PURE__ */ e(
         jt,
         {
           date: x,
@@ -1228,15 +1233,19 @@ function At({
 }
 function Ft() {
   return /* @__PURE__ */ c("tr", { children: [
-    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-full" }) }) }),
-    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-6 w-16 rounded" }) }) }),
-    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-16" }) }) }),
-    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
-      /* @__PURE__ */ e(T, { className: "w-8 h-8 rounded-full shrink-0" }),
-      /* @__PURE__ */ e(T, { className: "h-4 w-20" })
+    /* @__PURE__ */ e("td", { className: f(I, "pl-4 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(D, { className: "h-4 w-full" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(I, "pl-4 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(D, { className: "h-6 w-16 rounded" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(I, "pl-4 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(D, { className: "h-4 w-16" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(I, "pl-4 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
+      /* @__PURE__ */ e(D, { className: "w-8 h-8 rounded-full shrink-0" }),
+      /* @__PURE__ */ e(D, { className: "h-4 w-20" })
     ] }) }),
-    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-20" }) }) })
+    /* @__PURE__ */ e("td", { className: f(I, "pl-4 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(D, { className: "h-4 w-20" }) }) })
   ] });
+}
+function _t({ level: t, children: n }) {
+  const l = `h${t}`;
+  return /* @__PURE__ */ e(l, { className: "flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans", children: n });
 }
 const O = [
   { key: "name", label: "# Task Name" },
@@ -1245,7 +1254,7 @@ const O = [
   { key: "assignee", label: "Task Assign Name" },
   { key: "dueDate", label: "Due Date" }
 ];
-function Hn({
+function Sn({
   groups: t,
   isLoading: n = !1,
   emptyTitle: l = "No tasks yet",
@@ -1267,7 +1276,7 @@ function Hn({
           "div",
           {
             className: f(
-              D,
+              I,
               "px-4",
               d === 0 && "border-l rounded-l-4",
               d === O.length - 1 && "rounded-r-4"
@@ -1285,7 +1294,7 @@ function Hn({
           /* @__PURE__ */ c("tbody", { children: [
             /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: O.length, className: "p-0 border border-neutral-3", children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4", children: [
               /* @__PURE__ */ e(se, { className: "w-6 h-6 shrink-0 text-muted" }),
-              /* @__PURE__ */ e("h3", { className: "flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans", children: r.title }),
+              /* @__PURE__ */ e(_t, { level: r.headingLevel ?? 3, children: r.title }),
               r.actions
             ] }) }) }),
             r.rows.map((d, p) => /* @__PURE__ */ e(At, { ...d }, p))
@@ -1370,11 +1379,11 @@ function ge({
       ...a,
       ref: i,
       className: f("max-h-64 min-w-40 overflow-auto py-2 outline-none", l),
-      children: [...t.collection].map((r) => /* @__PURE__ */ e(_t, { item: r, state: t }, r.key))
+      children: [...t.collection].map((r) => /* @__PURE__ */ e(zt, { item: r, state: t }, r.key))
     }
   );
 }
-function _t({ item: t, state: n }) {
+function zt({ item: t, state: n }) {
   const l = y(null), { optionProps: s, isSelected: o, isFocused: i, isDisabled: a } = Ee(
     { key: t.key },
     n,
@@ -1416,7 +1425,7 @@ function _t({ item: t, state: n }) {
     }
   );
 }
-function Sn({
+function Tn({
   isLabelVisible: t = !1,
   placeholder: n,
   icon: l,
@@ -1511,7 +1520,7 @@ function Sn({
     r.isOpen ? /* @__PURE__ */ e(ie, { state: r, triggerRef: u, placement: "bottom start", children: /* @__PURE__ */ e(ge, { ...b, state: r }) }) : null
   ] });
 }
-function Tn({
+function Dn({
   label: t,
   placeholder: n,
   icon: l,
@@ -1581,7 +1590,7 @@ function Tn({
     u.isOpen ? /* @__PURE__ */ e(ie, { state: u, triggerRef: d, placement: "bottom start", children: /* @__PURE__ */ e(ge, { "aria-label": t, state: p, autoFocus: !0 }) }) : null
   ] });
 }
-function Dn({
+function In({
   label: t,
   triggerContent: n,
   isDisabled: l,
@@ -1611,7 +1620,7 @@ function Dn({
       }
     ),
     i.isOpen ? /* @__PURE__ */ e(ie, { state: i, triggerRef: a, placement: "bottom end", children: /* @__PURE__ */ e(
-      zt,
+      Ut,
       {
         ...u,
         ...o,
@@ -1621,11 +1630,11 @@ function Dn({
     ) }) : null
   ] });
 }
-function zt({ children: t, onAction: n, onClose: l, ...s }) {
+function Ut({ children: t, onAction: n, onClose: l, ...s }) {
   const o = lt({ ...s, children: t, selectionMode: "none" }), i = y(null), { menuProps: a } = _e({ ...s, onAction: n, onClose: l }, o, i);
-  return /* @__PURE__ */ e("ul", { ...a, ref: i, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...o.collection].map((r) => /* @__PURE__ */ e(Ut, { item: r, state: o, onClose: l }, r.key)) });
+  return /* @__PURE__ */ e("ul", { ...a, ref: i, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...o.collection].map((r) => /* @__PURE__ */ e(Wt, { item: r, state: o, onClose: l }, r.key)) });
 }
-function Ut({ item: t, state: n, onClose: l }) {
+function Wt({ item: t, state: n, onClose: l }) {
   const s = y(null), { menuItemProps: o, isFocused: i, isDisabled: a } = ze(
     { key: t.key, onClose: l },
     n,
@@ -1650,7 +1659,7 @@ function Ut({ item: t, state: n, onClose: l }) {
     }
   );
 }
-function In({
+function Rn({
   title: t,
   isOpen: n,
   onClose: l,
@@ -1702,7 +1711,7 @@ function In({
     }
   ) : null;
 }
-function Rn(t = !1) {
+function jn(t = !1) {
   const n = le({ defaultOpen: t });
   return {
     isOpen: n.isOpen,
@@ -1714,10 +1723,10 @@ function Rn(t = !1) {
 function fe(t, n) {
   return ct(ut(t, n));
 }
-function Wt(t, n) {
+function Kt(t, n) {
   return t.toDate(n);
 }
-function Kt({
+function $t({
   value: t,
   defaultValue: n,
   onChange: l,
@@ -1734,7 +1743,7 @@ function Kt({
 }) {
   const x = t !== void 0 ? { value: fe(t, a) } : { defaultValue: n ? fe(n, a) : null }, h = st({
     ...x,
-    onChange: (S) => l == null ? void 0 : l(Wt(S, a)),
+    onChange: (C) => l == null ? void 0 : l(Kt(C, a)),
     createCalendar: at,
     // Hardcoded, matching the prior implementation's hardcoded English
     // MONTHS/DAYS arrays — no `I18nProvider`/locale story exists in this kit
@@ -1746,9 +1755,9 @@ function Kt({
   }), { calendarProps: g, prevButtonProps: v, nextButtonProps: N } = Ke(
     { "aria-label": r },
     h
-  ), k = y(null), M = y(null), { buttonProps: I } = B(v, k), { buttonProps: P } = B(N, M), C = () => {
-    const S = dt(a);
-    h.setFocusedDate(S), h.selectDate(S);
+  ), k = y(null), P = y(null), { buttonProps: T } = B(v, k), { buttonProps: L } = B(N, P), S = () => {
+    const C = dt(a);
+    h.setFocusedDate(C), h.selectDate(C);
   };
   return /* @__PURE__ */ c(
     K,
@@ -1779,7 +1788,7 @@ function Kt({
               /* @__PURE__ */ e(
                 "button",
                 {
-                  ...I,
+                  ...T,
                   ref: k,
                   "aria-label": d,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50",
@@ -1792,8 +1801,8 @@ function Kt({
               /* @__PURE__ */ e(
                 "button",
                 {
-                  ...P,
-                  ref: M,
+                  ...L,
+                  ref: P,
                   "aria-label": p,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50",
                   children: /* @__PURE__ */ e(he, { className: "w-4 h-4" })
@@ -1812,14 +1821,14 @@ function Kt({
             ] })
           ] }),
           /* @__PURE__ */ e("div", { className: "h-px w-full bg-neutral-2" }),
-          /* @__PURE__ */ e($t, { state: h })
+          /* @__PURE__ */ e(Gt, { state: h })
         ] }),
         /* @__PURE__ */ e("div", { className: "h-px w-full bg-neutral-2" }),
         /* @__PURE__ */ e("div", { className: "flex items-center justify-center py-[9px] h-10", children: /* @__PURE__ */ e(
           "button",
           {
             type: "button",
-            onClick: C,
+            onClick: S,
             className: "text-body-sm font-normal font-sans text-interactive-text hover:opacity-80 transition-opacity cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs",
             children: "Today"
           }
@@ -1828,7 +1837,7 @@ function Kt({
     }
   );
 }
-function $t({ state: t }) {
+function Gt({ state: t }) {
   const { gridProps: n, headerProps: l, weekDays: s, weeksInMonth: o } = $e(
     { weekdayStyle: "short" },
     t
@@ -1837,7 +1846,7 @@ function $t({ state: t }) {
     /* @__PURE__ */ e("div", { ...l, className: "grid grid-cols-7", children: s.map((a, r) => /* @__PURE__ */ e("span", { className: "text-center text-body-sm font-normal text-main font-sans", children: a }, r)) }),
     Array.from({ length: o }, (a, r) => /* @__PURE__ */ e("div", { role: "row", className: "grid grid-cols-7", children: t.getDatesInWeek(r).map(
       (u, d) => u ? /* @__PURE__ */ e(
-        Gt,
+        qt,
         {
           state: t,
           date: u,
@@ -1848,7 +1857,7 @@ function $t({ state: t }) {
     ) }, r))
   ] });
 }
-function Gt({
+function qt({
   state: t,
   date: n,
   currentMonth: l
@@ -1871,8 +1880,8 @@ function Gt({
     }
   ) });
 }
-const qt = [1, 2, 3, 5, 8];
-function Yt({
+const Yt = [1, 2, 3, 5, 8];
+function Xt({
   value: t,
   onSelect: n,
   onClose: l,
@@ -1895,7 +1904,7 @@ function Yt({
       ),
       children: [
         /* @__PURE__ */ e("div", { className: "flex items-center h-8 px-4", children: /* @__PURE__ */ e("span", { className: "text-body-xl font-semibold text-muted-on-dark font-sans truncate", children: i }) }),
-        qt.map((r) => /* @__PURE__ */ c(
+        Yt.map((r) => /* @__PURE__ */ c(
           "button",
           {
             type: "button",
@@ -1924,7 +1933,7 @@ function Yt({
     }
   );
 }
-function Xt({
+function Jt({
   name: t,
   role: n,
   avatarSrc: l,
@@ -1971,7 +1980,7 @@ function Xt({
     }
   );
 }
-function Jt({
+function Qt({
   assignees: t,
   onSelect: n,
   onClose: l,
@@ -2000,7 +2009,7 @@ function Jt({
             type: "button",
             onClick: () => n(r),
             className: "flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2",
-            children: /* @__PURE__ */ e(Xt, { name: r.name, role: r.role, avatarSrc: r.avatarSrc, size: "sm" })
+            children: /* @__PURE__ */ e(Jt, { name: r.name, role: r.role, avatarSrc: r.avatarSrc, size: "sm" })
           },
           r.id
         ))
@@ -2008,7 +2017,7 @@ function Jt({
     }
   );
 }
-function Qt({
+function en({
   labels: t,
   onSelect: n,
   onClose: l,
@@ -2045,7 +2054,7 @@ function Qt({
     }
   );
 }
-function jn({
+function Bn({
   isOpen: t,
   onClose: n,
   assignees: l = [],
@@ -2058,12 +2067,12 @@ function jn({
   defaultLabel: d,
   className: p
 }) {
-  const [m, b] = V.useState(i), [x, h] = V.useState(a), [g, v] = V.useState(r), [N, k] = V.useState(u), [M, I] = V.useState(d), [P, C] = V.useState(null), S = (L) => C((z) => z === L ? null : L), _ = (L) => C((z) => z === L ? null : z), E = V.useRef(null), $ = V.useRef(null), G = V.useRef(null), q = V.useRef(null), ae = V.useRef(null), Y = () => {
-    b(i), h(a), v(r), k(u), I(d), C(null);
+  const [m, b] = V.useState(i), [x, h] = V.useState(a), [g, v] = V.useState(r), [N, k] = V.useState(u), [P, T] = V.useState(d), [L, S] = V.useState(null), C = (M) => S((z) => z === M ? null : M), _ = (M) => S((z) => z === M ? null : z), E = V.useRef(null), $ = V.useRef(null), G = V.useRef(null), q = V.useRef(null), ae = V.useRef(null), Y = () => {
+    b(i), h(a), v(r), k(u), T(d), S(null);
   }, [Ne, Ce] = V.useState(t);
   if (t !== Ne && (Ce(t), t && Y()), !t) return null;
-  const we = (L) => {
-    L.preventDefault(), m.trim() && (o == null || o({ title: m.trim(), dueDate: x, points: g, assignee: N, label: M }), Y(), n());
+  const we = (M) => {
+    M.preventDefault(), m.trim() && (o == null || o({ title: m.trim(), dueDate: x, points: g, assignee: N, label: P }), Y(), n());
   }, ke = () => {
     Y(), n();
   };
@@ -2081,7 +2090,7 @@ function jn({
           {
             autoFocus: !0,
             value: m,
-            onChange: (L) => b(L.target.value),
+            onChange: (M) => b(M.target.value),
             placeholder: "Task name",
             "aria-label": "Task name",
             className: "w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
@@ -2094,9 +2103,9 @@ function jn({
               {
                 ref: $,
                 type: "button",
-                onClick: () => S("estimate"),
+                onClick: () => C("estimate"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "estimate",
+                "aria-expanded": L === "estimate",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(J, { className: "size-6" }), children: "Estimate" })
               }
@@ -2105,9 +2114,9 @@ function jn({
               {
                 ref: $,
                 type: "button",
-                onClick: () => S("estimate"),
+                onClick: () => C("estimate"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "estimate",
+                "aria-expanded": L === "estimate",
                 className: "flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: [
                   /* @__PURE__ */ e("span", { className: "w-6 h-6 shrink-0", children: /* @__PURE__ */ e(J, { className: "size-6" }) }),
@@ -2117,12 +2126,12 @@ function jn({
                 ]
               }
             ),
-            P === "estimate" ? /* @__PURE__ */ e(
-              Yt,
+            L === "estimate" ? /* @__PURE__ */ e(
+              Xt,
               {
                 value: g,
-                onSelect: (L) => {
-                  v(L), C(null);
+                onSelect: (M) => {
+                  v(M), S(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("estimate"),
@@ -2137,9 +2146,9 @@ function jn({
               {
                 ref: G,
                 type: "button",
-                onClick: () => S("assignee"),
+                onClick: () => C("assignee"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "assignee",
+                "aria-expanded": L === "assignee",
                 className: "flex items-center gap-2 h-8 px-2 rounded-xs text-body-m font-normal text-main font-sans hover:bg-neutral-2 hover:text-neutral-5 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: [
                   /* @__PURE__ */ e(F, { src: N.avatarSrc, name: N.name, size: "sm" }),
@@ -2151,19 +2160,19 @@ function jn({
               {
                 ref: G,
                 type: "button",
-                onClick: () => S("assignee"),
+                onClick: () => C("assignee"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "assignee",
+                "aria-expanded": L === "assignee",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(vt, { className: "size-6" }), children: "Assignee" })
               }
             ),
-            P === "assignee" ? /* @__PURE__ */ e(
-              Jt,
+            L === "assignee" ? /* @__PURE__ */ e(
+              Qt,
               {
                 assignees: l,
-                onSelect: (L) => {
-                  k(L), C(null);
+                onSelect: (M) => {
+                  k(M), S(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("assignee"),
@@ -2173,35 +2182,35 @@ function jn({
             ) : null
           ] }),
           /* @__PURE__ */ c("div", { className: "relative", children: [
-            M ? /* @__PURE__ */ e(
+            P ? /* @__PURE__ */ e(
               "button",
               {
                 ref: q,
                 type: "button",
-                onClick: () => S("label"),
+                onClick: () => C("label"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "label",
+                "aria-expanded": L === "label",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(j, { variant: M.variant ?? "neutral", children: M.text })
+                children: /* @__PURE__ */ e(j, { variant: P.variant ?? "neutral", children: P.text })
               }
             ) : /* @__PURE__ */ e(
               "button",
               {
                 ref: q,
                 type: "button",
-                onClick: () => S("label"),
+                onClick: () => C("label"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "label",
+                "aria-expanded": L === "label",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(gt, { className: "size-6" }), children: "Label" })
               }
             ),
-            P === "label" ? /* @__PURE__ */ e(
-              Qt,
+            L === "label" ? /* @__PURE__ */ e(
+              en,
               {
                 labels: s,
-                onSelect: (L) => {
-                  I(L), C(null);
+                onSelect: (M) => {
+                  T(M), S(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("label"),
@@ -2216,19 +2225,19 @@ function jn({
               {
                 ref: ae,
                 type: "button",
-                onClick: () => S("date"),
+                onClick: () => C("date"),
                 "aria-haspopup": "dialog",
-                "aria-expanded": P === "date",
+                "aria-expanded": L === "date",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                 children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(yt, { className: "size-6" }), children: x ? x.toLocaleDateString("en-US") : "Due date" })
               }
             ),
-            P === "date" ? /* @__PURE__ */ e(
-              Kt,
+            L === "date" ? /* @__PURE__ */ e(
+              $t,
               {
                 value: x,
-                onChange: (L) => {
-                  h(L), C(null);
+                onChange: (M) => {
+                  h(M), S(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("date"),
@@ -2246,7 +2255,7 @@ function jn({
     }
   );
 }
-function Bn({ variant: t = "neutral", children: n, className: l }) {
+function Zn({ variant: t = "neutral", children: n, className: l }) {
   return /* @__PURE__ */ e(
     "span",
     {
@@ -2265,13 +2274,13 @@ function Bn({ variant: t = "neutral", children: n, className: l }) {
   );
 }
 const ye = Se(null);
-function Zn() {
+function En() {
   const t = He(ye);
   if (!t)
     throw new Error("useToast must be used within a ToastProvider");
   return t;
 }
-const en = 5e3, tn = {
+const tn = 5e3, nn = {
   neutral: "bg-surface-overlay text-main border border-subtle/10",
   success: "bg-success-4 text-neutral-5",
   warning: "bg-warning-5 text-neutral-5",
@@ -2286,7 +2295,7 @@ const en = 5e3, tn = {
   // the same footing as its neighbours: a saturated fill with dark text.
   danger: "bg-danger-4 text-neutral-5"
 };
-function nn({
+function ln({
   toast: t,
   state: n,
   closeLabel: l
@@ -2304,7 +2313,7 @@ function nn({
       className: f(
         "pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-sm shadow-elevation",
         "text-body-m font-semibold font-sans",
-        tn[t.content.tone]
+        nn[t.content.tone]
       ),
       children: [
         /* @__PURE__ */ e("div", { ...a, children: /* @__PURE__ */ e("span", { ...r, children: t.content.message }) }),
@@ -2322,7 +2331,7 @@ function nn({
     }
   );
 }
-function ln({
+function sn({
   state: t,
   label: n,
   closeLabel: l
@@ -2335,15 +2344,15 @@ function ln({
         ...o,
         ref: s,
         className: "pointer-events-none fixed right-4 bottom-4 z-toast flex flex-col gap-2",
-        children: t.visibleToasts.map((i) => /* @__PURE__ */ e(nn, { toast: i, state: t, closeLabel: l }, i.key))
+        children: t.visibleToasts.map((i) => /* @__PURE__ */ e(ln, { toast: i, state: t, closeLabel: l }, i.key))
       }
     ),
     document.body
   );
 }
-function En({
+function On({
   children: t,
-  duration: n = en,
+  duration: n = tn,
   maxVisibleToasts: l = 4,
   label: s = "Notifications",
   closeLabel: o = "Dismiss"
@@ -2372,10 +2381,10 @@ function En({
   );
   return /* @__PURE__ */ c(ye.Provider, { value: u, children: [
     t,
-    i.visibleToasts.length > 0 ? /* @__PURE__ */ e(ln, { state: i, label: s, closeLabel: o }) : null
+    i.visibleToasts.length > 0 ? /* @__PURE__ */ e(sn, { state: i, label: s, closeLabel: o }) : null
   ] });
 }
-function On({
+function An({
   children: t,
   isSelected: n,
   defaultSelected: l = !1,
@@ -2482,7 +2491,7 @@ function On({
     ) })
   ] });
 }
-function An({
+function Fn({
   label: t,
   isLabelVisible: n = !1,
   error: l,
@@ -2523,7 +2532,7 @@ function An({
     )
   ] });
 }
-function sn({
+function rn({
   icon: t,
   label: n,
   isActive: l = !1,
@@ -2587,7 +2596,7 @@ function sn({
     }
   );
 }
-function rn({
+function an({
   logo: t,
   items: n,
   label: l = "Main navigation",
@@ -2604,12 +2613,12 @@ function rn({
       ),
       children: [
         t ? /* @__PURE__ */ e("div", { className: "flex justify-center pt-3 h-24 shrink-0", children: t }) : null,
-        /* @__PURE__ */ e("div", { className: "flex flex-col gap-2 flex-1 overflow-y-auto", children: n.map((o, i) => /* @__PURE__ */ e(sn, { ...o }, i)) })
+        /* @__PURE__ */ e("div", { className: "flex flex-col gap-2 flex-1 overflow-y-auto", children: n.map((o, i) => /* @__PURE__ */ e(rn, { ...o }, i)) })
       ]
     }
   );
 }
-function Fn({
+function _n({
   value: t,
   onChange: n,
   leftIcon: l,
@@ -2684,7 +2693,7 @@ function Fn({
     }
   );
 }
-function _n({
+function zn({
   logo: t,
   sidebarItems: n,
   sidebar: l,
@@ -2694,7 +2703,7 @@ function _n({
   children: a,
   className: r
 }) {
-  const u = l !== void 0 ? l : n ? /* @__PURE__ */ e(rn, { logo: t, items: n, className: "self-stretch" }) : null, d = o !== void 0 ? o : /* @__PURE__ */ e(Ht, { ...s });
+  const u = l !== void 0 ? l : n ? /* @__PURE__ */ e(an, { logo: t, items: n, className: "self-stretch" }) : null, d = o !== void 0 ? o : /* @__PURE__ */ e(Ht, { ...s });
   return /* @__PURE__ */ c(
     "div",
     {
@@ -2713,34 +2722,34 @@ function _n({
   );
 }
 export {
-  jn as AddTaskModal,
+  Bn as AddTaskModal,
   ht as AlarmIcon,
-  _n as AppShell,
-  rn as ApplicationSidebar,
+  zn as AppShell,
+  an as ApplicationSidebar,
   vt as AssigneeIcon,
-  Jt as AssigneeModal,
+  Qt as AssigneeModal,
   Bt as AssigneeNameCell,
-  hn as AttachmentIcon,
+  xn as AttachmentIcon,
   F as Avatar,
-  Bn as Badge,
+  Zn as Badge,
   ce as BellIcon,
   ue as Button,
   yt as CalendarIcon,
-  Mn as Card,
+  Vn as Card,
   Ct as ChevronDoubleLeftIcon,
   wt as ChevronDoubleRightIcon,
   se as ChevronDownIcon,
   Nt as ChevronLeftIcon,
   he as ChevronRightIcon,
   re as CloseIcon,
-  vn as CommentIcon,
+  gn as CommentIcon,
   pt as DUE_DATE_URGENCY_COLOR,
   bt as DUE_DATE_URGENCY_LABEL,
-  Kt as DatePickerMenu,
-  An as Datepicker,
+  $t as DatePickerMenu,
+  Fn as Datepicker,
   jt as DueDateCell,
   ve as EmptyState,
-  Yt as EstimateModal,
+  Xt as EstimateModal,
   Zt as EstimationCell,
   Lt as FIELD_DESCRIPTION_CLASS,
   Mt as FIELD_ERROR_CLASS,
@@ -2748,46 +2757,46 @@ export {
   Pt as FIELD_LABEL_HIDDEN_CLASS,
   Z as FieldMessages,
   ie as FloatingPopover,
-  wn as FormField,
-  gn as GridViewIcon,
-  kn as Input,
-  On as LabelCheckbox,
+  kn as FormField,
+  yn as GridViewIcon,
+  Pn as Input,
+  An as LabelCheckbox,
   gt as LabelIcon,
-  Qt as LabelModal,
+  en as LabelModal,
   ge as ListBox,
-  yn as ListViewIcon,
-  Cn as LogoMark,
-  Dn as Menu,
-  bn as MenuDotsIcon,
-  In as Modal,
-  Tn as MultiSelect,
-  Nn as PlusIcon,
+  Nn as ListViewIcon,
+  wn as LogoMark,
+  In as Menu,
+  hn as MenuDotsIcon,
+  Rn as Modal,
+  Dn as MultiSelect,
+  Cn as PlusIcon,
   J as PointsIcon,
   K as Popover,
   Q as ProjectInfo,
   A as RequiredIndicator,
   Vt as SearchBar,
   xt as SearchIcon,
-  Ln as SegmentedControl,
-  Sn as Select,
-  sn as SidebarItem,
-  T as Skeleton,
-  xn as SubtaskIcon,
-  Pn as Tabs,
+  Mn as SegmentedControl,
+  Tn as Select,
+  rn as SidebarItem,
+  D as Skeleton,
+  vn as SubtaskIcon,
+  Ln as Tabs,
   j as Tag,
   Et as TagCell,
   It as TaskCard,
-  Vn as TaskListView,
+  Hn as TaskListView,
   Dt as TaskMetaBadges,
-  Hn as TaskTable,
+  Sn as TaskTable,
   At as TaskTableRow,
   de as TextButton,
-  En as ToastProvider,
+  On as ToastProvider,
   Ht as TopNav,
-  Xt as UserRow,
-  Fn as ViewSwitcher,
+  Jt as UserRow,
+  _n as ViewSwitcher,
   f as cn,
   W as fieldLabelClass,
-  Rn as useModalState,
-  Zn as useToast
+  jn as useModalState,
+  En as useToast
 };

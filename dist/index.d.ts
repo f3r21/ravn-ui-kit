@@ -2482,6 +2482,17 @@ export declare interface TaskTableGroup {
     /** Rows belonging to this group. */
     rows: TaskTableRowProps[];
     /**
+     * Which `<h*>` this group's header renders as (#95). It was hardcoded `<h3>`, with no way
+     * past it — so a consumer whose page runs `<h1>` page → `<h2>` status got `h1 → h3`, a
+     * skipped level that axe reports as `heading-order` and that no prop could fix.
+     *
+     * Per group rather than per table, matching where `title` and `actions` already live, and so
+     * it composes with `TaskTableRow.headingLevel` — set this one level above the rows' so the
+     * outline nests instead of colliding.
+     * @default 3
+     */
+    headingLevel?: HeadingLevel;
+    /**
      * Trailing action icons for this group's header (Figma shows an "add"/"more" icon pair,
      * `display: none` in most captured groups and visible in exactly one -- no legible glyph or
      * contradiction-free trigger condition, so left as a spec-free opt-in slot rather than a
@@ -2543,7 +2554,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2643,6 +2654,23 @@ export declare interface TaskTableRowProps {
      * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
      */
     dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
+    /**
+     * Controls rendered at the end of the Task Name cell — in practice a per-row overflow menu
+     * (Edit / Delete), which is what `TaskCard.actions` already exists for (#95). Without it a
+     * list view built on this component simply loses those actions.
+     *
+     * Name it for the task it belongs to (`"Task options for Fix auth bug"`), because a table of
+     * rows otherwise offers a screen-reader user a list of identical "options" buttons.
+     *
+     * **A click here does not open the row.** Like the select checkbox and the "Details" link, it
+     * is one of the row's own controls, so `onClick` does not fire — including from the keyboard,
+     * where activating a control synthesises a click that would otherwise bubble.
+     *
+     * It lands in the Task Name cell rather than a sixth column on purpose: the five column widths
+     * sum to the spec's 1108px row, and adding a column would break that invariant and the
+     * `colgroup` with it. A consumer-defined column set is #97.
+     */
+    actions?: React.ReactNode;
     /**
      * Called when the row is opened. Providing it renders the task title as a real `<button>`
      * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
