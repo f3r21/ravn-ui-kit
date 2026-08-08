@@ -33,7 +33,6 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `actions` already live, so it composes with `TaskTableRow.headingLevel` beneath it.
   Defaults to `3`, so existing callers are unchanged.
 
-## [0.6.0] — 2026-08-08
 ### Fixed
 
 - **Tag chips on `TaskCard` and in `TaskTable` render in caps again, without mutating the

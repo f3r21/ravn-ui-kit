@@ -134,7 +134,11 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   PLACEHOLDER_TABLE
+      //   metric       covered    margin        one fewer     verdict
+      //   statements   2634/2754  0.002702pp    95.606391     FAIL
+      //   branches      418/455   0.008132pp    91.648352     FAIL
+      //   functions     130/145   0.005172pp    88.965517     FAIL
+      //   lines        2634/2754  0.002702pp    95.606391     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -173,7 +177,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-      //   PLACEHOLDER_TABLE
+        statements: 95.64,
+        branches: 91.86,
+        functions: 89.65,
+        lines: 95.64,
       },
     },
   },
