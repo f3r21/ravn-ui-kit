@@ -105,10 +105,19 @@ export default defineConfig({
       //     for (const k of ['statements','branches','functions','lines'])
       //       console.log(k, t[k].covered+'/'+t[k].total, (t[k].covered/t[k].total*100).toFixed(6))"
       //
-      // These are set exact, with no deliberate headroom, and `branches` is one branch
-      // wide: 390/429 = 90.909091 passes, 389/429 = 90.675991 does not. That is chosen, and
-      // it has a consequence somebody will hit — raised in review on #89, recorded here
-      // rather than in the PR that will be hard to find.
+      // These are set exact, with no deliberate headroom. Review on #89 raised this for
+      // `branches`; it is true of **all four**, and `functions` is the tightest of them —
+      // losing a single covered unit fails every one:
+      //
+      //   metric       covered    margin        one fewer     verdict
+      //   statements   2533/2694  0.003756pp    93.986637     FAIL
+      //   branches      390/429   0.009091pp    90.675991     FAIL
+      //   functions     126/143   0.001888pp    87.412587     FAIL
+      //   lines        2533/2694  0.003756pp    93.986637     FAIL
+      //
+      // Re-derive with the json-summary command above rather than trusting this table.
+      // That tightness is chosen, and it has a consequence somebody will hit — recorded
+      // here rather than in a PR thread that will be hard to find.
       //
       // **A dependency bump can move the denominator without anyone's coverage regressing.**
       // Open right now: #32 bumps jsdom 26 -> 30, a major. This repo already knows that bump
