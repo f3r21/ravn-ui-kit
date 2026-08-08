@@ -242,29 +242,15 @@ describe('release-checks', () => {
     });
 
     /**
-     * What these two do **not** catch, stated so nobody reads #74 as closed by them.
+     * These two remain blind to **relocation** — an entry replayed from `[Unreleased]` into a
+     * released section is unique, well-formed, and in exactly one place. That is no longer a
+     * gap: `scripts/changelog-placement.mjs` catches it from the branch diff, which is where
+     * the deciding fact lives (#107).
      *
-     * The first firing moved `#102`'s entry from `[Unreleased]` into `[0.6.0]` with the heading
-     * still unique and nothing duplicated. Counting cannot see it: the entry is well-formed and
-     * in exactly one section, and whether it *belongs* there is a fact about which commits are
-     * in the tag, which the file does not contain. Catching that needs the branch diff — every
-     * changelog line a PR adds should land in `[Unreleased]` — which is a CI-level check, not a
-     * file-level one, and is left as follow-up work rather than half-built here.
+     * The test that sat here asserted the blindness and passed. It was deleted when #107 closed
+     * rather than left behind — **a gap pinned by a passing test reads as a live limitation
+     * forever**, and the next reader would have taken it as current.
      */
-    it('documents the gap: relocation alone leaves both checks silent', () => {
-      const relocated = `# Changelog
-
-## [Unreleased]
-
-## [0.5.1] — 2026-08-07
-
-### Fixed
-
-- An entry that belongs in [Unreleased] but was replayed into a released section.
-`;
-      expect(duplicateHeadings(relocated)).toEqual([]);
-      expect(duplicateEntries(relocated)).toEqual([]);
-    });
   });
 
   it('reports usage rather than crashing when given no version', () => {
