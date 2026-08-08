@@ -219,3 +219,41 @@ export const RowActions: Story = {
     ],
   },
 };
+
+/**
+ * A consumer-defined column set — **one added, one removed, one reordered** — which is what
+ * proves `columns` is real rather than decorative (#97).
+ *
+ * `Status` is a custom column: the kit draws no such cell, so it supplies its own `label`,
+ * `width` and `renderCell`. `renderCell` receives the row's own typed props, which is what
+ * keeps this additive — `TaskTableRowProps` stays field-by-field rather than becoming a
+ * generic bag, so nothing existing breaks.
+ *
+ * Estimation is dropped, and Due Date moves ahead of the tags. The header, the `colgroup`,
+ * every body row and the loading skeleton all follow, because all four read `resolveColumns`.
+ *
+ * **The 1108px total is gone here, on purpose.** These four widths sum to **840** — 420 + 120 +
+ * 132 + 168, and the rendered story's `min-width` reads `840px`. The table's minimum follows
+ * the columns rather than a constant, so a consumer who drops a column is not made to scroll
+ * for space it no longer occupies.
+ */
+export const CustomColumns: Story = {
+  args: {
+    ...Default.args,
+    columns: [
+      { key: 'name', width: 420 },
+      {
+        key: 'status',
+        label: 'Status',
+        width: 120,
+        renderCell: (row) => (
+          <span className="text-body-m font-normal text-main font-sans">
+            {row.dueDateUrgency === 'overdue' ? 'Blocked' : 'On track'}
+          </span>
+        ),
+      },
+      { key: 'dueDate' },
+      { key: 'tags' },
+    ],
+  },
+};
