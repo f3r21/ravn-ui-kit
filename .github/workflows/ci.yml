@@ -129,26 +129,6 @@ jobs:
       #   git add --intent-to-add dist/ && git diff      --exit-code dist/ ; echo $?   # 0
       #   git reset dist/ && git checkout -- dist/ && rm dist/ui-kit.css
       #   git add --intent-to-add dist/ && git diff HEAD --exit-code dist/ ; echo $?   # 1
-      # Every changelog entry a branch *adds* must be in `[Unreleased]` (#107).
-      #
-      # `.gitattributes` marks CHANGELOG.md `merge=union`, so rebasing onto a `main` whose
-      # `[Unreleased]` has just been rolled into a release relocates the entry **into the
-      # released section** — no conflict, no warning, and the result is well-formed. #74's
-      # file-level checks cannot see it: the entry is unique and in exactly one section, and
-      # whether it belongs there is a fact about the diff rather than about the file.
-      #
-      # Release branches are exempt, keyed on the branch name rather than the diff shape — a
-      # union merge produces the same shape and would otherwise exempt itself.
-      #
-      # That exemption reads `GITHUB_HEAD_REF`, which this event provides and which the `if:`
-      # above is what guarantees. It is not `git rev-parse --abbrev-ref HEAD`: `checkout` on a
-      # `pull_request` builds the merge commit in **detached HEAD**, where that returns the
-      # literal `HEAD`, so the exemption never fired here at all (#112). Widening the `if:` to
-      # another event without checking that the same variable is set puts it straight back.
-      - name: Check changelog entries land in [Unreleased]
-        if: github.event_name == 'pull_request'
-        run: node scripts/changelog-placement.mjs "origin/${{ github.base_ref }}"
-
       - name: Check committed dist/ is fresh
         run: |
           git add --intent-to-add dist/
@@ -229,6 +209,51 @@ jobs:
       # the tree.
       - name: Audit dependencies
         run: npm audit --audit-level=high
+
+      # Every changelog entry a branch *adds* must be in `[Unreleased]` (#107).
+      #
+      # `.gitattributes` marks CHANGELOG.md `merge=union`, so rebasing onto a `main` whose
+      # `[Unreleased]` has just been rolled into a release relocates the entry **into the
+      # released section** — no conflict, no warning, and the result is well-formed. #74's
+      # file-level checks cannot see it: the entry is unique and in exactly one section, and
+      # whether it belongs there is a fact about the diff rather than about the file.
+      #
+      # Release branches are exempt, keyed on the branch name rather than the diff shape — a
+      # union merge produces the same shape and would otherwise exempt itself.
+      #
+      # That exemption reads `GITHUB_HEAD_REF`, which this event provides and which the `if:`
+      # below is what guarantees. It is not `git rev-parse --abbrev-ref HEAD`: `checkout` on a
+      # `pull_request` builds the merge commit in **detached HEAD**, where that returns the
+      # literal `HEAD`, so the exemption never fired here at all (#112). Widening the `if:` to
+      # another event without checking that the same variable is set puts it straight back.
+      #
+      # ## This step is LAST on purpose, and the position is a decision
+      #
+      # It used to sit between "Build library" and the `dist/` freshness check, which cost two
+      # separate things when it was wrong — and it was wrong, on the first PR to add a nested
+      # changelog bullet:
+      #
+      # 1. **It suppressed four checks.** A failing step ends the job, so `dist/` freshness, the
+      #    Storybook build and the axe pass never ran. Two of those are the checks `npm run
+      #    gate` structurally cannot perform, so a PR tripping this got a red tick and no
+      #    coverage of the things most likely to actually be broken.
+      # 2. **It broke a documented adjacency.** The `dist/` check's own comment says "the build
+      #    ran immediately above, so any difference here is source that was changed without
+      #    rebuilding" — and it was no longer immediately above.
+      #
+      # The general rule, which is the part worth keeping: **a cheap heuristic check placed
+      # ahead of irreplaceable ones converts its own wrongness into their silence.** This one
+      # parses prose with regexes and has been wrong once already; `dist/` freshness, the
+      # Storybook build and axe cannot be replaced by anything a reviewer does by hand. So the
+      # fallible check goes last and pays only for itself.
+      #
+      # It stays **blocking** rather than `continue-on-error`. Non-blocking would fix the
+      # suppression by never stopping a real relocation either, which is the defect it exists
+      # to catch (#103 fired it four times in one afternoon). Last-and-blocking is the position
+      # that costs nothing when it is right and only itself when it is wrong.
+      - name: Check changelog entries land in [Unreleased]
+        if: github.event_name == 'pull_request'
+        run: node scripts/changelog-placement.mjs "origin/${{ github.base_ref }}"
 
   # Publishing is its own job so the gate stays the thing that decides whether
   # anything ships: `needs: ci` means a red typecheck, lint, test or audit run

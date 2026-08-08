@@ -25,6 +25,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   Both directions are pinned now: a nested bullet is not an added entry in either half, and a
   top-level entry that really did relocate into a released section is still caught.
 
+  **The step also moved to last in the CI job**, which is worth more than the predicate fix. It
+  sat between "Build library" and the `dist/` freshness check, so a failure ended the job and
+  `dist/` freshness, the Storybook build and the axe pass never ran — a PR tripping it got a red
+  tick and no coverage of the two checks `npm run gate` structurally cannot do. It also broke
+  the `dist/` check's documented "the build ran immediately above". A cheap heuristic check
+  placed ahead of irreplaceable ones converts its own wrongness into their silence. It stays
+  blocking; last-and-blocking costs nothing when right and only itself when wrong.
+
 ### Added
 
 - **The kit's remaining visible English copy is now overridable** (#90). Additive; every default
