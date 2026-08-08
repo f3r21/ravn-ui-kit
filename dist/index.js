@@ -2,11 +2,11 @@ import { clsx as Pe } from "clsx";
 import { twMerge as Le } from "tailwind-merge";
 import { jsx as e, jsxs as c, Fragment as me } from "react/jsx-runtime";
 import V, { useRef as y, useState as pe, useMemo as be, useId as Me, Fragment as Ve, useEffect as oe, useContext as He, createContext as Se } from "react";
-import { useButton as j, useField as ee, useTextField as te, useTabList as Te, useTab as Ie, useTabPanel as De, useOverlay as Re, FocusScope as ne, DismissButton as U, usePopover as je, Overlay as Be, useListBox as Ze, useOption as Ee, useSelect as Oe, HiddenSelect as Ae, useMenuTrigger as Fe, useMenu as _e, useMenuItem as ze, useModalOverlay as Ue, useDialog as We, useCalendar as Ke, useCalendarGrid as $e, useCalendarCell as Ge, useToastRegion as qe, useToast as Ye, useCheckbox as Xe } from "react-aria";
+import { useButton as B, useField as ee, useTextField as te, useTabList as Te, useTab as De, useTabPanel as Ie, useOverlay as Re, FocusScope as ne, DismissButton as U, usePopover as je, Overlay as Be, useListBox as Ze, useOption as Ee, useSelect as Oe, HiddenSelect as Ae, useMenuTrigger as Fe, useMenu as _e, useMenuItem as ze, useModalOverlay as Ue, useDialog as We, useCalendar as Ke, useCalendarGrid as $e, useCalendarCell as Ge, useToastRegion as qe, useToast as Ye, useCheckbox as Xe } from "react-aria";
 import { useTabListState as Je, Item as Qe, useSelectState as et, useOverlayTriggerState as le, useListState as tt, useMenuTriggerState as nt, useTreeState as lt, useCalendarState as st, useToastState as rt, useToggleState as it } from "react-stately";
 import { createCalendar as at, getLocalTimeZone as ot, toCalendarDate as ct, fromDate as ut, today as dt, isSameMonth as ft } from "@internationalized/date";
 import { createPortal as mt } from "react-dom";
-function d(...t) {
+function f(...t) {
   return Le(Pe(t));
 }
 const pt = {
@@ -247,20 +247,20 @@ function ue({
   isSelected: n = !1,
   children: l,
   className: s,
-  isDisabled: a,
+  isDisabled: o,
   role: i,
-  "aria-checked": r,
-  ...o
+  "aria-checked": a,
+  ...r
 }) {
-  const u = y(null), { buttonProps: f } = j({ ...o, isDisabled: a }, u);
+  const u = y(null), { buttonProps: d } = B({ ...r, isDisabled: o }, u);
   return /* @__PURE__ */ e(
     "button",
     {
-      ...f,
+      ...d,
       role: i,
-      "aria-checked": r,
+      "aria-checked": a,
       ref: u,
-      className: d(
+      className: f(
         "inline-flex items-center justify-center w-10 h-10 rounded-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
         {
           primary: "bg-primary-4 text-main border border-transparent",
@@ -277,10 +277,10 @@ function de({
   isSelected: n = !1,
   className: l,
   isDisabled: s,
-  ...a
+  ...o
 }) {
-  const i = y(null), { buttonProps: r } = j({ ...a, isDisabled: s }, i), o = {
-    primary: d(
+  const i = y(null), { buttonProps: a } = B({ ...o, isDisabled: s }, i), r = {
+    primary: f(
       "text-main",
       s ? "bg-primary-2" : n ? "bg-primary-3" : "bg-primary-4 hover:bg-primary-2"
     ),
@@ -294,14 +294,14 @@ function de({
   return /* @__PURE__ */ e(
     "button",
     {
-      ...r,
+      ...a,
       ref: i,
-      className: d(
+      className: f(
         "inline-flex items-center justify-center p-2 text-body-m font-normal rounded-sm transition-colors cursor-pointer font-sans select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:pointer-events-none",
-        o[t],
+        r[t],
         l
       ),
-      children: a.children
+      children: o.children
     }
   );
 }
@@ -326,26 +326,26 @@ function wn({
   isLabelVisible: n = !1,
   description: l,
   error: s,
-  isRequired: a = !1,
+  isRequired: o = !1,
   children: i,
-  className: r,
-  ...o
+  className: a,
+  ...r
 }) {
-  const { labelProps: u, fieldProps: f, descriptionProps: b, errorMessageProps: m } = ee({
-    ...o,
+  const { labelProps: u, fieldProps: d, descriptionProps: p, errorMessageProps: m } = ee({
+    ...r,
     label: t,
     description: l,
     errorMessage: s,
     isInvalid: !!s
   });
-  return /* @__PURE__ */ c("div", { className: d("flex flex-col gap-1.5", r), children: [
+  return /* @__PURE__ */ c("div", { className: f("flex flex-col gap-1.5", a), children: [
     t ? /* @__PURE__ */ c("label", { ...u, className: W(n), children: [
       t,
-      a ? /* @__PURE__ */ e(A, {}) : null
+      o ? /* @__PURE__ */ e(A, {}) : null
     ] }) : null,
     i({
-      ...f,
-      ...a ? { "aria-required": !0 } : {},
+      ...d,
+      ...o ? { "aria-required": !0 } : {},
       ...s ? { "aria-invalid": !0 } : {}
     }),
     /* @__PURE__ */ e(
@@ -353,7 +353,7 @@ function wn({
       {
         description: l,
         error: s,
-        descriptionProps: b,
+        descriptionProps: p,
         errorMessageProps: m
       }
     )
@@ -364,15 +364,15 @@ function kn({
   isLabelVisible: n = !1,
   error: l,
   description: s,
-  className: a,
+  className: o,
   ...i
 }) {
-  const r = y(null), { labelProps: o, inputProps: u, descriptionProps: f, errorMessageProps: b } = te(
+  const a = y(null), { labelProps: r, inputProps: u, descriptionProps: d, errorMessageProps: p } = te(
     { ...i, label: t, description: s, isInvalid: !!l, errorMessage: l },
-    r
+    a
   );
   return /* @__PURE__ */ c("div", { className: "flex flex-col gap-1.5 w-full", children: [
-    t ? /* @__PURE__ */ c("label", { ...o, className: W(n), children: [
+    t ? /* @__PURE__ */ c("label", { ...r, className: W(n), children: [
       t,
       i.isRequired ? /* @__PURE__ */ e(A, {}) : null
     ] }) : null,
@@ -380,11 +380,11 @@ function kn({
       "input",
       {
         ...u,
-        ref: r,
-        className: d(
+        ref: a,
+        className: f(
           "h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md placeholder:text-muted-on-light transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral",
           l && "border-danger-5 focus-visible:outline-danger-text",
-          a
+          o
         )
       }
     ),
@@ -393,8 +393,8 @@ function kn({
       {
         description: s,
         error: l,
-        descriptionProps: f,
-        errorMessageProps: b
+        descriptionProps: d,
+        errorMessageProps: p
       }
     )
   ] });
@@ -404,20 +404,20 @@ function Vt({
   value: n,
   onChange: l,
   onSubmit: s,
-  label: a = "Search",
+  label: o = "Search",
   id: i,
-  className: r
+  className: a
 }) {
-  const [o, u] = pe(""), f = n !== void 0, b = f ? n : o, m = y(null), { inputProps: p } = te(
+  const [r, u] = pe(""), d = n !== void 0, p = d ? n : r, m = y(null), { inputProps: b } = te(
     {
-      value: b,
-      onChange: (h) => {
-        f || u(h), l == null || l(h);
+      value: p,
+      onChange: (x) => {
+        d || u(x), l == null || l(x);
       },
-      onKeyDown: (h) => {
-        h.key === "Enter" && (s == null || s(b));
+      onKeyDown: (x) => {
+        x.key === "Enter" && (s == null || s(p));
       },
-      "aria-label": a,
+      "aria-label": o,
       id: i,
       // Makes the element a `searchbox` rather than a `textbox`, which is what a screen
       // reader announces and what a consumer's `getByRole('searchbox')` finds. It also
@@ -428,12 +428,12 @@ function Vt({
     },
     m
   );
-  return /* @__PURE__ */ c("div", { className: d("inline-flex items-center gap-6 min-w-0", r), children: [
+  return /* @__PURE__ */ c("div", { className: f("inline-flex items-center gap-6 min-w-0", a), children: [
     /* @__PURE__ */ e(xt, { className: "w-6 h-6 text-muted shrink-0" }),
     /* @__PURE__ */ e(
       "input",
       {
-        ...p,
+        ...b,
         ref: m,
         className: "flex-1 bg-transparent text-body-m text-main placeholder:text-muted-on-dark font-sans min-w-0 rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 [&::-webkit-search-cancel-button]:appearance-none"
       }
@@ -445,24 +445,24 @@ function F({
   name: n,
   fallbackLabel: l = "Unassigned",
   size: s = "md",
-  className: a
+  className: o
 }) {
   const i = {
     sm: "w-8 h-8 text-xs font-semibold",
     md: "w-10 h-10 text-sm font-semibold",
     lg: "w-12 h-12 text-base font-bold"
-  }, r = (u) => {
+  }, a = (u) => {
     if (!u) return "?";
-    const f = u.trim().split(" ");
-    return f.length >= 2 ? `${f[0][0]}${f[1][0]}`.toUpperCase() : f[0].substring(0, 2).toUpperCase();
-  }, o = n || l;
+    const d = u.trim().split(" ");
+    return d.length >= 2 ? `${d[0][0]}${d[1][0]}`.toUpperCase() : d[0].substring(0, 2).toUpperCase();
+  }, r = n || l;
   return /* @__PURE__ */ e(
     "div",
     {
       role: "img",
-      "aria-label": o,
-      title: o,
-      className: d(
+      "aria-label": r,
+      title: r,
+      className: f(
         // The initials are `neutral-5` on the `primary-1` tint, **not** the `primary-4`
         // they used to be. That pairing measured 2.61:1 and was the single largest
         // accessibility defect in the kit: 46 of the 131 colour-contrast violations an
@@ -481,13 +481,13 @@ function F({
         // alias names a *background* role, and this is a foreground.
         "relative inline-flex items-center justify-center rounded-full overflow-hidden bg-primary-1 text-neutral-5 select-none shrink-0",
         i[s],
-        a
+        o
       ),
       children: t ? (
         // `alt=""`, deliberately. The wrapper above already carries the name; an `alt` here
         // would have the avatar announced twice, and as "image, Alice" rather than "Alice".
         /* @__PURE__ */ e("img", { src: t, alt: "", className: "w-full h-full object-cover" })
-      ) : /* @__PURE__ */ e("span", { children: r(n) })
+      ) : /* @__PURE__ */ e("span", { children: a(n) })
     }
   );
 }
@@ -496,61 +496,64 @@ function Ht({
   searchPlaceholder: n,
   onSearchChange: l,
   onSearchSubmit: s,
-  searchLabel: a,
+  searchLabel: o,
   clearSearchLabel: i = "Clear search",
-  icon: r,
-  onNotificationsClick: o,
+  icon: a,
+  onNotificationsClick: r,
   notificationsLabel: u = "Notifications",
-  userName: f,
-  userAvatar: b,
-  className: m
+  userName: d,
+  userAvatar: p,
+  userSlot: m,
+  actions: b,
+  className: x
 }) {
-  const [p, h] = pe(""), x = t !== void 0, g = x ? t : p, v = (k) => {
-    x || h(k), l == null || l(k);
-  }, N = () => {
-    x || h(""), l == null || l("");
+  const [h, g] = pe(""), v = t !== void 0, N = v ? t : h, k = (I) => {
+    v || g(I), l == null || l(I);
+  }, M = () => {
+    v || g(""), l == null || l("");
   };
   return /* @__PURE__ */ c(
     "header",
     {
-      className: d(
+      className: f(
         "flex items-center justify-between gap-6 px-6 py-3 bg-surface-panel rounded-md",
-        m
+        x
       ),
       children: [
         /* @__PURE__ */ e(
           Vt,
           {
             placeholder: n,
-            value: g,
-            onChange: v,
+            value: N,
+            onChange: k,
             onSubmit: s,
-            label: a,
+            label: o,
             className: "flex-1"
           }
         ),
         /* @__PURE__ */ c("div", { className: "flex items-center gap-6 shrink-0", children: [
-          g ? /* @__PURE__ */ e(
+          N ? /* @__PURE__ */ e(
             "button",
             {
               type: "button",
-              onClick: N,
+              onClick: M,
               "aria-label": i,
               className: "w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full",
               children: /* @__PURE__ */ e(re, {})
             }
           ) : null,
-          o ? /* @__PURE__ */ e(
+          r ? /* @__PURE__ */ e(
             "button",
             {
               type: "button",
-              onClick: o,
+              onClick: r,
               "aria-label": u,
               className: "w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full",
-              children: r ?? /* @__PURE__ */ e(ce, {})
+              children: a ?? /* @__PURE__ */ e(ce, {})
             }
-          ) : /* @__PURE__ */ e("span", { className: "w-6 h-6 text-muted shrink-0 [&>svg]:w-full [&>svg]:h-full", children: r ?? /* @__PURE__ */ e(ce, {}) }),
-          f || b ? /* @__PURE__ */ e(F, { src: b, name: f, size: "md" }) : null
+          ) : /* @__PURE__ */ e("span", { className: "w-6 h-6 text-muted shrink-0 [&>svg]:w-full [&>svg]:h-full", children: a ?? /* @__PURE__ */ e(ce, {}) }),
+          b,
+          m ?? (d || p ? /* @__PURE__ */ e(F, { src: p, name: d, size: "md" }) : null)
         ] })
       ]
     }
@@ -561,43 +564,43 @@ function Pn({
   panels: n,
   defaultSelectedKey: l,
   selectedKey: s,
-  onSelectionChange: a,
+  onSelectionChange: o,
   label: i = "Tab navigation",
-  className: r
+  className: a
 }) {
   var m;
-  const o = be(() => new Map(t.map((p) => [p.id, p])), [t]), u = Je({
+  const r = be(() => new Map(t.map((b) => [b.id, b])), [t]), u = Je({
     items: t,
     selectedKey: s,
     defaultSelectedKey: l ?? ((m = t[0]) == null ? void 0 : m.id),
-    onSelectionChange: (p) => a == null ? void 0 : a(String(p)),
-    children: (p) => /* @__PURE__ */ e(Qe, { textValue: p.label, children: p.label }, p.id)
-  }), f = y(null), { tabListProps: b } = Te({ "aria-label": i }, u, f);
-  return /* @__PURE__ */ c("div", { className: d("flex flex-col", r), children: [
-    /* @__PURE__ */ e("div", { ...b, ref: f, className: "flex items-end", children: [...u.collection].map((p) => {
-      var h;
+    onSelectionChange: (b) => o == null ? void 0 : o(String(b)),
+    children: (b) => /* @__PURE__ */ e(Qe, { textValue: b.label, children: b.label }, b.id)
+  }), d = y(null), { tabListProps: p } = Te({ "aria-label": i }, u, d);
+  return /* @__PURE__ */ c("div", { className: f("flex flex-col", a), children: [
+    /* @__PURE__ */ e("div", { ...p, ref: d, className: "flex items-end", children: [...u.collection].map((b) => {
+      var x;
       return /* @__PURE__ */ e(
         St,
         {
-          item: p,
+          item: b,
           state: u,
-          icon: (h = o.get(String(p.key))) == null ? void 0 : h.icon
+          icon: (x = r.get(String(b.key))) == null ? void 0 : x.icon
         },
-        p.key
+        b.key
       );
     }) }),
     n ? /* @__PURE__ */ e(Tt, { state: u, panels: n }) : null
   ] });
 }
 function St({ item: t, state: n, icon: l }) {
-  const s = y(null), { tabProps: a, isSelected: i } = Ie({ key: t.key }, n, s);
+  const s = y(null), { tabProps: o, isSelected: i } = De({ key: t.key }, n, s);
   return /* @__PURE__ */ c(
     "button",
     {
-      ...a,
+      ...o,
       ref: s,
       type: "button",
-      className: d(
+      className: f(
         // Figma "Tabs" Frame 299: padding 12px 0px 8px (asymmetric
         // vertical padding around the label) -- was symmetric py-3.5.
         // Horizontal padding (px-5) is kept: Figma's own value there
@@ -627,26 +630,26 @@ function St({ item: t, state: n, icon: l }) {
   );
 }
 function Tt({ state: t, panels: n }) {
-  const l = y(null), { tabPanelProps: s } = De({}, t, l), a = t.selectedKey != null ? String(t.selectedKey) : "";
-  return /* @__PURE__ */ e("div", { ...s, ref: l, className: "flex-1", children: n[a] ?? null });
+  const l = y(null), { tabPanelProps: s } = Ie({}, t, l), o = t.selectedKey != null ? String(t.selectedKey) : "";
+  return /* @__PURE__ */ e("div", { ...s, ref: l, className: "flex-1", children: n[o] ?? null });
 }
 function Ln({
   options: t,
   value: n,
   defaultValue: l,
   onChange: s,
-  label: a = "View",
+  label: o = "View",
   className: i
 }) {
-  var h;
-  const [r, o] = V.useState(l ?? ((h = t[0]) == null ? void 0 : h.id) ?? ""), u = n !== void 0, f = u ? n : r, b = y([]), m = (x) => {
-    u || o(x), s == null || s(x);
-  }, p = (x) => {
+  var x;
+  const [a, r] = V.useState(l ?? ((x = t[0]) == null ? void 0 : x.id) ?? ""), u = n !== void 0, d = u ? n : a, p = y([]), m = (h) => {
+    u || r(h), s == null || s(h);
+  }, b = (h) => {
     var k;
-    const g = t.findIndex((M) => M.id === f);
+    const g = t.findIndex((M) => M.id === d);
     if (g === -1) return;
     let v = null;
-    switch (x.key) {
+    switch (h.key) {
       case "ArrowRight":
       case "ArrowDown":
         v = (g + 1) % t.length;
@@ -664,31 +667,31 @@ function Ln({
       default:
         return;
     }
-    x.preventDefault();
+    h.preventDefault();
     const N = t[v];
-    m(N.id), (k = b.current[v]) == null || k.focus();
+    m(N.id), (k = p.current[v]) == null || k.focus();
   };
   return /* @__PURE__ */ e(
     "div",
     {
       role: "radiogroup",
-      "aria-label": a,
-      className: d("inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10", i),
-      children: t.map((x, g) => {
-        const v = f === x.id;
+      "aria-label": o,
+      className: f("inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10", i),
+      children: t.map((h, g) => {
+        const v = d === h.id;
         return /* @__PURE__ */ c(
           "button",
           {
             ref: (N) => {
-              b.current[g] = N;
+              p.current[g] = N;
             },
             type: "button",
             role: "radio",
             "aria-checked": v,
             tabIndex: v ? 0 : -1,
-            onClick: () => m(x.id),
-            onKeyDown: p,
-            className: d(
+            onClick: () => m(h.id),
+            onKeyDown: b,
+            className: f(
               "inline-flex items-center justify-center gap-2 h-8 px-6 py-1 text-control-label font-normal rounded-sm transition-all cursor-pointer font-sans select-none text-main focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
               // The active label is `neutral-5`, not the white Figma draws. That is the
               // one deviation in this component and the ratio is why: white on the
@@ -703,11 +706,11 @@ function Ln({
               v ? "bg-neutral-2 text-neutral-5 shadow-small" : ""
             ),
             children: [
-              x.icon ? /* @__PURE__ */ e("span", { className: "text-base leading-none", children: x.icon }) : null,
-              x.label
+              h.icon ? /* @__PURE__ */ e("span", { className: "text-base leading-none", children: h.icon }) : null,
+              h.label
             ]
           },
-          x.id
+          h.id
         );
       })
     }
@@ -718,7 +721,7 @@ function Mn({ children: t, className: n, ...l }) {
     "div",
     {
       ...l,
-      className: d(
+      className: f(
         "p-5 bg-surface-neutral border border-subtle rounded-lg shadow-xs transition-shadow hover:shadow-sm",
         n
       ),
@@ -726,16 +729,16 @@ function Mn({ children: t, className: n, ...l }) {
     }
   );
 }
-function R({
+function j({
   variant: t = "neutral",
   outline: n = !1,
   icon: l,
   children: s,
-  onRemove: a,
+  onRemove: o,
   removeLabel: i = "Remove tag",
-  className: r
+  className: a
 }) {
-  const o = {
+  const r = {
     neutral: {
       solid: "bg-neutral-2/10 text-main",
       outline: "border border-neutral-1 text-main"
@@ -763,23 +766,23 @@ function R({
   return /* @__PURE__ */ c(
     "span",
     {
-      className: d(
+      className: f(
         // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
         // `rounded` step) -- matches Figma "Tag" component exactly (Style=Solid/Outline,
         // all Type variants, Tags00/01.md). Typography: Desktop/Body/M/bold - SF Pro
         // Display, 15px/24px, letter-spacing 0.75px (tracking-wider @ 15px), weight 600.
         "inline-flex items-center gap-2 px-4 py-1 text-body-m font-semibold rounded font-sans select-none",
-        n ? o[t].outline : o[t].solid,
-        r
+        n ? r[t].outline : r[t].solid,
+        a
       ),
       children: [
         l ? /* @__PURE__ */ e("span", { className: "flex items-center justify-center w-6 h-6 shrink-0", children: l }) : null,
         s,
-        a ? /* @__PURE__ */ e(
+        o ? /* @__PURE__ */ e(
           "button",
           {
             type: "button",
-            onClick: a,
+            onClick: o,
             "aria-label": i,
             className: "hover:bg-neutral-5/40 cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs",
             children: "×"
@@ -794,16 +797,16 @@ function Q({
   icon: n,
   onTitleClick: l,
   headingLevel: s = 3,
-  titleId: a,
+  titleId: o,
   className: i
 }) {
-  const r = `h${s}`;
-  return /* @__PURE__ */ c("div", { className: d("flex items-center gap-2 w-full", i), children: [
+  const a = `h${s}`;
+  return /* @__PURE__ */ c("div", { className: f("flex items-center gap-2 w-full", i), children: [
     /* @__PURE__ */ e(
-      r,
+      a,
       {
-        id: a,
-        className: d(
+        id: o,
+        className: f(
           "flex-1 min-w-0 text-body-l font-semibold text-main font-sans",
           !l && "truncate"
         ),
@@ -811,8 +814,8 @@ function Q({
           "button",
           {
             type: "button",
-            onClick: (o) => {
-              o.stopPropagation(), l();
+            onClick: (r) => {
+              r.stopPropagation(), l();
             },
             className: "inline-block max-w-full truncate align-bottom text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
             children: t
@@ -823,10 +826,10 @@ function Q({
     n ? /* @__PURE__ */ e("span", { className: "flex items-center justify-center w-6 h-6 shrink-0 text-muted", children: n }) : null
   ] });
 }
-function It({ badges: t, className: n }) {
+function Dt({ badges: t, className: n }) {
   return (
     // gap-4 matches Figma's "Frame 653" gap (16px, Cards01.md L614 / Cards00.md L657).
-    /* @__PURE__ */ e("div", { className: d("flex flex-wrap items-center gap-4", n), children: t.map((l) => /* @__PURE__ */ c(
+    /* @__PURE__ */ e("div", { className: f("flex flex-wrap items-center gap-4", n), children: t.map((l) => /* @__PURE__ */ c(
       "span",
       {
         className: "inline-flex items-center gap-1 text-body-m font-normal font-sans text-main",
@@ -847,23 +850,24 @@ function xe({ urgency: t, labels: n }) {
     l
   ] }) : null;
 }
-function Dt({
+function It({
   title: t,
   points: n,
   dueDateText: l,
   dueDateUrgency: s = "normal",
-  dueDateUrgencyLabel: a,
+  dueDateUrgencyLabel: o,
   tags: i = [],
-  assigneeName: r,
-  assigneeAvatar: o,
+  assigneeName: a,
+  assigneeAvatar: r,
   metaBadges: u = [],
-  actions: f,
-  headingLevel: b = 3,
-  titleId: m,
-  className: p,
+  actions: d,
+  icon: p,
+  headingLevel: m = 3,
+  titleId: b,
+  className: x,
   onClick: h
 }) {
-  const x = Me(), g = m ?? x;
+  const g = Me(), v = b ?? g;
   return (
     // The whole card stays clickable for a pointer user, but it is deliberately no longer an
     // ARIA button. `role="button"` + `tabIndex={0}` here made the card one control whose
@@ -887,9 +891,9 @@ function Dt({
     /* @__PURE__ */ c(
       "article",
       {
-        "aria-labelledby": g,
+        "aria-labelledby": v,
         onClick: h,
-        className: d(
+        className: f(
           // radius-sm (8px) matches Figma's "Task Card" border-radius exactly (Cards01.md L246);
           // rounded-lg here previously resolved to this project's --radius-lg (24px), far too round.
           // No border is ever rendered on the card in the export, so the resting border is transparent
@@ -899,28 +903,30 @@ function Dt({
           // utilities could never match. The ring lives on the title button that replaced them.
           "flex flex-col gap-4 p-4 bg-surface-panel text-main rounded-sm border border-transparent shadow-xs hover:border-subtle transition-all select-none",
           h && "cursor-pointer",
-          p
+          x
         ),
         children: [
-          f ? /* @__PURE__ */ c("div", { className: "flex items-start gap-2", children: [
+          d ? /* @__PURE__ */ c("div", { className: "flex items-start gap-2", children: [
             /* @__PURE__ */ e(
               Q,
               {
                 title: t,
+                icon: p,
                 onTitleClick: h,
-                headingLevel: b,
-                titleId: g,
+                headingLevel: m,
+                titleId: v,
                 className: "flex-1 min-w-0"
               }
             ),
-            /* @__PURE__ */ e("div", { className: "shrink-0", onClick: (v) => v.stopPropagation(), children: f })
+            /* @__PURE__ */ e("div", { className: "shrink-0", onClick: (N) => N.stopPropagation(), children: d })
           ] }) : /* @__PURE__ */ e(
             Q,
             {
               title: t,
+              icon: p,
               onTitleClick: h,
-              headingLevel: b,
-              titleId: g
+              headingLevel: m,
+              titleId: v
             }
           ),
           n !== void 0 || l ? /* @__PURE__ */ c("div", { className: "flex items-center justify-between gap-2", children: [
@@ -937,25 +943,25 @@ function Dt({
               // radius 4px, alarm-line icon, Desktop/Body/M/bold) — reusing `Tag` directly instead
               // of a bespoke span gets typography/spacing/color right for free.
               /* @__PURE__ */ c(
-                R,
+                j,
                 {
                   variant: pt[s],
                   icon: /* @__PURE__ */ e(ht, { className: "size-6" }),
                   children: [
                     l,
-                    /* @__PURE__ */ e(xe, { urgency: s, labels: a })
+                    /* @__PURE__ */ e(xe, { urgency: s, labels: o })
                   ]
                 }
               )
             ) : null
           ] }) : null,
-          i.length > 0 ? /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: i.map((v, N) => /* @__PURE__ */ e(R, { variant: v.variant || "neutral", children: v.label }, N)) }) : null,
+          i.length > 0 ? /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: i.map((N, k) => /* @__PURE__ */ e(j, { variant: N.variant || "neutral", children: N.label }, k)) }) : null,
           /* @__PURE__ */ c("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ c("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ e(F, { src: o, name: r, size: "sm" }),
-              r ? /* @__PURE__ */ e("span", { className: "font-sans text-xs font-medium text-muted truncate max-w-[120px]", children: r }) : null
+              /* @__PURE__ */ e(F, { src: r, name: a, size: "sm" }),
+              a ? /* @__PURE__ */ e("span", { className: "font-sans text-xs font-medium text-muted truncate max-w-[120px]", children: a }) : null
             ] }),
-            u.length > 0 ? /* @__PURE__ */ e(It, { badges: u }) : null
+            u.length > 0 ? /* @__PURE__ */ e(Dt, { badges: u }) : null
           ] })
         ]
       }
@@ -967,7 +973,7 @@ function T({ className: t }) {
     "div",
     {
       "aria-hidden": !0,
-      className: d("motion-safe:animate-pulse rounded-sm bg-neutral-3", t)
+      className: f("motion-safe:animate-pulse rounded-sm bg-neutral-3", t)
     }
   );
 }
@@ -976,15 +982,15 @@ function ve({
   description: n,
   icon: l,
   action: s,
-  label: a = "No results",
+  label: o = "No results",
   className: i
 }) {
   return /* @__PURE__ */ c(
     "div",
     {
       role: "group",
-      "aria-label": a,
-      className: d(
+      "aria-label": o,
+      className: f(
         "flex flex-col items-center gap-2 rounded-sm border border-dashed border-subtle/20",
         "px-6 py-10 text-center font-sans",
         i
@@ -1016,20 +1022,21 @@ function Vn({
   icon: n,
   tasks: l,
   isLoading: s = !1,
-  emptyTitle: a = "No tasks in this view",
+  emptyTitle: o = "No tasks in this view",
   emptyDescription: i,
-  emptyAction: r,
-  headingLevel: o = 3,
-  label: u,
-  className: f
+  emptyAction: a,
+  empty: r,
+  headingLevel: u = 3,
+  label: d,
+  className: p
 }) {
-  return /* @__PURE__ */ c(u ? "section" : "div", { "aria-label": u, className: d("flex flex-col gap-4 w-full", f), children: [
-    /* @__PURE__ */ e(Q, { title: t, icon: n, headingLevel: o }),
+  return /* @__PURE__ */ c(d ? "section" : "div", { "aria-label": d, className: f("flex flex-col gap-4 w-full", p), children: [
+    /* @__PURE__ */ e(Q, { title: t, icon: n, headingLevel: u }),
     s ? /* @__PURE__ */ c(me, { children: [
       /* @__PURE__ */ e(X, {}),
       /* @__PURE__ */ e(X, {}),
       /* @__PURE__ */ e(X, {})
-    ] }) : l.length === 0 ? /* @__PURE__ */ e(ve, { title: a, description: i, action: r }) : l.map((m, p) => /* @__PURE__ */ e(Dt, { ...m, className: "w-full" }, p))
+    ] }) : l.length === 0 ? r ?? /* @__PURE__ */ e(ve, { title: o, description: i, action: a }) : l.map((b, x) => /* @__PURE__ */ e(It, { ...b, className: "w-full" }, x))
   ] });
 }
 const H = {
@@ -1049,9 +1056,9 @@ const H = {
     "aria-hidden": !0,
     children: /* @__PURE__ */ e("rect", { x: "4", y: "4", width: "16", height: "16", rx: "3" })
   }
-), D = "text-body-m font-normal text-main font-sans", I = "h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3";
+), R = "text-body-m font-normal text-main font-sans", D = "h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3";
 function jt({ date: t, urgency: n = "normal", urgencyLabel: l }) {
-  return /* @__PURE__ */ c("span", { className: d(D, {
+  return /* @__PURE__ */ c("span", { className: f(R, {
     normal: "text-main",
     soon: "text-tertiary-4",
     // `primary-2`, not the `primary-4` this was. A cell renders on `surface-panel`, where
@@ -1074,18 +1081,18 @@ function jt({ date: t, urgency: n = "normal", urgencyLabel: l }) {
 function Bt({ name: t, avatarSrc: n }) {
   return /* @__PURE__ */ c("div", { className: "flex items-center gap-2 min-w-0", children: [
     /* @__PURE__ */ e(F, { src: n, name: t, size: "sm" }),
-    /* @__PURE__ */ e("span", { className: d(D, "truncate"), children: t })
+    /* @__PURE__ */ e("span", { className: f(R, "truncate"), children: t })
   ] });
 }
 function Zt({ points: t }) {
-  return /* @__PURE__ */ c("span", { className: d(D, "tabular-nums"), children: [
+  return /* @__PURE__ */ c("span", { className: f(R, "tabular-nums"), children: [
     t,
     " ",
     t === 1 ? "Point" : "Points"
   ] });
 }
 function Et({ labels: t }) {
-  return /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: t.map((n, l) => /* @__PURE__ */ e(R, { variant: n.variant ?? "neutral", children: n.label }, l)) });
+  return /* @__PURE__ */ e("div", { className: "flex flex-wrap items-center gap-2", children: t.map((n, l) => /* @__PURE__ */ e(j, { variant: n.variant ?? "neutral", children: n.label }, l)) });
 }
 const Ot = {
   neutral: "bg-neutral-2",
@@ -1099,36 +1106,36 @@ function At({
   title: n,
   indicatorColor: l = "green",
   reactions: s = [],
-  isSelected: a = !1,
+  isSelected: o = !1,
   onSelectedChange: i,
-  isSelectable: r = !0,
-  selectLabel: o,
+  isSelectable: a = !0,
+  selectLabel: r,
   headingLevel: u,
-  tags: f = [],
-  estimationPoints: b,
+  tags: d = [],
+  estimationPoints: p,
   assigneeName: m,
-  assigneeAvatar: p,
-  dueDate: h,
-  dueDateUrgency: x = "normal",
+  assigneeAvatar: b,
+  dueDate: x,
+  dueDateUrgency: h = "normal",
   dueDateUrgencyLabel: g,
   onClick: v,
   onViewDetails: N
 }) {
-  const k = (C) => C.stopPropagation(), M = u ? `h${u}` : null, B = M ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", P = v ? /* @__PURE__ */ e(
+  const k = (C) => C.stopPropagation(), M = u ? `h${u}` : null, I = M ? "inline-block max-w-full align-bottom" : "flex-1 min-w-0", P = v ? /* @__PURE__ */ e(
     "button",
     {
       type: "button",
       onClick: (C) => {
         k(C), v();
       },
-      className: d(
-        D,
-        B,
+      className: f(
+        R,
+        I,
         "truncate text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1"
       ),
       children: n
     }
-  ) : /* @__PURE__ */ e("span", { className: d(D, B, "truncate"), children: n });
+  ) : /* @__PURE__ */ e("span", { className: f(R, I, "truncate"), children: n });
   return (
     // The row-wide handler is a pointer convenience only. A `<tr>` cannot be the control
     // itself — giving it `role="button"` would strip its `row` role and break the table it
@@ -1136,10 +1143,10 @@ function At({
     // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
-    /* @__PURE__ */ c("tr", { onClick: v, className: d("group", v && "cursor-pointer"), children: [
-      /* @__PURE__ */ e("td", { className: d(I, "pl-0 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
-        /* @__PURE__ */ e("span", { className: d("w-1 h-full shrink-0", Ot[l]) }),
-        r ? (
+    /* @__PURE__ */ c("tr", { onClick: v, className: f("group", v && "cursor-pointer"), children: [
+      /* @__PURE__ */ e("td", { className: f(D, "pl-0 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
+        /* @__PURE__ */ e("span", { className: f("w-1 h-full shrink-0", Ot[l]) }),
+        a ? (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
           /* @__PURE__ */ c(
             "label",
@@ -1152,17 +1159,17 @@ function At({
                   {
                     type: "checkbox",
                     className: "sr-only",
-                    checked: a,
+                    checked: o,
                     onChange: (C) => i == null ? void 0 : i(C.target.checked),
-                    "aria-label": o ?? `Select ${n}`
+                    "aria-label": r ?? `Select ${n}`
                   }
                 ),
                 /* @__PURE__ */ e(
                   Rt,
                   {
-                    className: d(
+                    className: f(
                       "w-6 h-6 text-main transition-opacity",
-                      a ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                      o ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
                     )
                   }
                 )
@@ -1170,12 +1177,12 @@ function At({
             }
           )
         ) : null,
-        /* @__PURE__ */ e("span", { className: d(D, "shrink-0 tabular-nums"), children: String(t).padStart(2, "0") }),
-        M ? /* @__PURE__ */ e(M, { className: d(D, "flex-1 min-w-0"), children: P }) : P,
+        /* @__PURE__ */ e("span", { className: f(R, "shrink-0 tabular-nums"), children: String(t).padStart(2, "0") }),
+        M ? /* @__PURE__ */ e(M, { className: f(R, "flex-1 min-w-0"), children: P }) : P,
         s.map((C) => /* @__PURE__ */ c(
           "span",
           {
-            className: d(D, "inline-flex items-center gap-1 shrink-0"),
+            className: f(R, "inline-flex items-center gap-1 shrink-0"),
             children: [
               /* @__PURE__ */ e("span", { className: "tabular-nums", children: C.count }),
               /* @__PURE__ */ e("span", { children: C.emoji })
@@ -1190,8 +1197,8 @@ function At({
             onClick: (C) => {
               k(C), N();
             },
-            className: d(
-              D,
+            className: f(
+              R,
               // `hover:text-interactive-text`, not `hover:text-interactive`: this is a
               // text label, and hovering it used to drop it to 3.51:1 on the panel it
               // sits on. A hover state is invisible to a static-story axe pass, so this
@@ -1205,14 +1212,14 @@ function At({
           }
         ) : null
       ] }) }),
-      /* @__PURE__ */ e("td", { className: d(I, "pl-2 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: f.length > 0 ? /* @__PURE__ */ e(Et, { labels: f }) : null }) }),
-      /* @__PURE__ */ e("td", { className: d(I, "pl-2 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: b !== void 0 ? /* @__PURE__ */ e(Zt, { points: b }) : null }) }),
-      /* @__PURE__ */ e("td", { className: d(I, "pl-2 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: m ? /* @__PURE__ */ e(Bt, { name: m, avatarSrc: p }) : null }) }),
-      /* @__PURE__ */ e("td", { className: d(I, "pl-2 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: h ? /* @__PURE__ */ e(
+      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: d.length > 0 ? /* @__PURE__ */ e(Et, { labels: d }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: p !== void 0 ? /* @__PURE__ */ e(Zt, { points: p }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: m ? /* @__PURE__ */ e(Bt, { name: m, avatarSrc: b }) : null }) }),
+      /* @__PURE__ */ e("td", { className: f(D, "pl-2 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: x ? /* @__PURE__ */ e(
         jt,
         {
-          date: h,
-          urgency: x,
+          date: x,
+          urgency: h,
           urgencyLabel: g
         }
       ) : null }) })
@@ -1221,14 +1228,14 @@ function At({
 }
 function Ft() {
   return /* @__PURE__ */ c("tr", { children: [
-    /* @__PURE__ */ e("td", { className: d(I, "pl-4 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-full" }) }) }),
-    /* @__PURE__ */ e("td", { className: d(I, "pl-4 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-6 w-16 rounded" }) }) }),
-    /* @__PURE__ */ e("td", { className: d(I, "pl-4 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-16" }) }) }),
-    /* @__PURE__ */ e("td", { className: d(I, "pl-4 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
+    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4 border-l"), style: { width: H.name }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-full" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.tags }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-6 w-16 rounded" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.estimation }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-16" }) }) }),
+    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.assignee }, children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-full", children: [
       /* @__PURE__ */ e(T, { className: "w-8 h-8 rounded-full shrink-0" }),
       /* @__PURE__ */ e(T, { className: "h-4 w-20" })
     ] }) }),
-    /* @__PURE__ */ e("td", { className: d(I, "pl-4 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-20" }) }) })
+    /* @__PURE__ */ e("td", { className: f(D, "pl-4 pr-4"), style: { width: H.dueDate }, children: /* @__PURE__ */ e("div", { className: "flex items-center gap-2 h-full", children: /* @__PURE__ */ e(T, { className: "h-4 w-20" }) }) })
   ] });
 }
 const O = [
@@ -1243,46 +1250,47 @@ function Hn({
   isLoading: n = !1,
   emptyTitle: l = "No tasks yet",
   emptyDescription: s,
-  emptyAction: a,
-  className: i
+  emptyAction: o,
+  empty: i,
+  className: a
 }) {
   return /* @__PURE__ */ e(
     "div",
     {
-      className: d(
+      className: f(
         "w-full overflow-x-auto",
         "[scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-3 [&::-webkit-scrollbar-thumb]:rounded-full",
-        i
+        a
       ),
       children: /* @__PURE__ */ c("div", { className: "flex flex-col gap-4 min-w-[1108px]", children: [
-        /* @__PURE__ */ e("div", { className: "flex", children: O.map(({ key: r, label: o }, u) => /* @__PURE__ */ e(
+        /* @__PURE__ */ e("div", { className: "flex", children: O.map(({ key: r, label: u }, d) => /* @__PURE__ */ e(
           "div",
           {
-            className: d(
-              I,
+            className: f(
+              D,
               "px-4",
-              u === 0 && "border-l rounded-l-4",
-              u === O.length - 1 && "rounded-r-4"
+              d === 0 && "border-l rounded-l-4",
+              d === O.length - 1 && "rounded-r-4"
             ),
             style: { width: H[r] },
-            children: /* @__PURE__ */ e("span", { className: D, children: o })
+            children: /* @__PURE__ */ e("span", { className: R, children: u })
           },
           r
         )) }),
         n ? /* @__PURE__ */ c("table", { className: "border-collapse table-fixed", children: [
           /* @__PURE__ */ e("colgroup", { children: O.map(({ key: r }) => /* @__PURE__ */ e("col", { style: { width: H[r] } }, r)) }),
-          /* @__PURE__ */ e("tbody", { children: Array.from({ length: 5 }).map((r, o) => /* @__PURE__ */ e(Ft, {}, o)) })
-        ] }) : t.length === 0 ? /* @__PURE__ */ e(ve, { title: l, description: s, action: a }) : t.map((r, o) => /* @__PURE__ */ c("table", { className: "border-collapse table-fixed", children: [
-          /* @__PURE__ */ e("colgroup", { children: O.map(({ key: u }) => /* @__PURE__ */ e("col", { style: { width: H[u] } }, u)) }),
+          /* @__PURE__ */ e("tbody", { children: Array.from({ length: 5 }).map((r, u) => /* @__PURE__ */ e(Ft, {}, u)) })
+        ] }) : t.length === 0 ? i ?? /* @__PURE__ */ e(ve, { title: l, description: s, action: o }) : t.map((r, u) => /* @__PURE__ */ c("table", { className: "border-collapse table-fixed", children: [
+          /* @__PURE__ */ e("colgroup", { children: O.map(({ key: d }) => /* @__PURE__ */ e("col", { style: { width: H[d] } }, d)) }),
           /* @__PURE__ */ c("tbody", { children: [
             /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: O.length, className: "p-0 border border-neutral-3", children: /* @__PURE__ */ c("div", { className: "flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4", children: [
               /* @__PURE__ */ e(se, { className: "w-6 h-6 shrink-0 text-muted" }),
               /* @__PURE__ */ e("h3", { className: "flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans", children: r.title }),
               r.actions
             ] }) }) }),
-            r.rows.map((u, f) => /* @__PURE__ */ e(At, { ...u }, f))
+            r.rows.map((d, p) => /* @__PURE__ */ e(At, { ...d }, p))
           ] })
-        ] }, o))
+        ] }, u))
       ] })
     }
   );
@@ -1292,26 +1300,26 @@ function K({
   onClose: n,
   triggerRef: l,
   dismissExemptRef: s,
-  role: a = "dialog",
+  role: o = "dialog",
   children: i,
-  className: r,
-  ...o
+  className: a,
+  ...r
 }) {
-  const u = y(null), { overlayProps: f } = Re(
+  const u = y(null), { overlayProps: d } = Re(
     {
       isOpen: t,
       onClose: n,
       isDismissable: !0,
-      shouldCloseOnInteractOutside: (b) => {
-        var m, p;
-        return !((m = l == null ? void 0 : l.current) != null && m.contains(b)) && !((p = s == null ? void 0 : s.current) != null && p.contains(b));
+      shouldCloseOnInteractOutside: (p) => {
+        var m, b;
+        return !((m = l == null ? void 0 : l.current) != null && m.contains(p)) && !((b = s == null ? void 0 : s.current) != null && b.contains(p));
       }
     },
     u
   );
   return t ? (
     // eslint-disable-next-line jsx-a11y/no-autofocus
-    /* @__PURE__ */ e(ne, { restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ c("div", { ...f, ...o, ref: u, role: a, className: r, children: [
+    /* @__PURE__ */ e(ne, { restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ c("div", { ...d, ...r, ref: u, role: o, className: a, children: [
       /* @__PURE__ */ e(U, { onDismiss: n }),
       i,
       /* @__PURE__ */ e(U, { onDismiss: n })
@@ -1323,20 +1331,20 @@ function ie({
   children: n,
   popoverRef: l,
   className: s,
-  ...a
+  ...o
 }) {
-  const i = y(null), r = l ?? i, { popoverProps: o, underlayProps: u } = je({ ...a, popoverRef: r }, t);
+  const i = y(null), a = l ?? i, { popoverProps: r, underlayProps: u } = je({ ...o, popoverRef: a }, t);
   return /* @__PURE__ */ c(Be, { children: [
     /* @__PURE__ */ e("div", { ...u, className: "fixed inset-0" }),
     /* @__PURE__ */ e(ne, { restoreFocus: !0, children: /* @__PURE__ */ c(
       "div",
       {
-        ...o,
-        ref: r,
-        onKeyDownCapture: (f) => {
-          f.key === "Escape" && (f.stopPropagation(), t.close());
+        ...r,
+        ref: a,
+        onKeyDownCapture: (d) => {
+          d.key === "Escape" && (d.stopPropagation(), t.close());
         },
-        className: d(
+        className: f(
           "z-popover bg-surface-overlay rounded-sm border border-subtle shadow-xl",
           s
         ),
@@ -1355,19 +1363,19 @@ function ge({
   className: l,
   ...s
 }) {
-  const a = y(null), i = n ?? a, { listBoxProps: r } = Ze(s, t, i);
+  const o = y(null), i = n ?? o, { listBoxProps: a } = Ze(s, t, i);
   return /* @__PURE__ */ e(
     "ul",
     {
-      ...r,
+      ...a,
       ref: i,
-      className: d("max-h-64 min-w-40 overflow-auto py-2 outline-none", l),
-      children: [...t.collection].map((o) => /* @__PURE__ */ e(_t, { item: o, state: t }, o.key))
+      className: f("max-h-64 min-w-40 overflow-auto py-2 outline-none", l),
+      children: [...t.collection].map((r) => /* @__PURE__ */ e(_t, { item: r, state: t }, r.key))
     }
   );
 }
 function _t({ item: t, state: n }) {
-  const l = y(null), { optionProps: s, isSelected: a, isFocused: i, isDisabled: r } = Ee(
+  const l = y(null), { optionProps: s, isSelected: o, isFocused: i, isDisabled: a } = Ee(
     { key: t.key },
     n,
     l
@@ -1377,7 +1385,7 @@ function _t({ item: t, state: n }) {
     {
       ...s,
       ref: l,
-      className: d(
+      className: f(
         "flex items-center justify-between gap-4 px-4 py-1.5 text-body-m font-sans cursor-pointer",
         // Focus and selection are independent states with independent
         // styling — merging them would leave a keyboard user with no way
@@ -1398,12 +1406,12 @@ function _t({ item: t, state: n }) {
         // `-text`, not the bare `text-interactive`: this is the one place the accent is
         // used as *text* on a dark surface, and primary-4 measures 2.86:1 on the
         // popover's `surface-overlay`. See `tokens.css`'s contrast-safe roles.
-        a ? "text-interactive-text font-semibold" : "text-main",
-        r && "cursor-not-allowed opacity-50"
+        o ? "text-interactive-text font-semibold" : "text-main",
+        a && "cursor-not-allowed opacity-50"
       ),
       children: [
         /* @__PURE__ */ e("span", { children: t.rendered }),
-        a ? /* @__PURE__ */ e("span", { "aria-hidden": "true", children: "✓" }) : null
+        o ? /* @__PURE__ */ e("span", { "aria-hidden": "true", children: "✓" }) : null
       ]
     }
   );
@@ -1413,28 +1421,28 @@ function Sn({
   placeholder: n,
   icon: l,
   error: s,
-  description: a,
+  description: o,
   className: i,
-  ...r
+  ...a
 }) {
-  const o = et(r), u = y(null), { labelProps: f, triggerProps: b, valueProps: m, menuProps: p, descriptionProps: h, errorMessageProps: x } = Oe(
-    { ...r, description: a, errorMessage: s, isInvalid: !!s },
-    o,
+  const r = et(a), u = y(null), { labelProps: d, triggerProps: p, valueProps: m, menuProps: b, descriptionProps: x, errorMessageProps: h } = Oe(
+    { ...a, description: o, errorMessage: s, isInvalid: !!s },
+    r,
     u
-  ), { buttonProps: g } = j(b, u);
-  return /* @__PURE__ */ c("div", { className: d("inline-flex flex-col gap-1.5", i), children: [
-    r.label ? /* @__PURE__ */ c("span", { ...f, className: W(t), children: [
-      r.label,
-      r.isRequired ? /* @__PURE__ */ e(A, {}) : null
+  ), { buttonProps: g } = B(p, u);
+  return /* @__PURE__ */ c("div", { className: f("inline-flex flex-col gap-1.5", i), children: [
+    a.label ? /* @__PURE__ */ c("span", { ...d, className: W(t), children: [
+      a.label,
+      a.isRequired ? /* @__PURE__ */ e(A, {}) : null
     ] }) : null,
-    /* @__PURE__ */ e(Ae, { state: o, triggerRef: u, label: r.label, name: r.name }),
+    /* @__PURE__ */ e(Ae, { state: r, triggerRef: u, label: a.label, name: a.name }),
     /* @__PURE__ */ c(
       "button",
       {
         ...g,
         ref: u,
         type: "button",
-        className: d(
+        className: f(
           // The design's chip, not a light field. Figma draws every dropdown trigger in
           // this system as the same "Tag" atom — `rgba(148,151,154,0.1)` (neutral-2 at
           // 10%), 4px radius, 32px tall, 4px/16px padding, white 15px/600 label — over a
@@ -1460,7 +1468,7 @@ function Sn({
           // fails AA on all three. `muted-on-dark` composites against whatever it lands
           // on, so it carries the empty state instead.
           "inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
-          o.selectedItem ? "text-main" : "text-muted-on-dark",
+          r.selectedItem ? "text-main" : "text-muted-on-dark",
           // A `ring`, not a `border`: the design gives this chip no boundary at all, so
           // an invalid one has to appear out of nothing. A border would add 2px to a
           // control whose height the design fixes at 32px, nudging the whole filter row
@@ -1486,7 +1494,7 @@ function Sn({
         ),
         children: [
           l,
-          /* @__PURE__ */ e("span", { ...m, className: "flex-1 text-left truncate", children: o.selectedItem ? o.selectedItem.rendered : n }),
+          /* @__PURE__ */ e("span", { ...m, className: "flex-1 text-left truncate", children: r.selectedItem ? r.selectedItem.rendered : n }),
           /* @__PURE__ */ e(se, { className: "w-3 h-3 shrink-0" })
         ]
       }
@@ -1494,13 +1502,13 @@ function Sn({
     /* @__PURE__ */ e(
       Z,
       {
-        description: a,
+        description: o,
         error: s,
-        descriptionProps: h,
-        errorMessageProps: x
+        descriptionProps: x,
+        errorMessageProps: h
       }
     ),
-    o.isOpen ? /* @__PURE__ */ e(ie, { state: o, triggerRef: u, placement: "bottom start", children: /* @__PURE__ */ e(ge, { ...p, state: o }) }) : null
+    r.isOpen ? /* @__PURE__ */ e(ie, { state: r, triggerRef: u, placement: "bottom start", children: /* @__PURE__ */ e(ge, { ...b, state: r }) }) : null
   ] });
 }
 function Tn({
@@ -1508,40 +1516,40 @@ function Tn({
   placeholder: n,
   icon: l,
   isDisabled: s,
-  error: a,
+  error: o,
   description: i,
-  className: r,
-  ...o
+  className: a,
+  ...r
 }) {
-  const u = le({}), f = y(null), b = tt({
-    ...o,
+  const u = le({}), d = y(null), p = tt({
+    ...r,
     selectionMode: "multiple",
     // Explicit, not the default: a plain click on an item should add it to
     // the selection, not replace it — the behavior a set of checkable tags
     // needs, unlike a file browser's click-to-replace/Ctrl-click-to-add.
     selectionBehavior: "toggle"
-  }), { fieldProps: m, descriptionProps: p, errorMessageProps: h } = ee({
+  }), { fieldProps: m, descriptionProps: b, errorMessageProps: x } = ee({
     label: t,
     description: i,
-    errorMessage: a,
-    isInvalid: !!a
-  }), { buttonProps: x } = j(
+    errorMessage: o,
+    isInvalid: !!o
+  }), { buttonProps: h } = B(
     { onPress: () => u.toggle(), isDisabled: s, "aria-label": t },
-    f
-  ), g = [...b.collection].filter(
-    (v) => b.selectionManager.isSelected(v.key)
+    d
+  ), g = [...p.collection].filter(
+    (v) => p.selectionManager.isSelected(v.key)
   );
-  return /* @__PURE__ */ c("div", { className: d("inline-flex flex-col gap-1.5", r), children: [
+  return /* @__PURE__ */ c("div", { className: f("inline-flex flex-col gap-1.5", a), children: [
     /* @__PURE__ */ c(
       "button",
       {
-        ...x,
-        ref: f,
+        ...h,
+        ref: d,
         type: "button",
         "aria-haspopup": "listbox",
         "aria-expanded": u.isOpen,
         "aria-describedby": m["aria-describedby"],
-        className: d(
+        className: f(
           // The design's chip, identical to `Select`'s trigger — see that component for
           // the full derivation, the measured ratios, and why the white surface this
           // replaces was wrong. Identical on purpose: the two sit side by side in a
@@ -1549,7 +1557,7 @@ function Tn({
           // this control a different height or shape.
           "inline-flex items-center gap-2 h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold font-sans whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
           g.length > 0 ? "text-main" : "text-muted-on-dark",
-          a && "ring-1 ring-danger-text focus-visible:outline-danger-text"
+          o && "ring-1 ring-danger-text focus-visible:outline-danger-text"
         ),
         children: [
           l,
@@ -1565,60 +1573,60 @@ function Tn({
       Z,
       {
         description: i,
-        error: a,
-        descriptionProps: p,
-        errorMessageProps: h
+        error: o,
+        descriptionProps: b,
+        errorMessageProps: x
       }
     ),
-    u.isOpen ? /* @__PURE__ */ e(ie, { state: u, triggerRef: f, placement: "bottom start", children: /* @__PURE__ */ e(ge, { "aria-label": t, state: b, autoFocus: !0 }) }) : null
+    u.isOpen ? /* @__PURE__ */ e(ie, { state: u, triggerRef: d, placement: "bottom start", children: /* @__PURE__ */ e(ge, { "aria-label": t, state: p, autoFocus: !0 }) }) : null
   ] });
 }
-function In({
+function Dn({
   label: t,
   triggerContent: n,
   isDisabled: l,
   triggerClassName: s,
-  ...a
+  ...o
 }) {
-  const i = nt({}), r = y(null), { menuTriggerProps: o, menuProps: u } = Fe(
+  const i = nt({}), a = y(null), { menuTriggerProps: r, menuProps: u } = Fe(
     { isDisabled: l },
     i,
-    r
-  ), { buttonProps: f } = j(
-    { ...o, isDisabled: l, "aria-label": t },
-    r
+    a
+  ), { buttonProps: d } = B(
+    { ...r, isDisabled: l, "aria-label": t },
+    a
   );
   return /* @__PURE__ */ c(me, { children: [
     /* @__PURE__ */ e(
       "button",
       {
-        ...f,
-        ref: r,
+        ...d,
+        ref: a,
         type: "button",
-        className: d(
+        className: f(
           "cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
           s
         ),
         children: n
       }
     ),
-    i.isOpen ? /* @__PURE__ */ e(ie, { state: i, triggerRef: r, placement: "bottom end", children: /* @__PURE__ */ e(
+    i.isOpen ? /* @__PURE__ */ e(ie, { state: i, triggerRef: a, placement: "bottom end", children: /* @__PURE__ */ e(
       zt,
       {
         ...u,
-        ...a,
-        autoFocus: a.autoFocus ?? i.focusStrategy ?? !0,
+        ...o,
+        autoFocus: o.autoFocus ?? i.focusStrategy ?? !0,
         onClose: () => i.close()
       }
     ) }) : null
   ] });
 }
 function zt({ children: t, onAction: n, onClose: l, ...s }) {
-  const a = lt({ ...s, children: t, selectionMode: "none" }), i = y(null), { menuProps: r } = _e({ ...s, onAction: n, onClose: l }, a, i);
-  return /* @__PURE__ */ e("ul", { ...r, ref: i, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...a.collection].map((o) => /* @__PURE__ */ e(Ut, { item: o, state: a, onClose: l }, o.key)) });
+  const o = lt({ ...s, children: t, selectionMode: "none" }), i = y(null), { menuProps: a } = _e({ ...s, onAction: n, onClose: l }, o, i);
+  return /* @__PURE__ */ e("ul", { ...a, ref: i, className: "max-h-64 min-w-40 overflow-auto py-2 outline-none", children: [...o.collection].map((r) => /* @__PURE__ */ e(Ut, { item: r, state: o, onClose: l }, r.key)) });
 }
 function Ut({ item: t, state: n, onClose: l }) {
-  const s = y(null), { menuItemProps: a, isFocused: i, isDisabled: r } = ze(
+  const s = y(null), { menuItemProps: o, isFocused: i, isDisabled: a } = ze(
     { key: t.key, onClose: l },
     n,
     s
@@ -1626,9 +1634,9 @@ function Ut({ item: t, state: n, onClose: l }) {
   return /* @__PURE__ */ e(
     "li",
     {
-      ...a,
+      ...o,
       ref: s,
-      className: d(
+      className: f(
         "text-body-m font-sans cursor-pointer px-4 py-1.5 text-main",
         // Same defect and same fix as `ListBox` — see its comment for the reasoning.
         // `bg-neutral-4` on the menu's `surface-overlay` is 1.23:1, so the highlight was
@@ -1636,52 +1644,52 @@ function Ut({ item: t, state: n, onClose: l }) {
         // here than anywhere: the app's task-card menu is the sole entry point to
         // Edit/Delete, and this kit has already lost that focus indicator once.
         i && "bg-neutral-4 outline-solid outline-2 -outline-offset-2 outline-interactive-text",
-        r && "cursor-not-allowed opacity-50"
+        a && "cursor-not-allowed opacity-50"
       ),
       children: t.rendered
     }
   );
 }
-function Dn({
+function In({
   title: t,
   isOpen: n,
   onClose: l,
   children: s,
-  width: a = "max-w-md",
+  width: o = "max-w-md",
   role: i = "dialog",
-  isDismissable: r = !0,
-  closeLabel: o = "Close modal"
+  isDismissable: a = !0,
+  closeLabel: r = "Close modal"
 }) {
-  const u = y(null), f = y(null), b = le({
+  const u = y(null), d = y(null), p = le({
     isOpen: n,
     onOpenChange: (v) => {
       v || l();
     }
-  }), { modalProps: m, underlayProps: p } = Ue(
-    { isDismissable: r, isKeyboardDismissDisabled: !r },
-    b,
+  }), { modalProps: m, underlayProps: b } = Ue(
+    { isDismissable: a, isKeyboardDismissDisabled: !a },
+    p,
     u
-  ), { dialogProps: h, titleProps: x, contentProps: g } = We({ role: i }, f);
+  ), { dialogProps: x, titleProps: h, contentProps: g } = We({ role: i }, d);
   return n ? /* @__PURE__ */ e(
     "div",
     {
-      ...p,
+      ...b,
       className: "fixed inset-0 z-overlay flex items-center justify-center bg-black/60 backdrop-blur-sm p-4",
-      children: /* @__PURE__ */ e(ne, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...m, ref: u, className: d("w-full", a), children: /* @__PURE__ */ c(
+      children: /* @__PURE__ */ e(ne, { contain: !0, restoreFocus: !0, autoFocus: !0, children: /* @__PURE__ */ e("div", { ...m, ref: u, className: f("w-full", o), children: /* @__PURE__ */ c(
         "div",
         {
-          ...h,
-          ref: f,
+          ...x,
+          ref: d,
           className: "flex flex-col bg-surface-overlay rounded-sm border border-subtle overflow-hidden",
           children: [
             /* @__PURE__ */ c("div", { className: "flex items-center justify-between px-4 py-4 border-b border-neutral-4", children: [
-              /* @__PURE__ */ e("h2", { ...x, className: "font-sans font-bold text-base text-main", children: t }),
+              /* @__PURE__ */ e("h2", { ...h, className: "font-sans font-bold text-base text-main", children: t }),
               /* @__PURE__ */ e(
                 "button",
                 {
                   type: "button",
                   onClick: l,
-                  "aria-label": o,
+                  "aria-label": r,
                   className: "flex items-center justify-center w-8 h-8 rounded-md text-muted hover:bg-neutral-4 hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
                   children: /* @__PURE__ */ e(re, { className: "w-4 h-4" })
                 }
@@ -1714,19 +1722,19 @@ function Kt({
   defaultValue: n,
   onChange: l,
   onClose: s,
-  triggerRef: a,
+  triggerRef: o,
   dismissExemptRef: i,
-  timeZone: r = ot(),
-  label: o = "Date picker",
+  timeZone: a = ot(),
+  label: r = "Date picker",
   previousYearLabel: u = "Previous year",
-  previousMonthLabel: f = "Previous month",
-  nextMonthLabel: b = "Next month",
+  previousMonthLabel: d = "Previous month",
+  nextMonthLabel: p = "Next month",
   nextYearLabel: m = "Next year",
-  className: p
+  className: b
 }) {
-  const h = t !== void 0 ? { value: fe(t, r) } : { defaultValue: n ? fe(n, r) : null }, x = st({
-    ...h,
-    onChange: (S) => l == null ? void 0 : l(Wt(S, r)),
+  const x = t !== void 0 ? { value: fe(t, a) } : { defaultValue: n ? fe(n, a) : null }, h = st({
+    ...x,
+    onChange: (S) => l == null ? void 0 : l(Wt(S, a)),
     createCalendar: at,
     // Hardcoded, matching the prior implementation's hardcoded English
     // MONTHS/DAYS arrays — no `I18nProvider`/locale story exists in this kit
@@ -1736,23 +1744,23 @@ function Kt({
     firstDayOfWeek: "sun",
     weeksInMonth: 6
   }), { calendarProps: g, prevButtonProps: v, nextButtonProps: N } = Ke(
-    { "aria-label": o },
-    x
-  ), k = y(null), M = y(null), { buttonProps: B } = j(v, k), { buttonProps: P } = j(N, M), C = () => {
-    const S = dt(r);
-    x.setFocusedDate(S), x.selectDate(S);
+    { "aria-label": r },
+    h
+  ), k = y(null), M = y(null), { buttonProps: I } = B(v, k), { buttonProps: P } = B(N, M), C = () => {
+    const S = dt(a);
+    h.setFocusedDate(S), h.selectDate(S);
   };
   return /* @__PURE__ */ c(
     K,
     {
       isOpen: !0,
       onClose: s,
-      triggerRef: a,
+      triggerRef: o,
       dismissExemptRef: i,
-      "aria-label": o,
-      className: d(
+      "aria-label": r,
+      className: f(
         "flex flex-col w-[280px] bg-surface-shell border border-subtle rounded-4 shadow-elevation select-none",
-        p
+        b
       ),
       children: [
         /* @__PURE__ */ c("div", { ...g, className: "flex flex-col", children: [
@@ -1762,7 +1770,7 @@ function Kt({
                 "button",
                 {
                   type: "button",
-                  onClick: () => x.focusPreviousSection(!0),
+                  onClick: () => h.focusPreviousSection(!0),
                   "aria-label": u,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs",
                   children: /* @__PURE__ */ e(Ct, { className: "w-4 h-4" })
@@ -1771,22 +1779,22 @@ function Kt({
               /* @__PURE__ */ e(
                 "button",
                 {
-                  ...B,
+                  ...I,
                   ref: k,
-                  "aria-label": f,
+                  "aria-label": d,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50",
                   children: /* @__PURE__ */ e(Nt, { className: "w-4 h-4" })
                 }
               )
             ] }),
-            /* @__PURE__ */ e("span", { className: "font-sans font-semibold text-body-sm text-main", children: x.visibleRange.start.toDate(r).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: r }) }),
+            /* @__PURE__ */ e("span", { className: "font-sans font-semibold text-body-sm text-main", children: h.visibleRange.start.toDate(a).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: a }) }),
             /* @__PURE__ */ c("div", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ e(
                 "button",
                 {
                   ...P,
                   ref: M,
-                  "aria-label": b,
+                  "aria-label": p,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs disabled:pointer-events-none disabled:opacity-50",
                   children: /* @__PURE__ */ e(he, { className: "w-4 h-4" })
                 }
@@ -1795,7 +1803,7 @@ function Kt({
                 "button",
                 {
                   type: "button",
-                  onClick: () => x.focusNextSection(!0),
+                  onClick: () => h.focusNextSection(!0),
                   "aria-label": m,
                   className: "flex items-center justify-center w-4 h-4 text-main hover:text-interactive transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs",
                   children: /* @__PURE__ */ e(wt, { className: "w-4 h-4" })
@@ -1804,7 +1812,7 @@ function Kt({
             ] })
           ] }),
           /* @__PURE__ */ e("div", { className: "h-px w-full bg-neutral-2" }),
-          /* @__PURE__ */ e($t, { state: x })
+          /* @__PURE__ */ e($t, { state: h })
         ] }),
         /* @__PURE__ */ e("div", { className: "h-px w-full bg-neutral-2" }),
         /* @__PURE__ */ e("div", { className: "flex items-center justify-center py-[9px] h-10", children: /* @__PURE__ */ e(
@@ -1821,14 +1829,14 @@ function Kt({
   );
 }
 function $t({ state: t }) {
-  const { gridProps: n, headerProps: l, weekDays: s, weeksInMonth: a } = $e(
+  const { gridProps: n, headerProps: l, weekDays: s, weeksInMonth: o } = $e(
     { weekdayStyle: "short" },
     t
   ), i = t.visibleRange.start;
   return /* @__PURE__ */ c("div", { ...n, className: "flex flex-col px-3 py-2", children: [
-    /* @__PURE__ */ e("div", { ...l, className: "grid grid-cols-7", children: s.map((r, o) => /* @__PURE__ */ e("span", { className: "text-center text-body-sm font-normal text-main font-sans", children: r }, o)) }),
-    Array.from({ length: a }, (r, o) => /* @__PURE__ */ e("div", { role: "row", className: "grid grid-cols-7", children: t.getDatesInWeek(o).map(
-      (u, f) => u ? /* @__PURE__ */ e(
+    /* @__PURE__ */ e("div", { ...l, className: "grid grid-cols-7", children: s.map((a, r) => /* @__PURE__ */ e("span", { className: "text-center text-body-sm font-normal text-main font-sans", children: a }, r)) }),
+    Array.from({ length: o }, (a, r) => /* @__PURE__ */ e("div", { role: "row", className: "grid grid-cols-7", children: t.getDatesInWeek(r).map(
+      (u, d) => u ? /* @__PURE__ */ e(
         Gt,
         {
           state: t,
@@ -1836,8 +1844,8 @@ function $t({ state: t }) {
           currentMonth: i
         },
         u.toString()
-      ) : /* @__PURE__ */ e("div", { role: "gridcell", "aria-hidden": "true" }, f)
-    ) }, o))
+      ) : /* @__PURE__ */ e("div", { role: "gridcell", "aria-hidden": "true" }, d)
+    ) }, r))
   ] });
 }
 function Gt({
@@ -1845,21 +1853,21 @@ function Gt({
   date: n,
   currentMonth: l
 }) {
-  const s = y(null), a = !ft(n, l), { cellProps: i, buttonProps: r, isSelected: o, isDisabled: u, formattedDate: f } = Ge(
-    { date: n, isOutsideMonth: a },
+  const s = y(null), o = !ft(n, l), { cellProps: i, buttonProps: a, isSelected: r, isDisabled: u, formattedDate: d } = Ge(
+    { date: n, isOutsideMonth: o },
     t,
     s
   );
   return /* @__PURE__ */ e("div", { ...i, className: "flex items-center justify-center my-[3px]", children: /* @__PURE__ */ e(
     "div",
     {
-      ...r,
+      ...a,
       ref: s,
-      className: d(
+      className: f(
         "flex items-center justify-center w-6 h-6 rounded-2 text-body-sm font-normal font-sans transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text",
-        u ? "text-muted cursor-default" : o ? "border border-primary-4 text-main cursor-pointer" : "text-main hover:bg-neutral-3 cursor-pointer"
+        u ? "text-muted cursor-default" : r ? "border border-primary-4 text-main cursor-pointer" : "text-main hover:bg-neutral-3 cursor-pointer"
       ),
-      children: f
+      children: d
     }
   ) });
 }
@@ -1869,9 +1877,9 @@ function Yt({
   onSelect: n,
   onClose: l,
   triggerRef: s,
-  dismissExemptRef: a,
+  dismissExemptRef: o,
   label: i = "Estimate",
-  className: r
+  className: a
 }) {
   return /* @__PURE__ */ c(
     K,
@@ -1879,38 +1887,38 @@ function Yt({
       isOpen: !0,
       onClose: l,
       triggerRef: s,
-      dismissExemptRef: a,
+      dismissExemptRef: o,
       "aria-label": i,
-      className: d(
+      className: f(
         "flex flex-col w-[122px] py-2 bg-surface-overlay border border-subtle rounded-sm",
-        r
+        a
       ),
       children: [
         /* @__PURE__ */ e("div", { className: "flex items-center h-8 px-4", children: /* @__PURE__ */ e("span", { className: "text-body-xl font-semibold text-muted-on-dark font-sans truncate", children: i }) }),
-        qt.map((o) => /* @__PURE__ */ c(
+        qt.map((r) => /* @__PURE__ */ c(
           "button",
           {
             type: "button",
-            onClick: () => n(o),
-            "aria-pressed": t === o,
-            className: d(
+            onClick: () => n(r),
+            "aria-pressed": t === r,
+            className: f(
               "flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2",
               // `text-neutral-5` wherever the row's fill is a solid `neutral-2`: white on
               // that fill is 2.94:1, and it applies to the hover state as much as the
               // selected one. Only the selected case was visible to axe — a static story
               // has no hover.
-              t === o ? "bg-neutral-2 text-neutral-5" : "hover:bg-neutral-2 hover:text-neutral-5"
+              t === r ? "bg-neutral-2 text-neutral-5" : "hover:bg-neutral-2 hover:text-neutral-5"
             ),
             children: [
               /* @__PURE__ */ e("span", { className: "w-6 h-6 shrink-0", children: /* @__PURE__ */ e(J, { className: "size-6" }) }),
               /* @__PURE__ */ c("span", { className: "whitespace-nowrap", children: [
-                o,
+                r,
                 " Point",
-                o !== 1 ? "s" : ""
+                r !== 1 ? "s" : ""
               ] })
             ]
           },
-          o
+          r
         ))
       ]
     }
@@ -1921,39 +1929,39 @@ function Xt({
   role: n,
   avatarSrc: l,
   size: s = "md",
-  isOnline: a = !1,
+  isOnline: o = !1,
   className: i,
-  onClick: r
+  onClick: a
 }) {
-  const o = {
+  const r = {
     sm: "text-[10px]",
     md: "text-xs",
     lg: "text-sm"
   };
   return /* @__PURE__ */ c(
-    r ? "button" : "div",
+    a ? "button" : "div",
     {
-      type: r ? "button" : void 0,
-      onClick: r,
-      className: d(
+      type: a ? "button" : void 0,
+      onClick: a,
+      className: f(
         // padding: 4px 16px, gap: 8px -- matches Figma "User" component (Avatar frame, 239x56)
         "flex items-center gap-2 px-4 py-1 min-w-0",
-        r && "cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-sm",
+        a && "cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-sm",
         i
       ),
       children: [
         /* @__PURE__ */ c("div", { className: "relative shrink-0", children: [
           /* @__PURE__ */ e(F, { src: l, name: t, size: s }),
-          a ? /* @__PURE__ */ e("span", { className: "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary-4 border-2 border-neutral-5" }) : null
+          o ? /* @__PURE__ */ e("span", { className: "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary-4 border-2 border-neutral-5" }) : null
         ] }),
         /* @__PURE__ */ c("div", { className: "flex flex-col min-w-0", children: [
           /* @__PURE__ */ e("span", { className: "font-sans font-normal text-body-m text-main truncate", children: t }),
           n ? /* @__PURE__ */ e(
             "span",
             {
-              className: d(
+              className: f(
                 "font-sans text-muted-on-dark truncate leading-tight",
-                o[s]
+                r[s]
               ),
               children: n
             }
@@ -1968,9 +1976,9 @@ function Jt({
   onSelect: n,
   onClose: l,
   triggerRef: s,
-  dismissExemptRef: a,
+  dismissExemptRef: o,
   label: i = "Assignee",
-  className: r
+  className: a
 }) {
   return /* @__PURE__ */ c(
     K,
@@ -1978,23 +1986,23 @@ function Jt({
       isOpen: !0,
       onClose: l,
       triggerRef: s,
-      dismissExemptRef: a,
+      dismissExemptRef: o,
       "aria-label": i,
-      className: d(
+      className: f(
         "flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm",
-        r
+        a
       ),
       children: [
         /* @__PURE__ */ e("div", { className: "flex items-center h-8 px-4", children: /* @__PURE__ */ e("span", { className: "text-body-xl font-semibold text-muted-on-dark font-sans truncate", children: i }) }),
-        t.map((o) => /* @__PURE__ */ e(
+        t.map((r) => /* @__PURE__ */ e(
           "button",
           {
             type: "button",
-            onClick: () => n(o),
+            onClick: () => n(r),
             className: "flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2",
-            children: /* @__PURE__ */ e(Xt, { name: o.name, role: o.role, avatarSrc: o.avatarSrc, size: "sm" })
+            children: /* @__PURE__ */ e(Xt, { name: r.name, role: r.role, avatarSrc: r.avatarSrc, size: "sm" })
           },
-          o.id
+          r.id
         ))
       ]
     }
@@ -2005,9 +2013,9 @@ function Qt({
   onSelect: n,
   onClose: l,
   triggerRef: s,
-  dismissExemptRef: a,
+  dismissExemptRef: o,
   label: i = "Label",
-  className: r
+  className: a
 }) {
   return /* @__PURE__ */ c(
     K,
@@ -2015,23 +2023,23 @@ function Qt({
       isOpen: !0,
       onClose: l,
       triggerRef: s,
-      dismissExemptRef: a,
+      dismissExemptRef: o,
       "aria-label": i,
-      className: d(
+      className: f(
         "flex flex-col w-[160px] py-2 bg-surface-overlay border border-subtle rounded-sm",
-        r
+        a
       ),
       children: [
         /* @__PURE__ */ e("div", { className: "flex items-center h-8 px-4", children: /* @__PURE__ */ e("span", { className: "text-body-xl font-semibold text-muted-on-dark font-sans truncate", children: i }) }),
-        t.map((o) => /* @__PURE__ */ e(
+        t.map((r) => /* @__PURE__ */ e(
           "button",
           {
             type: "button",
-            onClick: () => n(o),
+            onClick: () => n(r),
             className: "flex items-center w-full px-4 py-1.5 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2",
-            children: /* @__PURE__ */ e(R, { variant: o.variant ?? "neutral", children: o.text })
+            children: /* @__PURE__ */ e(j, { variant: r.variant ?? "neutral", children: r.text })
           },
-          o.id
+          r.id
         ))
       ]
     }
@@ -2042,20 +2050,20 @@ function jn({
   onClose: n,
   assignees: l = [],
   labels: s = [],
-  onSubmit: a,
+  onSubmit: o,
   defaultTitle: i = "",
-  defaultDueDate: r,
-  defaultPoints: o,
+  defaultDueDate: a,
+  defaultPoints: r,
   defaultAssignee: u,
-  defaultLabel: f,
-  className: b
+  defaultLabel: d,
+  className: p
 }) {
-  const [m, p] = V.useState(i), [h, x] = V.useState(r), [g, v] = V.useState(o), [N, k] = V.useState(u), [M, B] = V.useState(f), [P, C] = V.useState(null), S = (L) => C((z) => z === L ? null : L), _ = (L) => C((z) => z === L ? null : z), E = V.useRef(null), $ = V.useRef(null), G = V.useRef(null), q = V.useRef(null), ae = V.useRef(null), Y = () => {
-    p(i), x(r), v(o), k(u), B(f), C(null);
+  const [m, b] = V.useState(i), [x, h] = V.useState(a), [g, v] = V.useState(r), [N, k] = V.useState(u), [M, I] = V.useState(d), [P, C] = V.useState(null), S = (L) => C((z) => z === L ? null : L), _ = (L) => C((z) => z === L ? null : z), E = V.useRef(null), $ = V.useRef(null), G = V.useRef(null), q = V.useRef(null), ae = V.useRef(null), Y = () => {
+    b(i), h(a), v(r), k(u), I(d), C(null);
   }, [Ne, Ce] = V.useState(t);
   if (t !== Ne && (Ce(t), t && Y()), !t) return null;
   const we = (L) => {
-    L.preventDefault(), m.trim() && (a == null || a({ title: m.trim(), dueDate: h, points: g, assignee: N, label: M }), Y(), n());
+    L.preventDefault(), m.trim() && (o == null || o({ title: m.trim(), dueDate: x, points: g, assignee: N, label: M }), Y(), n());
   }, ke = () => {
     Y(), n();
   };
@@ -2063,9 +2071,9 @@ function jn({
     "form",
     {
       onSubmit: we,
-      className: d(
+      className: f(
         "flex flex-col items-end gap-6 w-[578px] p-4 bg-surface-overlay rounded-sm",
-        b
+        p
       ),
       children: [
         /* @__PURE__ */ e(
@@ -2073,7 +2081,7 @@ function jn({
           {
             autoFocus: !0,
             value: m,
-            onChange: (L) => p(L.target.value),
+            onChange: (L) => b(L.target.value),
             placeholder: "Task name",
             "aria-label": "Task name",
             className: "w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
@@ -2090,7 +2098,7 @@ function jn({
                 "aria-haspopup": "dialog",
                 "aria-expanded": P === "estimate",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(R, { icon: /* @__PURE__ */ e(J, { className: "size-6" }), children: "Estimate" })
+                children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(J, { className: "size-6" }), children: "Estimate" })
               }
             ) : /* @__PURE__ */ c(
               "button",
@@ -2147,7 +2155,7 @@ function jn({
                 "aria-haspopup": "dialog",
                 "aria-expanded": P === "assignee",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(R, { icon: /* @__PURE__ */ e(vt, { className: "size-6" }), children: "Assignee" })
+                children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(vt, { className: "size-6" }), children: "Assignee" })
               }
             ),
             P === "assignee" ? /* @__PURE__ */ e(
@@ -2174,7 +2182,7 @@ function jn({
                 "aria-haspopup": "dialog",
                 "aria-expanded": P === "label",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(R, { variant: M.variant ?? "neutral", children: M.text })
+                children: /* @__PURE__ */ e(j, { variant: M.variant ?? "neutral", children: M.text })
               }
             ) : /* @__PURE__ */ e(
               "button",
@@ -2185,7 +2193,7 @@ function jn({
                 "aria-haspopup": "dialog",
                 "aria-expanded": P === "label",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(R, { icon: /* @__PURE__ */ e(gt, { className: "size-6" }), children: "Label" })
+                children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(gt, { className: "size-6" }), children: "Label" })
               }
             ),
             P === "label" ? /* @__PURE__ */ e(
@@ -2193,7 +2201,7 @@ function jn({
               {
                 labels: s,
                 onSelect: (L) => {
-                  B(L), C(null);
+                  I(L), C(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("label"),
@@ -2212,15 +2220,15 @@ function jn({
                 "aria-haspopup": "dialog",
                 "aria-expanded": P === "date",
                 className: "cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2",
-                children: /* @__PURE__ */ e(R, { icon: /* @__PURE__ */ e(yt, { className: "size-6" }), children: h ? h.toLocaleDateString("en-US") : "Due date" })
+                children: /* @__PURE__ */ e(j, { icon: /* @__PURE__ */ e(yt, { className: "size-6" }), children: x ? x.toLocaleDateString("en-US") : "Due date" })
               }
             ),
             P === "date" ? /* @__PURE__ */ e(
               Kt,
               {
-                value: h,
+                value: x,
                 onChange: (L) => {
-                  x(L), C(null);
+                  h(L), C(null);
                 },
                 dismissExemptRef: E,
                 onClose: () => _("date"),
@@ -2242,7 +2250,7 @@ function Bn({ variant: t = "neutral", children: n, className: l }) {
   return /* @__PURE__ */ e(
     "span",
     {
-      className: d(
+      className: f(
         "inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border font-sans",
         {
           neutral: "bg-surface-neutral text-neutral-4 border-subtle",
@@ -2283,28 +2291,28 @@ function nn({
   state: n,
   closeLabel: l
 }) {
-  const s = y(null), a = y(null), { toastProps: i, contentProps: r, titleProps: o, closeButtonProps: u } = Ye(
+  const s = y(null), o = y(null), { toastProps: i, contentProps: a, titleProps: r, closeButtonProps: u } = Ye(
     { toast: t },
     n,
     s
-  ), { buttonProps: f } = j(u, a);
+  ), { buttonProps: d } = B(u, o);
   return /* @__PURE__ */ c(
     "div",
     {
       ...i,
       ref: s,
-      className: d(
+      className: f(
         "pointer-events-auto flex items-center gap-3 px-4 py-2 rounded-sm shadow-elevation",
         "text-body-m font-semibold font-sans",
         tn[t.content.tone]
       ),
       children: [
-        /* @__PURE__ */ e("div", { ...r, children: /* @__PURE__ */ e("span", { ...o, children: t.content.message }) }),
+        /* @__PURE__ */ e("div", { ...a, children: /* @__PURE__ */ e("span", { ...r, children: t.content.message }) }),
         /* @__PURE__ */ e(
           "button",
           {
-            ...f,
-            ref: a,
+            ...d,
+            ref: o,
             "aria-label": l,
             className: "shrink-0 opacity-70 hover:opacity-100 transition-opacity cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-current focus-visible:outline-offset-2",
             children: /* @__PURE__ */ e(re, { className: "size-4" })
@@ -2319,12 +2327,12 @@ function ln({
   label: n,
   closeLabel: l
 }) {
-  const s = y(null), { regionProps: a } = qe({ "aria-label": n }, t, s);
+  const s = y(null), { regionProps: o } = qe({ "aria-label": n }, t, s);
   return mt(
     /* @__PURE__ */ e(
       "div",
       {
-        ...a,
+        ...o,
         ref: s,
         className: "pointer-events-none fixed right-4 bottom-4 z-toast flex flex-col gap-2",
         children: t.visibleToasts.map((i) => /* @__PURE__ */ e(nn, { toast: i, state: t, closeLabel: l }, i.key))
@@ -2338,25 +2346,25 @@ function En({
   duration: n = en,
   maxVisibleToasts: l = 4,
   label: s = "Notifications",
-  closeLabel: a = "Dismiss"
+  closeLabel: o = "Dismiss"
 }) {
-  const i = rt({ maxVisibleToasts: l }), r = y(i);
+  const i = rt({ maxVisibleToasts: l }), a = y(i);
   oe(() => {
-    r.current = i;
+    a.current = i;
   }, [i]);
-  const o = y(n);
+  const r = y(n);
   oe(() => {
-    o.current = n;
+    r.current = n;
   }, [n]);
   const u = be(
     () => ({
-      show: (f, b, m) => r.current.add(
-        { tone: f, message: b },
+      show: (d, p, m) => a.current.add(
+        { tone: d, message: p },
         // `undefined` in `options.timeout` means "not specified, use the default";
         // an explicit `null` means "stay until dismissed", which react-stately
         // expresses as a timeout of 0.
         {
-          timeout: (m == null ? void 0 : m.timeout) === null ? 0 : (m == null ? void 0 : m.timeout) ?? o.current
+          timeout: (m == null ? void 0 : m.timeout) === null ? 0 : (m == null ? void 0 : m.timeout) ?? r.current
         }
       )
     }),
@@ -2364,7 +2372,7 @@ function En({
   );
   return /* @__PURE__ */ c(ye.Provider, { value: u, children: [
     t,
-    i.visibleToasts.length > 0 ? /* @__PURE__ */ e(ln, { state: i, label: s, closeLabel: a }) : null
+    i.visibleToasts.length > 0 ? /* @__PURE__ */ e(ln, { state: i, label: s, closeLabel: o }) : null
   ] });
 }
 function On({
@@ -2372,38 +2380,38 @@ function On({
   isSelected: n,
   defaultSelected: l = !1,
   onChange: s,
-  isDisabled: a = !1,
+  isDisabled: o = !1,
   isIndeterminate: i = !1,
-  error: r,
-  description: o,
+  error: a,
+  description: r,
   isRequired: u = !1,
-  label: f,
-  className: b
+  label: d,
+  className: p
 }) {
   const m = it({
     isSelected: n,
     defaultSelected: l,
     onChange: s
-  }), p = y(null), { fieldProps: h, descriptionProps: x, errorMessageProps: g } = ee({
-    description: o,
-    errorMessage: r,
-    isInvalid: !!r
+  }), b = y(null), { fieldProps: x, descriptionProps: h, errorMessageProps: g } = ee({
+    description: r,
+    errorMessage: a,
+    isInvalid: !!a
   }), { inputProps: v, labelProps: N } = Xe(
     {
       isSelected: m.isSelected,
       isIndeterminate: i,
-      isDisabled: a,
+      isDisabled: o,
       isRequired: u,
-      isInvalid: !!r,
-      "aria-label": f ?? (typeof t == "string" ? t : "Checkbox")
+      isInvalid: !!a,
+      "aria-label": d ?? (typeof t == "string" ? t : "Checkbox")
     },
     m,
-    p
+    b
   ), k = /* @__PURE__ */ c(
     "label",
     {
       ...N,
-      className: d(
+      className: f(
         // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
         // `rounded` step) -- matches Figma "Label Checkbox" component exactly
         // (Property 1=Default/Selected, Tags01.md / Add Task Modal04/05.md).
@@ -2418,23 +2426,23 @@ function On({
         // an outline that was never drawn. Same trap as the `outline-none` bug this kit
         // already paid for once; see `button.tsx`. Do not drop `outline-solid` as redundant.
         "inline-flex items-center gap-2 px-4 py-1 rounded cursor-pointer select-none group has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-interactive-text has-[:focus-visible]:outline-offset-2",
-        a && "opacity-50 cursor-not-allowed",
-        b
+        o && "opacity-50 cursor-not-allowed",
+        p
       ),
       children: [
         /* @__PURE__ */ e(
           "input",
           {
             ...v,
-            ref: p,
-            "aria-describedby": h["aria-describedby"],
+            ref: b,
+            "aria-describedby": x["aria-describedby"],
             className: "sr-only"
           }
         ),
         /* @__PURE__ */ c(
           "svg",
           {
-            className: d("w-6 h-6 shrink-0", r ? "text-danger-text" : "text-main"),
+            className: f("w-6 h-6 shrink-0", a ? "text-danger-text" : "text-main"),
             viewBox: "0 0 24 24",
             fill: "none",
             stroke: "currentColor",
@@ -2461,14 +2469,14 @@ function On({
       ]
     }
   );
-  return !r && !o ? k : /* @__PURE__ */ c("div", { className: "inline-flex flex-col gap-1", children: [
+  return !a && !r ? k : /* @__PURE__ */ c("div", { className: "inline-flex flex-col gap-1", children: [
     k,
     /* @__PURE__ */ e("span", { className: "px-4", children: /* @__PURE__ */ e(
       Z,
       {
-        description: o,
-        error: r,
-        descriptionProps: x,
+        description: r,
+        error: a,
+        descriptionProps: h,
         errorMessageProps: g
       }
     ) })
@@ -2479,15 +2487,15 @@ function An({
   isLabelVisible: n = !1,
   error: l,
   description: s,
-  className: a,
+  className: o,
   ...i
 }) {
-  const r = y(null), { labelProps: o, inputProps: u, descriptionProps: f, errorMessageProps: b } = te(
+  const a = y(null), { labelProps: r, inputProps: u, descriptionProps: d, errorMessageProps: p } = te(
     { ...i, label: t, description: s, type: "date", isInvalid: !!l, errorMessage: l },
-    r
+    a
   );
   return /* @__PURE__ */ c("div", { className: "flex flex-col gap-1.5 w-full", children: [
-    t ? /* @__PURE__ */ c("label", { ...o, className: W(n), children: [
+    t ? /* @__PURE__ */ c("label", { ...r, className: W(n), children: [
       t,
       i.isRequired ? /* @__PURE__ */ e(A, {}) : null
     ] }) : null,
@@ -2495,12 +2503,12 @@ function An({
       "input",
       {
         ...u,
-        ref: r,
+        ref: a,
         type: "date",
-        className: d(
+        className: f(
           "h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral font-sans cursor-pointer",
           l && "border-danger-5 focus-visible:outline-danger-text",
-          a
+          o
         )
       }
     ),
@@ -2509,8 +2517,8 @@ function An({
       {
         description: s,
         error: l,
-        descriptionProps: f,
-        errorMessageProps: b
+        descriptionProps: d,
+        errorMessageProps: p
       }
     )
   ] });
@@ -2520,16 +2528,16 @@ function sn({
   label: n,
   isActive: l = !1,
   badgeCount: s,
-  onClick: a,
+  onClick: o,
   className: i
 }) {
   return /* @__PURE__ */ c(
     "button",
     {
       type: "button",
-      onClick: a,
+      onClick: o,
       "aria-current": l ? "page" : void 0,
-      className: d(
+      className: f(
         "relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2",
         // `-text`, not the bare `text-interactive`, on both the active and the hover
         // label: an item's label is text, and primary-4 as text clears 4.5:1 nowhere
@@ -2547,7 +2555,7 @@ function sn({
         s !== void 0 ? /* @__PURE__ */ e(
           "span",
           {
-            className: d(
+            className: f(
               "px-2 py-0.5 text-xs font-bold rounded-full shrink-0",
               // The active badge was `bg-primary-4 text-main` — white on the brand red at
               // **3.83:1**, the same failing pairing as the primary CTA but on text the
@@ -2569,7 +2577,7 @@ function sn({
         /* @__PURE__ */ e(
           "span",
           {
-            className: d(
+            className: f(
               "w-1 h-full shrink-0 bg-primary-4 transition-opacity",
               l ? "opacity-100" : "opacity-0"
             )
@@ -2589,14 +2597,14 @@ function rn({
     "nav",
     {
       "aria-label": l,
-      className: d(
+      className: f(
         // 232px / rounded-lg (24px) matches the real "Sidebar" layer (ApplicationSidebar01.md + Dashboard Mockup.md).
         "flex flex-col w-[232px] h-full bg-surface-panel rounded-lg select-none shrink-0",
         s
       ),
       children: [
         t ? /* @__PURE__ */ e("div", { className: "flex justify-center pt-3 h-24 shrink-0", children: t }) : null,
-        /* @__PURE__ */ e("div", { className: "flex flex-col gap-2 flex-1 overflow-y-auto", children: n.map((a, i) => /* @__PURE__ */ e(sn, { ...a }, i)) })
+        /* @__PURE__ */ e("div", { className: "flex flex-col gap-2 flex-1 overflow-y-auto", children: n.map((o, i) => /* @__PURE__ */ e(sn, { ...o }, i)) })
       ]
     }
   );
@@ -2606,16 +2614,16 @@ function Fn({
   onChange: n,
   leftIcon: l,
   rightIcon: s,
-  leftLabel: a,
+  leftLabel: o,
   rightLabel: i,
-  label: r = "View",
-  className: o
+  label: a = "View",
+  className: r
 }) {
-  const u = y(null), f = (m) => {
-    var p, h;
-    n == null || n(m), (h = (p = u.current) == null ? void 0 : p.querySelectorAll("button")[m === "left" ? 0 : 1]) == null || h.focus();
-  }, b = (m) => {
-    let p;
+  const u = y(null), d = (m) => {
+    var b, x;
+    n == null || n(m), (x = (b = u.current) == null ? void 0 : b.querySelectorAll("button")[m === "left" ? 0 : 1]) == null || x.focus();
+  }, p = (m) => {
+    let b;
     switch (m.key) {
       // With exactly two options, "next" and "previous" are the same move — both wrap, the
       // same way SegmentedControl's modular arithmetic does at length 2.
@@ -2623,26 +2631,26 @@ function Fn({
       case "ArrowDown":
       case "ArrowLeft":
       case "ArrowUp":
-        p = t === "left" ? "right" : "left";
+        b = t === "left" ? "right" : "left";
         break;
       case "Home":
-        p = "left";
+        b = "left";
         break;
       case "End":
-        p = "right";
+        b = "right";
         break;
       default:
         return;
     }
-    m.preventDefault(), f(p);
+    m.preventDefault(), d(b);
   };
   return /* @__PURE__ */ c(
     "div",
     {
       ref: u,
       role: "radiogroup",
-      "aria-label": r,
-      className: d("flex items-center w-20 h-10 bg-surface-shell rounded-sm", o),
+      "aria-label": a,
+      className: f("flex items-center w-20 h-10 bg-surface-shell rounded-sm", r),
       children: [
         /* @__PURE__ */ e(
           ue,
@@ -2652,9 +2660,9 @@ function Fn({
             "aria-checked": t === "left",
             excludeFromTabOrder: t !== "left",
             isSelected: t === "left",
-            "aria-label": a,
-            onKeyDown: b,
-            onPress: () => f("left"),
+            "aria-label": o,
+            onKeyDown: p,
+            onPress: () => d("left"),
             children: l
           }
         ),
@@ -2667,8 +2675,8 @@ function Fn({
             excludeFromTabOrder: t !== "right",
             isSelected: t === "right",
             "aria-label": i,
-            onKeyDown: b,
-            onPress: () => f("right"),
+            onKeyDown: p,
+            onPress: () => d("right"),
             children: s
           }
         )
@@ -2679,21 +2687,24 @@ function Fn({
 function _n({
   logo: t,
   sidebarItems: n,
-  topNavProps: l,
-  topBar: s,
+  sidebar: l,
+  topNavProps: s,
+  topNav: o,
+  topBar: i,
   children: a,
-  className: i
+  className: r
 }) {
+  const u = l !== void 0 ? l : n ? /* @__PURE__ */ e(rn, { logo: t, items: n, className: "self-stretch" }) : null, d = o !== void 0 ? o : /* @__PURE__ */ e(Ht, { ...s });
   return /* @__PURE__ */ c(
     "div",
     {
-      className: d("flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8", i),
+      className: f("flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8", r),
       children: [
-        /* @__PURE__ */ e(rn, { logo: t, items: n, className: "self-stretch" }),
+        u,
         /* @__PURE__ */ c("div", { className: "flex flex-col gap-8 flex-1 min-w-0", children: [
-          /* @__PURE__ */ e(Ht, { ...l }),
+          d,
           /* @__PURE__ */ c("div", { className: "flex flex-col gap-4", children: [
-            s ? /* @__PURE__ */ e("div", { className: "flex items-start justify-between gap-6", children: s }) : null,
+            i ? /* @__PURE__ */ e("div", { className: "flex items-start justify-between gap-6", children: i }) : null,
             a
           ] })
         ] })
@@ -2746,9 +2757,9 @@ export {
   ge as ListBox,
   yn as ListViewIcon,
   Cn as LogoMark,
-  In as Menu,
+  Dn as Menu,
   bn as MenuDotsIcon,
-  Dn as Modal,
+  In as Modal,
   Tn as MultiSelect,
   Nn as PlusIcon,
   J as PointsIcon,
@@ -2763,11 +2774,11 @@ export {
   T as Skeleton,
   xn as SubtaskIcon,
   Pn as Tabs,
-  R as Tag,
+  j as Tag,
   Et as TagCell,
-  Dt as TaskCard,
+  It as TaskCard,
   Vn as TaskListView,
-  It as TaskMetaBadges,
+  Dt as TaskMetaBadges,
   Hn as TaskTable,
   At as TaskTableRow,
   de as TextButton,
@@ -2775,7 +2786,7 @@ export {
   Ht as TopNav,
   Xt as UserRow,
   Fn as ViewSwitcher,
-  d as cn,
+  f as cn,
   W as fieldLabelClass,
   Rn as useModalState,
   Zn as useToast

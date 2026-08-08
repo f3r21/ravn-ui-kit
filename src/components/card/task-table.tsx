@@ -523,6 +523,19 @@ export interface TaskTableProps {
   emptyDescription?: string;
   /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
   emptyAction?: React.ReactNode;
+  /**
+   * Replaces the whole empty state, rather than configuring the one this renders (#15).
+   *
+   * The three `empty*` props above flatten three of `EmptyState`'s five, leaving its `icon`
+   * and `label` unreachable — and `label` matters, because a page holding both this and a
+   * `TaskListView` otherwise presents a screen-reader user with two groups called "No
+   * results". Pass an `EmptyState` of your own and every prop is yours.
+   *
+   * **Additive on purpose.** Replacing the flattened props would break every existing
+   * caller, and they are a fine shorthand for the common case — so they stay, and this wins
+   * when both are given. Identical slot on `TaskListView`.
+   */
+  empty?: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -585,6 +598,7 @@ export function TaskTable({
   emptyTitle = 'No tasks yet',
   emptyDescription,
   emptyAction,
+  empty,
   className,
 }: TaskTableProps) {
   return (
@@ -628,7 +642,9 @@ export function TaskTable({
             </tbody>
           </table>
         ) : groups.length === 0 ? (
-          <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
+          (empty ?? (
+            <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
+          ))
         ) : (
           groups.map((group, gi) => (
             <table key={gi} className="border-collapse table-fixed">

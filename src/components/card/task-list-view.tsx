@@ -41,6 +41,23 @@ export interface TaskListViewProps {
   /** Optional way out of the empty state (e.g. a "Create task" button), rendered below the text. */
   emptyAction?: React.ReactNode;
   /**
+   * Replaces the whole empty state, rather than configuring the one this renders (#15).
+   *
+   * The three `empty*` props above flatten exactly three of `EmptyState`'s five, which left
+   * its `icon` and `label` unreachable from here — and `label` is the one that matters,
+   * because two empty states on one screen otherwise present a screen-reader user with two
+   * identically-named groups. Pass an `EmptyState` of your own and every prop is yours:
+   *
+   * ```tsx
+   * <TaskListView title="Working" tasks={[]} empty={<EmptyState title="All clear" label="No working tasks" icon={<InboxIcon />} />} />
+   * ```
+   *
+   * **Additive on purpose.** Replacing the flattened props would be a breaking change for
+   * every existing caller, and they are a genuinely convenient shorthand for the common
+   * case — so they stay, and this wins when both are given. Same slot on `TaskTable`.
+   */
+  empty?: React.ReactNode;
+  /**
    * Renders 3 skeleton task-card placeholders instead of `tasks` while data is in flight.
    * No ground-truth basis (static exports have no loading state) — an engineering-only
    * addition, same precedent as `Skeleton` itself.
@@ -90,6 +107,7 @@ export function TaskListView({
   emptyTitle = 'No tasks in this view',
   emptyDescription,
   emptyAction,
+  empty,
   headingLevel = 3,
   label,
   className,
@@ -108,7 +126,9 @@ export function TaskListView({
           <TaskCardSkeleton />
         </>
       ) : tasks.length === 0 ? (
-        <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
+        (empty ?? (
+          <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
+        ))
       ) : (
         tasks.map((task, idx) => <TaskCard key={idx} {...task} className="w-full" />)
       )}

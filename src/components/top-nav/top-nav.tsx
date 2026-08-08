@@ -45,10 +45,33 @@ export interface TopNavProps {
    * @default 'Notifications'
    */
   notificationsLabel?: string;
-  /** Logged-in user's name (used for avatar initials/alt text). */
+  /** Logged-in user's name (used for avatar initials/alt text). Ignored when `userSlot` is supplied. */
   userName?: string;
-  /** Logged-in user's avatar image URL. */
+  /** Logged-in user's avatar image URL. Ignored when `userSlot` is supplied. */
   userAvatar?: string;
+  /**
+   * Replaces the bare `Avatar` that `userName`/`userAvatar` render, for the case those two
+   * strings cannot express (#15).
+   *
+   * A user avatar in a top nav is an account menu in almost every real application — and the
+   * kit ships `Menu` while `TopNav` had no way to accept one, so a consumer had to rebuild
+   * the whole bar to attach a sign-out. Put a `Menu` here whose trigger is an `Avatar`.
+   *
+   * When both are given this wins. Unlike the avatar it replaces, this slot is not wrapped
+   * in a fixed-size box, so a real control has room for its own padding and focus ring.
+   */
+  userSlot?: ReactNode;
+  /**
+   * Extra controls rendered in the trailing group, between the notifications bell and the
+   * user area (#15).
+   *
+   * For the things a real product bar grows that this component cannot anticipate — a help
+   * button, a workspace switcher, a theme toggle. Anything focusable placed here needs its
+   * own accessible name and focus ring; the kit's own controls in this row carry
+   * `focus-visible:outline-2 focus-visible:outline-interactive-text`, and matching that
+   * keeps the row consistent.
+   */
+  actions?: ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -90,6 +113,8 @@ export function TopNav({
   notificationsLabel = 'Notifications',
   userName,
   userAvatar,
+  userSlot,
+  actions,
   className,
 }: TopNavProps) {
   const [internalSearchValue, setInternalSearchValue] = useState('');
@@ -155,7 +180,12 @@ export function TopNav({
           </span>
         )}
 
-        {userName || userAvatar ? <Avatar src={userAvatar} name={userName} size="md" /> : null}
+        {actions}
+
+        {/* `userSlot` wins over the string pair rather than rendering beside it — two user
+            affordances in one bar is a worse answer than either alone. */}
+        {userSlot ??
+          (userName || userAvatar ? <Avatar src={userAvatar} name={userName} size="md" /> : null)}
       </div>
     </header>
   );

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { TaskCard } from './task-card';
-import { MenuDotsIcon } from '../icons/icons';
+import { Item } from 'react-stately';
+import { MenuDotsIcon, AlarmIcon } from '../icons/icons';
+import { Menu } from '../menu/menu';
 
 const CommentIcon = () => (
   <svg
@@ -117,5 +119,43 @@ export const Overdue: Story = {
     tags: [{ label: 'BUG', variant: 'red' }],
     assigneeName: 'Fernando Ramirez',
     metaBadges: [{ icon: <CommentIcon />, count: 12, label: '12 comments' }],
+  },
+};
+
+/**
+ * #15. The kit declared `MenuDotsIcon` as *"Overflow / 'more actions' affordance — opens a
+ * task card's options menu"*, `ProjectInfo` exposed an `icon` slot, and `TaskCard` forwarded
+ * nothing — it shipped the slot and blocked it.
+ *
+ * Both slots at once, because they are different jobs: `icon` is the decorative 24×24 glyph
+ * Figma's own "Project Info" instance draws inside the title row, and `actions` is the real
+ * control beside it. A `Menu` in `icon` would be clipped by that fixed box.
+ */
+export const WithIconAndMenu: Story = {
+  args: {
+    title: 'Fix Critical GraphQL Bug',
+    points: 5,
+    dueDateText: 'OVERDUE',
+    dueDateUrgency: 'overdue',
+    assigneeName: 'Fernando Ramirez',
+    icon: <AlarmIcon className="size-6" />,
+    actions: (
+      <Menu<{ id: string; label: string }>
+        label="Task options for Fix Critical GraphQL Bug"
+        triggerContent={<MenuDotsIcon className="size-5" />}
+        triggerClassName="w-8 h-8 rounded-sm inline-flex items-center justify-center text-main hover:bg-neutral-4 focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+        items={[
+          { id: 'edit', label: 'Edit' },
+          { id: 'delete', label: 'Delete' },
+        ]}
+        onAction={fn()}
+      >
+        {(item) => (
+          <Item key={item.id} textValue={item.label}>
+            {item.label}
+          </Item>
+        )}
+      </Menu>
+    ),
   },
 };

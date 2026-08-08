@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { withSurface } from '../../../.storybook/decorators';
+import { Item } from 'react-stately';
 import { TopNav } from './top-nav';
+import { Menu } from '../menu/menu';
+import { Avatar } from '../avatar/avatar';
 
 const meta: Meta<typeof TopNav> = {
   title: 'Layout/TopNav',
@@ -64,5 +67,46 @@ export const InteractiveNotifications: Story = {
     userName: 'Jerome Bell',
     onNotificationsClick: fn(),
     notificationsLabel: 'Notifications, 3 unread',
+  },
+};
+
+/**
+ * #15. The user area was `userName`/`userAvatar` rendering a bare `Avatar` — but a user
+ * avatar in a top nav is an account menu in almost every real application, and the kit ships
+ * `Menu` while this component had no way to accept one.
+ *
+ * `userSlot` takes the real thing. It is not wrapped in a fixed-size box, so the trigger has
+ * room for its own padding and focus ring — which the 24×24 `icon` slot does not.
+ */
+export const WithAccountMenu: Story = {
+  args: {
+    userSlot: (
+      <Menu<{ id: string; label: string }>
+        label="Account menu for Jerome Bell"
+        triggerContent={<Avatar name="Jerome Bell" size="md" />}
+        triggerClassName="rounded-full focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+        items={[
+          { id: 'profile', label: 'Profile' },
+          { id: 'settings', label: 'Settings' },
+          { id: 'signout', label: 'Sign out' },
+        ]}
+        onAction={fn()}
+      >
+        {(item) => (
+          <Item key={item.id} textValue={item.label}>
+            {item.label}
+          </Item>
+        )}
+      </Menu>
+    ),
+    actions: (
+      <button
+        type="button"
+        aria-label="Help"
+        className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
+      >
+        ?
+      </button>
+    ),
   },
 };
