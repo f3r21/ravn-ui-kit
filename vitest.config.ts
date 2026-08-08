@@ -108,6 +108,15 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
+      // Then #95 gave `TaskTableRow` an actions slot and `TaskTableGroup` a heading level,
+      // adding 9 cases. 95.29 -> 95.31, branches 91.75 -> 91.83, functions 88.88 -> 88.96.
+      //
+      // NOTE for whichever of #95/#102 lands second: these two branches were both cut from
+      // 0bd0bd5 and each raised the thresholds from *main's* numbers, so their values differ
+      // and this file will conflict on merge. That conflict is the correct outcome and must be
+      // resolved by RE-DERIVING against the merged tree, not by taking either side — picking
+      // the lower one silently lowers a ratchet, and picking the higher one reds the gate.
+      //
       // Then #15's composition slots gave `AppShell` its first test file and added slot cases
       // to `TopNav`, `TaskCard`, `TaskListView` and `TaskTable`. 94.33 -> 95.29, branches
       // 91.30 -> 91.75. `functions` did not move: the new slots are props on existing
@@ -119,10 +128,10 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2611/2740  0.001971pp    95.255474     FAIL
-      //   branches      412/449   0.009465pp    91.536748     FAIL
-      //   functions     128/144   0.008889pp    88.194444     FAIL
-      //   lines        2611/2740  0.001971pp    95.255474     FAIL
+      //   statements   2622/2751  0.010796pp    95.274446     FAIL
+      //   branches      416/453   0.082230pp    91.611479     FAIL
+      //   functions     129/145   0.085517pp    88.275862     FAIL
+      //   lines        2622/2751  0.010796pp    95.274446     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -161,10 +170,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.29,
-        branches: 91.75,
-        functions: 88.88,
-        lines: 95.29,
+        statements: 95.31,
+        branches: 91.83,
+        functions: 88.96,
+        lines: 95.31,
       },
     },
   },
