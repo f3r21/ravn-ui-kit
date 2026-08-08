@@ -19,15 +19,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `formatPointsLong` (`"1 Point"` / `"4 Points"`), plus a `formatPoints` prop on `TaskCard`,
   `EstimationCell`, `TaskTableRow` and `EstimateModal`.
 
-  **The two wordings still differ, deliberately.** The card's `"Pts"` cites
-  `Cards01.md L340-359` and the cell's `"Points"` cites `Task Column02.md`, and neither could be
-  re-derived — the design exports are untracked here and the Figma API returns
-  `403 Invalid token`. Unifying them would override a citation on no evidence. What is shared is
-  the rule that decides singular from plural, so they cannot drift again.
+  **The two wordings still differ, and the corpus supports that.** The design exports are not in
+  this repo but are reachable one level up, so the question was answerable after all. In
+  `Components/`: `Cards00/01` and `Task Column03` carry `Pts` and no `Points`; `Task Column01`
+  carries `Points` 19 times and no `Pts`; **no file mixes them**. So keeping them apart is
+  contrary evidence, not absence of evidence. What is shared is the rule that decides singular
+  from plural, so they cannot drift again.
 
-  `"Pt"` is the one token here with no design source. It is the English singular of an attested
-  abbreviation rather than a new design value, and the alternative was shipping `"1 Pts"` —
-  flagged in `format-points.ts` as the line to change if a source ever says otherwise.
+  Two corrections to what an earlier draft of this entry said. The cell's support is
+  **`Task Column01.md`, not `Task Column02.md`** — that file contains neither wording, and a
+  reader who checked it would have concluded the wording was unsourced. And **both singulars are
+  invented**: `1 Pt` and `1 Point` are each absent from the entire export tree, so flagging only
+  the abbreviation implied the long form was sourced.
+
+  The mockups _do_ mix — six files, none in `Components/` — and attributing those occurrences to
+  components is inference rather than evidence, since the exports attest strings within frames
+  rather than component boundaries. Recorded in `format-points.ts` as the thing that would
+  overturn this.
 
   `formatPoints` is also the seam #90 needs: `points === 1` is English's rule, not every
   language's, and this is the third call site of it.
