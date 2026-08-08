@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { withSurface } from '../../../.storybook/decorators';
 import { ViewSwitcher } from './view-switcher';
 
@@ -75,15 +75,10 @@ export const Playground: Story = {
   render: (args) => {
     const [value, setValue] = useState<'left' | 'right'>(args.value ?? 'right');
     return (
-      <ViewSwitcher
-        leftIcon={<GridIcon />}
-        rightIcon={<ListIcon />}
-        leftLabel="Board view"
-        rightLabel="List view"
-        {...args}
-        value={value}
-        onChange={setValue}
-      />
+      // The icons and labels come from the meta's `args`, so listing them here as well
+      // only produced four props the spread immediately overwrote. Storybook 10's arg
+      // typing is what surfaced that (TS2783); the rendering is unchanged.
+      <ViewSwitcher {...args} value={value} onChange={setValue} />
     );
   },
   args: { value: 'right' },

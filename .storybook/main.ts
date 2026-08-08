@@ -78,12 +78,12 @@ const config: StorybookConfig = {
       // `typography.mdx`'s 9-row scale were both prose, and the colour aliases are
       // exactly what a consumer opens that page to read (#21).
       //
-      // Configured on `@storybook/addon-docs` directly, and listed *before*
-      // essentials. Essentials delivers addon-docs, so the obvious spelling is to
-      // nest these under its `docs` key — that builds green and changes nothing,
-      // which is the same failure mode as the bug itself. Essentials skips
-      // registering addon-docs when it is already present, so naming it here is what
-      // gets the options to the MDX compiler rather than a double registration.
+      // Configured on `@storybook/addon-docs` directly. Under Storybook 8 this also
+      // had to be listed *before* `addon-essentials`, which delivered addon-docs and
+      // skipped registering it when already present — nesting the options under
+      // essentials' own `docs` key built green and changed nothing, the same failure
+      // mode as the bug itself. Storybook 10 removed essentials, so the ordering
+      // constraint is gone and only the direct configuration remains (#113).
       //
       // GFM is more than tables — it also brings autolink literals, strikethrough,
       // footnotes and task lists — so this changes how every `.mdx` page parses, not
@@ -100,8 +100,6 @@ const config: StorybookConfig = {
         },
       },
     },
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
     '@storybook/addon-a11y',
     'storybook-addon-pseudo-states',
   ],
