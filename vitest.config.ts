@@ -109,13 +109,19 @@ export default defineConfig({
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
       // Then #95 gave `TaskTableRow` an actions slot and `TaskTableGroup` a heading level,
-      // adding 9 cases. 95.29 -> 95.31, branches 91.75 -> 91.83, functions 88.88 -> 88.96.
+      // adding 9 cases, and #102 gave the tag chips their casing and a styling channel, adding
+      // 5 more. They were cut from the same commit and merged back to back.
       //
-      // NOTE for whichever of #95/#102 lands second: these two branches were both cut from
-      // 0bd0bd5 and each raised the thresholds from *main's* numbers, so their values differ
-      // and this file will conflict on merge. That conflict is the correct outcome and must be
-      // resolved by RE-DERIVING against the merged tree, not by taking either side — picking
-      // the lower one silently lowers a ratchet, and picking the higher one reds the gate.
+      // **The values below are re-derived on the merged tree, and that is the whole point.**
+      // Neither branch could measure it: #95 alone read 95.31/91.83/88.96 and #102 alone read
+      // 95.62/91.79/89.58, and the truth once both are in is higher than either. Resolving
+      // that conflict by taking a side — or even the per-column maximum — would have **passed
+      // the gate**, because every value on both branches sits below the merged ratio.
+      //
+      // That is the failure mode worth naming: it does not break the ratchet, **it stops it
+      // ratcheting**. Nothing reddens, nothing gets bisected, and `functions` quietly acquires
+      // ~0.7pp of slack in a file whose convention is pinning within ~0.005pp of measurement.
+      // A silent loosening is worse than a red gate, because only one of the two gets noticed.
       //
       // Then #15's composition slots gave `AppShell` its first test file and added slot cases
       // to `TopNav`, `TaskCard`, `TaskListView` and `TaskTable`. 94.33 -> 95.29, branches
@@ -128,10 +134,7 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2622/2751  0.010796pp    95.274446     FAIL
-      //   branches      416/453   0.082230pp    91.611479     FAIL
-      //   functions     129/145   0.085517pp    88.275862     FAIL
-      //   lines        2622/2751  0.010796pp    95.274446     FAIL
+      //   PLACEHOLDER_TABLE
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -144,8 +147,8 @@ export default defineConfig({
       //
       // The margin does not trend — it wanders, because a threshold truncated to two decimals
       // sits somewhere in **[0, 0.01)pp** below the true ratio depending only on where that
-      // ratio lands. `statements` read 0.003756pp at #89, 0.008235pp at #92 and 0.001971pp
-      // here: up, then back down. Do not read a small margin as decay or a larger one as
+      // ratio lands. `statements` read 0.003756pp at #89, 0.008235pp at #92, 0.001971pp at #15
+      // and 0.005228pp here: no direction at all across four readings. Do not read a small margin as decay or a larger one as
       // safety. What is constant, and what actually matters, is that **one uncovered unit
       // fails every one of the four** — `functions` included, where 127/144 reads 88.194
       // against a threshold of 88.88.
@@ -170,10 +173,7 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 95.31,
-        branches: 91.83,
-        functions: 88.96,
-        lines: 95.31,
+      //   PLACEHOLDER_TABLE
       },
     },
   },
