@@ -777,8 +777,36 @@ export declare interface DatepickerProps extends AriaTextFieldProps {
  */
 export declare const DUE_DATE_URGENCY_COLOR: Record<DueDateUrgency, AccentColor>;
 
+/**
+ * Shared mapping from due-date urgency onto the text that states it, announced to assistive
+ * tech beside the date. The counterpart to `DUE_DATE_URGENCY_COLOR` above, and paired with it
+ * for the same reason: `TaskCard` and `DueDateCell` must not drift on what "overdue" *says*
+ * any more than on what it looks like.
+ *
+ * **This exists because the colour was the whole signal** (#92). Both renderers took an
+ * urgency and rendered it as `text-primary-2` / a red `Tag` fill and nothing else, so the
+ * state reached neither a screen-reader user nor a colour-blind sighted one — WCAG 2.2 1.4.1.
+ * The date text is not a substitute: `'Yesterday'` reads as past to a human, but
+ * `'20 July, 2026'` requires already knowing today's date, which is the inference an
+ * accessible name exists to remove.
+ *
+ * `normal` is deliberately **empty, and that is load-bearing rather than a placeholder.**
+ * "Not urgent" is the absence of a state, so announcing it would add noise to every ordinary
+ * task on the board — and an empty string is what makes "announce nothing when there is
+ * nothing to announce" structural instead of a condition each renderer re-implements. A
+ * consumer can silence `soon`/`overdue` the same way, by passing `''`.
+ *
+ * `soon` is included even though #92 is written about `overdue`: yellow-versus-neutral is
+ * exactly as much a colour-only signal as red-versus-neutral, so fixing only the red half
+ * would leave 1.4.1 failing for the other one.
+ *
+ * English by default and overridable per renderer — a hardcoded string here would rebuild
+ * #13's defect in a new place. See `TaskCard.dueDateUrgencyLabel` / `DueDateCell.urgencyLabel`.
+ */
+export declare const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string>;
+
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
-export declare function DueDateCell({ date, urgency }: DueDateCellProps): JSX.Element;
+export declare function DueDateCell({ date, urgency, urgencyLabel }: DueDateCellProps): JSX.Element;
 
 export declare interface DueDateCellProps {
     /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
@@ -788,6 +816,19 @@ export declare interface DueDateCellProps {
      * @default 'normal'
      */
     urgency?: DueDateUrgency;
+    /**
+     * What each urgency *says*, announced to assistive tech beside the date. Merged over the
+     * shared `DUE_DATE_URGENCY_LABEL` defaults.
+     *
+     * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Named `urgencyLabel` here and
+     * `dueDateUrgencyLabel` on `TaskCard` to match each component's own prop vocabulary; both
+     * read the same defaults, so the two renderers cannot disagree about what "overdue" says
+     * any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how it looks.
+     *
+     * Pass `''` for an urgency to announce nothing for it; `normal` is already `''`.
+     * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+     */
+    urgencyLabel?: Partial<Record<DueDateUrgency, string>>;
 }
 
 /**
@@ -2166,7 +2207,7 @@ export declare interface TagProps {
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, tags, assigneeName, assigneeAvatar, metaBadges, actions, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
 
 export declare interface TaskCardProps {
     /** Task title, shown in the header row and truncated to a single line. */
@@ -2186,6 +2227,25 @@ export declare interface TaskCardProps {
      * @default 'normal'
      */
     dueDateUrgency?: DueDateUrgency;
+    /**
+     * What each urgency *says*, announced to assistive tech beside the date. Merged over the
+     * shared `DUE_DATE_URGENCY_LABEL` defaults, so passing `{ overdue: 'past due' }` changes
+     * that one and leaves the rest.
+     *
+     * The colour used to be the whole signal (#92) — WCAG 2.2 1.4.1, failing for a
+     * screen-reader user and a colour-blind sighted user alike. The state is now rendered as
+     * an `sr-only` node inside the Tag, after the date: "Yesterday, overdue".
+     *
+     * **The visible text is untouched.** `dueDateText` stays exactly what you passed — this
+     * adds a spoken state, it does not rewrite the pill. A *visible* affix would serve
+     * colour-blind sighted users too, and is deliberately not done here: no Figma export draws
+     * one, and inventing a design value is forbidden by this repo's first rule.
+     *
+     * Pass `''` for an urgency to announce nothing for it. `normal` is already `''`, because
+     * "not urgent" is the absence of a state rather than a state worth repeating on every card.
+     * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+     */
+    dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
     /**
      * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to `'neutral'` when omitted.
      * @default []
@@ -2411,7 +2471,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, assigneeName, assigneeAvatar, dueDate, dueDateUrgency, dueDateUrgencyLabel, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2505,6 +2565,12 @@ export declare interface TaskTableRowProps {
      * @default 'normal'
      */
     dueDateUrgency?: DueDateUrgency;
+    /**
+     * What each urgency *says*, forwarded to this row's `DueDateCell` — see
+     * `DueDateCell.urgencyLabel`. Without it a row states its urgency in colour only (#92).
+     * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
+     */
+    dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
     /**
      * Called when the row is opened. Providing it renders the task title as a real `<button>`
      * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
