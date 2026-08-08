@@ -71,6 +71,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   where it previously showed an empty cell. That is the same rendering a board card has always
   used for this state. Rows _with_ an assignee are unchanged, and no `textContent` moves, so a
   consumer querying by person name keeps working.
+
 ### Changed
 
 - **Storybook 8.5 → 10.5** (#113). Tooling only; no runtime, published API or `dist/` change.
