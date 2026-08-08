@@ -110,6 +110,28 @@ under release pressure in the order they remember them. The check that would hav
 already existed — the app's `ui-kit-smoke.test.tsx`, whose comment names this gap verbatim — and
 was not run, which is why a _second_ thing to remember would not have fixed it either.
 
+**That tag no longer exists, and nothing recorded its removal** (#100). It was pushed — #54 read
+it over the API and quoted `"version": "0.4.0"` from it — and #54's comment records the decision
+to keep it: _"`v0.5.0` stays in place. A published tag is never moved or deleted; this issue is
+the record."_ It was deleted anyway, after 2026-08-07T19:03Z, by nobody recorded; the events API
+window has expired, so who and why are not recoverable. Re-derive:
+
+```bash
+gh api 'repos/f3r21/ravn-ui-kit/contents/package.json?ref=v0.5.0'   # 404
+gh api 'repos/f3r21/ravn-ui-kit/contents/package.json?ref=v0.4.0'   # 200 — control
+git ls-remote --tags origin | awk '{print $2}' | sed 's|refs/tags/||' | grep -v '\^{}' | sort -V
+```
+
+**This does not weaken the no-moving-tags rule** — it is the one case of that rule being broken,
+and the cost is concrete: #54's re-derivation commands no longer run, so an issue written to be
+the record of a defect can no longer show it. `release.yml`'s duplicate-tag check used to cite
+`v0.5.0` as proof of the norm and now explains this instead.
+
+**`v0.5.1` has a tag but no GitHub release** — visible in the same commands. It predates the
+Release workflow's first run (2026-08-07T21:16Z), so it was cut by hand when a matching release
+was not yet automatic. The app pins **tags**, not releases, so nothing consuming this package is
+affected; it is recorded here because the two lists disagreeing is otherwise a puzzle.
+
 Do not cut tags by hand. That still works — this repo has no tag protection
 (`gh api repos/f3r21/ravn-ui-kit/rulesets -q length` → 0, where the app returns 1, so the query
 works) and #59 is what would close it. If you do anyway, `.github/workflows/tag-check.yml` fires

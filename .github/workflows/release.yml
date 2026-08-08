@@ -106,9 +106,27 @@ jobs:
           echo "bare=$BARE" >> "$GITHUB_OUTPUT"
           echo "tag=v$BARE" >> "$GITHUB_OUTPUT"
 
-      # Before anything expensive, and before anything that writes. A tag is not moved or
-      # deleted in this project (`v0.5.0` is left in place precisely so #54 can point at it), so
-      # a duplicate is a hard stop rather than something to force past.
+      # Before anything expensive, and before anything that writes. Published tags are not
+      # moved or deleted in this project, so a duplicate is a hard stop rather than something
+      # to force past.
+      #
+      # This comment used to offer `v0.5.0` as the proof — "left in place precisely so #54 can
+      # point at it". **That tag no longer exists** (#100), so the strongest evidence for the
+      # norm was an example of the norm being broken:
+      #
+      #   gh api 'repos/f3r21/ravn-ui-kit/contents/package.json?ref=v0.5.0'   # 404
+      #   gh api 'repos/f3r21/ravn-ui-kit/contents/package.json?ref=v0.4.0'   # 200 — control
+      #
+      # It was pushed: #54 read it over the API on 2026-08-07 and its comment records the
+      # decision, "v0.5.0 stays in place. A published tag is never moved or deleted; this issue
+      # is the record." It was deleted anyway, some time after 19:03Z that day, by nobody
+      # recorded — the events API window has since expired, so who and why are not recoverable.
+      #
+      # **The rule is still right and this check is still right.** A consumer pins a tag; moving
+      # one changes what an unchanged pin resolves to, which is the failure a lockfile exists to
+      # prevent. What is gone is only the example, and #54's own re-derivation commands are now
+      # unrunnable because of it — which is the concrete cost of deleting a published tag, and a
+      # better argument for the norm than the sentence it replaces.
       - name: Refuse to overwrite an existing tag
         run: |
           if git rev-parse -q --verify "refs/tags/${{ steps.v.outputs.tag }}" >/dev/null; then
