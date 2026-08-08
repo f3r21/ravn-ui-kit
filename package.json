@@ -73,7 +73,7 @@
     "eslint-plugin-storybook": "^0.11.6",
     "globals": "^17.9.0",
     "http-server": "^14.1.1",
-    "jsdom": "^26.0.0",
+    "jsdom": "^30.0.1",
     "prettier": "^3.9.6",
     "react-aria": "^3.37.0",
     "react-stately": "^3.35.0",
