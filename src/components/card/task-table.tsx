@@ -282,6 +282,11 @@ export interface TaskTableRowProps {
    */
   isSelectable?: boolean;
   /**
+   * The trailing link's visible text (#90). Ignored unless `onViewDetails` is set.
+   * @default 'Details'
+   */
+  detailsLabel?: string;
+  /**
    * Accessible name for the row's select checkbox. Ignored unless `isSelectable`.
    *
    * The default interpolates the row's own `title`, so within one table the checkboxes are
@@ -389,6 +394,7 @@ export function TaskTableRow({
   onSelectedChange,
   isSelectable = true,
   selectLabel,
+  detailsLabel = 'Details',
   headingLevel,
   tags = [],
   estimationPoints,
@@ -517,7 +523,7 @@ export function TaskTableRow({
                 'inline-flex items-center gap-1 shrink-0 hover:text-interactive-text transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1 rounded-xs',
               )}
             >
-              <span>Details</span>
+              <span>{detailsLabel}</span>
               <ChevronRightIcon className="w-4 h-4" />
             </button>
           ) : null}
@@ -640,6 +646,18 @@ export interface TaskTableProps {
    * when both are given. Identical slot on `TaskListView`.
    */
   empty?: React.ReactNode;
+  /**
+   * The column headers, merged over the English defaults (#90). They were a module-level
+   * constant with no way past them, so a consumer could not translate the one row of this
+   * component that is pure prose.
+   *
+   * This names the five columns the table draws today. **#97 proposes a `columns` prop** that
+   * would let a consumer add, remove or reorder them, and would supersede this — that is a
+   * larger redesign with an unresolved question inside it (the five widths sum to the spec's
+   * 1108px row), so this is the small fix rather than a down-payment on that shape.
+   * @default { name: '# Task Name', tags: 'Task Tags', estimation: 'Estimate', assignee: 'Task Assign Name', dueDate: 'Due Date' }
+   */
+  columnLabels?: Partial<TaskTableColumnLabels>;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -691,13 +709,29 @@ function GroupHeading({ level, children }: { level: HeadingLevel; children: Reac
   );
 }
 
-const headerCells: { key: keyof typeof COLUMN_WIDTHS; label: string }[] = [
-  { key: 'name', label: '# Task Name' },
-  { key: 'tags', label: 'Task Tags' },
-  { key: 'estimation', label: 'Estimate' },
-  { key: 'assignee', label: 'Task Assign Name' },
-  { key: 'dueDate', label: 'Due Date' },
-];
+/** The column headers this table draws, per `Task Column02.md`'s "Table Header Cell". */
+export interface TaskTableColumnLabels {
+  /** The first column, which also carries the row index. */
+  name: string;
+  /** The tag-chips column. */
+  tags: string;
+  /** The story-points column. */
+  estimation: string;
+  /** The assignee column. */
+  assignee: string;
+  /** The due-date column. */
+  dueDate: string;
+}
+
+const DEFAULT_COLUMN_LABELS: TaskTableColumnLabels = {
+  name: '# Task Name',
+  tags: 'Task Tags',
+  estimation: 'Estimate',
+  assignee: 'Task Assign Name',
+  dueDate: 'Due Date',
+};
+
+const COLUMN_ORDER = ['name', 'tags', 'estimation', 'assignee', 'dueDate'] as const;
 
 /**
  * TaskTable
@@ -717,8 +751,16 @@ export function TaskTable({
   emptyDescription,
   emptyAction,
   empty,
+  columnLabels,
   className,
 }: TaskTableProps) {
+  // Built here rather than at module scope so `columnLabels` can reach it. `COLUMN_ORDER` keeps
+  // the column sequence a single source of truth; only the words are overridable (#90).
+  const headerCells = COLUMN_ORDER.map((key) => ({
+    key,
+    label: { ...DEFAULT_COLUMN_LABELS, ...columnLabels }[key],
+  }));
+
   return (
     <div
       className={cn(

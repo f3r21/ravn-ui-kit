@@ -8,6 +8,43 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **The kit's remaining visible English copy is now overridable** (#90). Additive; every default
+  is the exact string it replaced. **Minor.**
+
+  #13 made every hardcoded _accessible name_ overridable and deliberately left the visible copy,
+  because it is a different and larger surface. This is that surface.
+
+  | Component        | New prop        | Covers                                                                                     |
+  | ---------------- | --------------- | ------------------------------------------------------------------------------------------ |
+  | `AddTaskModal`   | `copy`          | the title placeholder and its accessible name, the four trigger chips, and the button pair |
+  | `AddTaskModal`   | `formatDueDate` | how a chosen date is written on its chip                                                   |
+  | `DatePickerMenu` | `todayLabel`    | the footer action                                                                          |
+  | `TaskTableRow`   | `detailsLabel`  | the trailing link                                                                          |
+  | `TaskTable`      | `columnLabels`  | the five column headers                                                                    |
+
+  **`formatDueDate` is the one that fixes a wrong output rather than an untranslated one.** The
+  default was `d.toLocaleDateString('en-US')`, which renders `3/15/2026` where most of the world
+  reads `15/3/2026` — a consumer outside the US was shown a _different date_, not merely an
+  English one.
+
+  `AddTaskModal` takes one `copy` object rather than seven props: the strings are a cohesive set,
+  and #13's per-string precedent produces `labelLabel` here. It is named `copy` and not `labels`
+  because `labels` on that component already means the selectable `Label[]`.
+
+  `copy.title` drives the placeholder **and** the input's accessible name from one key — they
+  were two copies of the same string, and splitting them would let the announced name drift from
+  the visible one, which is the WCAG 2.5.3 failure the anchored popovers avoid the same way.
+
+  **`TaskTable.columnLabels` renames columns; it does not reorder or remove them.** A
+  consumer-defined column set is #97, which would supersede this and carries an unresolved
+  question of its own — the five widths sum to the spec's 1108px row.
+
+  `EstimateModal`'s pluralisation, which #90 also listed, was solved separately in #94: it needs
+  a formatter rather than a string, because `points === 1` is English's rule and not every
+  language's.
+
 ### Fixed
 
 - **An unassigned task announced "Unassigned" on a card and nothing at all in a table row**

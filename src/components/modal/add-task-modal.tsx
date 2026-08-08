@@ -40,9 +40,60 @@ export interface AddTaskModalProps {
   defaultAssignee?: Assignee;
   /** Pre-fills the label trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
   defaultLabel?: Label;
+  /**
+   * The widget's visible copy, merged over the English defaults (#90).
+   *
+   * One object rather than seven props: `#13`'s precedent is an optional prop per string, which
+   * is right for a component with one or two and produces `labelLabel` here. The strings are
+   * one cohesive set — a consumer translating any of them translates all of them.
+   *
+   * `title` drives the placeholder **and** the input's accessible name, deliberately. They were
+   * two copies of `'Task name'`, and splitting them would let the announced name drift from the
+   * visible one — the WCAG 2.5.3 failure the three anchored popovers avoid the same way.
+   * @default { title: 'Task name', estimate: 'Estimate', assignee: 'Assignee', label: 'Label', dueDate: 'Due date', cancel: 'Cancel', submit: 'Create Task' }
+   */
+  copy?: Partial<AddTaskModalCopy>;
+  /**
+   * How a chosen due date is written on its chip (#90).
+   *
+   * The default is `d.toLocaleDateString('en-US')`, and the hardcoded locale is the reason this
+   * prop exists rather than a `dueDate` string: `'en-US'` renders `3/15/2026` where most of the
+   * world reads `15/3/2026`, so a consumer in another locale got a **wrong date**, not merely an
+   * untranslated one. Pass `(d) => d.toLocaleDateString(yourLocale)`, or your own formatter.
+   * @default (d) => d.toLocaleDateString('en-US')
+   */
+  formatDueDate?: (date: Date) => string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
+
+/** The visible strings `AddTaskModal` renders. See `AddTaskModalProps.copy`. */
+export interface AddTaskModalCopy {
+  /** The title field's placeholder, and its accessible name. */
+  title: string;
+  /** The estimate trigger chip, shown until a value is picked. */
+  estimate: string;
+  /** The assignee trigger chip, shown until a person is picked. */
+  assignee: string;
+  /** The label trigger chip, shown until a label is picked. */
+  label: string;
+  /** The due-date trigger chip, shown until a date is picked. */
+  dueDate: string;
+  /** The dismiss button. */
+  cancel: string;
+  /** The submit button. */
+  submit: string;
+}
+
+const DEFAULT_COPY: AddTaskModalCopy = {
+  title: 'Task name',
+  estimate: 'Estimate',
+  assignee: 'Assignee',
+  label: 'Label',
+  dueDate: 'Due date',
+  cancel: 'Cancel',
+  submit: 'Create Task',
+};
 
 /**
  * AddTaskModal
@@ -95,8 +146,14 @@ export function AddTaskModal({
   defaultPoints,
   defaultAssignee,
   defaultLabel,
+  copy: copyOverrides,
+  formatDueDate = (d) => d.toLocaleDateString('en-US'),
   className,
 }: AddTaskModalProps) {
+  // Named `copy`, not `labels`: `labels` is already this component's list of selectable
+  // `Label`s. Two different meanings of the same word on one component is how a consumer
+  // reaches for the wrong one.
+  const copy = { ...DEFAULT_COPY, ...copyOverrides };
   const [title, setTitle] = React.useState(defaultTitle);
   const [dueDate, setDueDate] = React.useState<Date | undefined>(defaultDueDate);
   const [points, setPoints] = React.useState<number | undefined>(defaultPoints);
@@ -197,8 +254,8 @@ export function AddTaskModal({
         autoFocus
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Task name"
-        aria-label="Task name"
+        placeholder={copy.title}
+        aria-label={copy.title}
         // `placeholder:text-muted-on-dark`, not `placeholder:text-muted`: this modal is
         // `surface-overlay`, where neutral-2 is 3.73:1. axe never flagged it because the
         // story renders the field with a value — a placeholder only exists while empty,
@@ -222,7 +279,7 @@ export function AddTaskModal({
               aria-expanded={openPopover === 'estimate'}
               className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
-              <Tag icon={<PointsIcon className="size-6" />}>Estimate</Tag>
+              <Tag icon={<PointsIcon className="size-6" />}>{copy.estimate}</Tag>
             </button>
           ) : (
             <button
@@ -267,7 +324,7 @@ export function AddTaskModal({
               aria-expanded={openPopover === 'assignee'}
               className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
-              <Tag icon={<AssigneeIcon className="size-6" />}>Assignee</Tag>
+              <Tag icon={<AssigneeIcon className="size-6" />}>{copy.assignee}</Tag>
             </button>
           ) : (
             <button
@@ -309,7 +366,7 @@ export function AddTaskModal({
               aria-expanded={openPopover === 'label'}
               className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
-              <Tag icon={<LabelIcon className="size-6" />}>Label</Tag>
+              <Tag icon={<LabelIcon className="size-6" />}>{copy.label}</Tag>
             </button>
           ) : (
             <button
@@ -349,7 +406,7 @@ export function AddTaskModal({
             className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
           >
             <Tag icon={<CalendarIcon className="size-6" />}>
-              {dueDate ? dueDate.toLocaleDateString('en-US') : 'Due date'}
+              {dueDate ? formatDueDate(dueDate) : copy.dueDate}
             </Tag>
           </button>
           {openPopover === 'date' ? (
@@ -370,10 +427,10 @@ export function AddTaskModal({
 
       <div className="flex items-center gap-6">
         <TextButton variant="secondary" onPress={handleCancel}>
-          Cancel
+          {copy.cancel}
         </TextButton>
         <TextButton variant="primary" type="submit" isDisabled={!title.trim()}>
-          Create Task
+          {copy.submit}
         </TextButton>
       </div>
     </form>

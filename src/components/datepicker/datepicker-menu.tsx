@@ -98,6 +98,11 @@ export interface DatePickerMenuProps {
    * @default 'Next year'
    */
   nextYearLabel?: string;
+  /**
+   * The footer action's visible text (#90). It jumps the calendar to today and selects it.
+   * @default 'Today'
+   */
+  todayLabel?: string;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -173,6 +178,7 @@ export function DatePickerMenu({
   previousMonthLabel = 'Previous month',
   nextMonthLabel = 'Next month',
   nextYearLabel = 'Next year',
+  todayLabel = 'Today',
   className,
 }: DatePickerMenuProps) {
   const valueProps =
@@ -289,7 +295,7 @@ export function DatePickerMenu({
           onClick={goToday}
           className="text-body-sm font-normal font-sans text-interactive-text hover:opacity-80 transition-opacity cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs"
         >
-          Today
+          {todayLabel}
         </button>
       </div>
     </Popover>

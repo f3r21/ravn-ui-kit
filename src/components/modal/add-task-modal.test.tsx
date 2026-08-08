@@ -178,3 +178,82 @@ describe('closing a chip popover from outside the row (#82)', () => {
     },
   );
 });
+
+/**
+ * #90. Every visible string this widget renders was hardcoded English, so a consumer whose app
+ * is not English could not translate the one component a user types into.
+ *
+ * `copy` is one object rather than seven props because the strings are a cohesive set — and
+ * because #13's per-string precedent produces `labelLabel` here. `labels` was already taken by
+ * the list of selectable `Label`s, which is why the prop is named `copy`.
+ */
+describe('visible copy is overridable (#90)', () => {
+  it('renders the English defaults, so existing callers are unchanged', () => {
+    render(<AddTaskModal isOpen onClose={vi.fn()} />);
+
+    expect(screen.getByPlaceholderText('Task name')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Create Task' })).toBeDefined();
+    expect(screen.getByText('Estimate')).toBeDefined();
+    expect(screen.getByText('Assignee')).toBeDefined();
+    expect(screen.getByText('Due date')).toBeDefined();
+  });
+
+  it('takes a partial override and merges the rest', () => {
+    render(<AddTaskModal isOpen onClose={vi.fn()} copy={{ submit: 'Add', cancel: 'Discard' }} />);
+
+    expect(screen.getByRole('button', { name: 'Add' })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Discard' })).toBeDefined();
+    // Untouched keys keep their defaults — the point of merging over replacing.
+    expect(screen.getByPlaceholderText('Task name')).toBeDefined();
+  });
+
+  /**
+   * `title` drives the placeholder *and* the accessible name from one key. Two props would let
+   * the announced name drift from the visible one, which is the WCAG 2.5.3 failure the anchored
+   * popovers avoid the same way.
+   */
+  it('names the title field and its placeholder from one key', () => {
+    render(<AddTaskModal isOpen onClose={vi.fn()} copy={{ title: 'Nombre de la tarea' }} />);
+
+    const field = screen.getByPlaceholderText('Nombre de la tarea');
+    expect(field.getAttribute('aria-label')).toBe('Nombre de la tarea');
+  });
+
+  it('renders every chip label from copy', () => {
+    render(
+      <AddTaskModal
+        isOpen
+        onClose={vi.fn()}
+        copy={{ estimate: 'Puntos', assignee: 'Responsable', label: 'Etiqueta', dueDate: 'Fecha' }}
+      />,
+    );
+
+    for (const s of ['Puntos', 'Responsable', 'Etiqueta', 'Fecha']) {
+      expect(screen.getByText(s)).toBeDefined();
+    }
+  });
+
+  /**
+   * The date formatter matters more than the strings. The default is
+   * `toLocaleDateString('en-US')`, which renders `3/15/2026` where most of the world reads
+   * `15/3/2026` — so a consumer elsewhere got a **wrong date**, not an untranslated one.
+   */
+  it('formats a chosen due date through the caller’s formatter', () => {
+    render(
+      <AddTaskModal
+        isOpen
+        onClose={vi.fn()}
+        defaultDueDate={new Date(2026, 2, 15)}
+        formatDueDate={(d) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`}
+      />,
+    );
+    expect(screen.getByText('15/3/2026')).toBeDefined();
+  });
+
+  it('control: the default formatter still renders the US order', () => {
+    // Without this, a fix that dropped the default entirely would pass the case above.
+    render(<AddTaskModal isOpen onClose={vi.fn()} defaultDueDate={new Date(2026, 2, 15)} />);
+    expect(screen.getByText('3/15/2026')).toBeDefined();
+  });
+});

@@ -121,7 +121,25 @@ export declare type AccentColor = 'neutral' | 'red' | 'green' | 'yellow' | 'blue
  * then owned by the field — this widget's open is its mount, since a closed one renders
  * nothing.
  */
-export declare function AddTaskModal({ isOpen, onClose, assignees, labels, onSubmit, defaultTitle, defaultDueDate, defaultPoints, defaultAssignee, defaultLabel, className, }: AddTaskModalProps): default_2.JSX.Element | null;
+export declare function AddTaskModal({ isOpen, onClose, assignees, labels, onSubmit, defaultTitle, defaultDueDate, defaultPoints, defaultAssignee, defaultLabel, copy: copyOverrides, formatDueDate, className, }: AddTaskModalProps): default_2.JSX.Element | null;
+
+/** The visible strings `AddTaskModal` renders. See `AddTaskModalProps.copy`. */
+export declare interface AddTaskModalCopy {
+    /** The title field's placeholder, and its accessible name. */
+    title: string;
+    /** The estimate trigger chip, shown until a value is picked. */
+    estimate: string;
+    /** The assignee trigger chip, shown until a person is picked. */
+    assignee: string;
+    /** The label trigger chip, shown until a label is picked. */
+    label: string;
+    /** The due-date trigger chip, shown until a date is picked. */
+    dueDate: string;
+    /** The dismiss button. */
+    cancel: string;
+    /** The submit button. */
+    submit: string;
+}
 
 export declare interface AddTaskModalProps {
     /** Whether the widget is currently mounted. */
@@ -154,6 +172,29 @@ export declare interface AddTaskModalProps {
     defaultAssignee?: Assignee;
     /** Pre-fills the label trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
     defaultLabel?: Label;
+    /**
+     * The widget's visible copy, merged over the English defaults (#90).
+     *
+     * One object rather than seven props: `#13`'s precedent is an optional prop per string, which
+     * is right for a component with one or two and produces `labelLabel` here. The strings are
+     * one cohesive set — a consumer translating any of them translates all of them.
+     *
+     * `title` drives the placeholder **and** the input's accessible name, deliberately. They were
+     * two copies of `'Task name'`, and splitting them would let the announced name drift from the
+     * visible one — the WCAG 2.5.3 failure the three anchored popovers avoid the same way.
+     * @default { title: 'Task name', estimate: 'Estimate', assignee: 'Assignee', label: 'Label', dueDate: 'Due date', cancel: 'Cancel', submit: 'Create Task' }
+     */
+    copy?: Partial<AddTaskModalCopy>;
+    /**
+     * How a chosen due date is written on its chip (#90).
+     *
+     * The default is `d.toLocaleDateString('en-US')`, and the hardcoded locale is the reason this
+     * prop exists rather than a `dueDate` string: `'en-US'` renders `3/15/2026` where most of the
+     * world reads `15/3/2026`, so a consumer in another locale got a **wrong date**, not merely an
+     * untranslated one. Pass `(d) => d.toLocaleDateString(yourLocale)`, or your own formatter.
+     * @default (d) => d.toLocaleDateString('en-US')
+     */
+    formatDueDate?: (date: Date) => string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -718,7 +759,7 @@ export declare function Datepicker({ label, isLabelVisible, error, description, 
  * correct, standard grid semantics is a net accessibility improvement, not a regression against
  * verified spec.
  */
-export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, label, previousYearLabel, previousMonthLabel, nextMonthLabel, nextYearLabel, className, }: DatePickerMenuProps): JSX.Element;
+export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, label, previousYearLabel, previousMonthLabel, nextMonthLabel, nextYearLabel, todayLabel, className, }: DatePickerMenuProps): JSX.Element;
 
 export declare interface DatePickerMenuProps {
     /**
@@ -785,6 +826,11 @@ export declare interface DatePickerMenuProps {
      * @default 'Next year'
      */
     nextYearLabel?: string;
+    /**
+     * The footer action's visible text (#90). It jumps the calendar to today and selects it.
+     * @default 'Today'
+     */
+    todayLabel?: string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2633,7 +2679,21 @@ export declare interface TaskMetaBadgesProps {
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, className, }: TaskTableProps): JSX.Element;
+export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, columnLabels, className, }: TaskTableProps): JSX.Element;
+
+/** The column headers this table draws, per `Task Column02.md`'s "Table Header Cell". */
+export declare interface TaskTableColumnLabels {
+    /** The first column, which also carries the row index. */
+    name: string;
+    /** The tag-chips column. */
+    tags: string;
+    /** The story-points column. */
+    estimation: string;
+    /** The assignee column. */
+    assignee: string;
+    /** The due-date column. */
+    dueDate: string;
+}
 
 export declare interface TaskTableGroup {
     /** Group/status title, e.g. `"To Do (05)"`. Figma "Task Cell" -- Desktop/Body/L/bold. */
@@ -2693,6 +2753,18 @@ export declare interface TaskTableProps {
      * when both are given. Identical slot on `TaskListView`.
      */
     empty?: React.ReactNode;
+    /**
+     * The column headers, merged over the English defaults (#90). They were a module-level
+     * constant with no way past them, so a consumer could not translate the one row of this
+     * component that is pure prose.
+     *
+     * This names the five columns the table draws today. **#97 proposes a `columns` prop** that
+     * would let a consumer add, remove or reorder them, and would supersede this — that is a
+     * larger redesign with an unresolved question inside it (the five widths sum to the spec's
+     * 1108px row), so this is the small fix rather than a down-payment on that shape.
+     * @default { name: '# Task Name', tags: 'Task Tags', estimation: 'Estimate', assignee: 'Task Assign Name', dueDate: 'Due Date' }
+     */
+    columnLabels?: Partial<TaskTableColumnLabels>;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2713,7 +2785,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -2767,6 +2839,11 @@ export declare interface TaskTableRowProps {
      * @default true
      */
     isSelectable?: boolean;
+    /**
+     * The trailing link's visible text (#90). Ignored unless `onViewDetails` is set.
+     * @default 'Details'
+     */
+    detailsLabel?: string;
     /**
      * Accessible name for the row's select checkbox. Ignored unless `isSelectable`.
      *
