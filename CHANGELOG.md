@@ -8,6 +8,49 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **The prop surface is measurable now, and the two scripts that measure it are tested.**
+  Repo tooling only; nothing ships and `dist/` is unchanged. **Patch.**
+
+  `scripts/prop-surface.mjs` resolves the public API through the TypeScript checker and splits
+  every prop by where it is _declared_: 307 the kit declares in `src/` against 1408 it inherits
+  from `node_modules`, across 49 components, with the 21 icons reported apart because each takes
+  `React.SVGProps<SVGSVGElement>` and inherits 488 props on its own —
+  `node scripts/prop-surface.mjs`.
+
+  That split is the point rather than a presentation choice. A prop the kit declares is one it
+  owns and could remove; a prop it inherits arrives whether anyone decided anything or not, and
+  `ButtonProps extends AriaButtonProps` brings 38 with it that no regex over the interface body
+  will ever find — `node scripts/prop-surface.mjs --by-component | grep ' Button '`. Counting
+  the two together answers no question worth asking, which is how an audit came to report "302
+  props across 46 components": both readings were correct when taken, at `fa451a7` and `9ab508e`,
+  and `6bc133f` moved them to 307 and 49 in a single commit.
+
+  `scripts/consumer-prop-usage.mjs` is the other half — which of those props the sole consumer
+  actually passes, parsed out of a checkout of the app rather than guessed. **Its figures are not
+  reproducible from this repo alone** and the script's own header says so: the answer depends on
+  which app ref you point it at, so a figure taken from it has to name one.
+
+  Both are driven by `scripts/prop-surface.test.mjs`, which Vitest collects, so they run inside
+  `npm run gate`. That is the point of it existing: `.claude/hooks/` shipped inert for a release
+  and a line-based story probe reported six broken files where seven were, and both exited 0. So
+  the classifier is asserted in both directions — `Button` declares `variant` and inherits
+  `onPress`, `Tag` inherits nothing at all — and a separate case fails if the classifier collapses
+  everything into one bucket, which the direction checks alone cannot see. Sabotaged five ways
+  before being trusted; each one failed the cases it should and no others.
+
+  One of those five found a case with no teeth. `ignores identically-named imports from other
+packages` asserted that `Button` did not carry `'ignored'` from
+  `<Other variant="ignored" />` — but `'ignored'` is the attribute's _value_ and `variant` its
+  name, so it tested for a string the script cannot emit and passed with the package filter
+  deleted. The fixture prop is now named `fromAnotherPackage`, which nothing else can produce.
+  Recorded because a control aimed at a value the instrument never reports is indistinguishable
+  from a working one until something breaks.
+
+  Written for #129, which uses these figures to decide whether the prop surface should be cut
+  before #11, #14 and #16 rewrite it. No component, prop, story or token changed.
+
 ## [0.8.0] - 2026-08-09
 
 ### Fixed
