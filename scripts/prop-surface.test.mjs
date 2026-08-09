@@ -98,6 +98,24 @@ describe('prop-surface: the kit measures its own public surface', () => {
     expect(result.components.find((c) => c.name === 'Tag').names).toEqual(['Tag']);
   });
 
+  it('no component has a shape that would make the count silently low', () => {
+    // `propsTypeOf` reads `getCallSignatures()[0]`, so a second overload's props are ignored; and
+    // `getPropertiesOfType` on a union returns only the properties common to every member, so a
+    // discriminated-union props type drops every variant-specific prop. Both are ordinary React
+    // patterns that could arrive without anyone thinking about this script, and both fail
+    // *quietly* and *low* — the direction that flatters #129's "unused" reading.
+    //
+    // Probed rather than read: this was raised as an unproven assumption and closing it by eye
+    // would leave it unproven the next time someone adds a component.
+    const overloaded = result.components.filter((c) => c.shape.signatures > 1).map((c) => c.name);
+    const unions = result.components.filter((c) => c.shape.propsIsUnion).map((c) => c.name);
+    expect(overloaded).toEqual([]);
+    expect(unions).toEqual([]);
+    // Control: the shape data is actually populated, so the two assertions above are not passing
+    // because `shape` is undefined everywhere.
+    expect(result.components.every((c) => c.shape.signatures >= 1)).toBe(true);
+  });
+
   it('icons are counted apart from the components', () => {
     // Each icon takes `React.SVGProps<SVGSVGElement>` and inherits hundreds of props. Folding
     // 20 copies of one decision into the headline total is what this split exists to prevent,

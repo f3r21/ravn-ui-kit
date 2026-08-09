@@ -66,6 +66,23 @@ export function measure(root = process.cwd()) {
     return checker.getTypeOfSymbolAtLocation(param, param.valueDeclaration ?? decl);
   };
 
+  /**
+   * The two shapes that would make `propsTypeOf` undercount, reported so a test can assert neither
+   * exists rather than a reader having to check by eye.
+   *
+   * `getCallSignatures()[0]` reads only the first overload, so a component with two would have the
+   * second's props ignored entirely. `getPropertiesOfType` on a **union** returns only the
+   * properties common to every member, so a discriminated-union props type would silently drop
+   * every variant-specific prop. Neither exists in the kit today; both are ordinary React patterns
+   * and could arrive without anyone thinking about this script.
+   */
+  const propsShapeOf = (sym) => {
+    const decl = sym.valueDeclaration ?? sym.declarations[0];
+    const sigs = checker.getTypeOfSymbolAtLocation(sym, decl).getCallSignatures();
+    const t = propsTypeOf(sym);
+    return { signatures: sigs.length, propsIsUnion: Boolean(t?.isUnion?.()) };
+  };
+
   /** Where a prop is declared is who owns it. This one line is the instrument. */
   const originOf = (propSym) => {
     const d = propSym.declarations?.[0];
@@ -80,6 +97,7 @@ export function measure(root = process.cwd()) {
   for (const sym of checker.getExportsOfModule(moduleSymbol)) {
     if (!isComponent(sym)) continue;
     symbolOf.set(sym.getName(), sym);
+    const shape = propsShapeOf(sym);
     const propsType = propsTypeOf(sym);
     const props = (propsType ? checker.getPropertiesOfType(propsType) : []).map((p) => {
       const d = p.declarations?.[0];
@@ -94,6 +112,7 @@ export function measure(root = process.cwd()) {
       name: sym.getName(),
       file: relative(root, declFile),
       names: [sym.getName()],
+      shape,
       declared: props.filter((p) => p.origin === 'declared'),
       inherited: props.filter((p) => p.origin === 'inherited'),
       total: props.length,
