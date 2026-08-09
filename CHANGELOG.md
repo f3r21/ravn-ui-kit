@@ -38,10 +38,23 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
   Also `self-start`, so the chip sizes to content. The wrapper is `flex flex-col w-full` and a flex
   item stretches — measured at **1390px** on the story against `Select`'s **151px** for the same
-  classes. A 32px band spanning the form is neither the old field nor the design's chip. An explicit
-  width still wins, and the consuming app already passes `className="w-40"` — the workaround this
-  default made necessary. Rendered and measured at **175×32** after the change, not inferred from
-  the class list.
+  classes. A 32px band spanning the form is neither the old field nor the design's chip. Rendered
+  and measured at **175×32** after the change, not inferred from the class list.
+
+  Content-sized is a **deliberate deviation from the export's literal `width: 128px`**. The kit
+  ships none of `--font-sans`'s three families, so a fixed box calibrated in Figma clips on a
+  machine without them — that is #20, and it has already cost this repo once (`EstimateModal`'s
+  header measured 86.5px on macOS and 105.5px on CI against an 88px box). A date value is
+  locale-formatted on top of that. The component comment says so, because the plausible later
+  "correction" is `w-32`, which would reintroduce #20's defect in the component that just had its
+  surface fixed.
+
+  **Consumers: `@ravn/ui-kit`'s `Datepicker` no longer needs a width override.** The consuming app
+  passes `className="w-40"` (`task-form-dialog.tsx:221`) because the old default stretched to fill
+  its column. That override still works and now pins the chip at 160px against a design value of
+  128px — so it is not merely redundant, it is a stale number that nothing will flag, because
+  removing the reason for a workaround breaks nothing on the day it stops being needed. Drop it
+  when adopting this version.
 
   The invalid state moves from `border-danger-5` to `ring-1 ring-danger-text`, for the reasons
   `select.tsx` sets out: `danger-5`'s border survived 1.4.11 only on the strength of the white

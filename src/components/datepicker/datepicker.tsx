@@ -74,9 +74,17 @@ export function Datepicker({
           // is `flex flex-col w-full`, so without it a flex item fills the column — measured at
           // **1390px** on the story, against `Select`'s content-sized **151px** for the same chip
           // classes. A 32px-tall band spanning the form is neither the old white field nor the
-          // design's chip. An explicit width still wins, so a caller passing one is unaffected:
-          // the consuming app already passes `className="w-40"`, which is the workaround this
-          // default made necessary.
+          // design's chip. An explicit width still wins, so a caller passing one is unaffected.
+          //
+          // **Content-sized is a deliberate deviation from the export's literal `width: 128px`,
+          // not an omission — do not "correct" it to `w-32`.** That value was transcribed from
+          // Figma, where the font was present; this kit ships none of `--font-sans`'s three
+          // families, so on a Linux runner the same string renders wider and a fixed box clips
+          // it. That is #20, and it has already cost this repo once: `EstimateModal`'s header
+          // measured 86.5px on macOS and 105.5px on CI against an 88px box. A date value is
+          // locale-formatted on top of that — `dd/mm/yyyy` and `mm/dd/yyyy` differ, and a
+          // long-form locale differs more. Sizing to content is what makes the box follow the
+          // text instead of the text overflowing the box.
           'self-start inline-flex items-center h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold text-main [color-scheme:dark] font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none',
           // A `ring`, not a `border`, and `danger-text` rather than `danger-5` — both for the
           // reasons `select.tsx` sets out at length. `danger-5`'s invalid border survived 1.4.11
