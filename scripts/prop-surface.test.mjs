@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { measure, isIconFile } from './prop-surface.mjs';
@@ -98,7 +99,7 @@ describe('prop-surface: the kit measures its own public surface', () => {
     expect(result.components.find((c) => c.name === 'Tag').names).toEqual(['Tag']);
   });
 
-  it('no component has a shape that would make the count silently low', () => {
+  it('no component in this kit has a shape that would make the count silently low', () => {
     // `propsTypeOf` reads `getCallSignatures()[0]`, so a second overload's props are ignored; and
     // `getPropertiesOfType` on a union returns only the properties common to every member, so a
     // discriminated-union props type drops every variant-specific prop. Both are ordinary React
@@ -125,6 +126,80 @@ describe('prop-surface: the kit measures its own public surface', () => {
     expect(result.components.filter((c) => isIconFile(c.file)).length).toBe(
       result.totals.iconComponents,
     );
+  });
+});
+
+describe('the shape probe detects the shapes, rather than reporting none', () => {
+  /**
+   * The assertion above says the kit has no overloaded or union-props component. On its own that
+   * is **unfalsifiable**: hardcode `signatures: 1, propsIsUnion: false` and it stays green, and so
+   * does its `signatures >= 1` control, because `1 >= 1`. A check that returns a plausible answer
+   * without consulting anything is indistinguishable from one that works — the same defect this
+   * whole instrument exists to argue about, and the reason the corpus needs a synthetic case: the
+   * kit contains neither shape, so only a fixture can prove the probe can see them.
+   */
+  let fx;
+  let result;
+  beforeAll(() => {
+    fx = mkdtempSync(join(tmpdir(), 'kit-shapes-'));
+    mkdirSync(join(fx, 'src'), { recursive: true });
+    writeFileSync(
+      join(fx, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          moduleResolution: 'bundler',
+          strict: true,
+          noEmit: true,
+          types: [],
+        },
+        include: ['src'],
+      }),
+    );
+    // No React import — `isComponent` keys off the return type's *name*, so a local `Element`
+    // satisfies it and the fixture needs no dependency tree of its own.
+    writeFileSync(
+      join(fx, 'src', 'index.ts'),
+      `type Element = { __element: true };
+       export function Plain(p: { a?: string }): Element { return p as unknown as Element; }
+       export function Overloaded(p: { x?: string }): Element;
+       export function Overloaded(p: { y?: number }): Element;
+       export function Overloaded(p: { x?: string } | { y?: number }): Element { return p as unknown as Element; }
+       type UnionProps = { kind: 'a'; a: string } | { kind: 'b'; b: number };
+       export function UnionPropped(p: UnionProps): Element { return p as unknown as Element; }`,
+    );
+    result = measure(fx);
+  }, TIMEOUT);
+  afterAll(() => rmSync(fx, { recursive: true, force: true }));
+
+  const find = (n) => result.components.find((c) => c.name === n);
+
+  it('detects a component with two call signatures', () => {
+    expect(find('Overloaded').shape.signatures).toBe(2);
+  });
+
+  it('detects a union props type', () => {
+    expect(find('UnionPropped').shape.propsIsUnion).toBe(true);
+  });
+
+  it('control: a plain component trips neither', () => {
+    // Without this the two above pass against a probe that reports every component as overloaded
+    // and union-typed — which would fail the kit's real assertion, but loudly and for the wrong
+    // reason. This pins that the probe discriminates.
+    expect(find('Plain').shape).toEqual({ signatures: 1, propsIsUnion: false });
+  });
+
+  it('shows why the shapes matter: a union props type really does undercount', () => {
+    // The reason the kit-level assertion exists at all. `UnionProps` has three properties across
+    // its two members — `kind`, `a`, `b` — and `getPropertiesOfType` on a union returns only the
+    // ones common to every member. So the surface reads **1** where the component accepts 3, and
+    // it reads it silently and low. This is the failure the probe is guarding against, measured
+    // rather than described.
+    const declared = find('UnionPropped').declared.map((p) => p.name);
+    expect(declared).toEqual(['kind']);
+    expect(declared).not.toContain('a');
+    expect(declared).not.toContain('b');
   });
 });
 
@@ -257,6 +332,31 @@ describe('consumer-prop-usage: what a consumer actually passes', () => {
       expect(unfollowableImports(t)).toEqual([]);
     } finally {
       rmSync(t, { recursive: true, force: true });
+    }
+  });
+
+  it('the CLI warns in --json mode, which is the mode every join calls', () => {
+    // The warning first shipped inside the human-readable branch, so it appeared everywhere
+    // except the one mode whose numbers get quoted in an issue. Driven through the CLI rather
+    // than through `unfollowableImports()` directly, because the defect was the *placement*, not
+    // the detection — a unit test on the function passes either way.
+    const ns = mkdtempSync(join(tmpdir(), 'kit-consumer-cli-'));
+    mkdirSync(join(ns, 'src'), { recursive: true });
+    writeFileSync(
+      join(ns, 'src', 'n.tsx'),
+      `import * as Kit from '@ravn/ui-kit';
+       export const N = () => <Kit.Button />;`,
+    );
+    try {
+      const r = spawnSync('node', ['scripts/consumer-prop-usage.mjs', ns, '--json'], {
+        encoding: 'utf8',
+      });
+      expect(r.status).toBe(0);
+      expect(r.stderr).toMatch(/WARNING: namespace import `Kit`/);
+      // stdout stays parseable — the warning must not corrupt the JSON a join reads.
+      expect(() => JSON.parse(r.stdout)).not.toThrow();
+    } finally {
+      rmSync(ns, { recursive: true, force: true });
     }
   });
 

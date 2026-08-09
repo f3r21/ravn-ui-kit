@@ -149,7 +149,13 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     process.exit(2);
   }
   const rows = analyze(app);
-  const blind = unfollowableImports(app);
+
+  // Warned before the mode branch, and that placement is the point: `--json` is what every join
+  // calls, so leaving this inside the human-readable branch put the warning everywhere except the
+  // mode whose numbers get quoted. stderr, so it cannot corrupt the JSON on stdout.
+  for (const h of unfollowableImports(app))
+    console.error(`WARNING: ${h.kind} import \`${h.local}\` in ${h.file} is not followed`);
+
   if (process.argv.includes('--json')) {
     console.log(JSON.stringify(rows, null, 2));
   } else {
@@ -161,9 +167,6 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     console.log(
       `distinct (component, prop) pairs: ${rows.reduce((n, r) => n + r.props.length, 0)}`,
     );
-    // Loud rather than silent. Anything here means the counts above are undercounts.
-    for (const h of blind)
-      console.error(`WARNING: ${h.kind} import \`${h.local}\` in ${h.file} is not followed`);
   }
 }
 /* c8 ignore stop */

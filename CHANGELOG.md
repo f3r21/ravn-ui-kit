@@ -75,6 +75,31 @@ packages` asserted that `Button` did not carry `'ignored'` from
   imported carrying 211, 42 props passed. The compound defect was latent because the app uses no
   `Card`, which is exactly why it was worth fixing before a consumer adopts one.
 
+  A second review round then found the sharpest defect of the three, in the fix for the previous
+  round: **the two shape assertions could not fail.** They asserted that no component has an
+  overload or a union props type, and their control asserted `signatures >= 1` — so hardcoding
+  `{signatures: 1, propsIsUnion: false}` left the whole suite green, control included, because
+  `1 >= 1`. The check could not tell "probed all 49 and found none" from "reports none
+  unconditionally", which is the same defect the instrument exists to argue about, one level up.
+
+  The kit contains neither shape, so only a fixture can prove the probe sees them: a temp project
+  with an overloaded component and a union-props one, asserted to be **detected**, plus a plain
+  component asserted to trip neither. The fourth case is the one worth reading — it shows the
+  union really does undercount, reading **1** declared prop where the component accepts three,
+  because `getPropertiesOfType` on a union returns only the properties common to every member.
+  That is the failure being guarded against, measured instead of described.
+
+  Two smaller ones from the same round, both on the seam between the library and its published
+  commands, which is where a library-level fix stops travelling:
+
+  - `--props` emitted only the undotted name, so a shell join over it stayed exact-match. It now
+    carries a fourth column with every name a consumer can render the component as — appended, so
+    the row count stays 307 and existing `awk` forms keep working.
+  - The unfollowable-import warning was inside the human-readable branch, so it was absent from
+    `--json` — **the mode every join calls.** Moved above the branch; it is stderr and cannot
+    corrupt the JSON on stdout, and a case now drives the CLI rather than the function, because
+    the defect was the placement and a unit test on the function passes either way.
+
   Written for #129, which uses these figures to decide whether the prop surface should be cut
   before #11, #14 and #16 rewrite it. No component, prop, story or token changed.
 

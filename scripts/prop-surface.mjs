@@ -171,8 +171,14 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   if (args.includes('--json')) {
     console.log(JSON.stringify({ totals, components }, null, 2));
   } else if (args.includes('--props')) {
+    // Four columns: name, prop, declaring file, then every name a consumer can render the
+    // component as, comma-separated. The fourth is appended rather than folded in so the row
+    // count stays one-per-declared-prop and `awk '{print $1"."$2}'` keeps working — but a join
+    // that matches only column 1 is exact-match on the undotted name and will miss a consumer
+    // writing `<Card.Header>`. Join on column 4.
     for (const c of components)
-      for (const p of c.declared) console.log(`${c.name}\t${p.name}\t${p.from}`);
+      for (const p of c.declared)
+        console.log(`${c.name}\t${p.name}\t${p.from}\t${c.names.join(',')}`);
   } else {
     if (args.includes('--by-component')) {
       for (const c of components)
