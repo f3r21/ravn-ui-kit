@@ -20,8 +20,18 @@ export const Default: Story = {
   args: {},
 };
 
+/**
+ * Every control live. `timeZone` is the one worth trying: the calendar reads the date in the
+ * zone it is given rather than the machine's, so setting it moves "today". The four `*Label`
+ * props are the navigation buttons' accessible names.
+ */
 export const Playground: Story = {
-  args: {},
+  args: {
+    defaultValue: new Date(2026, 2, 15),
+    timeZone: 'Asia/Tokyo',
+    label: 'Choose a due date',
+    todayLabel: 'Today',
+  },
 };
 
 export const WithSelectedDate: Story = {

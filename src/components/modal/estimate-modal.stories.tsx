@@ -25,3 +25,16 @@ export const WithSelection: Story = {
     value: 5,
   },
 };
+
+/**
+ * Every control live. `formatPoints` is the interesting one: `points === 1` is English's
+ * pluralisation rule and not every language's, which is why this is a formatter rather than a
+ * string (#94).
+ */
+export const Playground: Story = {
+  args: {
+    value: 4,
+    label: 'Estimate this task',
+    formatPoints: (points) => `${points} pt${points === 1 ? '' : 's'}`,
+  },
+};

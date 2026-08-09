@@ -10,6 +10,28 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Nineteen story files did not comply with the `Playground` convention, and nothing checked**
+  (#storybook-conventions). Stories, docs and a new test; no component source changed. **Patch.**
+
+  Twelve files had a canonical story and **no `Playground`**; seven had a `Playground`
+  byte-identical to another story — `menu.stories.tsx` had `export const Default: Story = {};`
+  and `export const Playground: Story = {};`, both empty. A `Playground` identical to the story
+  beside it exposes nothing.
+
+  All nineteen now expose real controls. `scripts/stories-compliance.test.mjs` enforces it with a
+  TypeScript AST, and `CONTRIBUTING.md` is updated so the prose and the test agree.
+
+  **The ruling this encodes:** `Playground` is required everywhere and must differ from every
+  other story in the file. The canonical example may be `Default` **or a descriptive name** —
+  `AppShell` ships `Dashboard`, `Icons` ships `AllIcons`, `ViewSwitcher` ships `LeftSelected`,
+  and all three are correct. The check deliberately does **not** assert a story named `Default`.
+
+  Four new `.storybook/a11y-allowlist.ts` entries, each an **existing accepted pairing on a new
+  story key** rather than a new finding: the new `Playground`s reuse their siblings' story-local
+  `primary-4` triggers, and the allowlist is keyed story × rule.
+
+### Fixed
+
 - **Two tests failed under machine load at an undeclared 5000ms timeout** (#63). Test config
   only; no shipped code, `dist/` byte-identical. **Patch.**
 

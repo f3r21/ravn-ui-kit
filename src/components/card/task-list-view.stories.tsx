@@ -47,10 +47,19 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Every control live, including the ones the stories above do not reach: `headingLevel` for the
+ * page outline, `label` — the list's own accessible name, which matters when a board shows more
+ * than one column — and the three `empty*` props.
+ */
 export const Playground: Story = {
   args: {
-    title: 'Working (03)',
-    tasks: sampleTasks,
+    title: 'In Review (02)',
+    headingLevel: 2,
+    label: 'Tasks in review',
+    tasks: sampleTasks.slice(0, 2),
+    emptyTitle: 'Nothing in review',
+    emptyDescription: 'Move a task here when it is ready for a second pair of eyes.',
   },
 };
 

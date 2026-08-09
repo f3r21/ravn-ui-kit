@@ -159,7 +159,18 @@ export const StaysUntilDismissed: Story = {
   },
 };
 
+/**
+ * Every control live: `duration` before a toast auto-dismisses, `maxVisibleToasts` before the
+ * stack starts queueing, and the two accessible names — `label` for the region and `closeLabel`
+ * for each toast's dismiss button.
+ */
 export const Playground: Story = {
+  args: {
+    duration: 8000,
+    maxVisibleToasts: 2,
+    label: 'Notifications',
+    closeLabel: 'Dismiss this notification',
+  },
   render: (args) => (
     <ToastProvider {...args}>
       <ToneButtons />

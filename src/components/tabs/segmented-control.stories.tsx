@@ -26,9 +26,16 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Every control live. `label` names the group for assistive tech — give it something specific
+ * when a page holds more than one switcher — and `defaultValue` seeds the uncontrolled case
+ * while `value` drives the controlled one.
+ */
 export const Playground: Story = {
   args: {
-    defaultValue: 'board',
+    defaultValue: 'list',
+    label: 'Task layout',
+    className: 'w-64',
   },
 };
 

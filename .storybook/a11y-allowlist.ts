@@ -94,7 +94,13 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   'components-modal-base--default': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — the story's "Open modal"
   'components-modal-base--wide-variant': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — ditto
   'components-modal-base--alert-dialog': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — the story's "Delete task"
+  // Same story-local "Open modal" trigger as `--default`, via the shared `render`.
+  'components-modal-base--playground': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — the story's trigger
   'components-modal-addtask--default': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — the story's trigger
+  // The `Playground` added for the story-convention check reuses `--default`'s `render`, so it
+  // renders the same story-local trigger and inherits the same accepted pairing. A new story key
+  // needs a new entry because this file is keyed story x rule — not because anything regressed.
+  'components-modal-addtask--playground': TEXT_BUTTON_PRIMARY_CONTRAST, // 1 node — the story's trigger
   // 2 nodes: the story's trigger, plus `AddTaskModal`'s own submit. The submit is exempt in
   // `--default` only because an empty title disables it, and axe skips disabled controls.
   'components-modal-addtask--edit': TEXT_BUTTON_PRIMARY_CONTRAST,
@@ -108,6 +114,9 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   // as the entries above — the palette has no darker red — but note that this one is
   // fixable independently of `TextButton`, by making the story use a passing variant.
   'primitives-floatingpopover--default': { violations: ['color-contrast'] },
+  // `Playground` renders the same `PopoverDemo`, so it draws the same hand-rolled `bg-primary-4`
+  // trigger this section already accepts twice. Not a kit component and not a new finding.
+  'primitives-floatingpopover--playground': { violations: ['color-contrast'] },
   'primitives-floatingpopover--escapes-overflow-hidden-ancestor': {
     violations: ['color-contrast'],
   },
@@ -149,4 +158,7 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   'layout-applicationsidebar--playground': { incomplete: ['color-contrast'] },
   'layout-appshell--dashboard': { incomplete: ['color-contrast'] },
   'layout-appshell--task-default-view': { incomplete: ['color-contrast'] },
+  // `incomplete`, not `violations` — same sidebar label as the two above, which axe cannot
+  // resolve rather than has judged failing. The new `Playground` renders the same shell.
+  'layout-appshell--playground': { incomplete: ['color-contrast'] },
 };

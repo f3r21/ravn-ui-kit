@@ -76,3 +76,18 @@ export const Edit: Story = {
     );
   },
 };
+
+/**
+ * Every control live, including the two #90 added: `copy` for the visible strings, and
+ * `formatDueDate` — which is the one that fixed a *wrong* output rather than an untranslated
+ * one, since the default wrote the US date order for everybody.
+ */
+export const Playground: Story = {
+  args: {
+    defaultTitle: 'Design the empty state',
+    defaultPoints: 4,
+    copy: { submit: 'Add task' },
+    formatDueDate: (d) => `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`,
+  },
+  render: Default.render,
+};

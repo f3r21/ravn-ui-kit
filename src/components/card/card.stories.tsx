@@ -107,14 +107,24 @@ export const Interactive: Story = {
   },
 };
 
+/**
+ * Every control live. `as` switches the rendered element — `article` is what `TaskCard` uses so
+ * a screen reader can navigate to the card — and `isInteractive` reveals the hover border for a
+ * card that is clickable as a whole.
+ */
 export const Playground: Story = {
   args: {
+    as: 'section',
+    isInteractive: true,
+    className: 'w-80',
     children: (
       <>
-        <h4 className="text-body-l font-semibold text-main font-sans">Card title</h4>
-        <p className="text-body-m text-muted font-sans">
-          Explanatory card content within the interface.
-        </p>
+        <Card.Header>
+          <h4 className="text-body-l font-semibold text-main font-sans flex-1">Editable card</h4>
+        </Card.Header>
+        <Card.Body>
+          <p className="text-body-m text-muted font-sans">Change `as` and `isInteractive` above.</p>
+        </Card.Body>
       </>
     ),
   },
