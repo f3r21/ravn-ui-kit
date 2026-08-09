@@ -39,9 +39,10 @@ export interface SelectProps<T extends object> extends AriaSelectProps<T> {
 /**
  * Select
  *
- * The single-value dropdown the app currently hand-rolls in several places
- * (`BoardFiltersBar`'s status/estimate/owner filters, `TaskFormDialog`'s
- * points/assignee/status fields — `MIGRATION_GAPS.md` Section 4). Composes
+ * The single-value dropdown the app hand-rolled before this existed — its
+ * `board-filters.tsx` status/estimate/owner filters and `task-form-dialog.tsx`
+ * points/assignee/status fields both route through this now, via the app's own
+ * `option-select.tsx`. Composes
  * `ListBox` (the option list) and `FloatingPopover` (the portalled, anchored
  * surface) over react-stately's `useSelectState` and react-aria's
  * `useSelect`. Fully generic over item type via `AriaSelectProps<T>`'s own

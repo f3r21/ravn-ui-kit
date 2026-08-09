@@ -58,8 +58,9 @@ export interface TextButtonProps extends AriaButtonProps {
  * draws no error state at all, so that ramp step was a free choice constrained only by
  * contrast. Here it is the brand's own CTA.
  *
- * `contrast.test.ts` asserts the current state so it cannot be mistaken for passing, and
- * `MIGRATION_GAPS.md` tracks it as the open item it is. The **icon** `Button`'s
+ * `contrast.test.ts` asserts the current ratio, so it cannot be mistaken for passing and
+ * a palette change that fixed it would fail that test until the number is updated — which
+ * is the tracking, rather than a note somewhere. The **icon** `Button`'s
  * `variant="primary"` uses the same fill and is *not* affected: an icon is non-text, so
  * 1.4.11's 3:1 applies to it and 3.83:1 clears that.
  */

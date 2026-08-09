@@ -41,8 +41,8 @@ export interface PopoverProps {
    * popover, the same composition a native date input's popup uses) and the
    * `Assignee`/`Estimate`/`Label` pick-one-option lists, none of which
    * implement full `listbox`/`option` semantics (roving tabindex,
-   * `aria-selected`) yet — that's the bigger `ListBox`/`Select` family
-   * tracked separately in `MIGRATION_GAPS.md` Section 4, out of scope here.
+   * `aria-selected`) yet — that is the `ListBox`/`Select`/`MultiSelect`
+   * family, which exists in this kit and is out of scope for this shell.
    * `'dialog'` is the honest role for "a floating region with interactive
    * content and no listbox wiring," not a placeholder for one.
    * @default 'dialog'
@@ -60,10 +60,10 @@ export interface PopoverProps {
  *
  * The shared floating-surface shell behind `DatePickerMenu`, `AssigneeModal`,
  * `EstimateModal`, and `LabelModal` — previously each was an independent
- * plain `<div>` with no `useOverlay`, `FocusScope`, dismissal, or role at all
- * (see `MIGRATION_GAPS.md` Section 2). Those four all anchor to a trigger via
- * plain CSS (`absolute` positioning inside a `relative` wrapper, set by the
- * caller's `className`), not a portal — so this primitive is built on
+ * plain `<div>` with no `useOverlay`, `FocusScope`, dismissal, or role at
+ * all. Those four all anchor to a trigger via plain CSS (`absolute`
+ * positioning inside a `relative` wrapper, set by the caller's `className`),
+ * not a portal — so this primitive is built on
  * react-aria's `useOverlay` + `DismissButton` + `FocusScope` directly rather
  * than `usePopover` (which adds portalling via `Overlay` and floating-ui-style
  * anchored positioning these four don't need). The heavier `usePopover`-based

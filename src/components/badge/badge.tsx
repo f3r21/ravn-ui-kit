@@ -35,8 +35,8 @@ export function Badge({ variant = 'neutral', children, className }: BadgeProps) 
   // green in the palette — `secondary-4`, the closest, manages 2.50:1 on `success-1`. So
   // its label falls back to `neutral-4`, the same colour the `neutral` variant already
   // uses (13.09:1), and the green fill carries the status on its own. That is a palette
-  // gap rather than a component decision, and it is recorded as one in
-  // `MIGRATION_GAPS.md`: the honest fix is a `success-6` from the design.
+  // gap rather than a component decision: the honest fix is a `success-6` from the
+  // design, and until one exists no component-level change can produce it.
   const variants: Record<StatusTone, string> = {
     neutral: 'bg-surface-neutral text-neutral-4 border-subtle',
     success: 'bg-success-1 text-neutral-4 border-success-2',

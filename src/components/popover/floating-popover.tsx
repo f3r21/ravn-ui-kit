@@ -21,9 +21,9 @@ export interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef
  * FloatingPopover
  *
  * A second, deliberately separate popover primitive from `./popover.tsx`'s
- * `Popover` — not a mode flag on it. `Popover` (Section 2 of
- * `MIGRATION_GAPS.md`) is explicitly non-portalled and CSS-anchored
- * (`absolute` inside a `relative` wrapper), which is the right shape for the
+ * `Popover` — not a mode flag on it. `Popover` is explicitly non-portalled
+ * and CSS-anchored (`absolute` inside a `relative` wrapper), which is the
+ * right shape for the
  * modal-shaped popovers it serves (`AssigneeModal`/`EstimateModal`/
  * `LabelModal`/`DatePickerMenu`) but the wrong shape for a dropdown: those
  * anchor inside layout contexts (a filter bar, a table cell) that routinely
