@@ -221,7 +221,7 @@ form misses — narrower where it should be, wider where it should be.
 **It is narrower, not clean, and the honest thing is to say where it still fails.** Because the
 pattern is unanchored it also drops a *code* line whose own content carries `:<digits>: //` —
 `const s = "port:12: //x"` is code and this filter discards it. In this repo that is currently
-theoretical:
+theoretical. Both readings are at `0708a83`, and both drift — re-run rather than quoting them:
 
 ```bash
 git grep -n '' -- 'src/**' | cut -d: -f3- | grep -cE ':[0-9]+: *//'    # 0  ← the residual class
