@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { withSurface } from '../../../.storybook/decorators';
 import { ProjectInfo } from './project-info';
 
@@ -42,5 +43,19 @@ export const LongTitle: Story = {
   args: {
     title: 'A much longer task title that truncates once it runs out of room',
     icon: <ChevronIcon />,
+  },
+};
+
+/**
+ * Every control live: the title, the heading level the outline needs, and the trailing icon
+ * slot. `onTitleClick` turns the title into a real `<button>` — toggle it in the controls panel
+ * and the accessible role changes with it.
+ */
+export const Playground: Story = {
+  args: {
+    title: 'Design the empty state',
+    headingLevel: 2,
+    icon: <ChevronIcon />,
+    onTitleClick: fn(),
   },
 };

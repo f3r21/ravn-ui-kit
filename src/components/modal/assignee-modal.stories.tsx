@@ -36,3 +36,13 @@ export const WithRoles: Story = {
     ],
   },
 };
+
+/**
+ * Every control live, including `label` — the popover's own accessible name, which a page
+ * holding two of these needs so a screen-reader user can tell them apart.
+ */
+export const Playground: Story = {
+  args: {
+    label: 'Assign this task to someone',
+  },
+};

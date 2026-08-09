@@ -97,3 +97,18 @@ export const InsideOverflowHiddenContainer: Story = {
     </div>
   ),
 };
+
+/**
+ * Every control live. `label`, `placeholder`, `isDisabled`, `error` and `description` are the
+ * component's own props and all edit in the controls panel; `items`, `children` and
+ * `selectedKeys` are `control: false` in the meta because they are structures a control cannot
+ * usefully edit, and the demo owns the selection state.
+ */
+export const Playground: Story = {
+  args: {
+    label: 'Labels',
+    placeholder: 'Pick some labels',
+    description: 'Choose as many as apply.',
+  },
+  render: (args) => <MultiSelectDemo {...args} />,
+};

@@ -158,7 +158,23 @@ const meta: Meta<typeof MyComponent> = {
 Stories to include, only where the component actually has the corresponding
 prop/axis (don't force a story that has nothing real to show):
 
-- `Default` and `Playground` — always. `Playground` exposes every control live.
+- **`Playground` — always, and it must differ from every other story in the file.**
+  It has a job: exposing every control live. A `Playground` byte-identical to the
+  story beside it exposes nothing, which is the rule complied with rather than
+  served — seven files were in that state, and `menu.stories.tsx` had
+  `export const Default: Story = {};` and `export const Playground: Story = {};`,
+  both empty.
+- **A canonical example — `Default`, or a descriptive name where that reads better.**
+  This bullet used to say "`Default` and `Playground` — always", which contradicted
+  the preamble directly above it and would have made three deliberate namings into
+  violations: `AppShell` ships `Dashboard`, `Icons` ships `AllIcons`, `ViewSwitcher`
+  ships `LeftSelected`. Those are correct. Do not add a `Default` to them.
+
+  `scripts/stories-compliance.test.mjs` enforces the first bullet and deliberately
+  **not** the second: it asserts `Playground` exists and differs, and never asserts a
+  story named `Default`. A test freezes whichever reading it encodes, so the rejected
+  alternative is recorded there too.
+
 - `Variants` — only if there's a real variant-like union prop; render all
   values side by side.
 - `Sizes` — only if there's a real size union prop; same pattern.

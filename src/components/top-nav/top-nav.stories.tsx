@@ -31,9 +31,22 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Every control live, including the four accessible names the stories above leave at their
+ * defaults: `searchLabel`, `clearSearchLabel` and `notificationsLabel`.
+ *
+ * This story used to be byte-identical to `NoUser` — which is why the compliance check compares
+ * `Playground` against *every* story rather than against `Default`. It differed from `Default`
+ * and duplicated a story further down, so a narrower check reported it compliant.
+ */
 export const Playground: Story = {
   args: {
-    searchPlaceholder: 'Search...',
+    searchPlaceholder: 'Search tasks, projects…',
+    searchValue: 'wireframe',
+    userName: 'Amelia Nellson',
+    searchLabel: 'Search the workspace',
+    clearSearchLabel: 'Clear the search box',
+    notificationsLabel: 'Notifications, 3 unread',
   },
 };
 

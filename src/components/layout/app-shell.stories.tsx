@@ -237,3 +237,18 @@ export const NoSidebar: Story = {
     children: <TaskListView title="Working (01)" tasks={[{ title: 'Fix auth bug' }]} />,
   },
 };
+
+/**
+ * Every control live. `logo`, `sidebarItems` and `topNavProps` seed the shell from the meta;
+ * `className` and the `topNavProps` object edit in the controls panel. The three slot props
+ * (`sidebar`, `topNav`, `topBar`) replace whole regions and are exercised by the stories above
+ * rather than here — a slot is a component, not a value a control can type.
+ */
+export const Playground: Story = {
+  args: {
+    topNavProps: { searchPlaceholder: 'Search everything…', userName: 'Amelia Nellson' },
+    children: (
+      <div className="p-8 text-body-m text-main font-sans">Your page content goes here.</div>
+    ),
+  },
+};

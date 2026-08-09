@@ -65,3 +65,13 @@ export const EscapesOverflowHiddenAncestor: Story = {
     </div>
   ),
 };
+
+/**
+ * Every control live. `state` is an `OverlayTriggerState` and `popoverRef` is a ref, so
+ * `className` is the only prop a control can edit — the demo below owns the trigger and the
+ * state, which is how this component is always used.
+ */
+export const Playground: Story = {
+  render: () => <PopoverDemo />,
+  args: { className: 'min-w-56' },
+};

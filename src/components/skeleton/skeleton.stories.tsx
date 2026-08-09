@@ -48,3 +48,13 @@ export const Card: Story = {
     </div>
   ),
 };
+
+/**
+ * `className` is the whole API — the component draws one shimmering block and every shape in the
+ * stories above is that block sized differently. Edit it live here.
+ */
+export const Playground: Story = {
+  args: {
+    className: 'h-6 w-64 rounded',
+  },
+};

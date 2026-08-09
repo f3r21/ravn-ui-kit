@@ -27,3 +27,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {},
 };
+
+/**
+ * Every control live, including `label` — the popover's own accessible name, which a page
+ * holding more than one of these needs in order to tell them apart.
+ */
+export const Playground: Story = {
+  args: {
+    label: 'Choose a label for this task',
+  },
+};

@@ -53,3 +53,14 @@ export const Default: Story = {
 export const MultipleSelection: Story = {
   render: () => <ListBoxDemo selectionMode="multiple" />,
 };
+
+/**
+ * Every control live — which for this component is a short list, and saying so is the point.
+ * `state` comes from `useListState` and `listBoxRef` is a ref, so `className` is the only prop a
+ * control can edit. `selectionMode` below belongs to the demo wrapper rather than to `ListBox`,
+ * and is exposed here because it is the axis a reader actually wants to try.
+ */
+export const Playground: Story = {
+  render: () => <ListBoxDemo selectionMode="multiple" />,
+  args: { className: 'w-64' },
+};

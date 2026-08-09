@@ -102,3 +102,17 @@ export const Decorative: Story = {
     ],
   },
 };
+
+/**
+ * Every control live. `badges` is the whole API — edit the array in the controls panel to see a
+ * count-only badge, an icon-only one, and the `decorative` arm side by side.
+ */
+export const Playground: Story = {
+  args: {
+    badges: [
+      { icon: <AttachmentIcon />, label: 'Has attachments' },
+      { icon: <SubtaskIcon />, count: 5, label: '5 subtasks' },
+      { icon: <CommentIcon />, count: 12, decorative: true },
+    ],
+  },
+};

@@ -54,11 +54,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Playground: Story = {};
-
-export const Disabled: Story = {
+/**
+ * Every control live. `label` is the trigger's accessible name — a page of these otherwise
+ * offers a screen-reader user a list of identical "options" buttons — and `isDisabled` and
+ * `triggerClassName` are the other two props the component declares.
+ */
+export const Playground: Story = {
   args: {
-    isDisabled: true,
+    label: 'Task options for Create wireframe',
+    isDisabled: false,
+    triggerClassName: 'w-8 h-8 rounded-sm inline-flex items-center justify-center text-main',
   },
 };
 

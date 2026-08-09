@@ -67,3 +67,19 @@ export const AlertDialog: Story = {
     );
   },
 };
+
+/**
+ * Every control live: the title, the width override, `role` — which switches the dialog to an
+ * `alertdialog` for a destructive confirmation — `isDismissable`, and `closeLabel`, the close
+ * button's accessible name.
+ */
+export const Playground: Story = {
+  args: {
+    title: 'Modal title',
+    width: 'w-[520px]',
+    role: 'dialog',
+    isDismissable: true,
+    closeLabel: 'Close this dialog',
+  },
+  render: Default.render,
+};
