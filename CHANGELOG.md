@@ -52,6 +52,40 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   placed ahead of irreplaceable ones converts its own wrongness into their silence. It stays
   blocking; last-and-blocking costs nothing when right and only itself when wrong.
 
+### Changed
+
+- **BREAKING: `Card` now renders the kit's own card surface, and gains `Header`/`Body`/`Footer`**
+  (#98).
+
+  `Card` rendered **a white card** — `bg-surface-neutral` resolves to `#ffffff`, measured at
+  `rgb(255, 255, 255)` with a 24px radius by reading computed style on its own story — in a kit
+  whose every other surface is neutral-4 or neutral-5. It was scaffolding from `f0b1445`
+  ("initialize repo, snapshot pre-refactor baseline"), predating the Figma work, and it survived
+  because nothing rendered it.
+
+  It now renders `bg-surface-panel rounded-sm p-4` — `#2C2F33` / 8px / 16px, which
+  `Cards01.md L246` pins for "Task Card". Nothing in the exports backed the old values: the only
+  `border-radius: 24px` in the card files sits on an element filled `#DA584B`, a red chip.
+
+  **`TaskCard` composes `Card` instead of restating its chrome**, which is #15's actual
+  complaint — two card surfaces that could drift apart independently. They now cannot, and
+  `card.test.tsx` compares the two **against each other** rather than pinning each to a literal.
+
+  **New:** `Card.Header`, `Card.Body`, `Card.Footer`, plus `as` (`div`/`article`/`section`/`li`)
+  and `isInteractive`. The header is deliberately **not** a heading — a card's heading level
+  depends on the page it sits in.
+
+  **Migration.** If you rendered `Card` and relied on the white surface, pass
+  `className="bg-surface-neutral rounded-lg p-5"` to restore it exactly. Measured at the time of
+  writing, **no consumer did** — the app imports `TextButton`, `CloseIcon`, `Menu`, `Modal`,
+  `MultiSelect` and `Select`:
+
+  ```bash
+  grep -rn "from '@ravn/ui-kit'" src/     # in ravn-task-management-challenge
+  ```
+
+  That is a claim with a date on it. Re-run the command rather than trusting it.
+
 ### Added
 
 - **`TaskTable.columns` — the column schema is no longer frozen** (#97). Additive; omitted, the

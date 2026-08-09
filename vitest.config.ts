@@ -108,11 +108,19 @@ export default defineConfig({
       // Then #92 gave due-date urgency a spoken state, adding `DueDateUrgencyState` plus 18
       // cases across `TaskCard` and `TaskTable`. 94.02 -> 94.33, branches 90.90 -> 91.30.
       //
-      // Then #97 replaced the frozen column schema with a `columns` prop, adding 11 cases. The
-      // jump is large — 95.91 -> 97.56 — and most of it is deletion rather than new tests: five
-      // hardcoded `<td>`s in the row and five more in the skeleton became one map each, so the
-      // denominator fell as the numerator rose. A ratchet reading a big rise should be checked
-      // for exactly that; here it is real, and `npm run gate` on the tree is the check.
+      // Then #98 repainted `Card` onto the kit's own surface and had `TaskCard` compose it
+      // instead of restating the chrome, adding 11 cases in `Card`'s first test file.
+      //
+      // **Neither branch's numbers survive the merge, and neither dominates the other.** #97
+      // alone read 97.56/93.10/91.33 and #98 alone read 96.39/93.02/91.39 — #98 is *higher* on
+      // functions and lower on the other three. So even the per-column maximum is a guess here,
+      // which is the sharpest form of the hazard #95/#102 record below: it passes the gate while
+      // silently loosening the ratchet. Re-derived on the tree that has both.
+      //
+      // Then #97 replaced the frozen column schema with a `columns` prop, adding 11 cases. Its
+      // jump was large mostly because of deletion rather than new tests: five hardcoded `<td>`s
+      // in the row and five more in the skeleton became one map each, so the denominator fell as
+      // the numerator rose. A ratchet reading a big rise should be checked for exactly that.
       //
       // Then #90 made the kit's remaining visible copy overridable — `AddTaskModal.copy` and
       // `formatDueDate`, `DatePickerMenu.todayLabel`, `TaskTableRow.detailsLabel`,
@@ -162,10 +170,10 @@ export default defineConfig({
       // losing a single covered unit fails every one:
       //
       //   metric       covered    margin        one fewer     verdict
-      //   statements   2766/2835  0.006138pp    97.530864     FAIL
-      //   branches      459/493   0.003448pp    92.900609     FAIL
-      //   functions     137/150   0.003333pp    90.666667     FAIL
-      //   lines        2766/2835  0.006138pp    97.530864     FAIL
+      //   statements   2816/2873  0.006011pp    97.981204     FAIL
+      //   branches      464/497   0.000161pp    93.158954     FAIL
+      //   functions     141/153   0.006863pp    91.503268     FAIL
+      //   lines        2816/2873  0.006011pp    97.981204     FAIL
       //
       // Compute that table, do not transcribe it. Three of these margins were hand-copied
       // from a terminal across #92 and #15 and three were wrong the same way — a dropped
@@ -204,10 +212,10 @@ export default defineConfig({
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
       thresholds: {
-        statements: 97.56,
-        branches: 93.1,
-        functions: 91.33,
-        lines: 97.56,
+        statements: 98.01,
+        branches: 93.36,
+        functions: 92.15,
+        lines: 98.01,
       },
     },
   },
