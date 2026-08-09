@@ -193,8 +193,25 @@ or an arrow:
 
 ```markdown
 - 527 tests, 33 files — `out=$(npm run gate 2>&1); rc=$?; echo "$out" | grep -E 'Test Files|Tests  '`
-- `grep -rn "forwardRef" src/` → 0 hits
+- `grep -rn "forwardRef" src/ | grep -v ': *//'` → 0 hits
 ```
+
+**Both lines above are examples of the format, not current figures** — the test count moves every
+time the suite does, and quoting it here would make this file a second source competing with the
+gate. Run the command; do not read the number.
+
+**The second example acquired a comment filter, and the reason is the point.** It used to read
+`grep -rn "forwardRef" src/` → 0 hits. That command now returns **2** — because
+`view-switcher.tsx:68-69` carries a comment explaining that no component forwards a ref, and
+**quotes the grep and its result.** Writing the zero down created a non-zero.
+
+The substance never changed: with comment lines excluded the answer is still 0, and the control is
+that the same exclusion leaves `useState` at 24 rather than blinding the probe. But by this file's
+own rule, a command returning something other than its figure is **worse than no command, because
+the number then looks checked** — so the command had to change, not the claim.
+
+**This is self-contamination** (volume III §D1, §F): a probe that searches text can find the prose
+describing it. Any figure quoted inside the code it measures will do this eventually.
 
 A lane meeting a bare number decides whether to trust it. A lane meeting a number and its command
 runs the command. `file.tsx:48` citations and `#23` references need nothing — everything else

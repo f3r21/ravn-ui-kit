@@ -19,8 +19,14 @@ This package is not on any registry — `npm install @ravn/ui-kit` resolves to s
 else entirely. Install it from this repository, pinned to a tag:
 
 ```bash
-npm install github:f3r21/ravn-ui-kit#v0.4.0
+# Pick a released tag. The latest is:
+#   gh release list -R f3r21/ravn-ui-kit --limit 1
+npm install github:f3r21/ravn-ui-kit#<tag>
 ```
+
+The tag is deliberately not written out here. This line named `v0.4.0` for three releases after
+that stopped being current, and the same string went stale in three other files at the same time —
+a version in prose has no way to notice it has been superseded.
 
 The repository is public, so this clones anonymously: no token, no `.npmrc`, nothing to
 configure in CI. Pin a **tag**, not a branch — a branch reference re-resolves on every
