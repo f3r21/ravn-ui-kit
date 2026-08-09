@@ -193,7 +193,7 @@ or an arrow:
 
 ```markdown
 - 527 tests, 33 files — `out=$(npm run gate 2>&1); rc=$?; echo "$out" | grep -E 'Test Files|Tests  '`
-- `grep -rn "forwardRef" src/ | grep -v ': *//'` → 0 hits
+- `grep -rn "forwardRef" src/ | grep -vE ':[0-9]+: *(//|\*)'` → 0 hits
 ```
 
 **Both lines above are examples of the format, not current figures** — the test count moves every
@@ -209,6 +209,14 @@ The substance never changed: with comment lines excluded the answer is still 0, 
 that the same exclusion leaves `useState` at 24 rather than blinding the probe. But by this file's
 own rule, a command returning something other than its figure is **worse than no command, because
 the number then looks checked** — so the command had to change, not the claim.
+
+**The filter is line-anchored on purpose.** The obvious spelling, `grep -v ': *//'`, also
+matches every URL scheme — at `origin/main` it drops **6 lines of real code**, including
+`avatar.stories.tsx`'s `xmlns="http://www.w3.org/2000/svg"`. The figure is unaffected today
+because no `forwardRef` hit sits on a URL line, but installing that as this file's exemplar of a
+correctly-scoped command would be the defect the section warns about. `:[0-9]+:` anchors to the
+`grep -n` line prefix, and `\*` additionally catches block-comment continuation lines the simpler
+form misses — narrower where it should be, wider where it should be.
 
 **This is self-contamination** (volume III §D1, §F): a probe that searches text can find the prose
 describing it. Any figure quoted inside the code it measures will do this eventually.
