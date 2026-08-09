@@ -4,10 +4,15 @@ name: Tag check
 #
 # `release.yml` (#57) is the preventive half: it verifies everything and then cuts the tag
 # itself. This is the detective half, and it exists for the one case that workflow structurally
-# cannot intercept — someone running `git tag v0.6.0 && git push origin v0.6.0` from a laptop.
-# That still works and will keep working until #59's `v*` ruleset lands:
-#   gh api repos/f3r21/ravn-ui-kit/rulesets -q length   -> 0
-#   (control: the consuming app returns 1, so the query works)
+# cannot intercept — someone running `git tag v0.8.0 && git push origin v0.8.0` from a laptop.
+# That still works. A `v*` ruleset now exists, and it does NOT close this:
+#   gh api repos/f3r21/ravn-ui-kit/rulesets -q length          -> 1
+#   id=$(gh api repos/f3r21/ravn-ui-kit/rulesets -q '.[0].id')
+#   gh api "repos/f3r21/ravn-ui-kit/rulesets/$id" -q '[.rules[].type]'  -> ["update","deletion"]
+#   (control: the consuming app also returns 1, so the query reads)
+# `update` and `deletion` forbid moving and removing a published tag; neither forbids creating
+# one. So this job is still the only thing standing between a hand-cut tag and nobody noticing,
+# and #59 stays open — its title, "no rulesets on v*", is the part that has gone stale.
 #
 # `on: push: tags:` is the only trigger that cannot be skipped, because it fires on the ref
 # existing rather than on anyone remembering to invoke it. That is the whole argument: `v0.5.0`
@@ -29,6 +34,15 @@ name: Tag check
 # **A tag is not a release until this is green.** That is the half that matters: it converts an
 # immutable mistake into a revocable one. `v0.5.0` was deletable precisely because it was caught
 # before anything consumed it.
+#
+# **The remedy is narrower than it was, and that is worth knowing before relying on it.** The
+# `deletion` rule above now blocks removing a `v*` tag, so "delete it and re-cut" is no longer
+# available to everyone — one repository role holds `bypass_mode: always` and can still do it:
+#   gh api "repos/f3r21/ravn-ui-kit/rulesets/$id" -q '.bypass_actors'
+# So a bad hand-cut tag is still revocable, but only by that actor. For anyone else the failure
+# this job reports is now the whole remedy: mark it not-a-release and cut the next patch.
+# (#100 is the case that made this concrete — `v0.5.0` was deleted with no record of by whom,
+# which is exactly what the rule now prevents.)
 
 on:
   push:
