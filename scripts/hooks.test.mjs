@@ -146,7 +146,25 @@ describe('block-dangerous.sh (PreToolUse: Bash)', () => {
   });
 });
 
-describe('format-file.sh (PostToolUse: Edit|Write)', () => {
+/**
+ * These cases spawn a **real Prettier process** each, which is the whole point — the hook they
+ * exercise shells out, and mocking that would test a different program. It is also why they are
+ * the two that fail under machine load while nothing else does (#63).
+ *
+ * Measured on one machine, idle against load average ~78 with six concurrent suites:
+ *
+ *   idle        614ms / 356ms
+ *   under load  5965ms / 6125ms   -> both exceeded the 5000ms default
+ *
+ * 20000ms is ~32x the slower case's idle time, and it is an allowance rather than a removal:
+ * the file's whole idle runtime is about a second, so a case that genuinely hangs still fails,
+ * in 20s instead of 5. That distinction is the point — a bound raised until nothing ever fails
+ * is a deleted bound wearing a number, and `hangs and is caught` is pinned by a test below.
+ *
+ * The suite-wide `testTimeout` in `vitest.config.ts` is deliberately left at 5000ms so the
+ * other ~800 tests keep the tight bound. Do not move this number to fix a different test.
+ */
+describe('format-file.sh (PostToolUse: Edit|Write)', { timeout: 20000 }, () => {
   // Outside the repo on purpose: it doubles as the fixture for the
   // CLAUDE_PROJECT_DIR guard, and a stray unformatted file inside the tree
   // would be caught by `format:check` rather than by the assertion.

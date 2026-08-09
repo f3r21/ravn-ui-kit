@@ -7,6 +7,28 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
+    /**
+     * Vitest's own default, **written down** (#63).
+     *
+     * It was undeclared, so a lane meeting `Test timed out in 5000ms` had nothing in the repo
+     * to read: no number to weigh their test against and no statement that 5s is deliberate.
+     * The value is unchanged — this is the bound becoming visible, not a bump.
+     *
+     * **It is deliberately not raised globally.** Five tests failed under load and the honest
+     * fix is a declared allowance on the two that do genuinely slow work, not a suite-wide
+     * number chosen until nothing fails. A global raise is indistinguishable from removing the
+     * bound for the other 799 tests, and that difference only shows up the day one really hangs.
+     *
+     * Measured on this machine at load average ~78 (six concurrent suites), against idle:
+     *
+     *   scripts/hooks.test.mjs        614ms / 356ms idle  ->  5965ms / 6125ms  FAILED
+     *   datepicker navigation/tz   108/84/47ms idle       ->  1574/1302/828ms  passed
+     *
+     * The two that fail spawn a real Prettier process per case; the datepicker cases are pure
+     * in-process work and keep 3x headroom even under that load. So the allowance goes on the
+     * process-spawning file only — see the `describe` in `scripts/hooks.test.mjs`.
+     */
+    testTimeout: 5000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary'],

@@ -10,6 +10,31 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Two tests failed under machine load at an undeclared 5000ms timeout** (#63). Test config
+  only; no shipped code, `dist/` byte-identical. **Patch.**
+
+  `testTimeout` is now **declared** in `vitest.config.ts` at its existing 5000ms — the value is
+  unchanged; the bound is simply written down, so a lane meeting `Test timed out in 5000ms` has
+  something in the repo to read.
+
+  The two cases in `scripts/hooks.test.mjs` that spawn a real Prettier process get a declared
+  `{ timeout: 20000 }` on their `describe`, sized from measurement rather than raised until
+  nothing failed:
+
+  |                                  | idle            | at load avg ~78              |
+  | -------------------------------- | --------------- | ---------------------------- |
+  | the two hook cases               | 614ms / 356ms   | **5965ms / 6125ms** — failed |
+  | datepicker navigation / timeZone | 108 / 84 / 47ms | 1574 / 1302 / 828ms — passed |
+
+  **Not raised globally**, deliberately: the other ~790 tests keep the tight bound, and a
+  suite-wide raise is indistinguishable from removing it for them.
+
+  Proven to change the reproduction, which a timeout fix otherwise cannot claim — at comparable
+  load the previously-failing case now takes **5213ms**, above the old bound and below the new
+  one. And proven still to be a bound: a deliberately hanging test fails in **20011ms**.
+
+### Fixed
+
 - **`release.yml` and `CLAUDE.md` both claimed `v0.5.0` was left in place; it does not exist**
   (#100). Documentation only; no shipped code, `dist/` byte-identical. **Patch.**
 
