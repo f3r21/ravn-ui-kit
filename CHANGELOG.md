@@ -37,7 +37,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
   **Six mentions in released `CHANGELOG.md` sections are left alone**, on purpose — those are a
   record of what was written at the time, not live citations, and editing a released section
-  would make the history false. None are in `[Unreleased]`.
+  would make the history false.
+
+  This entry names the files too, and so does its re-derivation command above. That is the
+  point of the distinction rather than an exception to it: **the defect is a citation offered as
+  retrievable authority, not the string appearing anywhere.** `CHANGELOG.md` ships in no
+  artifact, and a changelog describing which citations were removed has to name them.
 
 ### Fixed
 
