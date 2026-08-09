@@ -218,6 +218,27 @@ correctly-scoped command would be the defect the section warns about. `:[0-9]+:`
 `grep -n` line prefix, and `\*` additionally catches block-comment continuation lines the simpler
 form misses — narrower where it should be, wider where it should be.
 
+**It is narrower, not clean, and the honest thing is to say where it still fails.** Because the
+pattern is unanchored it also drops a *code* line whose own content carries `:<digits>: //` —
+`const s = "port:12: //x"` is code and this filter discards it. In this repo that is currently
+theoretical:
+
+```bash
+git grep -n '' -- 'src/**' | cut -d: -f3- | grep -cE ':[0-9]+: *//'    # 0  ← the residual class
+git grep -n '' -- 'src/**' | cut -d: -f3- | grep -cE '^[[:space:]]*//'  # 997 ← control: it reads
+```
+
+A fully content-anchored spelling exists — `… | cut -d: -f3- | grep -vE '^[[:space:]]*(//|\*)'` —
+and no content shape defeats it. It is **not** the exemplar here, for two reasons worth more than
+the class it closes: it discards the `path:line` prefix, so the figure can no longer be followed
+to the hits it counts, and `cut -d: -f3-` reintroduces an assumption about colons in filenames
+that the unanchored form does not make. Trading a named limit for an unnamed one is not progress.
+
+**Naming the limit beside the figure is this section's own prescription**, not a concession to
+laziness: *prefer a spelling that can fail, and if only a silent one exists, say so beside the
+figure.* A residual class measured at 0, with the control that proves the measurement reads, is
+what that instruction asks for.
+
 **This is self-contamination** (volume III §D1, §F): a probe that searches text can find the prose
 describing it. Any figure quoted inside the code it measures will do this eventually.
 
