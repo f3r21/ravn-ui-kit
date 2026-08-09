@@ -8,6 +8,101 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **The prop surface is measurable now, and the two scripts that measure it are tested.**
+  Repo tooling only; nothing ships and `dist/` is unchanged. **Patch.**
+
+  `scripts/prop-surface.mjs` resolves the public API through the TypeScript checker and splits
+  every prop by where it is _declared_: 307 the kit declares in `src/` against 1408 it inherits
+  from `node_modules`, across 49 components, with the 21 icons reported apart because each takes
+  `React.SVGProps<SVGSVGElement>` and inherits 488 props on its own —
+  `node scripts/prop-surface.mjs`.
+
+  That split is the point rather than a presentation choice. A prop the kit declares is one it
+  owns and could remove; a prop it inherits arrives whether anyone decided anything or not, and
+  `ButtonProps extends AriaButtonProps` brings 38 with it that no regex over the interface body
+  will ever find — `node scripts/prop-surface.mjs --by-component | grep ' Button '`. Counting
+  the two together answers no question worth asking, which is how an audit came to report "302
+  props across 46 components": both readings were correct when taken, at `fa451a7` and `9ab508e`,
+  and `6bc133f` moved them to 307 and 49 in a single commit.
+
+  `scripts/consumer-prop-usage.mjs` is the other half — which of those props the sole consumer
+  actually passes, parsed out of a checkout of the app rather than guessed. **Its figures are not
+  reproducible from this repo alone** and the script's own header says so: the answer depends on
+  which app ref you point it at, so a figure taken from it has to name one.
+
+  Both are driven by `scripts/prop-surface.test.mjs`, which Vitest collects, so they run inside
+  `npm run gate`. That is the point of it existing: `.claude/hooks/` shipped inert for a release
+  and a line-based story probe reported six broken files where seven were, and both exited 0. So
+  the classifier is asserted in both directions — `Button` declares `variant` and inherits
+  `onPress`, `Tag` inherits nothing at all — and a separate case fails if the classifier collapses
+  everything into one bucket, which the direction checks alone cannot see. Sabotaged five ways
+  before being trusted; each one failed the cases it should and no others.
+
+  One of those five found a case with no teeth. `ignores identically-named imports from other
+packages` asserted that `Button` did not carry `'ignored'` from
+  `<Other variant="ignored" />` — but `'ignored'` is the attribute's _value_ and `variant` its
+  name, so it tested for a string the script cannot emit and passed with the package filter
+  deleted. The fixture prop is now named `fromAnotherPackage`, which nothing else can produce.
+  Recorded because a control aimed at a value the instrument never reports is indistinguishable
+  from a working one until something breaks.
+
+  Three defects a second session found in the first version, all fixed here, and all failing in the
+  same direction — **toward "unused"**, which is the direction #129's argument runs and so the one
+  bias this instrument must not have:
+
+  - **Compound components were unjoinable.** `card.tsx:120-122` ships `Card.Header = CardHeader`,
+    so a consumer writes `<Card.Header>` while the module export is `CardHeader`. The join between
+    the two scripts is exact-match, so a consumer using the `Card` API v0.8.0 shipped would have
+    had every sub-component counted as never imported. `prop-surface.mjs` now emits a `names` array
+    per component carrying the dotted forms alongside the export name.
+  - **Type-only imports counted as components.** `import type { AccentColor }` cannot receive a
+    prop. Five of the app's imports are types, so the headline read 31 where 26 value exports are
+    imported. Both spellings are now skipped, and `ImportClause.isTypeOnly` is read alongside
+    TypeScript 5.9's replacement `phaseModifier`, since a silently-false read lets them back in.
+  - **Namespace imports were silently invisible.** `import * as Kit` makes every `<Kit.Button>`
+    unseeable by a syntax-only walk. Following it needs a type checker, which this script
+    deliberately does not use, so the blind spot is now **loud** — `unfollowableImports()` reports
+    it and the CLI warns on stderr.
+
+  That last one immediately fired on the real app, and was wrong to: its only `import * as` is
+  `import type * as UiKit` (`board-render-cost.test.tsx:8`), which renders nothing. A warning that
+  is wrong on the single instance in the corpus is worse than no warning, so type-only namespace
+  imports are excluded and a case pins it.
+
+  **None of #129's substantive figures moved** — 49 components, 307 declared props, 35 of 49 never
+  imported carrying 211, 42 props passed. The compound defect was latent because the app uses no
+  `Card`, which is exactly why it was worth fixing before a consumer adopts one.
+
+  A second review round then found the sharpest defect of the three, in the fix for the previous
+  round: **the two shape assertions could not fail.** They asserted that no component has an
+  overload or a union props type, and their control asserted `signatures >= 1` — so hardcoding
+  `{signatures: 1, propsIsUnion: false}` left the whole suite green, control included, because
+  `1 >= 1`. The check could not tell "probed all 49 and found none" from "reports none
+  unconditionally", which is the same defect the instrument exists to argue about, one level up.
+
+  The kit contains neither shape, so only a fixture can prove the probe sees them: a temp project
+  with an overloaded component and a union-props one, asserted to be **detected**, plus a plain
+  component asserted to trip neither. The fourth case is the one worth reading — it shows the
+  union really does undercount, reading **1** declared prop where the component accepts three,
+  because `getPropertiesOfType` on a union returns only the properties common to every member.
+  That is the failure being guarded against, measured instead of described.
+
+  Two smaller ones from the same round, both on the seam between the library and its published
+  commands, which is where a library-level fix stops travelling:
+
+  - `--props` emitted only the undotted name, so a shell join over it stayed exact-match. It now
+    carries a fourth column with every name a consumer can render the component as — appended, so
+    the row count stays 307 and existing `awk` forms keep working.
+  - The unfollowable-import warning was inside the human-readable branch, so it was absent from
+    `--json` — **the mode every join calls.** Moved above the branch; it is stderr and cannot
+    corrupt the JSON on stdout, and a case now drives the CLI rather than the function, because
+    the defect was the placement and a unit test on the function passes either way.
+
+  Written for #129, which uses these figures to decide whether the prop surface should be cut
+  before #11, #14 and #16 rewrite it. No component, prop, story or token changed.
+
 ## [0.8.0] - 2026-08-09
 
 ### Fixed
