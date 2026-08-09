@@ -8,6 +8,51 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Node floor is declared and enforced instead of satisfied by luck** (#132). Repo tooling
+  only; nothing ships, `dist/` is unchanged and no consumer is affected — npm never publishes
+  `.npmrc` and `files` is `["dist"]` besides. **Patch.**
+
+  `npm warn EBADENGINE` is advisory: npm prints it, installs anyway and exits 0. So a Node the
+  dependencies refuse was indistinguishable from a supported one, and `npm run gate` was green on
+  both. The jsdom 26 → 30 bump made it concrete — jsdom 30 requires
+  `^22.22.2 || ^24.15.0 || >=26.0.0` where 26 required `>=18` — and its own CI run is the cleanest
+  demonstration the repo will get: **CI at v22.23.1 emitted zero warnings, a local v22.17.0 emitted
+  ten, and both exited 0** with the same lockfile and the same green gate.
+
+  Two changes, and they work together:
+
+  - **`.nvmrc` pins `22.23.1`** instead of a floating `22`. A bare major resolves to whatever 22.x
+    a runner has cached, so _which_ Node CI used was decided by the cache rather than by this repo.
+    Three consecutive green runs resolved v22.23.1 — that was luck holding, not a guarantee, and
+    v22.0.0 through v22.22.1 are all legitimate readings of `22` that jsdom 30 rejects.
+  - **`.npmrc` sets `engine-strict=true`**, which makes EBADENGINE fatal. This is the load-bearing
+    half: without it the pin is a suggestion.
+
+  **`package.json` still declares no `engines`, deliberately, and a case pins that** so it is not
+  "fixed" without reading #132. `engine-strict` already enforces every dependency's own range,
+  derived from the installed tree. A hand-written `engines.node` beside it is a second source for
+  the same fact, and the two drift the moment a dependency raises its floor — which is exactly what
+  jsdom 30 just did. A version range with no derivation behind it is the same defect as a figure
+  with no command behind it.
+
+  **This is a breaking change for a local checkout, not for a consumer.** On a Node below the floor
+  `npm ci` now fails where it used to warn — which is the fix, and the pin is the remedy:
+  `nvm install` reads `.nvmrc`. Worth stating plainly that the suite currently _passes_ on a
+  below-floor Node (910 tests green on v22.17.0 with jsdom 30), so the floor is jsdom's declaration
+  rather than an observed break; the point is that nothing could tell the two apart.
+
+  `scripts/node-floor.test.mjs` proves the mechanism can fail rather than asserting a version:
+  an impossible floor exits non-zero under `engine-strict`, a satisfiable one exits 0, and the same
+  impossible floor exits **0** with the setting off — the defect itself, reproduced as a control.
+
+  That third arm is also how a second finding surfaced: npm exports config to spawned processes as
+  `npm_config_*`, and env outranks a project `.npmrc`, so the setting reached the fixture through
+  `npm run gate` → vitest → `npm install` and the off-arm measured 1 where a bare shell measures 0.
+  The helper now strips the key. Recorded in `.npmrc` because it means the guard is **wider** than
+  that file appears to set, and nobody would learn it from reading the file.
+
 ## [0.8.0] - 2026-08-09
 
 ### Fixed
