@@ -76,8 +76,10 @@ export function measure(root = process.cwd()) {
   };
 
   const components = [];
+  const symbolOf = new Map();
   for (const sym of checker.getExportsOfModule(moduleSymbol)) {
     if (!isComponent(sym)) continue;
+    symbolOf.set(sym.getName(), sym);
     const propsType = propsTypeOf(sym);
     const props = (propsType ? checker.getPropertiesOfType(propsType) : []).map((p) => {
       const d = p.declarations?.[0];
@@ -91,12 +93,38 @@ export function measure(root = process.cwd()) {
     components.push({
       name: sym.getName(),
       file: relative(root, declFile),
+      names: [sym.getName()],
       declared: props.filter((p) => p.origin === 'declared'),
       inherited: props.filter((p) => p.origin === 'inherited'),
       total: props.length,
       props,
     });
   }
+
+  // Compound components are addressable two ways and a consumer will use the dotted one.
+  // `card.tsx:120-122` does `Card.Header = CardHeader`, and the comment there says why: "so a
+  // consumer composes `Card.Header` rather than importing four names". A consumer's source
+  // therefore says `<Card.Header>`, while this script's export name is `CardHeader` — and any
+  // join between the two is exact-match, so the sub-component reads as never imported and its
+  // props as never passed. That biases toward "unused", which is precisely the direction #129's
+  // argument runs, so it is the one bias this instrument must not have.
+  for (const [parentName, parentSym] of symbolOf) {
+    const decl = parentSym.valueDeclaration ?? parentSym.declarations[0];
+    for (const staticProp of checker.getTypeOfSymbolAtLocation(parentSym, decl).getProperties()) {
+      if (!/^[A-Z]/.test(staticProp.getName())) continue;
+      const target = staticProp.declarations?.[0];
+      if (!target) continue;
+      // Resolve what the static was assigned — `Card.Header = CardHeader` makes `Header`'s
+      // declaration the assignment, whose initializer names the component.
+      const init = ts.isBinaryExpression(target.parent) ? target.parent.right : null;
+      const targetName = init && ts.isIdentifier(init) ? init.text : null;
+      const child = components.find((c) => c.name === targetName);
+      if (!child) continue;
+      const dotted = `${parentName}.${staticProp.getName()}`;
+      if (!child.names.includes(dotted)) child.names.push(dotted);
+    }
+  }
+
   components.sort((a, b) => a.name.localeCompare(b.name));
 
   const sum = (list, key) => list.reduce((n, c) => n + c[key].length, 0);

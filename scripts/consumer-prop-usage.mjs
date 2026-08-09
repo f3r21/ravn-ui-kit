@@ -34,19 +34,68 @@ function sourceFiles(dir, out = []) {
   return out;
 }
 
-/** local JSX identifier -> the kit's own exported name, for `import { Foo as Bar }`. */
+/**
+ * `import type { X }` — TypeScript 5.9 replaced `ImportClause.isTypeOnly` with a `phaseModifier`
+ * carrying `type` or `defer`, and deprecated the boolean. Both spellings are read so this keeps
+ * working either side of that change; a silently-false read here would let type imports back in.
+ */
+const isTypeOnlyClause = (clause) =>
+  clause?.phaseModifier === ts.SyntaxKind.TypeKeyword || clause?.isTypeOnly === true;
+
+/**
+ * local JSX identifier -> the kit's own exported name, for `import { Foo as Bar }`.
+ *
+ * Type-only imports are skipped: a type cannot receive a prop, so counting `import type
+ * { AccentColor }` as an imported component overstates how much of the kit the app renders.
+ */
 function kitImports(sf) {
   const aliasToKit = new Map();
   sf.forEachChild((node) => {
     if (!ts.isImportDeclaration(node)) return;
     if (!ts.isStringLiteral(node.moduleSpecifier)) return;
     if (node.moduleSpecifier.text !== PACKAGE) return;
+    if (isTypeOnlyClause(node.importClause)) return; // `import type { X } from ...`
     const named = node.importClause?.namedBindings;
     if (named && ts.isNamedImports(named))
-      for (const el of named.elements)
+      for (const el of named.elements) {
+        if (el.isTypeOnly) continue; // `import { type X } from ...`
         aliasToKit.set(el.name.text, (el.propertyName ?? el.name).text);
+      }
   });
   return aliasToKit;
+}
+
+/**
+ * Files reaching the kit through a binding this script cannot follow — `import * as Kit` or a
+ * default import. Both would make every `<Kit.Button>` invisible, and invisible in the same
+ * direction as everything else here: toward "unused".
+ *
+ * Reported rather than handled. Handling them means resolving a member expression against a
+ * namespace, which is a type-checker job, and this script is deliberately syntax-only so it can
+ * run against a bare checkout. A loud blind spot is worth more than a quiet one.
+ */
+export function unfollowableImports(appRoot) {
+  const hits = [];
+  for (const file of sourceFiles(join(appRoot, 'src'))) {
+    const sf = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+    sf.forEachChild((node) => {
+      if (!ts.isImportDeclaration(node)) return;
+      if (!ts.isStringLiteral(node.moduleSpecifier)) return;
+      if (node.moduleSpecifier.text !== PACKAGE) return;
+      const clause = node.importClause;
+      if (!clause) return;
+      // `import type * as UiKit` renders nothing and passes no props, so it is not a blind spot.
+      // The app has exactly one of these (`board-render-cost.test.tsx:8`, feeding
+      // `importOriginal<typeof UiKit>()`), and the first version of this warning flagged it — a
+      // check that cries wolf on the only instance in the corpus gets overridden reflexively and
+      // then protects nothing.
+      if (isTypeOnlyClause(clause)) return;
+      if (clause.name) hits.push({ file, kind: 'default', local: clause.name.text });
+      if (clause.namedBindings && ts.isNamespaceImport(clause.namedBindings))
+        hits.push({ file, kind: 'namespace', local: clause.namedBindings.name.text });
+    });
+  }
+  return hits;
 }
 
 /** @returns {Array<{name: string, props: string[]}>} */
@@ -100,17 +149,21 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     process.exit(2);
   }
   const rows = analyze(app);
+  const blind = unfollowableImports(app);
   if (process.argv.includes('--json')) {
     console.log(JSON.stringify(rows, null, 2));
   } else {
     for (const r of rows) console.log(`${r.name.padEnd(24)} ${r.props.join(' ') || '(none)'}`);
     console.log('');
     console.log(
-      `kit exports imported by the app:  ${rows.filter((r) => !r.name.includes('.')).length}`,
+      `kit value exports imported:       ${rows.filter((r) => !r.name.includes('.')).length}`,
     );
     console.log(
       `distinct (component, prop) pairs: ${rows.reduce((n, r) => n + r.props.length, 0)}`,
     );
+    // Loud rather than silent. Anything here means the counts above are undercounts.
+    for (const h of blind)
+      console.error(`WARNING: ${h.kind} import \`${h.local}\` in ${h.file} is not followed`);
   }
 }
 /* c8 ignore stop */

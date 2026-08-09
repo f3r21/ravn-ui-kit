@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { measure, isIconFile } from './prop-surface.mjs';
-import { analyze } from './consumer-prop-usage.mjs';
+import { analyze, unfollowableImports } from './consumer-prop-usage.mjs';
 
 /**
  * These two scripts exist to produce figures that go into issues, and a figure is trusted in
@@ -79,6 +79,25 @@ describe('prop-surface: the kit measures its own public surface', () => {
     expect(tag.declared.map((p) => p.name)).toContain('variant');
   });
 
+  it('a compound sub-component carries the dotted name a consumer renders', () => {
+    // `card.tsx:120-122` does `Card.Header = CardHeader`, so a consumer's source says
+    // `<Card.Header>` while this script's export name is `CardHeader`. Joining the two is
+    // exact-match, so without the dotted alias the sub-component reads as never imported and its
+    // props as never passed — an undercount biased toward "unused", which is the one direction
+    // this instrument must not lean, because that is the direction #129's argument runs.
+    const header = result.components.find((c) => c.name === 'CardHeader');
+    expect(header.names).toContain('CardHeader');
+    expect(header.names).toContain('Card.Header');
+    // The parent is not a sub-component of anything and must not acquire a dotted name.
+    expect(result.components.find((c) => c.name === 'Card').names).toEqual(['Card']);
+  });
+
+  it('control: a plain component gets exactly one name', () => {
+    // Without this, `names` could be built by appending a dotted form to everything and the case
+    // above would still pass.
+    expect(result.components.find((c) => c.name === 'Tag').names).toEqual(['Tag']);
+  });
+
   it('icons are counted apart from the components', () => {
     // Each icon takes `React.SVGProps<SVGSVGElement>` and inherits hundreds of props. Folding
     // 20 copies of one decision into the headline total is what this split exists to prevent,
@@ -113,6 +132,12 @@ describe('consumer-prop-usage: what a consumer actually passes', () => {
       join(app, 'src', 'nested', 'spread.tsx'),
       `import { Avatar, Skeleton } from '@ravn/ui-kit';
        export const A = (p) => <Avatar {...p} size="md" />;`,
+    );
+    writeFileSync(
+      join(app, 'src', 'types-only.tsx'),
+      `import type { AccentColor } from '@ravn/ui-kit';
+       import { type DueDateUrgency, Badge } from '@ravn/ui-kit';
+       export const t = (c: AccentColor, d: DueDateUrgency) => <Badge tone="x" />;`,
     );
   });
   afterAll(() => rmSync(app, { recursive: true, force: true }));
@@ -158,6 +183,63 @@ describe('consumer-prop-usage: what a consumer actually passes', () => {
     const rows = Object.fromEntries(analyze(app).map((r) => [r.name, r.props]));
     expect(rows.Button).toEqual(['onPress', 'variant']);
     expect(Object.values(rows).flat()).not.toContain('fromAnotherPackage');
+  });
+
+  it('skips type-only imports — a type cannot receive a prop', () => {
+    // Both spellings. Counting `import type { AccentColor }` as an imported component overstates
+    // how much of the kit the app renders: the measured app imports 31 names of which 5 are types.
+    const names = analyze(app).map((r) => r.name);
+    expect(names).not.toContain('AccentColor'); // `import type { X }`
+    expect(names).not.toContain('DueDateUrgency'); // `import { type X }`
+    // Control: the value import sitting in the same statement as the inline type import survives,
+    // so this is skipping type bindings rather than skipping the statement.
+    expect(names).toContain('Badge');
+  });
+
+  it('reports a namespace or default import instead of silently ignoring it', () => {
+    // `import * as Kit` makes every `<Kit.Button>` invisible, and invisible in the same direction
+    // as every other gap here — toward "unused". Following it needs a type checker, which this
+    // script deliberately does not use, so the blind spot is made loud rather than closed.
+    const ns = mkdtempSync(join(tmpdir(), 'kit-consumer-ns-'));
+    mkdirSync(join(ns, 'src'), { recursive: true });
+    writeFileSync(
+      join(ns, 'src', 'n.tsx'),
+      `import * as Kit from '@ravn/ui-kit';
+       export const N = () => <Kit.Button variant="primary" />;`,
+    );
+    try {
+      expect(analyze(ns)).toEqual([]); // it genuinely cannot see it...
+      const hits = unfollowableImports(ns); // ...and says so
+      expect(hits).toHaveLength(1);
+      expect(hits[0]).toMatchObject({ kind: 'namespace', local: 'Kit' });
+    } finally {
+      rmSync(ns, { recursive: true, force: true });
+    }
+  });
+
+  it('control: named imports raise no unfollowable warning', () => {
+    // Otherwise the check above passes on a function that flags every file.
+    expect(unfollowableImports(app)).toEqual([]);
+  });
+
+  it('does not warn on a type-only namespace import', () => {
+    // Found by running the warning against the real app: its only `import * as` is
+    // `import type * as UiKit` in `board-render-cost.test.tsx`, feeding
+    // `importOriginal<typeof UiKit>()`. That renders nothing and passes no props, so flagging it
+    // makes the warning wrong on the single instance in the corpus — and a warning that is wrong
+    // the one time it fires is worse than no warning.
+    const t = mkdtempSync(join(tmpdir(), 'kit-consumer-tns-'));
+    mkdirSync(join(t, 'src'), { recursive: true });
+    writeFileSync(
+      join(t, 'src', 't.ts'),
+      `import type * as Kit from '@ravn/ui-kit';
+       export type P = Kit.TagProps;`,
+    );
+    try {
+      expect(unfollowableImports(t)).toEqual([]);
+    } finally {
+      rmSync(t, { recursive: true, force: true });
+    }
   });
 
   it('control: reports nothing for a tree that imports no kit', () => {

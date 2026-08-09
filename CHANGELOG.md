@@ -48,6 +48,33 @@ packages` asserted that `Button` did not carry `'ignored'` from
   Recorded because a control aimed at a value the instrument never reports is indistinguishable
   from a working one until something breaks.
 
+  Three defects a second session found in the first version, all fixed here, and all failing in the
+  same direction — **toward "unused"**, which is the direction #129's argument runs and so the one
+  bias this instrument must not have:
+
+  - **Compound components were unjoinable.** `card.tsx:120-122` ships `Card.Header = CardHeader`,
+    so a consumer writes `<Card.Header>` while the module export is `CardHeader`. The join between
+    the two scripts is exact-match, so a consumer using the `Card` API v0.8.0 shipped would have
+    had every sub-component counted as never imported. `prop-surface.mjs` now emits a `names` array
+    per component carrying the dotted forms alongside the export name.
+  - **Type-only imports counted as components.** `import type { AccentColor }` cannot receive a
+    prop. Five of the app's imports are types, so the headline read 31 where 26 value exports are
+    imported. Both spellings are now skipped, and `ImportClause.isTypeOnly` is read alongside
+    TypeScript 5.9's replacement `phaseModifier`, since a silently-false read lets them back in.
+  - **Namespace imports were silently invisible.** `import * as Kit` makes every `<Kit.Button>`
+    unseeable by a syntax-only walk. Following it needs a type checker, which this script
+    deliberately does not use, so the blind spot is now **loud** — `unfollowableImports()` reports
+    it and the CLI warns on stderr.
+
+  That last one immediately fired on the real app, and was wrong to: its only `import * as` is
+  `import type * as UiKit` (`board-render-cost.test.tsx:8`), which renders nothing. A warning that
+  is wrong on the single instance in the corpus is worse than no warning, so type-only namespace
+  imports are excluded and a case pins it.
+
+  **None of #129's substantive figures moved** — 49 components, 307 declared props, 35 of 49 never
+  imported carrying 211, 42 props passed. The compound defect was latent because the app uses no
+  `Card`, which is exactly why it was worth fixing before a consumer adopts one.
+
   Written for #129, which uses these figures to decide whether the prop surface should be cut
   before #11, #14 and #16 rewrite it. No component, prop, story or token changed.
 
