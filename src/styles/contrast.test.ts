@@ -170,9 +170,19 @@ describe('token contrast', () => {
   });
 
   describe('text on the light field surface', () => {
-    // `--color-surface-neutral` is white — the inside of Input, Datepicker, Card and
-    // Badge's neutral variant. Not Select or MultiSelect any more: their triggers are
-    // the design's dark chip, measured in the block below.
+    // `--color-surface-neutral` is white. Two live users: `Input`, which is genuinely a light
+    // field, and `Badge`'s neutral variant — see the note on that block below.
+    //
+    // **This list has been wrong twice, in both directions, so it is derived rather than
+    // remembered.** It named `Select`/`MultiSelect` after their triggers became the design's
+    // dark chip, and it named `Card` after `6bc133f` moved it to `bg-surface-panel`. `Datepicker`
+    // has now left too (#130). Re-derive before trusting it:
+    //
+    //   grep -rn 'bg-surface-neutral' src/components/*/*.tsx \
+    //     | grep -vE '\.(test|stories)\.tsx' | grep -vE ':[0-9]+: *(//|\*)'
+    //
+    // A prose list of which components share a surface goes stale silently every time one
+    // moves, which is the same defect #130 was filed about, one layer up.
     it('--color-neutral-5 (the value) clears AA', () => {
       expect(contrastRatio('--color-neutral-5', '--color-surface-neutral')).toBeGreaterThanOrEqual(
         AA_TEXT,
@@ -441,11 +451,11 @@ describe('token contrast', () => {
    * carried by the interior. So the assertion is "at least one side", which is what the
    * success criterion actually requires — not "every side", which nothing here meets.
    *
-   * This covers `Input`, `Datepicker`, `Card`, `Badge` and `FloatingPopover` — every
-   * bordered surface left. `Select` and `MultiSelect` are no longer among them: their
+   * This covers `Input`, `Card`, `Badge` and `FloatingPopover` — every bordered surface left.
+   * `Select`, `MultiSelect` and now `Datepicker` (#130) are no longer among them: their
    * triggers are the design's chip, which has no border at all, and their invalid ring
    * is measured in "text on the chip surface" above precisely because the
-   * white-interior half of the argument below is not available to it.
+   * white-interior half of the argument below is not available to them.
    */
   describe('field borders are perceivable against at least one adjacent surface', () => {
     for (const border of ['--color-subtle', '--color-danger']) {
@@ -508,10 +518,11 @@ describe('token contrast', () => {
      * **2.02:1** — worse than the `primary-4` it replaced (3.83:1) — so a consumer placing
      * a kit control on a light container has to override the ring.
      *
-     * No kit surface is light, which is what makes the trade correct here: `Input` and
-     * `Datepicker` have white *interiors*, but `outline-offset-2` draws the ring clear of
-     * the field, on the dark container outside it. `Card` and `Badge` are the kit's only
-     * light surfaces and neither is focusable nor contains a focusable of its own.
+     * No kit surface is light, which is what makes the trade correct here: `Input` has a white
+     * *interior*, but `outline-offset-2` draws the ring clear of the field, on the dark container
+     * outside it. `Badge` is the kit's only other light surface and is neither focusable nor
+     * contains a focusable of its own. (`Datepicker` was in this sentence until #130 moved it to
+     * the chip, and `Card` until `6bc133f` moved it to `bg-surface-panel`.)
      */
     it('are specified for the kit’s dark containers — a consumer on white must override', () => {
       expect(contrastRatio('--color-interactive-text', '--color-surface-neutral')).toBeLessThan(

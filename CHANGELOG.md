@@ -10,6 +10,61 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **BREAKING: `Datepicker` renders the design's chip, not a white field** (#130). Restore the old
+  appearance with `className="h-10 px-3 py-2 bg-surface-neutral text-neutral-5 border border-subtle rounded-md"`.
+  **Minor**, under `CONTRIBUTING.md`'s pre-1.0 carve-out, called out here as the policy requires.
+
+  It was `bg-surface-neutral` — white — putting a light field on the consuming app's dark board.
+  This is the same defect `Select`'s trigger already had and was corrected for, from the same
+  premise: `Input` is genuinely a light field, a date control is not, and the surface was borrowed
+  without checking. `Datepicker` was written from that premise and nobody swept for siblings.
+
+  **The design backs the chip directly rather than merely permitting it.**
+  `Add Task Modal00.md:78-140` draws the modal's four pickers as the `Tag` atom on the dark card —
+  `rgba(148, 151, 154, 0.1)`, 32px tall, 4px/16px padding, with a 24×24 `/* Vector */` glyph filled
+  `#FFFFFF`. `Datepicker.md` carries **no white surface at all**: its only four `#FFFFFF` blocks are
+  `/* Vector */` glyphs and its surfaces are `#222528` and `#2C2F33`.
+
+  **`[color-scheme:dark]` is load-bearing, and it is why this was not a two-class change.** This is
+  a native `<input type="date">`, so the calendar glyph is drawn by the user agent, which takes its
+  colour from `color-scheme`. Measured in Chrome on the app shell: on the chip with `color-scheme`
+  unset the glyph renders near-black and is effectively invisible; with `color-scheme: dark` it
+  renders white, which is what the export specifies. **The white surface was the only thing making
+  that glyph legible**, so the obvious recolour would have traded a wrong-but-visible field for a
+  right-looking field with an invisible control.
+
+  Nothing in this repo could have caught that: the glyph is UA-drawn and carries no token, so
+  `contrast.test.ts` cannot measure it _even in principle_.
+
+  Also `self-start`, so the chip sizes to content. The wrapper is `flex flex-col w-full` and a flex
+  item stretches — measured at **1390px** on the story against `Select`'s **151px** for the same
+  classes. A 32px band spanning the form is neither the old field nor the design's chip. An explicit
+  width still wins, and the consuming app already passes `className="w-40"` — the workaround this
+  default made necessary. Rendered and measured at **175×32** after the change, not inferred from
+  the class list.
+
+  The invalid state moves from `border-danger-5` to `ring-1 ring-danger-text`, for the reasons
+  `select.tsx` sets out: `danger-5`'s border survived 1.4.11 only on the strength of the white
+  interior it separated from the container, and this control no longer has one.
+
+- **A new `bg-surface-neutral` now has to be justified** (`src/styles/light-surface-allowlist.test.ts`).
+  Repo tooling; nothing ships. **Patch.**
+
+  `contrast.test.ts` cannot catch the class #130 belongs to — it verifies legibility _given_ a
+  surface and never whether the surface is right, so `Select` and `Datepicker` passed it the whole
+  time they were white fields on a dark board. This asserts **membership** instead: a component
+  painting the white surface fails until someone adds an allowlist entry with a reason, in the shape
+  `.storybook/a11y-allowlist.ts` already uses. Two entries — `Input`, which is genuinely a light
+  field, and `Badge`, which is tracked separately.
+
+  It carries controls in both directions, because a list like this drifts both ways: one proving the
+  probe can see the surface where it is present, and one proving no entry has outlived the code it
+  excused. `Select`, `MultiSelect`, `Card` and `Datepicker` have each left this surface and a prose
+  list in `contrast.test.ts` recorded **none** of the four departures — that list is now derived
+  rather than remembered, with the command beside it.
+
+### Fixed
+
 - **The Node floor is declared and enforced instead of satisfied by luck** (#132). Repo tooling
   only; nothing ships, `dist/` is unchanged and no consumer is affected — npm never publishes
   `.npmrc` and `files` is `["dist"]` besides. **Patch.**

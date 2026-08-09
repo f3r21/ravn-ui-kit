@@ -2655,8 +2655,37 @@ function ts({
         ref: a,
         type: "date",
         className: f(
-          "h-10 px-3 py-2 text-sm bg-surface-neutral text-neutral-5 border border-subtle rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 focus-visible:border-transparent disabled:opacity-50 disabled:bg-surface-neutral font-sans cursor-pointer",
-          n && "border-danger-5 focus-visible:outline-danger-text",
+          // The design's chip, not a light field — the same correction `Select` took, for the
+          // same reason and from the same source. `Add Task Modal00.md:78-140` draws the modal's
+          // four pickers as the `Tag` atom on the dark card: `rgba(148, 151, 154, 0.1)` (neutral-2
+          // at 10%), 32px tall, 4px/16px padding, and a 24×24 `/* Vector */` glyph filled
+          // `#FFFFFF`. `Datepicker.md` carries no white surface at all — its only four `#FFFFFF`
+          // blocks are `/* Vector */` glyphs, and its surfaces are `#222528` and `#2C2F33`.
+          //
+          // **`[color-scheme:dark]` is load-bearing and is not a browser workaround.** This is a
+          // native `<input type="date">`, so the calendar-picker glyph is drawn by the user agent,
+          // not by this file, and the UA picks its colour from `color-scheme`. Measured in Chrome
+          // on the app shell: on this chip with `color-scheme` unset the glyph renders near-black
+          // and is effectively invisible; with `color-scheme: dark` it renders white. White-on-dark
+          // is what the export above specifies, so this property is how a native control is made to
+          // draw the design rather than a trick to rescue a recolour.
+          //
+          // Nothing in this repo could have caught the invisible-glyph state: the glyph is UA-drawn
+          // and has no token, so `contrast.test.ts` cannot measure it even in principle. The white
+          // field surface was the only reason it was legible before.
+          // `self-start` sizes the chip to its content instead of letting it stretch. The wrapper
+          // is `flex flex-col w-full`, so without it a flex item fills the column — measured at
+          // **1390px** on the story, against `Select`'s content-sized **151px** for the same chip
+          // classes. A 32px-tall band spanning the form is neither the old white field nor the
+          // design's chip. An explicit width still wins, so a caller passing one is unaffected:
+          // the consuming app already passes `className="w-40"`, which is the workaround this
+          // default made necessary.
+          "self-start inline-flex items-center h-8 px-4 rounded-4 bg-neutral-2/10 text-body-m font-semibold text-main [color-scheme:dark] font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+          // A `ring`, not a `border`, and `danger-text` rather than `danger-5` — both for the
+          // reasons `select.tsx` sets out at length. `danger-5`'s invalid border survived 1.4.11
+          // only on the strength of the white interior it separated from the container; this
+          // control no longer has one, and `danger-5` measures 2.55:1 on `surface-overlay`.
+          n && "ring-1 ring-danger-text focus-visible:outline-danger-text",
           r
         )
       }
