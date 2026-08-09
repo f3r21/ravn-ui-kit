@@ -13,7 +13,8 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **Published doc comments no longer cite documents that exist on one machine** (#49, #50).
   Comments only; no behaviour change. **Patch.**
 
-  Twelve source files cited `MIGRATION_GAPS.md` or `UI_KIT_MASTER_PLAN.md`, and **nine of those
+  **Twelve citations across ten source files** named `MIGRATION_GAPS.md` or
+  `UI_KIT_MASTER_PLAN.md` — `icons.tsx` and `popover.tsx` carry two each — and **nine of those
   citations survived the build into `dist/index.d.ts`** — which is what a consumer installs, and
   which the consuming app's own `CLAUDE.md` names as the way to answer "what does this component
   do". Both files are gitignored (`.gitignore:42-43`) and exist in exactly one working

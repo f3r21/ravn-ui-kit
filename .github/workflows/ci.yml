@@ -160,6 +160,16 @@ jobs:
       #   git show HEAD:dist/index.d.ts   | grep -cE 'MIGRATION_GAPS|UI_KIT_MASTER_PLAN'   # 0
       - name: Check dist/ cites no gitignored document
         run: |
+          # Positive control FIRST, in the same step. This check's pass condition is an
+          # absence, and an absence is indistinguishable from having read nothing: with `dist/`
+          # missing, `grep -r` exits 2, the `if` below is false, and the step reports success
+          # having opened no file at all. Ordering after the freshness check mitigates that
+          # today — and a reorder would remove the guarantee silently, which is exactly the
+          # kind of dependency that should not live in step ordering.
+          if ! grep -rlq 'export' dist/; then
+            echo "::error::the dist/ citation check found no exports to read — dist/ is missing or empty, so its result below would be meaningless."
+            exit 1
+          fi
           if grep -rlE 'MIGRATION_GAPS|UI_KIT_MASTER_PLAN' dist/; then
             echo "::error::dist/ cites a gitignored planning document. Those files exist in one working directory and ship to consumers as unresolvable references — inline what the citation carried instead (#49, #50)."
             exit 1

@@ -1751,9 +1751,10 @@ export declare interface ModalProps {
 /**
  * MultiSelect
  *
- * The tag/multi-value picker the app currently hand-rolls — `TaskFormDialog`'s
- * tags field and `BoardFiltersBar`'s tags filter are the two call sites this
- * replaces. Composes `ListBox` and `FloatingPopover` like `Select` does, but over
+ * The tag/multi-value picker the app hand-rolled before this existed — its
+ * `task-form-dialog.tsx` tags field and `board-filters.tsx` tags filter both
+ * route through this now, via the app's own `option-select.tsx`.
+ * Composes `ListBox` and `FloatingPopover` like `Select` does, but over
  * react-stately's `useListState` instead of `useSelectState`: there is no
  * native multi-select element or single "selected item" to show in the
  * trigger, and the popover should stay open while the user picks several
@@ -2175,9 +2176,10 @@ export declare interface SegmentedControlProps {
 /**
  * Select
  *
- * The single-value dropdown the app currently hand-rolls in several places
- * — `BoardFiltersBar`'s status/estimate/owner filters and `TaskFormDialog`'s
- * points/assignee/status fields are the call sites this replaces. Composes
+ * The single-value dropdown the app hand-rolled before this existed — its
+ * `board-filters.tsx` status/estimate/owner filters and `task-form-dialog.tsx`
+ * points/assignee/status fields both route through this now, via the app's own
+ * `option-select.tsx`. Composes
  * `ListBox` (the option list) and `FloatingPopover` (the portalled, anchored
  * surface) over react-stately's `useSelectState` and react-aria's
  * `useSelect`. Fully generic over item type via `AriaSelectProps<T>`'s own
