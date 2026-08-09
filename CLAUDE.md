@@ -219,7 +219,7 @@ correctly-scoped command would be the defect the section warns about. `:[0-9]+:`
 form misses — narrower where it should be, wider where it should be.
 
 **It is narrower, not clean, and the honest thing is to say where it still fails.** Because the
-pattern is unanchored it also drops a *code* line whose own content carries `:<digits>: //` —
+pattern is unanchored it also drops a _code_ line whose own content carries `:<digits>: //` —
 `const s = "port:12: //x"` is code and this filter discards it. In this repo that is currently
 theoretical. Both readings are at `0708a83`, and both drift — re-run rather than quoting them:
 
@@ -235,8 +235,8 @@ to the hits it counts, and `cut -d: -f3-` reintroduces an assumption about colon
 that the unanchored form does not make. Trading a named limit for an unnamed one is not progress.
 
 **Naming the limit beside the figure is this section's own prescription**, not a concession to
-laziness: *prefer a spelling that can fail, and if only a silent one exists, say so beside the
-figure.* A residual class measured at 0, with the control that proves the measurement reads, is
+laziness: _prefer a spelling that can fail, and if only a silent one exists, say so beside the
+figure._ A residual class measured at 0, with the control that proves the measurement reads, is
 what that instruction asks for.
 
 **This is self-contamination** (volume III §D1, §F): a probe that searches text can find the prose
