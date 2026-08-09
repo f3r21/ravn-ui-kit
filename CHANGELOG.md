@@ -8,6 +8,35 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-09
+
+### Fixed
+
+- **`release.yml` and `tag-check.yml` both said there were no `v*` rulesets; there is one.**
+  Repo tooling only; nothing shipped. **Patch.**
+
+  Both headers instruct the reader to re-derive rather than assume, which is what made the stale
+  claims worth fixing rather than ignoring. Now measured:
+
+  ```bash
+  gh api repos/f3r21/ravn-ui-kit/rulesets -q length          # 1
+  id=$(gh api repos/f3r21/ravn-ui-kit/rulesets -q '.[0].id')
+  gh api "repos/f3r21/ravn-ui-kit/rulesets/$id" -q '[.rules[].type]'   # ["update","deletion"]
+  gh api repos/f3r21/ravn-task-management-challenge/rulesets -q length # 1 — control
+  ```
+
+  **It forbids moving and deleting published tags, not creating them**, so #59 stays open — its
+  title is the stale part, not its goal. `release.yml` also claimed #56 was "NOT built yet";
+  `tag-check.yml` has existed and has fired twice on a real tag push.
+
+  **The `GITHUB_TOKEN` argument against switching to a PAT is kept and strengthened**, not
+  deleted: it is _more_ likely to be reached for now, because the next reader finds a backstop
+  that visibly never runs for released tags rather than no backstop at all.
+
+  Recorded in `tag-check.yml`: the `deletion` rule narrows its own remedy. "Delete it and
+  re-cut" now requires the one repository role holding `bypass_mode: always` — which is exactly
+  what #100 found missing when `v0.5.0` was deleted with no record.
+
 ### Fixed
 
 - **Published doc comments no longer cite documents that exist on one machine** (#49, #50).
