@@ -193,8 +193,54 @@ or an arrow:
 
 ```markdown
 - 527 tests, 33 files — `out=$(npm run gate 2>&1); rc=$?; echo "$out" | grep -E 'Test Files|Tests  '`
-- `grep -rn "forwardRef" src/` → 0 hits
+- `grep -rn "forwardRef" src/ | grep -vE ':[0-9]+: *(//|\*)'` → 0 hits
 ```
+
+**Both lines above are examples of the format, not current figures** — the test count moves every
+time the suite does, and quoting it here would make this file a second source competing with the
+gate. Run the command; do not read the number.
+
+**The second example acquired a comment filter, and the reason is the point.** It used to read
+`grep -rn "forwardRef" src/` → 0 hits. That command now returns **2** — because
+`view-switcher.tsx:68-69` carries a comment explaining that no component forwards a ref, and
+**quotes the grep and its result.** Writing the zero down created a non-zero.
+
+The substance never changed: with comment lines excluded the answer is still 0, and the control is
+that the same exclusion leaves `useState` at 24 rather than blinding the probe. But by this file's
+own rule, a command returning something other than its figure is **worse than no command, because
+the number then looks checked** — so the command had to change, not the claim.
+
+**The filter is line-anchored on purpose.** The obvious spelling, `grep -v ': *//'`, also
+matches every URL scheme — at `origin/main` it drops **6 lines of real code**, including
+`avatar.stories.tsx`'s `xmlns="http://www.w3.org/2000/svg"`. The figure is unaffected today
+because no `forwardRef` hit sits on a URL line, but installing that as this file's exemplar of a
+correctly-scoped command would be the defect the section warns about. `:[0-9]+:` anchors to the
+`grep -n` line prefix, and `\*` additionally catches block-comment continuation lines the simpler
+form misses — narrower where it should be, wider where it should be.
+
+**It is narrower, not clean, and the honest thing is to say where it still fails.** Because the
+pattern is unanchored it also drops a _code_ line whose own content carries `:<digits>: //` —
+`const s = "port:12: //x"` is code and this filter discards it. In this repo that is currently
+theoretical. Both readings are at `0708a83`, and both drift — re-run rather than quoting them:
+
+```bash
+git grep -n '' -- 'src/**' | cut -d: -f3- | grep -cE ':[0-9]+: *//'    # 0  ← the residual class
+git grep -n '' -- 'src/**' | cut -d: -f3- | grep -cE '^[[:space:]]*//'  # 997 ← control: it reads
+```
+
+A fully content-anchored spelling exists — `… | cut -d: -f3- | grep -vE '^[[:space:]]*(//|\*)'` —
+and no content shape defeats it. It is **not** the exemplar here, for two reasons worth more than
+the class it closes: it discards the `path:line` prefix, so the figure can no longer be followed
+to the hits it counts, and `cut -d: -f3-` reintroduces an assumption about colons in filenames
+that the unanchored form does not make. Trading a named limit for an unnamed one is not progress.
+
+**Naming the limit beside the figure is this section's own prescription**, not a concession to
+laziness: _prefer a spelling that can fail, and if only a silent one exists, say so beside the
+figure._ A residual class measured at 0, with the control that proves the measurement reads, is
+what that instruction asks for.
+
+**This is self-contamination** (volume III §D1, §F): a probe that searches text can find the prose
+describing it. Any figure quoted inside the code it measures will do this eventually.
 
 A lane meeting a bare number decides whether to trust it. A lane meeting a number and its command
 runs the command. `file.tsx:48` citations and `#23` references need nothing — everything else
