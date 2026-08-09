@@ -48,8 +48,9 @@ export interface MenuProps<T extends object> extends Omit<
  * Menu
  *
  * A dropdown/context menu of actions — e.g. the task card's three-dot
- * options menu (`MIGRATION_GAPS.md` Section 4). Composes `FloatingPopover`
- * (the same portalled, anchored surface `Select`/`MultiSelect` use) over
+ * options menu, which the consuming app hand-rolled before this existed.
+ * Composes `FloatingPopover` (the same portalled, anchored surface
+ * `Select`/`MultiSelect` use) over
  * react-stately's `useMenuTriggerState`/`useTreeState` and react-aria's
  * `useMenuTrigger`/`useMenu`/`useMenuItem`. Fully generic over item type via
  * the same Collection/`<Item>` composition `Select`/`ListBox`/`Tabs` use, not

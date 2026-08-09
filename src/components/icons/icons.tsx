@@ -28,8 +28,8 @@ import type { SVGProps } from 'react';
  *    Stated plainly, with why it exists anyway.
  *
  * Where a glyph resolves to a named `remix-icons` component in the Figma file, that name
- * is recorded. (The design is built on remix-icons; `UI_KIT_MASTER_PLAN.md` Chunks 24/25
- * established this, and the per-component CSS exports name several of them outright.)
+ * is recorded. (The design is built on remix-icons — the per-component CSS exports in the
+ * Figma files name several of them outright, which is where these names come from.)
  *
  * ## Two things change on the way in from Figma, both deliberate
  *
@@ -397,8 +397,8 @@ export function ChevronLeftIcon(props: IconProps) {
  *
  * Figma: "Arrow Chevron Forward" in `Date Picker.md`, mirroring `ChevronLeftIcon`'s
  * metrics. The task-table "Details" link resolves to `remix-icons/line/system/
- * arrow-right-s-line` (`UI_KIT_MASTER_PLAN.md` Chunk 25); no verbatim path export exists
- * for either, and one stroked chevron serves both. Tier 2 (reconstructed) — see
+ * arrow-right-s-line`, named in that file's own export; no verbatim path export exists for
+ * either, and one stroked chevron serves both. Tier 2 (reconstructed) — see
  * `ChevronLeftIcon` for the derivation.
  */
 export function ChevronRightIcon(props: IconProps) {

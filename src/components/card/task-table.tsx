@@ -28,8 +28,8 @@ const COLUMN_WIDTHS = {
 // kit's icon set: it is this control's own chrome rather than a glyph from the design's
 // vocabulary, it has no Figma identity of its own, and `LabelCheckbox` draws the same box
 // with a check inside it depending on state — so it is a checkbox rendering, not an icon.
-// (That duplication between the two checkbox implementations is real, and tracked in
-// `MIGRATION_GAPS.md` Section 3; sharing one control is a bigger change than an icon swap.)
+// (The duplication between the two checkbox implementations is real and known; the fix is
+// sharing one control, which is a bigger change than an icon swap and is not this.)
 // Named for what it draws — it was previously called `CheckIcon`, which described a
 // checkmark this has never contained.
 const CheckboxBoxIcon = ({ className }: { className?: string }) => (

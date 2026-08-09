@@ -40,9 +40,9 @@ export interface MultiSelectProps<T extends object> extends Omit<
 /**
  * MultiSelect
  *
- * The tag/multi-value picker the app currently hand-rolls (`TaskFormDialog`'s
- * tags field, `BoardFiltersBar`'s tags filter — `MIGRATION_GAPS.md` Section
- * 4). Composes `ListBox` and `FloatingPopover` like `Select` does, but over
+ * The tag/multi-value picker the app currently hand-rolls — `TaskFormDialog`'s
+ * tags field and `BoardFiltersBar`'s tags filter are the two call sites this
+ * replaces. Composes `ListBox` and `FloatingPopover` like `Select` does, but over
  * react-stately's `useListState` instead of `useSelectState`: there is no
  * native multi-select element or single "selected item" to show in the
  * trigger, and the popover should stay open while the user picks several

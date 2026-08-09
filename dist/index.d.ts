@@ -712,8 +712,8 @@ export declare function ChevronLeftIcon(props: IconProps): JSX.Element;
  *
  * Figma: "Arrow Chevron Forward" in `Date Picker.md`, mirroring `ChevronLeftIcon`'s
  * metrics. The task-table "Details" link resolves to `remix-icons/line/system/
- * arrow-right-s-line` (`UI_KIT_MASTER_PLAN.md` Chunk 25); no verbatim path export exists
- * for either, and one stroked chevron serves both. Tier 2 (reconstructed) — see
+ * arrow-right-s-line`, named in that file's own export; no verbatim path export exists for
+ * either, and one stroked chevron serves both. Tier 2 (reconstructed) — see
  * `ChevronLeftIcon` for the derivation.
  */
 export declare function ChevronRightIcon(props: IconProps): JSX.Element;
@@ -1210,9 +1210,9 @@ export declare interface FieldMessagesProps {
  * FloatingPopover
  *
  * A second, deliberately separate popover primitive from `./popover.tsx`'s
- * `Popover` — not a mode flag on it. `Popover` (Section 2 of
- * `MIGRATION_GAPS.md`) is explicitly non-portalled and CSS-anchored
- * (`absolute` inside a `relative` wrapper), which is the right shape for the
+ * `Popover` — not a mode flag on it. `Popover` is explicitly non-portalled
+ * and CSS-anchored (`absolute` inside a `relative` wrapper), which is the
+ * right shape for the
  * modal-shaped popovers it serves (`AssigneeModal`/`EstimateModal`/
  * `LabelModal`/`DatePickerMenu`) but the wrong shape for a dropdown: those
  * anchor inside layout contexts (a filter bar, a table cell) that routinely
@@ -1372,8 +1372,8 @@ export declare type HeadingLevel = 2 | 3 | 4 | 5 | 6;
  *    Stated plainly, with why it exists anyway.
  *
  * Where a glyph resolves to a named `remix-icons` component in the Figma file, that name
- * is recorded. (The design is built on remix-icons; `UI_KIT_MASTER_PLAN.md` Chunks 24/25
- * established this, and the per-component CSS exports name several of them outright.)
+ * is recorded. (The design is built on remix-icons — the per-component CSS exports in the
+ * Figma files name several of them outright, which is where these names come from.)
  *
  * ## Two things change on the way in from Figma, both deliberate
  *
@@ -1645,8 +1645,9 @@ export declare function LogoMark(props: IconProps): JSX.Element;
  * Menu
  *
  * A dropdown/context menu of actions — e.g. the task card's three-dot
- * options menu (`MIGRATION_GAPS.md` Section 4). Composes `FloatingPopover`
- * (the same portalled, anchored surface `Select`/`MultiSelect` use) over
+ * options menu, which the consuming app hand-rolled before this existed.
+ * Composes `FloatingPopover` (the same portalled, anchored surface
+ * `Select`/`MultiSelect` use) over
  * react-stately's `useMenuTriggerState`/`useTreeState` and react-aria's
  * `useMenuTrigger`/`useMenu`/`useMenuItem`. Fully generic over item type via
  * the same Collection/`<Item>` composition `Select`/`ListBox`/`Tabs` use, not
@@ -1750,9 +1751,9 @@ export declare interface ModalProps {
 /**
  * MultiSelect
  *
- * The tag/multi-value picker the app currently hand-rolls (`TaskFormDialog`'s
- * tags field, `BoardFiltersBar`'s tags filter — `MIGRATION_GAPS.md` Section
- * 4). Composes `ListBox` and `FloatingPopover` like `Select` does, but over
+ * The tag/multi-value picker the app currently hand-rolls — `TaskFormDialog`'s
+ * tags field and `BoardFiltersBar`'s tags filter are the two call sites this
+ * replaces. Composes `ListBox` and `FloatingPopover` like `Select` does, but over
  * react-stately's `useListState` instead of `useSelectState`: there is no
  * native multi-select element or single "selected item" to show in the
  * trigger, and the popover should stay open while the user picks several
@@ -1876,10 +1877,10 @@ export declare function PointsIcon(props: IconProps): JSX.Element;
  *
  * The shared floating-surface shell behind `DatePickerMenu`, `AssigneeModal`,
  * `EstimateModal`, and `LabelModal` — previously each was an independent
- * plain `<div>` with no `useOverlay`, `FocusScope`, dismissal, or role at all
- * (see `MIGRATION_GAPS.md` Section 2). Those four all anchor to a trigger via
- * plain CSS (`absolute` positioning inside a `relative` wrapper, set by the
- * caller's `className`), not a portal — so this primitive is built on
+ * plain `<div>` with no `useOverlay`, `FocusScope`, dismissal, or role at
+ * all. Those four all anchor to a trigger via plain CSS (`absolute`
+ * positioning inside a `relative` wrapper, set by the caller's `className`),
+ * not a portal — so this primitive is built on
  * react-aria's `useOverlay` + `DismissButton` + `FocusScope` directly rather
  * than `usePopover` (which adds portalling via `Overlay` and floating-ui-style
  * anchored positioning these four don't need). The heavier `usePopover`-based
@@ -1938,8 +1939,8 @@ export declare interface PopoverProps {
      * popover, the same composition a native date input's popup uses) and the
      * `Assignee`/`Estimate`/`Label` pick-one-option lists, none of which
      * implement full `listbox`/`option` semantics (roving tabindex,
-     * `aria-selected`) yet — that's the bigger `ListBox`/`Select` family
-     * tracked separately in `MIGRATION_GAPS.md` Section 4, out of scope here.
+     * `aria-selected`) yet — that is the `ListBox`/`Select`/`MultiSelect`
+     * family, which exists in this kit and is out of scope for this shell.
      * `'dialog'` is the honest role for "a floating region with interactive
      * content and no listbox wiring," not a placeholder for one.
      * @default 'dialog'
@@ -2175,8 +2176,8 @@ export declare interface SegmentedControlProps {
  * Select
  *
  * The single-value dropdown the app currently hand-rolls in several places
- * (`BoardFiltersBar`'s status/estimate/owner filters, `TaskFormDialog`'s
- * points/assignee/status fields — `MIGRATION_GAPS.md` Section 4). Composes
+ * — `BoardFiltersBar`'s status/estimate/owner filters and `TaskFormDialog`'s
+ * points/assignee/status fields are the call sites this replaces. Composes
  * `ListBox` (the option list) and `FloatingPopover` (the portalled, anchored
  * surface) over react-stately's `useSelectState` and react-aria's
  * `useSelect`. Fully generic over item type via `AriaSelectProps<T>`'s own
@@ -3153,8 +3154,9 @@ export declare interface TaskTag {
  * draws no error state at all, so that ramp step was a free choice constrained only by
  * contrast. Here it is the brand's own CTA.
  *
- * `contrast.test.ts` asserts the current state so it cannot be mistaken for passing, and
- * `MIGRATION_GAPS.md` tracks it as the open item it is. The **icon** `Button`'s
+ * `contrast.test.ts` asserts the current ratio, so it cannot be mistaken for passing and
+ * a palette change that fixed it would fail that test until the number is updated — which
+ * is the tracking, rather than a note somewhere. The **icon** `Button`'s
  * `variant="primary"` uses the same fill and is *not* affected: an icon is non-text, so
  * 1.4.11's 3:1 applies to it and 3.83:1 clears that.
  */

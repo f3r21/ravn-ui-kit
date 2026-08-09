@@ -10,6 +10,37 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Published doc comments no longer cite documents that exist on one machine** (#49, #50).
+  Comments only; no behaviour change. **Patch.**
+
+  Twelve source files cited `MIGRATION_GAPS.md` or `UI_KIT_MASTER_PLAN.md`, and **nine of those
+  citations survived the build into `dist/index.d.ts`** — which is what a consumer installs, and
+  which the consuming app's own `CLAUDE.md` names as the way to answer "what does this component
+  do". Both files are gitignored (`.gitignore:42-43`) and exist in exactly one working
+  directory, so the documented reading path terminated in a reference the reader cannot resolve
+  or even tell had existed. Worse than a stale pointer: a stale one is falsifiable.
+
+  **Each citation was replaced by what it was carrying, not repointed at another document.**
+  Where the substance was already in the sentence the pointer was removed; where the pointer was
+  the only support, the fact is now stated in the comment.
+
+  `dist/index.d.ts` goes **9 → 0**:
+
+  ```bash
+  git show v0.7.0:dist/index.d.ts | grep -cE 'MIGRATION_GAPS|UI_KIT_MASTER_PLAN'   # 9
+  git show HEAD:dist/index.d.ts   | grep -cE 'MIGRATION_GAPS|UI_KIT_MASTER_PLAN'   # 0
+  ```
+
+  A CI step greps the built output so this cannot regress. Deliberately **not** a source-side
+  lint: citing these files in a comment is legitimate during a transition, and it is their
+  survival into the published artifact that is the defect.
+
+  **Six mentions in released `CHANGELOG.md` sections are left alone**, on purpose — those are a
+  record of what was written at the time, not live citations, and editing a released section
+  would make the history false. None are in `[Unreleased]`.
+
+### Fixed
+
 - **Nineteen story files did not comply with the `Playground` convention, and nothing checked**
   (#storybook-conventions). Stories, docs and a new test; no component source changed. **Patch.**
 
