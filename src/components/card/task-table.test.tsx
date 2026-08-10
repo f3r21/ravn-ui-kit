@@ -85,6 +85,7 @@ describe('TaskTable Component', () => {
       const onClick = vi.fn();
       renderRow({ onClick });
 
+      await user.tab(); // the group header toggle (#140)
       await user.tab(); // the row-select checkbox
       await user.tab(); // the title, which is the opener
 
@@ -559,6 +560,93 @@ describe('TaskTable group heading level (#95)', () => {
     const levels = screen.getAllByRole('heading').map((h) => Number(h.tagName.slice(1)));
     expect(levels).toEqual([2, 4]);
     expect(levels[1] - levels[0]).toBeGreaterThan(1);
+  });
+});
+
+/**
+ * #140. The header rendered a `ChevronDownIcon` and rows unconditionally, with no `useState`
+ * anywhere in the file and no handler on the header — the icon was decoration. These fail
+ * against that code: there is no `aria-expanded` to read and no button to click.
+ */
+describe('group headers collapse and expand their rows (#140)', () => {
+  const groups = () => [
+    {
+      title: 'To Do (02)',
+      rows: [
+        { index: 1, title: 'Create wireframe' },
+        { index: 2, title: 'Slack Logo Design' },
+      ],
+    },
+  ];
+
+  it('starts expanded: aria-expanded is true and the rows are visible', () => {
+    render(<TaskTable groups={groups()} />);
+    expect(screen.getByRole('button', { name: 'To Do (02)' }).getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+    expect(screen.getByText('Create wireframe')).toBeDefined();
+  });
+
+  it('clicking the header collapses the group: rows leave the DOM and aria-expanded flips', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+
+    await user.click(screen.getByRole('button', { name: 'To Do (02)' }));
+
+    expect(screen.getByRole('button', { name: 'To Do (02)' }).getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+    expect(screen.queryByText('Slack Logo Design')).toBeNull();
+  });
+
+  it('clicking a second time re-expands it', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+    const header = screen.getByRole('button', { name: 'To Do (02)' });
+
+    await user.click(header);
+    await user.click(header);
+
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByText('Create wireframe')).toBeDefined();
+  });
+
+  it('is keyboard-operable: focusing the header and pressing Enter toggles it', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+    const header = screen.getByRole('button', { name: 'To Do (02)' });
+
+    header.focus();
+    await user.keyboard('{Enter}');
+
+    expect(header.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+  });
+
+  it('collapsing one group leaves a sibling group expanded (state is per-group)', async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskTable
+        groups={[
+          ...groups(),
+          { title: 'In Progress', rows: [{ index: 1, title: 'Dashboard Design' }] },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'To Do (02)' }));
+
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+    expect(screen.getByText('Dashboard Design')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'In Progress' }).getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+  });
+
+  it('the group title stays discoverable as a heading, collapsible or not', () => {
+    render(<TaskTable groups={groups()} />);
+    expect(screen.getByRole('heading', { name: 'To Do (02)' }).tagName).toBe('H3');
   });
 });
 
