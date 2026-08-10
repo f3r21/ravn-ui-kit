@@ -245,7 +245,14 @@ export interface TaskTableRowProps {
    * the row samples in the real "Task Default View" mockup -- `neutral` and `blue` are
    * available for consistency with `Tag`, not because the spec shows them. No spec evidence
    * ties this color to due-date urgency or any other field, so it's a plain, independent prop.
-   * @default 'green'
+   *
+   * **No longer defaults to `'green'`** (#141) — every row rendered the same stripe regardless
+   * of status, because nothing supplied a value and `'green'` looked like a safe, positive
+   * choice rather than the loud "everything is done" it actually painted. Compute one instead
+   * of leaving this unset: `statusToIndicatorColor()` / `TASK_STATUS_INDICATOR_COLOR`
+   * (`../../types/color-variants`) map the consuming app's five task statuses onto this prop's
+   * vocabulary.
+   * @default 'neutral'
    */
   indicatorColor?: AccentColor;
   /**
@@ -404,7 +411,7 @@ const indicatorColorMap: Record<AccentColor, string> = {
 export function TaskTableRow({
   index,
   title,
-  indicatorColor = 'green',
+  indicatorColor = 'neutral',
   reactions = [],
   isSelected = false,
   onSelectedChange,
