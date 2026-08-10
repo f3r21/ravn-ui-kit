@@ -2322,6 +2322,13 @@ export declare interface SkeletonProps {
 }
 
 /**
+ * Turns a task's status into the accent colour its `TaskTableRow.indicatorColor` stripe should
+ * render. A thin wrapper over `TASK_STATUS_INDICATOR_COLOR` so a consumer imports one name
+ * rather than indexing a `Record` directly.
+ */
+export declare function statusToIndicatorColor(status: TaskStatus): AccentColor;
+
+/**
  * A semantic status: what a state *means*, rather than which colour it is.
  *
  * Deliberately kept separate from `AccentColor`, because it resolves to a different set
@@ -2457,6 +2464,32 @@ export declare interface TagProps {
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
+
+/**
+ * Shared mapping from a task's status onto the accent palette, so a consumer rendering
+ * `TaskTableRow.indicatorColor` does not have to invent one — every row defaulted to the same
+ * green stripe before this existed (ravn-ui-kit#141).
+ *
+ * **Not spec-verified, and the design vault says more than merely "unverified" here.** The
+ * mockup this component is built from (`Mockups/Task Default View/My Task Mockup.md`) draws the
+ * indicator stripe in three different colours *within a single status group* — `To Do`'s five
+ * sample rows read red/green/yellow/green/red — which rules out a status→colour reading of the
+ * source design rather than just lacking one. This mapping is an engineering decision in the
+ * same category `DUE_DATE_URGENCY_COLOR` already is: some deterministic mapping beats every row
+ * rendering identically, chosen to bridge `StatusTone`'s "what a state means" reading onto
+ * `AccentColor`:
+ *
+ * | Status                | `StatusTone` reading          | `AccentColor` |
+ * | ---------------------- | ------------------------------ | -------------- |
+ * | `BACKLOG`, `TODO`      | not started / queued           | `neutral`      |
+ * | `IN_PROGRESS`          | warning: active, not settled   | `yellow`       |
+ * | `DONE`                 | success                        | `green`        |
+ * | `CANCELLED`            | danger: negative terminal      | `red`          |
+ *
+ * `blue` is unused, matching `indicatorColorMap`'s own doc comment on `TaskTableRow` — no accent
+ * sample in the mockup ever draws it.
+ */
+export declare const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor>;
 
 /**
  * Kanban-style task summary card showing title, points, due date, tags, assignee, and reactions.
@@ -2751,6 +2784,21 @@ export declare interface TaskMetaBadgesProps {
 }
 
 /**
+ * The consuming app's task lifecycle, as a domain concept the kit renders directly — the same
+ * shape as `DueDateUrgency` above: a status vocabulary the kit does not otherwise model, carried
+ * here because a Task-domain component (`TaskTableRow.indicatorColor`, ravn-ui-kit#141) needs to
+ * render it and the app should not have to reinvent the mapping.
+ *
+ * Matches the consuming app's own generated `Status` enum
+ * (`ravn-task-management-challenge/src/graphql/generated/graphql.ts`) exactly — the same five
+ * values — so `task.status` passes straight through with no translation layer of the app's own.
+ * `priority` is deliberately absent: it does not exist as an app field (checked the GraphQL
+ * schema, the task fragment and the task form — zero hits repo-wide for `priority`), so there is
+ * nothing else to key this mapping on.
+ */
+export declare type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED';
+
+/**
  * TaskTable
  *
  * Figma: "Table View" (Mockups/Task Default View/My Task Mockup.md) -- a shared column-header
@@ -2951,7 +2999,14 @@ export declare interface TaskTableRowProps {
      * the row samples in the real "Task Default View" mockup -- `neutral` and `blue` are
      * available for consistency with `Tag`, not because the spec shows them. No spec evidence
      * ties this color to due-date urgency or any other field, so it's a plain, independent prop.
-     * @default 'green'
+     *
+     * **No longer defaults to `'green'`** (#141) — every row rendered the same stripe regardless
+     * of status, because nothing supplied a value and `'green'` looked like a safe, positive
+     * choice rather than the loud "everything is done" it actually painted. Compute one instead
+     * of leaving this unset: `statusToIndicatorColor()` / `TASK_STATUS_INDICATOR_COLOR`
+     * (`../../types/color-variants`) map the consuming app's five task statuses onto this prop's
+     * vocabulary.
+     * @default 'neutral'
      */
     indicatorColor?: AccentColor;
     /**

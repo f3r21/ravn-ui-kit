@@ -14,6 +14,11 @@ import {
 import type { HeadingLevel } from '../../types/heading-level';
 import { TaskCard } from './task-card';
 import { EmptyState } from '../empty-state/empty-state';
+import {
+  statusToIndicatorColor,
+  TASK_STATUS_INDICATOR_COLOR,
+  type TaskStatus,
+} from '../../types/color-variants';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -863,5 +868,66 @@ describe('consumer-defined columns (#97)', () => {
     const cells = container.querySelectorAll('tbody tr:last-child td');
     expect(cells[0].className).toContain('border-l');
     expect(cells[1].className).not.toContain('border-l');
+  });
+});
+
+/**
+ * #141. `indicatorColor` defaulted unconditionally to `'green'`, so every row in every group
+ * rendered the same stripe regardless of status — this default swap and the status mapping are
+ * what fix it. Fails against the pre-fix component: the first case below reads `bg-secondary-4`
+ * (green) rather than `bg-neutral-2`, and the mapping export does not exist at all.
+ */
+describe('TaskTableRow.indicatorColor no longer defaults to green, and a status mapping exists (#141)', () => {
+  const stripeClass = (container: HTMLElement) =>
+    container.querySelector('.w-1.h-full.shrink-0')?.className ?? '';
+
+  it('defaults to neutral, not green, when omitted', () => {
+    const { container } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" />
+        </tbody>
+      </table>,
+    );
+    expect(stripeClass(container)).toContain('bg-neutral-2');
+    expect(stripeClass(container)).not.toContain('bg-secondary-4');
+  });
+
+  it('still renders whatever colour is explicitly passed', () => {
+    const { container } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" indicatorColor="red" />
+        </tbody>
+      </table>,
+    );
+    expect(stripeClass(container)).toContain('bg-primary-4');
+  });
+
+  /**
+   * Table-driven across all five statuses rather than one happy-path case — a mapping is only
+   * proven once every branch of it is read, not just the one an author remembered to check.
+   */
+  it.each([
+    ['BACKLOG', 'neutral'],
+    ['TODO', 'neutral'],
+    ['IN_PROGRESS', 'yellow'],
+    ['DONE', 'green'],
+    ['CANCELLED', 'red'],
+  ] as const)('%s maps to %s', (status, color) => {
+    expect(statusToIndicatorColor(status)).toBe(color);
+    expect(TASK_STATUS_INDICATOR_COLOR[status]).toBe(color);
+  });
+
+  it('covers exactly the app-facing status set, no more and no fewer', () => {
+    const statuses: TaskStatus[] = ['BACKLOG', 'TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
+    expect(Object.keys(TASK_STATUS_INDICATOR_COLOR).sort()).toEqual([...statuses].sort());
+  });
+
+  it("control: a status the mapping doesn't cover is a compile error, not a runtime default", () => {
+    // @ts-expect-error -- 'ARCHIVED' is not a member of TaskStatus; this line must fail to
+    // typecheck, which is what `npm run gate`'s typecheck step actually proves. If this stops
+    // erroring, the union widened silently and this control caught it.
+    expect(() => statusToIndicatorColor('ARCHIVED')).not.toThrow();
   });
 });
