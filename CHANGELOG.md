@@ -8,6 +8,8 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-10
+
 ### Added
 
 - **`statusToIndicatorColor()` and `TASK_STATUS_INDICATOR_COLOR`** (#141), mapping the consuming
