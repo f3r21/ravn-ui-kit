@@ -10,6 +10,13 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`TaskTable` group headers actually collapse now** (#140). The chevron next to a group title
+  (`"To Do (05)"`, `"In Progress"`) rendered unconditionally and did nothing when clicked — no
+  handler existed anywhere in the file, and rows always rendered regardless. Clicking (or
+  Enter/Space on) a group header now toggles that group's rows, with `aria-expanded` on the
+  header and the chevron rotating to match. State is internal and per-group; nothing changes for
+  a consumer that never interacts with the header.
+
 - **BREAKING: `Datepicker` renders the design's chip, not a white field** (#130). Restore the old
   appearance with `className="h-10 px-3 py-2 bg-surface-neutral text-neutral-5 border border-subtle rounded-md"`.
   **Minor**, under `CONTRIBUTING.md`'s pre-1.0 carve-out, called out here as the policy requires.
