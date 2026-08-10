@@ -20,6 +20,15 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`TaskTable` header labels no longer wrap** (#142). `"Task Assign Name"`, the longest default
+  header, wrapped to two lines while every other header stayed on one — `CELL_TEXT` carried no
+  `whitespace-nowrap`/`truncate`. Fixed by adding `whitespace-nowrap` to every header label
+  (`COLUMN_WIDTHS` and the 1108px total are untouched). Measured in a real rendered build: the
+  label leaves ~20px of margin inside its 168px cell, so this neither clips nor overflows into
+  the next column for any of the five default labels. A caller-supplied label significantly
+  longer than the defaults can still overflow its cell — this kit carries no responsive columns
+  (desktop-only, 833px floor) to fall back to, so a long custom label is the one case this does
+  not fully solve.
 - **BREAKING: `TaskTableRow.indicatorColor` no longer defaults to `'green'`** (#141). Every row in
   every status group rendered the same stripe, because nothing supplied a value and `'green'`
   looked like a safe default rather than the "everything is done" it actually painted. Defaults to

@@ -1448,7 +1448,7 @@ function $n({
               C === d.length - 1 && "rounded-r-4"
             ),
             style: { width: v },
-            children: /* @__PURE__ */ e("span", { className: I, children: b })
+            children: /* @__PURE__ */ e("span", { className: f(I, "whitespace-nowrap"), children: b })
           },
           x
         )) }),
