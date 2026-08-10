@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { cn } from '../../utils/cn';
 import { Avatar } from '../avatar/avatar';
 import { Tag } from '../tag/tag';
@@ -780,13 +781,57 @@ function TaskTableRowSkeleton({ columns }: { columns: ResolvedTaskTableColumn[] 
  * A group header's `<h*>`. Split out only so the level is a value rather than a literal tag —
  * the class list is unchanged from the `<h3>` this replaced, so the typography is identical at
  * every level and the heading carries semantics rather than size.
+ *
+ * Sizing only — no `truncate` here since #140. The heading now wraps the toggle `<button>`
+ * (`GroupHeaderToggle`), and a truncating ancestor clips a focus ring painted outside the box,
+ * the same reason `TaskTableRow`'s own `TitleHeading` moves `truncate` onto the innermost
+ * control rather than the heading around it.
  */
 function GroupHeading({ level, children }: { level: HeadingLevel; children: React.ReactNode }) {
   const Tag = `h${level}` as const;
+  return <Tag className="flex-1 min-w-0">{children}</Tag>;
+}
+
+/**
+ * The group header's click/keyboard toggle (#140). A native `<button>` rather than a `role`/
+ * `tabIndex`/`onKeyDown` trio: Enter, Space, focus and `aria-expanded` all come from the
+ * platform for free, the same reasoning `TaskTableRow`'s own title button already applies.
+ *
+ * Wrapped *inside* `GroupHeading`'s `<h*>` rather than the other way around — `<button>`'s
+ * content model is phrasing content only, which a heading element is not, so
+ * `<button><h3>…</h3></button>` is invalid; `<h3><button>…</button></h3>` is the ARIA
+ * Authoring Practices' own disclosure-widget shape and keeps the title discoverable by heading
+ * navigation either way.
+ *
+ * No rotation convention exists elsewhere in this kit to match — `Select`/`MultiSelect` use the
+ * same `ChevronDownIcon` on a trigger that never rotates, and `DatepickerMenu`'s chevrons are
+ * prev/next navigation, not a state toggle (`grep -rn "rotate" src/components/` was 0 hits
+ * before this). `-rotate-90` when collapsed is this component's own choice, not a spec match.
+ */
+function GroupHeaderToggle({
+  title,
+  isExpanded,
+  onToggle,
+}: {
+  title: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
   return (
-    <Tag className="flex-1 min-w-0 truncate text-body-l font-semibold text-main font-sans">
-      {children}
-    </Tag>
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={isExpanded}
+      className="flex items-center gap-2 min-w-0 max-w-full text-left cursor-pointer rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-1"
+    >
+      <ChevronDownIcon
+        className={cn(
+          'w-6 h-6 shrink-0 text-muted transition-transform',
+          !isExpanded && '-rotate-90',
+        )}
+      />
+      <span className="truncate text-body-l font-semibold text-main font-sans">{title}</span>
+    </button>
   );
 }
 
@@ -946,6 +991,23 @@ export function TaskTable({
   // default set still comes out at 1108 and a test pins that.
   const minWidth = resolved.reduce((sum, col) => sum + col.width, 0);
 
+  // Which groups are collapsed, keyed by the same `gi` index the groups are rendered and keyed
+  // with below (#140). Internal rather than a controlled/uncontrolled prop pair: nothing here
+  // calls for a consumer to read or drive this state from outside, and `TaskTableRow`'s own
+  // `isSelected`/`onSelectedChange` split is the shape to reach for later if that changes.
+  const [collapsedGroups, setCollapsedGroups] = useState<ReadonlySet<number>>(() => new Set());
+  const toggleGroup = (index: number) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -991,33 +1053,51 @@ export function TaskTable({
             <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
           ))
         ) : (
-          groups.map((group, gi) => (
-            <table key={gi} className="border-collapse table-fixed">
-              <colgroup>
-                {resolved.map(({ key, width }) => (
-                  <col key={key} style={{ width }} />
-                ))}
-              </colgroup>
-              <tbody>
-                <tr>
-                  <td colSpan={resolved.length} className="p-0 border border-neutral-3">
-                    <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
-                      <ChevronDownIcon className="w-6 h-6 shrink-0 text-muted" />
-                      <GroupHeading level={group.headingLevel ?? 3}>{group.title}</GroupHeading>
-                      {group.actions}
-                    </div>
-                  </td>
-                </tr>
-                {group.rows.map((row, ri) => (
-                  // The table's column set wins over anything on the row: a row inside a
-                  // table that disagreed with its own header is not a configuration worth
-                  // supporting, and spreading `row` first would allow exactly that. Both go
-                  // through `resolveColumns`, so the row cannot resolve them differently.
-                  <TaskTableRow key={ri} {...row} columns={columns} columnLabels={columnLabels} />
-                ))}
-              </tbody>
-            </table>
-          ))
+          groups.map((group, gi) => {
+            const isExpanded = !collapsedGroups.has(gi);
+            return (
+              <table key={gi} className="border-collapse table-fixed">
+                <colgroup>
+                  {resolved.map(({ key, width }) => (
+                    <col key={key} style={{ width }} />
+                  ))}
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <td colSpan={resolved.length} className="p-0 border border-neutral-3">
+                      <div className="flex items-center gap-2 h-14 px-4 bg-surface-panel rounded-t-4">
+                        <GroupHeading level={group.headingLevel ?? 3}>
+                          <GroupHeaderToggle
+                            title={group.title}
+                            isExpanded={isExpanded}
+                            onToggle={() => toggleGroup(gi)}
+                          />
+                        </GroupHeading>
+                        {group.actions}
+                      </div>
+                    </td>
+                  </tr>
+                  {/* #140 — collapsed groups render no rows at all, rather than rows hidden by
+                      CSS: a collapsed group has nothing here for a screen reader or `Tab` to
+                      reach, matching what "collapsed" means for the sighted case too. */}
+                  {isExpanded
+                    ? group.rows.map((row, ri) => (
+                        // The table's column set wins over anything on the row: a row inside a
+                        // table that disagreed with its own header is not a configuration worth
+                        // supporting, and spreading `row` first would allow exactly that. Both go
+                        // through `resolveColumns`, so the row cannot resolve them differently.
+                        <TaskTableRow
+                          key={ri}
+                          {...row}
+                          columns={columns}
+                          columnLabels={columnLabels}
+                        />
+                      ))
+                    : null}
+                </tbody>
+              </table>
+            );
+          })
         )}
       </div>
     </div>
