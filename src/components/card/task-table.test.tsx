@@ -865,3 +865,36 @@ describe('consumer-defined columns (#97)', () => {
     expect(cells[1].className).not.toContain('border-l');
   });
 });
+
+/**
+ * #142. `CELL_TEXT` carried no `whitespace-nowrap`/`truncate`, so "Task Assign Name" — the
+ * longest default header label — wrapped to two lines while every other header stayed on one.
+ *
+ * jsdom computes no layout (no line-breaking, no `getBoundingClientRect`), so this can only pin
+ * the class that prevents the wrap, not the wrap itself — the same structural limit this
+ * project's own docs name for any layout defect. The absence of overflow at 168px was checked
+ * separately, in a real rendered Storybook build: the label's measured width left ~20px of
+ * margin inside the cell, so `whitespace-nowrap` alone neither clips nor bleeds into the next
+ * column for the default label.
+ */
+describe('header labels do not wrap (#142)', () => {
+  it('every default header label carries whitespace-nowrap, "Task Assign Name" included', () => {
+    render(<TaskTable groups={[{ title: 'To Do', rows: [] }]} />);
+
+    for (const label of ['# Task Name', 'Task Tags', 'Estimate', 'Task Assign Name', 'Due Date']) {
+      expect(screen.getByText(label).className).toContain('whitespace-nowrap');
+    }
+  });
+
+  it('a caller-supplied header label gets the same treatment', () => {
+    render(
+      <TaskTable
+        groups={[{ title: 'To Do', rows: [] }]}
+        columnLabels={{ assignee: 'A Much Longer Assignee Column Label' }}
+      />,
+    );
+    expect(screen.getByText('A Much Longer Assignee Column Label').className).toContain(
+      'whitespace-nowrap',
+    );
+  });
+});

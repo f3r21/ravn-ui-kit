@@ -1407,7 +1407,7 @@ function Un({
               x === d.length - 1 && "rounded-r-4"
             ),
             style: { width: h },
-            children: /* @__PURE__ */ e("span", { className: I, children: p })
+            children: /* @__PURE__ */ e("span", { className: f(I, "whitespace-nowrap"), children: p })
           },
           m
         )) }),

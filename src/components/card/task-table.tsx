@@ -968,7 +968,7 @@ export function TaskTable({
               )}
               style={{ width }}
             >
-              <span className={CELL_TEXT}>{label}</span>
+              <span className={cn(CELL_TEXT, 'whitespace-nowrap')}>{label}</span>
             </div>
           ))}
         </div>

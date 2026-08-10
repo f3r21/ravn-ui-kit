@@ -10,6 +10,16 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **`TaskTable` header labels no longer wrap** (#142). `"Task Assign Name"`, the longest default
+  header, wrapped to two lines while every other header stayed on one — `CELL_TEXT` carried no
+  `whitespace-nowrap`/`truncate`. Fixed by adding `whitespace-nowrap` to every header label
+  (`COLUMN_WIDTHS` and the 1108px total are untouched). Measured in a real rendered build: the
+  label leaves ~20px of margin inside its 168px cell, so this neither clips nor overflows into
+  the next column for any of the five default labels. A caller-supplied label significantly
+  longer than the defaults can still overflow its cell — this kit carries no responsive columns
+  (desktop-only, 833px floor) to fall back to, so a long custom label is the one case this does
+  not fully solve.
+
 - **BREAKING: `Datepicker` renders the design's chip, not a white field** (#130). Restore the old
   appearance with `className="h-10 px-3 py-2 bg-surface-neutral text-neutral-5 border border-subtle rounded-md"`.
   **Minor**, under `CONTRIBUTING.md`'s pre-1.0 carve-out, called out here as the policy requires.
