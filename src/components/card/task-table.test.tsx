@@ -14,6 +14,11 @@ import {
 import type { HeadingLevel } from '../../types/heading-level';
 import { TaskCard } from './task-card';
 import { EmptyState } from '../empty-state/empty-state';
+import {
+  statusToIndicatorColor,
+  TASK_STATUS_INDICATOR_COLOR,
+  type TaskStatus,
+} from '../../types/color-variants';
 
 describe('TaskTable Component', () => {
   it('renders each group header and its rows', () => {
@@ -85,6 +90,7 @@ describe('TaskTable Component', () => {
       const onClick = vi.fn();
       renderRow({ onClick });
 
+      await user.tab(); // the group header toggle (#140)
       await user.tab(); // the row-select checkbox
       await user.tab(); // the title, which is the opener
 
@@ -562,6 +568,93 @@ describe('TaskTable group heading level (#95)', () => {
   });
 });
 
+/**
+ * #140. The header rendered a `ChevronDownIcon` and rows unconditionally, with no `useState`
+ * anywhere in the file and no handler on the header — the icon was decoration. These fail
+ * against that code: there is no `aria-expanded` to read and no button to click.
+ */
+describe('group headers collapse and expand their rows (#140)', () => {
+  const groups = () => [
+    {
+      title: 'To Do (02)',
+      rows: [
+        { index: 1, title: 'Create wireframe' },
+        { index: 2, title: 'Slack Logo Design' },
+      ],
+    },
+  ];
+
+  it('starts expanded: aria-expanded is true and the rows are visible', () => {
+    render(<TaskTable groups={groups()} />);
+    expect(screen.getByRole('button', { name: 'To Do (02)' }).getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+    expect(screen.getByText('Create wireframe')).toBeDefined();
+  });
+
+  it('clicking the header collapses the group: rows leave the DOM and aria-expanded flips', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+
+    await user.click(screen.getByRole('button', { name: 'To Do (02)' }));
+
+    expect(screen.getByRole('button', { name: 'To Do (02)' }).getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+    expect(screen.queryByText('Slack Logo Design')).toBeNull();
+  });
+
+  it('clicking a second time re-expands it', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+    const header = screen.getByRole('button', { name: 'To Do (02)' });
+
+    await user.click(header);
+    await user.click(header);
+
+    expect(header.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByText('Create wireframe')).toBeDefined();
+  });
+
+  it('is keyboard-operable: focusing the header and pressing Enter toggles it', async () => {
+    const user = userEvent.setup();
+    render(<TaskTable groups={groups()} />);
+    const header = screen.getByRole('button', { name: 'To Do (02)' });
+
+    header.focus();
+    await user.keyboard('{Enter}');
+
+    expect(header.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+  });
+
+  it('collapsing one group leaves a sibling group expanded (state is per-group)', async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskTable
+        groups={[
+          ...groups(),
+          { title: 'In Progress', rows: [{ index: 1, title: 'Dashboard Design' }] },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'To Do (02)' }));
+
+    expect(screen.queryByText('Create wireframe')).toBeNull();
+    expect(screen.getByText('Dashboard Design')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'In Progress' }).getAttribute('aria-expanded')).toBe(
+      'true',
+    );
+  });
+
+  it('the group title stays discoverable as a heading, collapsible or not', () => {
+    render(<TaskTable groups={groups()} />);
+    expect(screen.getByRole('heading', { name: 'To Do (02)' }).tagName).toBe('H3');
+  });
+});
+
 /** #94 — the cell and the card share the rule while keeping their own words. */
 describe('points wording (#94)', () => {
   it('the cell pluralises, including zero', () => {
@@ -896,5 +989,66 @@ describe('header labels do not wrap (#142)', () => {
     expect(screen.getByText('A Much Longer Assignee Column Label').className).toContain(
       'whitespace-nowrap',
     );
+  });
+});
+
+/**
+ * #141. `indicatorColor` defaulted unconditionally to `'green'`, so every row in every group
+ * rendered the same stripe regardless of status — this default swap and the status mapping are
+ * what fix it. Fails against the pre-fix component: the first case below reads `bg-secondary-4`
+ * (green) rather than `bg-neutral-2`, and the mapping export does not exist at all.
+ */
+describe('TaskTableRow.indicatorColor no longer defaults to green, and a status mapping exists (#141)', () => {
+  const stripeClass = (container: HTMLElement) =>
+    container.querySelector('.w-1.h-full.shrink-0')?.className ?? '';
+
+  it('defaults to neutral, not green, when omitted', () => {
+    const { container } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" />
+        </tbody>
+      </table>,
+    );
+    expect(stripeClass(container)).toContain('bg-neutral-2');
+    expect(stripeClass(container)).not.toContain('bg-secondary-4');
+  });
+
+  it('still renders whatever colour is explicitly passed', () => {
+    const { container } = render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" indicatorColor="red" />
+        </tbody>
+      </table>,
+    );
+    expect(stripeClass(container)).toContain('bg-primary-4');
+  });
+
+  /**
+   * Table-driven across all five statuses rather than one happy-path case — a mapping is only
+   * proven once every branch of it is read, not just the one an author remembered to check.
+   */
+  it.each([
+    ['BACKLOG', 'neutral'],
+    ['TODO', 'neutral'],
+    ['IN_PROGRESS', 'yellow'],
+    ['DONE', 'green'],
+    ['CANCELLED', 'red'],
+  ] as const)('%s maps to %s', (status, color) => {
+    expect(statusToIndicatorColor(status)).toBe(color);
+    expect(TASK_STATUS_INDICATOR_COLOR[status]).toBe(color);
+  });
+
+  it('covers exactly the app-facing status set, no more and no fewer', () => {
+    const statuses: TaskStatus[] = ['BACKLOG', 'TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
+    expect(Object.keys(TASK_STATUS_INDICATOR_COLOR).sort()).toEqual([...statuses].sort());
+  });
+
+  it("control: a status the mapping doesn't cover is a compile error, not a runtime default", () => {
+    // @ts-expect-error -- 'ARCHIVED' is not a member of TaskStatus; this line must fail to
+    // typecheck, which is what `npm run gate`'s typecheck step actually proves. If this stops
+    // erroring, the union widened silently and this control caught it.
+    expect(() => statusToIndicatorColor('ARCHIVED')).not.toThrow();
   });
 });

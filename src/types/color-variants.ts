@@ -162,3 +162,59 @@ export const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string> = {
   soon: 'due soon',
   overdue: 'overdue',
 };
+
+/**
+ * The consuming app's task lifecycle, as a domain concept the kit renders directly — the same
+ * shape as `DueDateUrgency` above: a status vocabulary the kit does not otherwise model, carried
+ * here because a Task-domain component (`TaskTableRow.indicatorColor`, ravn-ui-kit#141) needs to
+ * render it and the app should not have to reinvent the mapping.
+ *
+ * Matches the consuming app's own generated `Status` enum
+ * (`ravn-task-management-challenge/src/graphql/generated/graphql.ts`) exactly — the same five
+ * values — so `task.status` passes straight through with no translation layer of the app's own.
+ * `priority` is deliberately absent: it does not exist as an app field (checked the GraphQL
+ * schema, the task fragment and the task form — zero hits repo-wide for `priority`), so there is
+ * nothing else to key this mapping on.
+ */
+export type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED';
+
+/**
+ * Shared mapping from a task's status onto the accent palette, so a consumer rendering
+ * `TaskTableRow.indicatorColor` does not have to invent one — every row defaulted to the same
+ * green stripe before this existed (ravn-ui-kit#141).
+ *
+ * **Not spec-verified, and the design vault says more than merely "unverified" here.** The
+ * mockup this component is built from (`Mockups/Task Default View/My Task Mockup.md`) draws the
+ * indicator stripe in three different colours *within a single status group* — `To Do`'s five
+ * sample rows read red/green/yellow/green/red — which rules out a status→colour reading of the
+ * source design rather than just lacking one. This mapping is an engineering decision in the
+ * same category `DUE_DATE_URGENCY_COLOR` already is: some deterministic mapping beats every row
+ * rendering identically, chosen to bridge `StatusTone`'s "what a state means" reading onto
+ * `AccentColor`:
+ *
+ * | Status                | `StatusTone` reading          | `AccentColor` |
+ * | ---------------------- | ------------------------------ | -------------- |
+ * | `BACKLOG`, `TODO`      | not started / queued           | `neutral`      |
+ * | `IN_PROGRESS`          | warning: active, not settled   | `yellow`       |
+ * | `DONE`                 | success                        | `green`        |
+ * | `CANCELLED`            | danger: negative terminal      | `red`          |
+ *
+ * `blue` is unused, matching `indicatorColorMap`'s own doc comment on `TaskTableRow` — no accent
+ * sample in the mockup ever draws it.
+ */
+export const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor> = {
+  BACKLOG: 'neutral',
+  TODO: 'neutral',
+  IN_PROGRESS: 'yellow',
+  DONE: 'green',
+  CANCELLED: 'red',
+};
+
+/**
+ * Turns a task's status into the accent colour its `TaskTableRow.indicatorColor` stripe should
+ * render. A thin wrapper over `TASK_STATUS_INDICATOR_COLOR` so a consumer imports one name
+ * rather than indexing a `Record` directly.
+ */
+export function statusToIndicatorColor(status: TaskStatus): AccentColor {
+  return TASK_STATUS_INDICATOR_COLOR[status];
+}

@@ -8,6 +8,16 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Added
+
+- **`statusToIndicatorColor()` and `TASK_STATUS_INDICATOR_COLOR`** (#141), mapping the consuming
+  app's five task statuses onto `TaskTableRow.indicatorColor`'s `AccentColor` vocabulary:
+  `BACKLOG`/`TODO` → `neutral`, `IN_PROGRESS` → `yellow`, `DONE` → `green`, `CANCELLED` → `red`.
+  Not spec-verified — the design vault shows the indicator stripe in three different colours
+  within a single status group, ruling out a status→colour reading of the source rather than
+  merely lacking one — so this is an engineering decision, the same category
+  `DUE_DATE_URGENCY_COLOR` already is.
+
 ### Fixed
 
 - **`TaskTable` header labels no longer wrap** (#142). `"Task Assign Name"`, the longest default
@@ -19,6 +29,18 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   longer than the defaults can still overflow its cell — this kit carries no responsive columns
   (desktop-only, 833px floor) to fall back to, so a long custom label is the one case this does
   not fully solve.
+- **BREAKING: `TaskTableRow.indicatorColor` no longer defaults to `'green'`** (#141). Every row in
+  every status group rendered the same stripe, because nothing supplied a value and `'green'`
+  looked like a safe default rather than the "everything is done" it actually painted. Defaults to
+  `'neutral'` now. **Minor**, under `CONTRIBUTING.md`'s pre-1.0 carve-out — a visual change to
+  every row that never set `indicatorColor` explicitly. Pass `indicatorColor="green"` to keep the
+  old look, or compute a real value with `statusToIndicatorColor()` above.
+- **`TaskTable` group headers actually collapse now** (#140). The chevron next to a group title
+  (`"To Do (05)"`, `"In Progress"`) rendered unconditionally and did nothing when clicked — no
+  handler existed anywhere in the file, and rows always rendered regardless. Clicking (or
+  Enter/Space on) a group header now toggles that group's rows, with `aria-expanded` on the
+  header and the chevron rotating to match. State is internal and per-group; nothing changes for
+  a consumer that never interacts with the header.
 
 - **BREAKING: `Datepicker` renders the design's chip, not a white field** (#130). Restore the old
   appearance with `className="h-10 px-3 py-2 bg-surface-neutral text-neutral-5 border border-subtle rounded-md"`.
