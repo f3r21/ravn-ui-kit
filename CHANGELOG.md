@@ -24,13 +24,20 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `TaskTag.accent`** (#14), in `types/color-variants.ts`. `TaskTag` was already exported and
   shared by `TaskCard.tags`/`TagCell.labels` — the issue that prompted this rename claimed no
   such type existed to import; that claim was stale, re-derived and corrected rather than
-  trusted. **Minor.**
+  trusted. **Breaks a real app-side caller** — `to-kit-props.ts:80` maps
+  `tags: task.tags.map((tag) => ({ label: tagLabel(tag), variant: tagAccent(tag) }))`;
+  mechanical field rename on the app side, tracked as an app-side follow-up alongside the
+  other two below. **Minor.**
 - **BREAKING: `DueDateCell.urgency`/`urgencyLabel` renamed to `dueDateUrgency`/
   `dueDateUrgencyLabel`** (#14), matching `TaskCard` and `TaskTableRow`, which already used
   the longer name for the identical value — previously documented as "matching each
   component's own prop vocabulary," which is the inconsistency this removes. **Minor.**
 - **BREAKING: `TaskTableRow.indicatorColor` renamed to `TaskTableRow.accent`** (#14), same
-  axis-naming convention as `Tag`. **Minor.**
+  axis-naming convention as `Tag`. **Breaks a real, recent app-side caller** —
+  `to-kit-props.ts:166` started passing `indicatorColor: statusToIndicatorColor(...)` (the
+  kit#141/app-side wiring) only a day before this rename landed; caught in review, not
+  before. Mechanical fix on the app side (`indicatorColor` → `accent` in that one object
+  literal and its test), tracked as an app-side follow-up. **Minor.**
 - **BREAKING: `TaskTableRow.onSelectedChange` renamed to `onChange`** (#14), matching React
   Aria's own `isSelected`/`onChange` pairing on `AriaCheckboxProps` — this is a per-row
   boolean checkbox toggle, not the multi-item `Selection`/`onSelectionChange` shape `Tabs`
@@ -76,9 +83,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **BREAKING: `Modal.width?: string` removed; fold the same Tailwind class into
   `className`** (#14), which `Modal` did not previously accept. `width` was typed as a raw
   string standing in for "a Tailwind max-width class," so `width="400px"` typechecked and
-  silently did nothing. No caller in this kit or the consuming app ever passed it — every one
-  used the `max-w-md` default — so this is a pure rename with no behaviour change for anyone:
-  pass `className="max-w-lg"` where you would have passed `width="max-w-lg"`. **Minor.**
+  silently did nothing. **This kit's own callers never passed it, but the consuming app has
+  two real ones** — `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both
+  `width="max-w-[578px]"` — caught in review after this entry originally (and wrongly)
+  claimed zero callers anywhere. Behavior is unchanged, only the prop name is:
+  `className="max-w-[578px]"` in their place. App-side follow-up tracked alongside the
+  `tags[].variant`→`accent` one below. **Minor.**
 
 ## [0.9.0] - 2026-08-10
 

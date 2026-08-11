@@ -20,10 +20,13 @@ export interface ModalProps {
    * the dialog's default `max-w-md` width.
    *
    * Replaces `width?: string` (#14) — that prop was typed as a raw string standing in for "a
-   * Tailwind max-width class," so `width="400px"` typechecked and silently did nothing. No
-   * caller in this kit or the consuming app ever passed it (every one used the `max-w-md`
-   * default), so folding it into `className` is a pure rename with no behavior change for
-   * anyone: pass `className="max-w-lg"` where you would have passed `width="max-w-lg"`.
+   * Tailwind max-width class," so `width="400px"` typechecked and silently did nothing.
+   * **This kit's own callers never passed it**, but the consuming app has two real ones —
+   * `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both `width="max-w-[578px]"`
+   * — caught in review, not by the original claim, which said "no caller, kit or app" and
+   * was wrong about the app half. Pass `className="max-w-[578px]"` in their place; behavior
+   * is unchanged, only the prop name is. Tracked as an app-side follow-up alongside this
+   * PR's other renamed props.
    */
   className?: string;
   /**
