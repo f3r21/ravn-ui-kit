@@ -26,8 +26,9 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   such type existed to import; that claim was stale, re-derived and corrected rather than
   trusted. **Breaks a real app-side caller** — `to-kit-props.ts:80` maps
   `tags: task.tags.map((tag) => ({ label: tagLabel(tag), variant: tagAccent(tag) }))`;
-  mechanical field rename on the app side, tracked as an app-side follow-up alongside the
-  other two below. **Minor.**
+  mechanical field rename on the app side, tracked as
+  [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157) alongside
+  the other two below. **Minor.**
 - **BREAKING: `DueDateCell.urgency`/`urgencyLabel` renamed to `dueDateUrgency`/
   `dueDateUrgencyLabel`** (#14), matching `TaskCard` and `TaskTableRow`, which already used
   the longer name for the identical value — previously documented as "matching each
@@ -37,7 +38,8 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `to-kit-props.ts:166` started passing `indicatorColor: statusToIndicatorColor(...)` (the
   kit#141/app-side wiring) only a day before this rename landed; caught in review, not
   before. Mechanical fix on the app side (`indicatorColor` → `accent` in that one object
-  literal and its test), tracked as an app-side follow-up. **Minor.**
+  literal and its test), tracked as
+  [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157). **Minor.**
 - **BREAKING: `TaskTableRow.onSelectedChange` renamed to `onChange`** (#14), matching React
   Aria's own `isSelected`/`onChange` pairing on `AriaCheckboxProps` — this is a per-row
   boolean checkbox toggle, not the multi-item `Selection`/`onSelectionChange` shape `Tabs`
@@ -87,8 +89,9 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   two real ones** — `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both
   `width="max-w-[578px]"` — caught in review after this entry originally (and wrongly)
   claimed zero callers anywhere. Behavior is unchanged, only the prop name is:
-  `className="max-w-[578px]"` in their place. App-side follow-up tracked alongside the
-  `tags[].variant`→`accent` one below. **Minor.**
+  `className="max-w-[578px]"` in their place. App-side follow-up tracked as
+  [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157) alongside
+  the `tags[].variant`→`accent` one below. **Minor.**
 
 ## [0.9.0] - 2026-08-10
 
