@@ -1,9 +1,15 @@
-import { useRef, useState } from 'react';
-import { useTextField } from 'react-aria';
+import { useState } from 'react';
+import { useTextField, useObjectRef } from 'react-aria';
 import { cn } from '../../utils/cn';
 import { SearchIcon } from '../icons/icons';
 
 export interface SearchBarProps {
+  /**
+   * Ref to the underlying `<input>` (#11), matching the form-control convention
+   * `Datepicker`/`Input`/`LabelCheckbox` already follow. Merged with the internal ref
+   * `useTextField` needs via `useObjectRef`.
+   */
+  ref?: React.Ref<HTMLInputElement>;
   /**
    * Placeholder text shown in the input.
    * @default 'Search...'
@@ -56,12 +62,13 @@ export function SearchBar({
   label = 'Search',
   id,
   className,
+  ref: forwardedRef,
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState('');
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
 
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useObjectRef(forwardedRef);
 
   const { inputProps } = useTextField(
     {

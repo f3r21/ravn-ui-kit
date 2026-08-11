@@ -1,7 +1,7 @@
 import { cn } from '../../utils/cn';
 import { SidebarItem, type SidebarItemProps } from './sidebar-item';
 
-export interface ApplicationSidebarProps {
+export interface ApplicationSidebarProps extends React.ComponentPropsWithRef<'nav'> {
   /** Logo / brand element shown at the top */
   logo?: React.ReactNode;
   /** Navigation items to render */
@@ -55,9 +55,13 @@ export function ApplicationSidebar({
   items,
   label = 'Main navigation',
   className,
+  ref,
+  ...rest
 }: ApplicationSidebarProps) {
   return (
     <nav
+      {...rest}
+      ref={ref}
       aria-label={label}
       className={cn(
         // 232px / rounded-lg (24px) matches the real "Sidebar" layer (ApplicationSidebar01.md + Dashboard Mockup.md).

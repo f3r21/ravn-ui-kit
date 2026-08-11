@@ -4,7 +4,7 @@ import { SearchBar } from './search-bar';
 import { Avatar } from '../avatar/avatar';
 import { BellIcon, CloseIcon } from '../icons/icons';
 
-export interface TopNavProps {
+export interface TopNavProps extends React.ComponentPropsWithRef<'header'> {
   /** Controlled search value. */
   searchValue?: string;
   /** Placeholder text shown in the search input. */
@@ -116,6 +116,8 @@ export function TopNav({
   userSlot,
   actions,
   className,
+  ref,
+  ...rest
 }: TopNavProps) {
   const [internalSearchValue, setInternalSearchValue] = useState('');
   const isControlled = controlledSearchValue !== undefined;
@@ -133,6 +135,8 @@ export function TopNav({
 
   return (
     <header
+      {...rest}
+      ref={ref}
       className={cn(
         'flex items-center justify-between gap-6 px-6 py-3 bg-surface-panel rounded-md',
         className,
@@ -153,9 +157,12 @@ export function TopNav({
             type="button"
             onClick={clearSearch}
             aria-label={clearSearchLabel}
-            className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full"
+            // No `[&>svg]:w-full [&>svg]:h-full` (#11) — that descendant selector is (0,2,0)
+            // specificity, which outranks a consumer's own `size-*` on their icon. This slot
+            // takes no consumer-supplied icon, so the default is sized directly instead.
+            className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs"
           >
-            <CloseIcon />
+            <CloseIcon className="w-full h-full" />
           </button>
         ) : null}
 
@@ -170,13 +177,16 @@ export function TopNav({
             type="button"
             onClick={onNotificationsClick}
             aria-label={notificationsLabel}
-            className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs [&>svg]:w-full [&>svg]:h-full"
+            // Same `[&>svg]` removal as above (#11) — `icon` here IS consumer-supplied, so
+            // sizing only the fallback `BellIcon` (below) is what lets `icon={<X
+            // className="size-4" />}` actually take effect instead of being overridden.
+            className="w-6 h-6 shrink-0 text-muted hover:text-main transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-xs"
           >
-            {icon ?? <BellIcon />}
+            {icon ?? <BellIcon className="w-full h-full" />}
           </button>
         ) : (
-          <span className="w-6 h-6 text-muted shrink-0 [&>svg]:w-full [&>svg]:h-full">
-            {icon ?? <BellIcon />}
+          <span className="w-6 h-6 text-muted shrink-0">
+            {icon ?? <BellIcon className="w-full h-full" />}
           </span>
         )}
 

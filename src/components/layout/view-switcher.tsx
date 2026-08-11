@@ -2,10 +2,16 @@ import { useRef } from 'react';
 import { Button } from '../button/button';
 import { cn } from '../../utils/cn';
 
-export interface ViewSwitcherProps {
+export interface ViewSwitcherProps extends Omit<React.ComponentPropsWithRef<'div'>, 'onChange'> {
   /** Which side is currently active. */
   value: 'left' | 'right';
-  /** Called with the side that was pressed. */
+  /**
+   * Called with the side that was pressed.
+   *
+   * Omitted from the inherited `div` attributes above (#11): every `HTMLAttributes` type
+   * carries a generic `onChange: FormEventHandler`, and this one takes the selected side
+   * directly — the same real signature conflict `SegmentedControl.onChange` has.
+   */
   onChange?: (value: 'left' | 'right') => void;
   /** 24×24 icon for the left button (`currentColor`). */
   leftIcon: React.ReactNode;
@@ -64,16 +70,20 @@ export function ViewSwitcher({
   rightLabel,
   label = 'View',
   className,
+  ref,
+  ...rest
 }: ViewSwitcherProps) {
-  // A ref per side would need `Button` to forward one, and this kit has no `forwardRef`
-  // anywhere (`grep -rn "forwardRef" src/` → 0 hits) — so focus moves via the group's own
-  // node instead. Exactly two buttons live here, in source order, so index 0/1 is the left
-  // and right side rather than a guess about the DOM.
-  const rootRef = useRef<HTMLDivElement>(null);
+  // Was a DOM query (`rootRef.current?.querySelectorAll('button')`) — `Button` forwarded no
+  // ref anywhere in this kit at the time, so this queried the rendered DOM by position
+  // instead (#11 fixed that; see `button.tsx`). Two real refs, not a query, now that
+  // `Button` accepts one — the "exactly two buttons in source order" assumption the query
+  // depended on is gone along with it, not just hidden.
+  const leftRef = useRef<HTMLButtonElement>(null);
+  const rightRef = useRef<HTMLButtonElement>(null);
 
   const select = (side: 'left' | 'right') => {
     onChange?.(side);
-    rootRef.current?.querySelectorAll('button')[side === 'left' ? 0 : 1]?.focus();
+    (side === 'left' ? leftRef : rightRef).current?.focus();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -103,12 +113,14 @@ export function ViewSwitcher({
 
   return (
     <div
-      ref={rootRef}
+      {...rest}
+      ref={ref}
       role="radiogroup"
       aria-label={label}
       className={cn('flex items-center w-20 h-10 bg-surface-shell rounded-sm', className)}
     >
       <Button
+        ref={leftRef}
         variant="secondary"
         role="radio"
         aria-checked={value === 'left'}
@@ -123,6 +135,7 @@ export function ViewSwitcher({
         {leftIcon}
       </Button>
       <Button
+        ref={rightRef}
         variant="secondary"
         role="radio"
         aria-checked={value === 'right'}

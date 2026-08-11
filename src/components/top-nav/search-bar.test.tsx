@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -96,5 +97,12 @@ describe('SearchBar Component', () => {
     expect(input.className).not.toContain('outline-none');
     expect(input.className).toContain('focus-visible:outline-2');
     expect(input.className).toContain('focus-visible:outline-interactive-text');
+  });
+
+  it('forwards a ref to the input (#11)', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<SearchBar ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current).toBe(screen.getByRole('searchbox'));
   });
 });
