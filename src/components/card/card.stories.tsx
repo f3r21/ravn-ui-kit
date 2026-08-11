@@ -19,6 +19,10 @@ const meta: Meta<typeof Card> = {
   // The card carries its own panel fill, so on Storybook's light default canvas it was a dark
   // box floating on white. Same treatment as `TaskCard` and `TaskTable` take.
   decorators: [withSurface('neutral-5')],
+  argTypes: {
+    as: { control: 'select', options: ['div', 'article', 'section', 'li'] },
+    isInteractive: { control: 'boolean' },
+  },
 };
 
 export default meta;

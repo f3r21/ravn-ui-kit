@@ -9,7 +9,7 @@ const sampleTasks = [
     points: 3,
     dueDateText: '2 DAYS',
     dueDateUrgency: 'soon' as const,
-    tags: [{ label: 'FRONTEND', variant: 'green' as const }],
+    tags: [{ label: 'FRONTEND', accent: 'green' as const }],
     assigneeName: 'Jerome Bell',
   },
   {
@@ -17,7 +17,7 @@ const sampleTasks = [
     points: 8,
     dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue' as const,
-    tags: [{ label: 'BUG', variant: 'red' as const }],
+    tags: [{ label: 'BUG', accent: 'red' as const }],
     assigneeName: 'Jane Doe',
   },
 ];
@@ -32,6 +32,10 @@ const meta: Meta<typeof TaskListView> = {
   // standing in for a surface this kit does not have.
   decorators: [withSurface('neutral-5')],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    headingLevel: { control: 'select', options: [2, 3, 4, 5, 6] },
+    isLoading: { control: 'boolean' },
+  },
   args: {
     title: 'Working (03)',
     tasks: sampleTasks,

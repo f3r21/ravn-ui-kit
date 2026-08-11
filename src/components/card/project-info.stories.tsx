@@ -22,6 +22,9 @@ const meta: Meta<typeof ProjectInfo> = {
   title: 'Components/ProjectInfo',
   component: ProjectInfo,
   tags: ['autodocs'],
+  argTypes: {
+    headingLevel: { control: 'select', options: [2, 3, 4, 5, 6] },
+  },
   decorators: [withSurface('neutral-4')],
   args: {
     title: 'Working (03) - RAVN Challenge',
