@@ -39,6 +39,31 @@
   and `AppSidebar` permanently for this reason. Do not add a breakpoint to
   one component in isolation — it makes that component responsive inside a
   shell that is not, which is worse than either answer on its own.
+- **A fixed pixel width around text is a claim about the font that renders it, and this kit
+  ships no font.** `--font-sans` is `'SF Pro Display', system-ui, sans-serif`
+  (`tokens.css:172`) — the kit bundles none of the three, so which one actually renders
+  depends on the consumer's machine: macOS is rescued by `system-ui` resolving to San
+  Francisco, while a Linux runner with neither of the first two falls through to
+  `sans-serif` and gets DejaVu Sans instead, which is wider. A width transcribed from Figma
+  (where the real font was installed) is only true on the machine that measured it (#20).
+  `scripts/font-fallback-sweep.mjs` reproduces the Linux case on any machine — it renders
+  every story once normally and once with `--font-sans` forced to a substitute font via an
+  injected `@font-face`, and reports any element that newly overflows its own box. Run it
+  before shipping a new fixed-pixel width around text, not after CI finds it.
+  **The house pattern, absent a reason to do otherwise, is `truncate` plus letting the box's
+  automatic minimum size drop to 0** (`overflow: hidden` does both at once) — `EstimateModal`,
+  `LabelModal` and `AssigneeModal` all take this path for a header inside a Figma-fixed card
+  width that has no room to grow (`estimate-modal.tsx:93-117`). Prefer `flex-wrap` over a
+  hard truncate when the box is a row of independent items rather than a single label —
+  `add-task-modal.tsx:270`'s chip row wraps instead of clipping, because there is no single
+  "less important" chip to cut. **Do not ship SF Pro Display itself to close this** —
+  Apple's font license (developer.apple.com/fonts) states plainly "You may not embed the
+  Apple Font in any software programs or other products," restricted to mockups of Apple-
+  platform interfaces by registered Apple Developers; a web-distributed `@font-face` is
+  exactly what it forbids. A real font file is still an option in principle — a freely
+  licensed, metrically-similar substitute (e.g. Inter), shipped as design intent rather than
+  the literal Figma name — but that is a separate, larger decision than either pattern above
+  and is not a quick fix for a single overflowing box.
 - **Field labels are `sr-only` by default.** `Input`, `Datepicker`, `Select`
   and `FormField` all default `isLabelVisible` to `false` and render the
   label `sr-only` — never `hidden`/`display:none`, so the accessible name

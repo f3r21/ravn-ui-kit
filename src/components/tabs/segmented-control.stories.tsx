@@ -35,7 +35,12 @@ export const Playground: Story = {
   args: {
     defaultValue: 'list',
     label: 'Task layout',
-    className: 'w-64',
+    // `w-72`, not `w-64` (#20): no consumer constrains this component's width today — this
+    // number exists only to demonstrate that `className` is honoured — but `w-64` (256px)
+    // clipped "Board"/"List"/"Table" by 8px under a DejaVu Sans fallback, which would have
+    // made this story itself the next macOS-only-passing example. `w-72` carries slack
+    // under both fonts without pretending to be a real design value.
+    className: 'w-72',
   },
 };
 

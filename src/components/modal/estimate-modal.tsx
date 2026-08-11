@@ -113,7 +113,15 @@ export function EstimateModal({
             accessibility baseline at all. `overflow: hidden` also drops this flex item's
             automatic minimum size from min-content to 0, which is the mechanism that lets
             the label clip rather than push out of the box. `LabelModal` and `AssigneeModal`
-            render the same header and already use `truncate`; this one was the outlier. */}
+            render the same header and already use `truncate`; this one was the outlier.
+
+            **Still clips today, deliberately** (#20): a DejaVu Sans sweep of every story
+            (`scripts/font-fallback-sweep.mjs`) confirms this exact span reproduces the
+            105/88 numbers above under a non-Apple fallback — "Estimate" renders truncated
+            rather than overflowing. That is this component's chosen trade-off in the
+            `w-[122px]` Figma card, not a regression to fix; a card that size has no room to
+            grow without deviating from Figma, and clipping the label is the accepted cost
+            of keeping it. */}
         <span className="text-body-xl font-semibold text-muted-on-dark font-sans truncate">
           {label}
         </span>

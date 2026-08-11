@@ -94,6 +94,40 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `className="max-w-[578px]"` in their place. App-side follow-up tracked as
   [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157) alongside
   the `tags[].variant`→`accent` one below. **Minor.**
+### Fixed
+
+- **`AddTaskModal`'s four-chip trigger row wraps instead of silently overflowing under a
+  non-Apple font fallback** (#20). `--font-sans` is `'SF Pro Display', system-ui,
+sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> DejaVu Sans
+  fallback the row's real content measures 555px against a 546px content box, a 9px overflow
+  invisible on macOS. `flex-wrap` costs nothing on the common case and turns the
+  font-substitution case into a second row instead of a silent horizontal overflow. Found via
+  a new sweep tool, `scripts/font-fallback-sweep.mjs` — see below.
+- **`SegmentedControl`'s `Playground` story no longer clips its own labels under the same
+  fallback** (#20) — its demo `className` was `w-64` (256px), 8px short of what
+  "Board"/"List"/"Table" needs under DejaVu Sans; widened to `w-72`. No real consumer
+  constrains this component's width today, so this was a story-authoring gap rather than a
+  product defect, but the sweep tool below would have flagged it as a false positive on
+  every future run otherwise.
+
+### Added
+
+- **`scripts/font-fallback-sweep.mjs`** (#20): renders every Storybook story twice — once as
+  the running machine naturally resolves `--font-sans`, once with it forced to a substitute
+  font via an injected `@font-face` — and reports any element that newly overflows its own
+  box under the substitute. This is the kit's existing verification technique from #6
+  (manually applied there to find `EstimateModal`'s header overflow) turned into a reusable
+  tool; not yet wired into CI, since the exact DejaVu Sans path on this repo's Ubuntu runner
+  was not independently confirmed as part of this change — confirm it before adding a
+  workflow step, rather than assuming a distro default.
+- **A font-fallback rule in `CONTRIBUTING.md`**, next to the existing design-value rule
+  (#20): a fixed pixel width around text is a claim about the font that renders it, and this
+  kit ships no font, so the house pattern is `truncate` (letting the box's minimum size drop
+  to 0) for a single label in a Figma-fixed box, or `flex-wrap` for a row of independent
+  items with no single thing to clip. Also states plainly, quoting Apple's own font license,
+  that shipping SF Pro Display itself is not an available fix: "You may not embed the Apple
+  Font in any software programs or other products," restricted to Apple-platform interface
+  mockups by registered Apple Developers.
 
 ## [0.9.0] - 2026-08-10
 
