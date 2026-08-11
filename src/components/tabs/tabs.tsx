@@ -14,7 +14,7 @@ export interface TabItem {
   icon?: React.ReactNode;
 }
 
-export interface TabsProps {
+export interface TabsProps extends React.ComponentPropsWithRef<'div'> {
   /** Tab item definitions */
   items: TabItem[];
   /** Content to render per tab (keyed by tab id) */
@@ -72,6 +72,8 @@ export function Tabs({
   onSelectionChange,
   label = 'Tab navigation',
   className,
+  ref,
+  ...rest
 }: TabsProps) {
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
 
@@ -91,7 +93,7 @@ export function Tabs({
   const { tabListProps } = useTabList<TabItem>({ 'aria-label': label }, state, tabListRef);
 
   return (
-    <div className={cn('flex flex-col', className)}>
+    <div {...rest} ref={ref} className={cn('flex flex-col', className)}>
       {/* Tab list — role="tablist" */}
       <div {...tabListProps} ref={tabListRef} className="flex items-end">
         {[...state.collection].map((item) => (

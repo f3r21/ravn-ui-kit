@@ -4,6 +4,7 @@ import {
   useMenu,
   useMenuItem,
   useMenuTrigger,
+  useObjectRef,
   type AriaMenuOptions,
   type AriaMenuProps,
 } from 'react-aria';
@@ -42,6 +43,11 @@ export interface MenuProps<T extends object> extends Omit<
    * component doc comment for why.
    */
   triggerClassName?: string;
+  /**
+   * Ref to the trigger button (#11). Merged with the internal ref
+   * `useMenuTrigger`/`useButton` need via `useObjectRef`.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 /**
@@ -79,10 +85,11 @@ export function Menu<T extends object>({
   triggerContent,
   isDisabled,
   triggerClassName,
+  ref: forwardedRef,
   ...menuProps
 }: MenuProps<T>) {
   const state = useMenuTriggerState({});
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useObjectRef(forwardedRef);
 
   const { menuTriggerProps, menuProps: triggerMenuProps } = useMenuTrigger<T>(
     { isDisabled },
