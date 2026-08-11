@@ -7,6 +7,7 @@ import {
   TaskTableRow,
   DueDateCell,
   EstimationCell,
+  AssigneeNameCell,
   TagCell,
   DEFAULT_COLUMNS,
   resolveColumns,
@@ -1103,5 +1104,52 @@ describe('TagCell ref and rest-spread (#11)', () => {
     render(<TagCell labels={[{ label: 'BUG' }]} ref={ref} data-testid="tag-cell" />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
     expect(screen.getByTestId('tag-cell')).toBe(ref.current);
+  });
+});
+
+describe('DueDateCell, EstimationCell, AssigneeNameCell ref and rest-spread (#11)', () => {
+  it('DueDateCell forwards a ref and spreads unrecognised props', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(<DueDateCell date="20 July, 2026" ref={ref} data-testid="due-date" />);
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+    expect(screen.getByTestId('due-date')).toBe(ref.current);
+  });
+
+  it('EstimationCell forwards a ref and spreads unrecognised props', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(<EstimationCell points={4} ref={ref} data-testid="estimation" />);
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+    expect(screen.getByTestId('estimation')).toBe(ref.current);
+  });
+
+  it('AssigneeNameCell forwards a ref and spreads unrecognised props', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<AssigneeNameCell name="Jerome Bell" ref={ref} data-testid="assignee" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('assignee')).toBe(ref.current);
+  });
+});
+
+describe('TaskTableRow ref and rest-spread (#11)', () => {
+  it('forwards a ref to the root tr and spreads unrecognised props', () => {
+    const ref = createRef<HTMLTableRowElement>();
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow index={1} title="Fix auth bug" ref={ref} data-testid="row" />
+        </tbody>
+      </table>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLTableRowElement);
+    expect(screen.getByTestId('row')).toBe(ref.current);
+  });
+});
+
+describe('TaskTable ref and rest-spread (#11)', () => {
+  it('forwards a ref and spreads unrecognised props onto the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<TaskTable groups={[]} ref={ref} data-testid="task-table" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('task-table')).toBe(ref.current);
   });
 });

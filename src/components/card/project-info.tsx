@@ -1,8 +1,13 @@
 import { cn } from '../../utils/cn';
 import type { HeadingLevel } from '../../types/heading-level';
 
-export interface ProjectInfoProps {
-  /** Task/project title. Grows to fill the row and truncates to a single line. */
+export interface ProjectInfoProps extends Omit<React.ComponentPropsWithRef<'div'>, 'title'> {
+  /**
+   * Task/project title. Grows to fill the row and truncates to a single line.
+   *
+   * Omitted from the inherited attributes above (#11), same reason as `TaskCard.title`:
+   * the native `title` is a tooltip, this is the row's real title text.
+   */
   title: string;
   /**
    * Which `<h*>` the title renders as. Was hardcoded to `3`, which is why a board's column
@@ -57,11 +62,13 @@ export function ProjectInfo({
   headingLevel = 3,
   titleId,
   className,
+  ref,
+  ...rest
 }: ProjectInfoProps) {
   const Heading = `h${headingLevel}` as const;
 
   return (
-    <div className={cn('flex items-center gap-2 w-full', className)}>
+    <div {...rest} ref={ref} className={cn('flex items-center gap-2 w-full', className)}>
       {/* Desktop/Body/L/bold: SF Pro Display, 18px/32px, weight 600, letter-spacing 0.75px.
           tracking-wider (0.05em) is only exact at 15px (the Chunk 2/3 convention) — at 18px
           that resolves to 0.9px, so an arbitrary value is used here instead for pixel accuracy.

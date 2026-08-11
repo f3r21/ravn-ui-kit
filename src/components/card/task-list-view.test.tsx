@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { TaskListView } from './task-list-view';
@@ -87,5 +88,12 @@ describe('TaskListView empty slot (#15)', () => {
     );
     expect(screen.queryByText('Composed')).toBeNull();
     expect(screen.getByText('A real task')).toBeDefined();
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLElement>();
+    render(<TaskListView title="Working" tasks={tasks} ref={ref} data-testid="list-view" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('list-view')).toBe(ref.current);
   });
 });

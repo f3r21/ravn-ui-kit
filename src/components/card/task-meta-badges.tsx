@@ -53,7 +53,7 @@ export interface TaskMetaBadgeDecorative extends TaskMetaBadgeBase {
 /** One badge in the row: announced (`label`) or decorative (`decorative: true`), never both. */
 export type TaskMetaBadge = TaskMetaBadgeLabelled | TaskMetaBadgeDecorative;
 
-export interface TaskMetaBadgesProps {
+export interface TaskMetaBadgesProps extends React.ComponentPropsWithRef<'div'> {
   /** Ordered list of metadata badges to render (e.g. attachment/subtask/comment counts). */
   badges: TaskMetaBadge[];
   /** Additional class names, merged last via `cn()` so they can override defaults. */
@@ -81,10 +81,10 @@ export interface TaskMetaBadgesProps {
  * badge with `count` omitted). Every real captured instance renders as plain white text+icon with
  * no fill, border, or radius (Cards00.md L595-875, Cards01.md L552-833) — preserved exactly.
  */
-export function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps) {
+export function TaskMetaBadges({ badges, className, ref, ...rest }: TaskMetaBadgesProps) {
   return (
     // gap-4 matches Figma's "Frame 653" gap (16px, Cards01.md L614 / Cards00.md L657).
-    <div className={cn('flex flex-wrap items-center gap-4', className)}>
+    <div {...rest} ref={ref} className={cn('flex flex-wrap items-center gap-4', className)}>
       {badges.map((b, i) => (
         <span
           // Labelled badges keep their label as the key, as before. A decorative badge has none

@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { isInaccessible } from '@testing-library/dom';
 import { describe, it, expect } from 'vitest';
@@ -199,5 +200,20 @@ describe('decorative badges (#93)', () => {
     // Rendering it proves the fixture is real rather than a type-only assertion floating free.
     const { container } = render(<TaskMetaBadges badges={badges} />);
     expect(container.textContent).toContain('12');
+  });
+});
+
+describe('TaskMetaBadges ref and rest-spread (#11)', () => {
+  it('forwards a ref and spreads unrecognised props onto the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <TaskMetaBadges
+        badges={[{ icon: <svg />, label: 'Has attachments' }]}
+        ref={ref}
+        data-testid="badges"
+      />,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('badges')).toBe(ref.current);
   });
 });

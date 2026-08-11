@@ -65,7 +65,7 @@ const CELL_TEXT = 'text-body-m font-normal text-main font-sans';
 // TaskTableRowSkeleton below), the same pattern the group-header cell already used correctly.
 const CELL_BASE = 'h-14 shrink-0 bg-surface-panel border-y border-r border-neutral-3';
 
-export interface DueDateCellProps {
+export interface DueDateCellProps extends React.ComponentPropsWithRef<'span'> {
   /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
   date: string;
   /**
@@ -98,6 +98,9 @@ export function DueDateCell({
   date,
   dueDateUrgency = 'normal',
   dueDateUrgencyLabel,
+  className,
+  ref,
+  ...rest
 }: DueDateCellProps) {
   // Same three urgency levels as the due-date Tag, expressed as text colour instead of a
   // chip. Kept in step with DUE_DATE_URGENCY_COLOR by hand rather than derived from it —
@@ -121,7 +124,7 @@ export function DueDateCell({
     overdue: 'text-primary-2',
   };
   return (
-    <span className={cn(CELL_TEXT, styles[dueDateUrgency])}>
+    <span {...rest} ref={ref} className={cn(CELL_TEXT, styles[dueDateUrgency], className)}>
       {date}
       {/* The state the colour above was carrying alone (#92). Inside the same span as the
           date so it is announced as one phrase — "6 July, 2020, overdue" — rather than as a
@@ -131,7 +134,7 @@ export function DueDateCell({
   );
 }
 
-export interface AssigneeNameCellProps {
+export interface AssigneeNameCellProps extends React.ComponentPropsWithRef<'div'> {
   /**
    * Assignee's full name, shown next to the avatar and used for initials fallback.
    *
@@ -164,9 +167,12 @@ export function AssigneeNameCell({
   name,
   avatarSrc,
   unassignedLabel = 'Unassigned',
+  className,
+  ref,
+  ...rest
 }: AssigneeNameCellProps) {
   return (
-    <div className="flex items-center gap-2 min-w-0">
+    <div {...rest} ref={ref} className={cn('flex items-center gap-2 min-w-0', className)}>
       {/* The `Avatar` is unconditional, exactly as `TaskCard` renders it — and the design draws
           it that way: both `Task Assign Name Cell` instances in `Task Column02.md` carry an
           Avatar, and no export anywhere draws an unassigned state, so there is no basis for an
@@ -180,7 +186,7 @@ export function AssigneeNameCell({
   );
 }
 
-export interface EstimationCellProps {
+export interface EstimationCellProps extends React.ComponentPropsWithRef<'span'> {
   /** Numeric estimation (story points) rendered as `"N Points"` / `"1 Point"`. */
   points: number;
   /**
@@ -200,8 +206,18 @@ export interface EstimationCellProps {
  * "3 Days" sample text; the real in-context "Task Default View" mockup renders it as
  * "N Points") is plain Desktop/Body/M/regular text directly in the cell, no badge/pill chrome.
  */
-export function EstimationCell({ points, formatPoints = formatPointsLong }: EstimationCellProps) {
-  return <span className={cn(CELL_TEXT, 'tabular-nums')}>{formatPoints(points)}</span>;
+export function EstimationCell({
+  points,
+  formatPoints = formatPointsLong,
+  className,
+  ref,
+  ...rest
+}: EstimationCellProps) {
+  return (
+    <span {...rest} ref={ref} className={cn(CELL_TEXT, 'tabular-nums', className)}>
+      {formatPoints(points)}
+    </span>
+  );
 }
 
 export interface TagCellProps extends React.ComponentPropsWithRef<'div'> {
@@ -233,14 +249,23 @@ export function TagCell({ labels, className, ref, ...rest }: TagCellProps) {
 
 // ── TaskTableRow ──────────────────────────────────────────────────
 
-export interface TaskTableRowProps {
+export interface TaskTableRowProps extends Omit<
+  React.ComponentPropsWithRef<'tr'>,
+  'title' | 'onChange'
+> {
   /**
    * Row index shown before the title (Figma's "01"/"02" sample text), zero-padded to 2 digits.
    * Restarts per status group, matching the real "Task Default View" mockup ("To Do (05)"'s
    * rows read 01-05, "In Progress"'s restart at 01).
    */
   index: number;
-  /** Task title shown in the Task Name column, truncated to a single line. */
+  /**
+   * Task title shown in the Task Name column, truncated to a single line.
+   *
+   * Omitted from the inherited `tr` attributes above (#11), same reason as `TaskCard.title`:
+   * the native `title` is a tooltip, this is the row's actual task title, and a required
+   * `string` narrowing an inherited optional one would typecheck without saying so.
+   */
   title: string;
   /**
    * Color of the "Line 1" status/priority stripe flush against the row's left edge. Takes the
@@ -298,6 +323,10 @@ export interface TaskTableRowProps {
    * `AriaCheckboxProps` — this checkbox toggle is exactly that shape, not the multi-item
    * `Selection`/`onSelectionChange` shape `Tabs` uses, which is why it gets Checkbox's
    * vocabulary and not Tabs's.
+   *
+   * Omitted from the inherited `tr` attributes (#11): every `HTMLAttributes` type carries
+   * a generic `onChange: FormEventHandler`, and this one takes the next selected state
+   * directly — a real signature conflict, the same one `SegmentedControl.onChange` has.
    */
   onChange?: (isSelected: boolean) => void;
   /**
@@ -459,6 +488,9 @@ export function TaskTableRow({
   columnLabels,
   onPress,
   onViewDetails,
+  className,
+  ref,
+  ...rest
 }: TaskTableRowProps) {
   // The row reads the same resolver the header, the colgroup and the skeleton read. That shared
   // resolution is what replaces the shared constants they all used to read directly (#97).
@@ -674,7 +706,12 @@ export function TaskTableRow({
     // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
-    <tr onClick={onPress} className={cn('group', onPress && 'cursor-pointer')}>
+    <tr
+      {...rest}
+      onClick={onPress}
+      ref={ref}
+      className={cn('group', onPress && 'cursor-pointer', className)}
+    >
       {resolved.map((col, i) => (
         <td
           key={col.key}
@@ -724,7 +761,7 @@ export interface TaskTableGroup {
   actions?: React.ReactNode;
 }
 
-export interface TaskTableProps {
+export interface TaskTableProps extends React.ComponentPropsWithRef<'div'> {
   /** Status groups rendered top to bottom, each its own bordered box per Figma's "Task Table". */
   groups: TaskTableGroup[];
   /**
@@ -1033,6 +1070,8 @@ export function TaskTable({
   columnLabels,
   columns,
   className,
+  ref,
+  ...rest
 }: TaskTableProps) {
   // Resolved once, here, and handed to all four renderers below — the header row, the
   // `<colgroup>`, `TaskTableRow` and `TaskTableRowSkeleton`. They used to agree because they
@@ -1063,6 +1102,8 @@ export function TaskTable({
 
   return (
     <div
+      {...rest}
+      ref={ref}
       className={cn(
         'w-full overflow-x-auto',
         '[scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-3 [&::-webkit-scrollbar-thumb]:rounded-full',

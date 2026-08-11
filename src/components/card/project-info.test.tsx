@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -75,5 +76,12 @@ describe('ProjectInfo Component', () => {
   it('puts titleId on the heading, so an ancestor can point aria-labelledby at it', () => {
     render(<ProjectInfo title="Fix auth bug" titleId="task-7-title" />);
     expect(screen.getByRole('heading', { name: 'Fix auth bug' }).id).toBe('task-7-title');
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<ProjectInfo title="Fix auth bug" ref={ref} data-testid="project-info" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('project-info')).toBe(ref.current);
   });
 });
