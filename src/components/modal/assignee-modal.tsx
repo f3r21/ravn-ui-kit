@@ -13,7 +13,7 @@ export interface Assignee {
   avatarSrc?: string;
 }
 
-export interface AssigneeModalProps {
+export interface AssigneeModalProps extends Pick<PopoverProps, 'ref'> {
   /** Full list of assignable people shown as rows. */
   assignees: Assignee[];
   /**
@@ -71,6 +71,7 @@ export function AssigneeModal({
   dismissExemptRef,
   label = 'Assignee',
   className,
+  ref,
 }: AssigneeModalProps) {
   return (
     <Popover
@@ -79,6 +80,7 @@ export function AssigneeModal({
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
       aria-label={label}
+      ref={ref}
       className={cn(
         'flex flex-col w-[239px] pt-2 bg-surface-overlay border border-subtle rounded-sm',
         className,

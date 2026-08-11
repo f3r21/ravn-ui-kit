@@ -9,7 +9,7 @@ import { formatPointsLong, type PointsFormatter } from '../../utils/format-point
 // ("1 Point"); the other 4 (~56-57px, all plural) match the classic Fibonacci-style scale.
 const POINT_OPTIONS = [1, 2, 3, 5, 8];
 
-export interface EstimateModalProps {
+export interface EstimateModalProps extends Pick<PopoverProps, 'ref'> {
   /** Currently selected point value, if any — highlights the matching row. */
   value?: number;
   /**
@@ -76,11 +76,13 @@ export function EstimateModal({
   formatPoints = formatPointsLong,
   label = 'Estimate',
   className,
+  ref,
 }: EstimateModalProps) {
   return (
     <Popover
       isOpen
       onClose={onClose}
+      ref={ref}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
       aria-label={label}

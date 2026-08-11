@@ -1,5 +1,11 @@
-import { useRef } from 'react';
-import { DismissButton, FocusScope, Overlay, usePopover, type AriaPopoverProps } from 'react-aria';
+import {
+  DismissButton,
+  FocusScope,
+  Overlay,
+  usePopover,
+  useObjectRef,
+  type AriaPopoverProps,
+} from 'react-aria';
 import type { OverlayTriggerState } from 'react-stately';
 import { cn } from '../../utils/cn';
 
@@ -11,8 +17,14 @@ export interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef
    */
   state: OverlayTriggerState;
   children: React.ReactNode;
-  /** Ref to the popover element. Provide only if a caller needs to measure/observe it directly. */
-  popoverRef?: React.RefObject<HTMLDivElement | null>;
+  /**
+   * Ref to the popover element (#11). Was the bespoke `popoverRef` — retired in favor of
+   * the universal `ref`, per kit#129's decision that a bespoke ref channel goes with #11
+   * wherever it reaches the same node a plain `ref` would. This one does: `usePopover`
+   * needs the identical element a caller measuring/observing the popover would want.
+   * Neither this kit nor the consuming app had a caller passing the old name.
+   */
+  ref?: React.Ref<HTMLDivElement>;
   /** Additional class names applied to the popover surface, merged last via `cn()`. */
   className?: string;
 }
@@ -65,12 +77,11 @@ export interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef
 export function FloatingPopover({
   state,
   children,
-  popoverRef,
   className,
+  ref: forwardedRef,
   ...props
 }: FloatingPopoverProps) {
-  const fallbackRef = useRef<HTMLDivElement>(null);
-  const ref = popoverRef ?? fallbackRef;
+  const ref = useObjectRef(forwardedRef);
 
   const { popoverProps, underlayProps } = usePopover({ ...props, popoverRef: ref }, state);
 

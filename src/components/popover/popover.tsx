@@ -1,7 +1,6 @@
-import React, { useRef } from 'react';
-import { useOverlay, DismissButton, FocusScope } from 'react-aria';
+import { useOverlay, useObjectRef, DismissButton, FocusScope } from 'react-aria';
 
-export interface PopoverProps {
+export interface PopoverProps extends React.ComponentPropsWithRef<'div'> {
   /** Whether the popover is currently open. When `false`, nothing is rendered. */
   isOpen: boolean;
   /** Called when the popover should close — Escape, an outside click, or a `DismissButton`. */
@@ -74,9 +73,12 @@ export function Popover({
   dismissExemptRef,
   children,
   className,
+  ref: forwardedRef,
   ...ariaProps
 }: PopoverProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
+  // Merged with the external ref via `useObjectRef` (#11) — `useOverlay` needs this same
+  // node for its own positioning/dismissal logic, the same pattern `Button` and `Modal` use.
+  const overlayRef = useObjectRef(forwardedRef);
 
   const { overlayProps } = useOverlay(
     {

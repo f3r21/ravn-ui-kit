@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -52,5 +53,12 @@ describe('LabelModal Component', () => {
     expect(screen.getByRole('dialog', { name: 'Category' })).toBeDefined();
     expect(screen.queryByRole('dialog', { name: 'Label' })).toBeNull();
     expect(screen.getByText('Category')).toBeDefined();
+  });
+
+  it('forwards a ref to the popover surface (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<LabelModal labels={LABELS} onAction={vi.fn()} onClose={vi.fn()} ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toBe(screen.getByRole('dialog'));
   });
 });

@@ -24,7 +24,7 @@ export interface AddTaskSubmitData {
   label?: TaskLabel;
 }
 
-export interface AddTaskModalProps {
+export interface AddTaskModalProps extends Omit<React.ComponentPropsWithRef<'form'>, 'onSubmit'> {
   /** Whether the widget is currently mounted. */
   isOpen: boolean;
   /** Called when the widget should close without submitting (Cancel button). */
@@ -33,7 +33,14 @@ export interface AddTaskModalProps {
   assignees?: Assignee[];
   /** Labels selectable in the label trigger's popover — see `LabelModal`. */
   labels?: TaskLabel[];
-  /** Called with the form values when the user submits a valid (non-empty title) task. */
+  /**
+   * Called with the form values when the user submits a valid (non-empty title) task.
+   *
+   * Omitted from the inherited `form` attributes above (#11): the native `onSubmit` is a
+   * `FormEvent` handler, this is a higher-level "here are the parsed values" callback with
+   * a completely different signature, and the two happen to share a name only because this
+   * component's root really is a `<form>`.
+   */
   onSubmit?: (data: AddTaskSubmitData) => void;
   /**
    * Pre-fills the title field (edit flow — reopening on an existing task). Uncontrolled:
@@ -158,6 +165,8 @@ export function AddTaskModal({
   copy: copyOverrides,
   formatDueDate = (d) => d.toLocaleDateString('en-US'),
   className,
+  ref,
+  ...rest
 }: AddTaskModalProps) {
   // Named `copy`, not `labels`: `labels` is already this component's list of selectable
   // `TaskLabel`s. Two different meanings of the same word on one component is how a consumer
@@ -247,7 +256,9 @@ export function AddTaskModal({
 
   return (
     <form
+      {...rest}
       onSubmit={handleSubmit}
+      ref={ref}
       className={cn(
         'flex flex-col items-end gap-6 w-[578px] p-4 bg-surface-overlay rounded-sm',
         className,
