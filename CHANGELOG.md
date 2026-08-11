@@ -192,10 +192,13 @@ null>` retired in favor of the universal `ref`** (#11) — same DOM node, one na
   current `main` (now 21 of 40) and checked each file's actual component props rather than
   adding `argTypes` mechanically wherever a grep flagged the file absent. Most of the 21 had
   no genuine boolean/string-union prop at their own top level to control (`icons.stories.tsx`'s
-  `IconProps` is 200+ inherited HTML attributes, none of them a real axis; the four
-  trigger-plus-popover modal stories all manage `isOpen` via internal state rather than
-  `args`, so a control on it would silently do nothing) — those are left as-is rather than
-  padded with an empty or non-functional block.
+  `IconProps` is 200+ inherited HTML attributes, none of them a real axis; of the four
+  trigger-plus-popover modal stories, only `AddTaskModal` has a real `isOpen` prop, managed
+  via internal state in its `render` function rather than `args` — `AssigneeModal`/
+  `EstimateModal`/`LabelModal` have no `isOpen` prop at all, hardcoding `<Popover isOpen>`
+  internally since their parent conditionally mounts them instead) — no control would do
+  anything useful on any of the four, for two different reasons, so those are left as-is
+  rather than padded with an empty or non-functional block.
 
 ### Fixed
 
