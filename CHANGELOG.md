@@ -85,10 +85,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 - **BREAKING: `Modal.width?: string` removed; fold the same Tailwind class into
   `className`** (#14), which `Modal` did not previously accept. `width` was typed as a raw
   string standing in for "a Tailwind max-width class," so `width="400px"` typechecked and
-  silently did nothing. **This kit's own callers never passed it, but the consuming app has
-  two real ones** — `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both
+  silently did nothing. **No component in this kit ever passed it** (two of this kit's own
+  stories did — `WideVariant`/`Playground`, migrated to `className` in this same PR). **The
+  consuming app has two real production callers**, both still on the old name until it
+  updates: `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both
   `width="max-w-[578px]"` — caught in review after this entry originally (and wrongly)
-  claimed zero callers anywhere. Behavior is unchanged, only the prop name is:
+  claimed zero callers anywhere, kit or app. Behavior is unchanged, only the prop name is:
   `className="max-w-[578px]"` in their place. App-side follow-up tracked as
   [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157) alongside
   the `tags[].variant`→`accent` one below. **Minor.**
