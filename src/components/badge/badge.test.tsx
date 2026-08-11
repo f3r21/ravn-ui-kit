@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { Badge } from './badge';
 import type { StatusTone } from '../../types/color-variants';
@@ -52,5 +53,18 @@ describe('Badge', () => {
   it('merges a consumer’s className last so it can override', () => {
     render(<Badge className="bg-blue">Status</Badge>);
     expect(screen.getByText('Status').className).toContain('bg-blue');
+  });
+
+  /** #11. Same defect and same fix as `Tag` — see that file's equivalent test. */
+  it('forwards a ref to the root element', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(<Badge ref={ref}>Status</Badge>);
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+    expect(ref.current?.textContent).toBe('Status');
+  });
+
+  it('spreads unrecognised props onto the root element', () => {
+    render(<Badge data-testid="status-badge">Status</Badge>);
+    expect(screen.getByTestId('status-badge')).toBeDefined();
   });
 });

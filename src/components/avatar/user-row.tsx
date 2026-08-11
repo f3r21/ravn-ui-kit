@@ -1,7 +1,13 @@
 import { cn } from '../../utils/cn';
 import { Avatar } from '../avatar/avatar';
 
-export interface UserRowProps {
+export interface UserRowProps extends React.HTMLAttributes<HTMLElement> {
+  /**
+   * Ref to the root element (#11). Typed to the common `HTMLElement` base rather than
+   * `HTMLButtonElement`/`HTMLDivElement` specifically — this row is polymorphic between the
+   * two depending on whether `onPress` is given, the same shape `Card`'s `as` prop is.
+   */
+  ref?: React.Ref<HTMLElement>;
   /** Full name of the user */
   name: string;
   /** Job title or role (e.g. "Frontend Developer") */
@@ -48,6 +54,8 @@ export function UserRow({
   isOnline = false,
   className,
   onPress,
+  ref,
+  ...rest
 }: UserRowProps) {
   // Name text is fixed (SF Pro Display 15px/24px regular, tracking 0.75px) per the
   // Figma "User" component — the only avatar+name typography spec in the ground
@@ -59,12 +67,18 @@ export function UserRow({
     lg: 'text-sm',
   };
 
-  const Wrapper = onPress ? 'button' : 'div';
+  // Cast to a single concrete tag for the same reason `Card` does — see that file's
+  // comment. `'button'`, not `'div'`, because `type` (passed below) only exists on a
+  // button — casting the other way would make TypeScript reject it even though the
+  // runtime element is a real `<button>` whenever `type` is actually set.
+  const Wrapper = (onPress ? 'button' : 'div') as 'button';
 
   return (
     <Wrapper
+      {...rest}
       type={onPress ? 'button' : undefined}
       onClick={onPress}
+      ref={ref as React.Ref<HTMLButtonElement>}
       className={cn(
         // padding: 4px 16px, gap: 8px -- matches Figma "User" component (Avatar frame, 239x56)
         'flex items-center gap-2 px-4 py-1 min-w-0',

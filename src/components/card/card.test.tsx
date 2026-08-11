@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { Card, CardHeader, CardBody, CardFooter } from './card';
@@ -41,6 +42,23 @@ describe('Card (#98)', () => {
     expect(container.firstElementChild?.className).toContain('p-0');
   });
 
+  /**
+   * #11. The ref is typed to the common `HTMLElement` base and internally cast through a
+   * single concrete tag to satisfy TypeScript's polymorphic-`as` checking (see the comment
+   * on `Card`'s render) — this proves that cast is a type-level fiction only: the ref still
+   * attaches to whichever real element `as` renders, `article` included, not always a div.
+   */
+  it('forwards a ref to whichever element `as` renders', () => {
+    const ref = createRef<HTMLElement>();
+    render(
+      <Card as="article" ref={ref}>
+        x
+      </Card>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLElement);
+    expect(ref.current?.tagName).toBe('ARTICLE');
+  });
+
   describe('sub-components', () => {
     it('are available as statics and as named exports', () => {
       expect(Card.Header).toBe(CardHeader);
@@ -72,6 +90,31 @@ describe('Card (#98)', () => {
         </Card>,
       );
       expect(screen.queryByRole('heading')).toBeNull();
+    });
+
+    it('forward a ref and spread rest props on each sub-component (#11)', () => {
+      const headerRef = createRef<HTMLDivElement>();
+      const bodyRef = createRef<HTMLDivElement>();
+      const footerRef = createRef<HTMLDivElement>();
+      render(
+        <Card>
+          <Card.Header ref={headerRef} data-testid="header">
+            head
+          </Card.Header>
+          <Card.Body ref={bodyRef} data-testid="body">
+            body
+          </Card.Body>
+          <Card.Footer ref={footerRef} data-testid="footer">
+            foot
+          </Card.Footer>
+        </Card>,
+      );
+      expect(headerRef.current).toBeInstanceOf(HTMLDivElement);
+      expect(bodyRef.current).toBeInstanceOf(HTMLDivElement);
+      expect(footerRef.current).toBeInstanceOf(HTMLDivElement);
+      expect(screen.getByTestId('header')).toBeDefined();
+      expect(screen.getByTestId('body')).toBeDefined();
+      expect(screen.getByTestId('footer')).toBeDefined();
     });
   });
 });

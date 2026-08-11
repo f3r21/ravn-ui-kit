@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -48,6 +49,22 @@ describe('EmptyState', () => {
     expect(container.querySelector('svg')).not.toBeNull();
   });
 
+  /**
+   * #11. `[&>svg]:w-full [&>svg]:h-full` used to sit on the icon frame, at (0,2,0)
+   * specificity — it outranked a consumer's own `size-*` utility (0,1,0), so the class was
+   * present but never won the cascade. This suite runs on jsdom with no stylesheet, so it
+   * cannot observe the cascade directly; what it pins is that the losing class is gone.
+   */
+  it('does not carry a class that would outrank a consumer icon size', () => {
+    const { container } = render(
+      <EmptyState title="Empty" icon={<svg data-testid="glyph" className="size-6" />} />,
+    );
+    const frame = container.querySelector('svg')?.parentElement;
+    expect(frame?.className).not.toContain('[&>svg]:w-full');
+    expect(frame?.className).not.toContain('[&>svg]:h-full');
+    expect([...screen.getByTestId('glyph').classList]).toContain('size-6');
+  });
+
   it('renders a working action slot', async () => {
     const onPress = vi.fn();
     const user = userEvent.setup();
@@ -64,6 +81,13 @@ describe('EmptyState', () => {
 
     await user.click(screen.getByRole('button', { name: 'Create task' }));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<EmptyState title="Empty" ref={ref} data-testid="empty" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('empty')).toBeDefined();
   });
 });
 

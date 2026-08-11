@@ -1,8 +1,13 @@
-import { useRef } from 'react';
-import { useButton, type AriaButtonProps } from 'react-aria';
+import { useButton, useObjectRef, type AriaButtonProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface ButtonProps extends AriaButtonProps {
+  /**
+   * Ref to the root `<button>` (#11). Merged with the internal ref `useButton` needs via
+   * `useObjectRef` — react-aria's own utility for exactly this case, a component that both
+   * uses a ref itself and must still forward whatever ref its caller passed.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
   /**
    * Figma "Property 1": Primary is a single documented state (solid fill,
    * no selected/unselected toggle). Secondary is icon-only chrome that
@@ -107,9 +112,10 @@ export function Button({
   isDisabled,
   role,
   'aria-checked': ariaChecked,
+  ref: forwardedRef,
   ...props
 }: ButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useObjectRef(forwardedRef);
   const { buttonProps } = useButton({ ...props, isDisabled }, ref);
 
   const variants = {

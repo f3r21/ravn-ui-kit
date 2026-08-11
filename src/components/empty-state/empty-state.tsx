@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 
-export interface EmptyStateProps {
+export interface EmptyStateProps extends React.ComponentPropsWithRef<'div'> {
   /** The headline — what is missing, in the user's terms. Required: an empty state with no text is just a gap. */
   title: string;
   /** Optional second line explaining why it is empty or what would fill it. */
@@ -48,9 +48,13 @@ export function EmptyState({
   action,
   label = 'No results',
   className,
+  ref,
+  ...rest
 }: EmptyStateProps) {
   return (
     <div
+      {...rest}
+      ref={ref}
       role="group"
       aria-label={label}
       className={cn(
@@ -59,8 +63,14 @@ export function EmptyState({
         className,
       )}
     >
+      {/* `[&>svg]:w-full [&>svg]:h-full` used to sit here — removed (#11): it compiles to
+          a (0,2,0) descendant selector, which outranks a consumer's own `size-*` utility
+          at (0,1,0), so `<EmptyState icon={<Icon className="size-6" />} />` silently
+          could not be resized. The 48×48 frame stays; the glyph sizes itself, same
+          contract `icons.tsx` already documents and `Tag`/`ProjectInfo`/`SidebarItem`/
+          `TaskMetaBadges` already follow. */}
       {icon ? (
-        <span className="flex items-center justify-center w-12 h-12 shrink-0 text-muted [&>svg]:w-full [&>svg]:h-full">
+        <span className="flex items-center justify-center w-12 h-12 shrink-0 text-muted">
           {icon}
         </span>
       ) : null}

@@ -37,7 +37,7 @@ import { cn } from '../../utils/cn';
  * sentence naming it as a sibling of this abstract class. So that variant
  * remains unimplemented, gated on real anatomy data not yet provided.
  */
-export interface SidebarItemProps {
+export interface SidebarItemProps extends React.ComponentPropsWithRef<'button'> {
   /** Optional icon rendered before the label (Figma "Icon Placeholder", 24×24). Should use `currentColor` so it inherits the row's state color. */
   icon?: React.ReactNode;
   /** Text label displayed for the item. */
@@ -68,11 +68,15 @@ export function SidebarItem({
   badgeCount,
   onPress,
   className,
+  ref,
+  ...rest
 }: SidebarItemProps) {
   return (
     <button
+      {...rest}
       type="button"
       onClick={onPress}
+      ref={ref}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',

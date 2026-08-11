@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { Avatar } from './avatar';
@@ -92,5 +93,13 @@ describe('Avatar Component', () => {
     expect(cls).toContain('bg-primary-1');
     expect(cls).toContain('text-neutral-5');
     expect(cls).not.toContain('text-primary-4');
+  });
+
+  /** #11. */
+  it('forwards a ref and spreads unrecognised props onto the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<Avatar name="Fernando Ramirez" ref={ref} data-testid="avatar" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('avatar')).toBeDefined();
   });
 });

@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -126,5 +127,19 @@ describe('Button Component', () => {
       </Button>,
     );
     expect([...screen.getByTestId('glyph').classList]).toContain('size-3.5');
+  });
+
+  /**
+   * #11. `useButton` already needs its own internal ref, so this proves `useObjectRef`
+   * actually merges it with a caller's rather than silently dropping one or the other.
+   */
+  it('forwards a ref to the root button', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <Button aria-label="Add" ref={ref}>
+        <Icon />
+      </Button>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement);
   });
 });

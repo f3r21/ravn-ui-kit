@@ -33,6 +33,13 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {
    */
   as?: 'div' | 'article' | 'section' | 'li';
   /**
+   * Ref to the root element (#11). Typed to the common `HTMLElement` base rather than
+   * whichever of `div`/`article`/`section`/`li` `as` resolves to — `Card` is polymorphic,
+   * so there is no single element type to narrow it to without a generic the four call
+   * sites in this kit have no need for.
+   */
+  ref?: React.Ref<HTMLElement>;
+  /**
    * Reveals a border on hover, for a card that is clickable as a whole.
    * @default false
    */
@@ -48,16 +55,20 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {
  * two card surfaces that could drift apart independently. They now cannot: there is one
  * `CARD_SURFACE`, and a test asserts the two components compute the same background and radius.
  */
-export function Card({
-  children,
-  as: Component = 'div',
-  isInteractive = false,
-  className,
-  ...props
-}: CardProps) {
+export function Card({ children, as, isInteractive = false, className, ref, ...props }: CardProps) {
+  // Cast to a single concrete tag rather than left as the `'div' | 'article' | ...` union
+  // `as` declares: JSX resolves a tag-name union's props by intersecting every member's
+  // attribute set, which for `ref` means requiring one value assignable to
+  // `RefObject<HTMLDivElement> & RefObject<HTMLArticleElement> & RefObject<HTMLLIElement>`
+  // simultaneously — stricter than any of the four tags actually need, since none of them
+  // differ in anything this component or a caller reads off the ref. The cast is a
+  // type-level fiction only; the runtime value is still whatever `as` actually holds, and
+  // `Component` below renders that value, not the literal string `'div'`.
+  const Component = (as ?? 'div') as 'div';
   return (
     <Component
       {...props}
+      ref={ref as React.Ref<HTMLDivElement>}
       className={cn(
         CARD_SURFACE,
         'flex flex-col gap-4 p-4',
@@ -81,19 +92,25 @@ export function Card({
 export function CardHeader({
   children,
   className,
+  ref,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.ComponentPropsWithRef<'div'>) {
   return (
-    <div {...props} className={cn('flex items-center gap-2', className)}>
+    <div {...props} ref={ref} className={cn('flex items-center gap-2', className)}>
       {children}
     </div>
   );
 }
 
 /** The card's main content, taking the remaining height. */
-export function CardBody({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function CardBody({
+  children,
+  className,
+  ref,
+  ...props
+}: React.ComponentPropsWithRef<'div'>) {
   return (
-    <div {...props} className={cn('flex flex-col gap-4 flex-1 min-w-0', className)}>
+    <div {...props} ref={ref} className={cn('flex flex-col gap-4 flex-1 min-w-0', className)}>
       {children}
     </div>
   );
@@ -106,10 +123,11 @@ export function CardBody({ children, className, ...props }: React.HTMLAttributes
 export function CardFooter({
   children,
   className,
+  ref,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.ComponentPropsWithRef<'div'>) {
   return (
-    <div {...props} className={cn('flex items-center gap-2 mt-auto', className)}>
+    <div {...props} ref={ref} className={cn('flex items-center gap-2 mt-auto', className)}>
       {children}
     </div>
   );

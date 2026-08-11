@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { Skeleton } from './skeleton';
@@ -36,5 +37,13 @@ describe('Skeleton Component', () => {
     expect(tokens).toContain('w-3/4');
     // The guard survives a consumer className — it is not something a caller opts into.
     expect(tokens).toContain('motion-safe:animate-pulse');
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    const { container } = render(<Skeleton ref={ref} data-testid="skeleton" />);
+    expect(ref.current).toBe(container.firstChild);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current?.getAttribute('data-testid')).toBe('skeleton');
   });
 });

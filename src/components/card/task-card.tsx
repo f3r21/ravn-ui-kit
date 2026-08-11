@@ -15,8 +15,18 @@ import {
   type TaskTag,
 } from '../../types/color-variants';
 
-export interface TaskCardProps {
-  /** Task title, shown in the header row and truncated to a single line. */
+export interface TaskCardProps extends Omit<React.ComponentPropsWithRef<'article'>, 'title'> {
+  /**
+   * Task title, shown in the header row and truncated to a single line.
+   *
+   * Shadows the native `article` `title` attribute (a tooltip) on purpose — this is the
+   * far more common thing a consumer means by `title` on a task card, and a component
+   * cannot expose both under one name. Omitted from the inherited attributes for the same
+   * reason `Omit<..., 'title'>` appears above: without it, the DOM tooltip's optional
+   * `string | undefined` and this required `string` would still typecheck (a required
+   * member can narrow an inherited optional one), silently hiding the shadowing from
+   * anyone reading the type.
+   */
   title: string;
   /**
    * Story point estimate. Omitted entirely when `undefined`.
@@ -168,6 +178,8 @@ export function TaskCard({
   titleId,
   className,
   onPress,
+  ref,
+  ...rest
 }: TaskCardProps) {
   const generatedTitleId = useId();
   const headingId = titleId ?? generatedTitleId;
@@ -215,10 +227,12 @@ export function TaskCard({
     // before: the keyboard and screen-reader path is the title `<button>` `ProjectInfo`
     // renders, and this handler is the redundant pointer target beside it.
     <Card
+      {...rest}
       as="article"
       isInteractive
       aria-labelledby={headingId}
       onClick={onPress}
+      ref={ref}
       className={cn(onPress && 'cursor-pointer', className)}
     >
       {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317) — same real component
