@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { TextButton } from './text-button';
 import { withSurface } from '../../../.storybook/decorators';
 
@@ -60,4 +60,41 @@ export const Selected: Story = {
 
 export const Disabled: Story = {
   args: { isDisabled: true, children: 'Disabled' },
+};
+
+/**
+ * Drives a real press rather than asserting only that the button renders (#16).
+ *
+ * `secondary`, not `primary` (#20's precedent): `primary` is the one pairing in this kit's
+ * whole palette that fails AA with no fix available, already accepted elsewhere via
+ * `.storybook/a11y-allowlist.ts` for call sites with no other option — this story has one.
+ */
+export const PressFires: Story = {
+  args: { variant: 'secondary' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Button' });
+
+    await userEvent.click(button);
+    expect(args.onPress).toHaveBeenCalledTimes(1);
+  },
+};
+
+/**
+ * `isDisabled` genuinely blocks a press, not merely styles the button as if it were off —
+ * `useButton` renders a real native `disabled` attribute (confirmed in `text-button.test.tsx`
+ * already), which is *why* there is nothing further to prove by attempting a click here: a
+ * real browser refuses to dispatch a pointer event at all on an element with the
+ * `pointer-events: none` this component's `disabled:pointer-events-none` class adds — trying
+ * anyway throws `StorybookTestRunnerError`, caught while writing this story, not assumed.
+ */
+export const DisabledBlocksPress: Story = {
+  args: { isDisabled: true, children: 'Disabled' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Disabled' });
+
+    expect(button).toBeDisabled();
+    expect(args.onPress).not.toHaveBeenCalled();
+  },
 };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { withSurface } from '../../../.storybook/decorators';
 import { SegmentedControl } from './segmented-control';
 
@@ -52,5 +52,37 @@ export const CustomGroupLabel: Story = {
   args: {
     defaultValue: 'board',
     label: 'Density',
+  },
+};
+
+/**
+ * Drives the hand-rolled keyboard handling directly (#16) — this component does not wrap a
+ * react-aria hook (see the component's own doc comment for why), so nothing else in this repo
+ * exercises `handleKeyDown`'s roving tabindex. Clicking "List" selects it and calls `onChange`;
+ * ArrowRight from there wraps to "Board" (modular arithmetic, not a hardcoded last index) and
+ * moves focus there without a click, matching the WAI-ARIA radiogroup pattern the component's
+ * own comment cites.
+ */
+export const KeyboardNavigation: Story = {
+  args: {
+    defaultValue: 'board',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    const list = canvas.getByRole('radio', { name: 'List' });
+    await userEvent.click(list);
+    expect(list).toHaveAttribute('aria-checked', 'true');
+    expect(args.onChange).toHaveBeenCalledWith('list');
+
+    await userEvent.keyboard('{ArrowRight}');
+    const table = canvas.getByRole('radio', { name: 'Table' });
+    expect(table).toHaveAttribute('aria-checked', 'true');
+    expect(table).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}');
+    const board = canvas.getByRole('radio', { name: 'Board' });
+    expect(board).toHaveAttribute('aria-checked', 'true');
+    expect(board).toHaveFocus();
   },
 };
