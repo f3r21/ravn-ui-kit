@@ -12,7 +12,6 @@ import { ListProps } from 'react-stately';
 import { ListState } from 'react-stately';
 import { OverlayTriggerState } from 'react-stately';
 import { ReactNode } from 'react';
-import { SVGProps } from 'react';
 
 /**
  * The kit's shared colour vocabularies.
@@ -121,7 +120,7 @@ export declare type AccentColor = 'neutral' | 'red' | 'green' | 'yellow' | 'blue
  * then owned by the field — this widget's open is its mount, since a closed one renders
  * nothing.
  */
-export declare function AddTaskModal({ isOpen, onClose, assignees, labels, onSubmit, defaultTitle, defaultDueDate, defaultPoints, defaultAssignee, defaultLabel, copy: copyOverrides, formatDueDate, className, }: AddTaskModalProps): default_2.JSX.Element | null;
+export declare function AddTaskModal({ isOpen, onClose, assignees, labels, onSubmit, defaultTitle, defaultDueDate, defaultPoints, defaultAssignee, defaultLabel, copy: copyOverrides, formatDueDate, className, ref, ...rest }: AddTaskModalProps): default_2.JSX.Element | null;
 
 /** The visible strings `AddTaskModal` renders. See `AddTaskModalProps.copy`. */
 export declare interface AddTaskModalCopy {
@@ -141,7 +140,7 @@ export declare interface AddTaskModalCopy {
     submit: string;
 }
 
-export declare interface AddTaskModalProps {
+export declare interface AddTaskModalProps extends Omit<default_2.ComponentPropsWithRef<'form'>, 'onSubmit'> {
     /** Whether the widget is currently mounted. */
     isOpen: boolean;
     /** Called when the widget should close without submitting (Cancel button). */
@@ -150,7 +149,14 @@ export declare interface AddTaskModalProps {
     assignees?: Assignee[];
     /** Labels selectable in the label trigger's popover — see `LabelModal`. */
     labels?: TaskLabel[];
-    /** Called with the form values when the user submits a valid (non-empty title) task. */
+    /**
+     * Called with the form values when the user submits a valid (non-empty title) task.
+     *
+     * Omitted from the inherited `form` attributes above (#11): the native `onSubmit` is a
+     * `FormEvent` handler, this is a higher-level "here are the parsed values" callback with
+     * a completely different signature, and the two happen to share a name only because this
+     * component's root really is a `<form>`.
+     */
     onSubmit?: (data: AddTaskSubmitData) => void;
     /**
      * Pre-fills the title field (edit flow — reopening on an existing task). Uncontrolled:
@@ -245,9 +251,9 @@ export declare function AlarmIcon(props: IconProps): JSX.Element;
  * codebase — removed as fabricated, same treatment Chunk 4 gave Button's
  * unfounded `size`/`isLoading` props.
  */
-export declare function ApplicationSidebar({ logo, items, label, className, }: ApplicationSidebarProps): JSX.Element;
+export declare function ApplicationSidebar({ logo, items, label, className, ref, ...rest }: ApplicationSidebarProps): JSX.Element;
 
-export declare interface ApplicationSidebarProps {
+export declare interface ApplicationSidebarProps extends React.ComponentPropsWithRef<'nav'> {
     /** Logo / brand element shown at the top */
     logo?: React.ReactNode;
     /** Navigation items to render */
@@ -293,9 +299,9 @@ export declare interface ApplicationSidebarProps {
  * the same "canvas-fit noise, not a real constraint" judgment call Chunk 7
  * made for Tabs' `px-5`.
  */
-export declare function AppShell({ logo, sidebarItems, sidebar, topNavProps, topNav, topBar, children, className, }: AppShellProps): JSX.Element;
+export declare function AppShell({ logo, sidebarItems, sidebar, topNavProps, topNav, topBar, children, className, ref, ...rest }: AppShellProps): JSX.Element;
 
-export declare interface AppShellProps {
+export declare interface AppShellProps extends React.ComponentPropsWithRef<'div'> {
     /** Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied. */
     logo?: ApplicationSidebarProps['logo'];
     /**
@@ -375,9 +381,9 @@ export declare function AssigneeIcon(props: IconProps): JSX.Element;
  * action (every real "User" row instance renders identically, with no highlighted/selected
  * variant anywhere in the export).
  */
-export declare function AssigneeModal({ assignees, onAction, onClose, triggerRef, dismissExemptRef, label, className, }: AssigneeModalProps): JSX.Element;
+export declare function AssigneeModal({ assignees, onAction, onClose, triggerRef, dismissExemptRef, label, className, ref, }: AssigneeModalProps): JSX.Element;
 
-export declare interface AssigneeModalProps {
+export declare interface AssigneeModalProps extends Pick<PopoverProps, 'ref'> {
     /** Full list of assignable people shown as rows. */
     assignees: Assignee[];
     /**
@@ -417,9 +423,9 @@ export declare interface AssigneeModalProps {
  * Figma "Task Assign Name Cell" (Task Column02.md): Avatar (32x32, matches `Avatar` `size="sm"`)
  * + name text, Desktop/Body/M/regular, neutral.1.
  */
-export declare function AssigneeNameCell({ name, avatarSrc, unassignedLabel, }: AssigneeNameCellProps): JSX.Element;
+export declare function AssigneeNameCell({ name, avatarSrc, unassignedLabel, className, ref, ...rest }: AssigneeNameCellProps): JSX.Element;
 
-export declare interface AssigneeNameCellProps {
+export declare interface AssigneeNameCellProps extends React.ComponentPropsWithRef<'div'> {
     /**
      * Assignee's full name, shown next to the avatar and used for initials fallback.
      *
@@ -469,9 +475,9 @@ export declare function AttachmentIcon(props: IconProps): JSX.Element;
  * `role="img"` makes the wrapper's contents presentational, so the initials are not announced
  * on top of `aria-label`; they remain in `textContent` for anyone asserting on them.
  */
-export declare function Avatar({ src, name, fallbackLabel, size, className, }: AvatarProps): JSX.Element;
+export declare function Avatar({ src, name, fallbackLabel, size, className, ref, ...rest }: AvatarProps): JSX.Element;
 
-export declare interface AvatarProps {
+export declare interface AvatarProps extends React.ComponentPropsWithRef<'div'> {
     /** Image URL to render. Falls back to initials derived from `name` when omitted. */
     src?: string;
     /**
@@ -497,9 +503,9 @@ export declare interface AvatarProps {
     className?: string;
 }
 
-export declare function Badge({ tone, children, className }: BadgeProps): JSX.Element;
+export declare function Badge({ tone, children, className, ref, ...rest }: BadgeProps): JSX.Element;
 
-export declare interface BadgeProps {
+export declare interface BadgeProps extends React.ComponentPropsWithRef<'span'> {
     /**
      * What the badge's state *means*, on the design's status ramps.
      *
@@ -574,9 +580,15 @@ export declare function BellIcon(props: IconProps): JSX.Element;
  * `outline-none` also outranks a consumer's own `@layer base :focus-visible`
  * rule, so it suppressed the app's global ring too.
  */
-export declare function Button({ variant, isSelected, children, className, isDisabled, role, 'aria-checked': ariaChecked, ...props }: ButtonProps): JSX.Element;
+export declare function Button({ variant, isSelected, children, className, isDisabled, role, 'aria-checked': ariaChecked, ref: forwardedRef, ...props }: ButtonProps): JSX.Element;
 
 export declare interface ButtonProps extends AriaButtonProps {
+    /**
+     * Ref to the root `<button>` (#11). Merged with the internal ref `useButton` needs via
+     * `useObjectRef` — react-aria's own utility for exactly this case, a component that both
+     * uses a ref itself and must still forward whatever ref its caller passed.
+     */
+    ref?: React.Ref<HTMLButtonElement>;
     /**
      * Figma "Property 1": Primary is a single documented state (solid fill,
      * no selected/unselected toggle). Secondary is icon-only chrome that
@@ -641,7 +653,7 @@ export declare function CalendarIcon(props: IconProps): JSX.Element;
  * two card surfaces that could drift apart independently. They now cannot: there is one
  * `CARD_SURFACE`, and a test asserts the two components compute the same background and radius.
  */
-export declare function Card({ children, as: Component, isInteractive, className, ...props }: CardProps): JSX.Element;
+export declare function Card({ children, as, isInteractive, className, ref, ...props }: CardProps): JSX.Element;
 
 export declare namespace Card {
     var Header: typeof CardHeader;
@@ -650,20 +662,20 @@ export declare namespace Card {
 }
 
 /** The card's main content, taking the remaining height. */
-export declare function CardBody({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+export declare function CardBody({ children, className, ref, ...props }: React.ComponentPropsWithRef<'div'>): JSX.Element;
 
 /**
  * The card's bottom row. `mt-auto` so a footer sits at the bottom of a card that has been given
  * a height, rather than floating directly under short content.
  */
-export declare function CardFooter({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+export declare function CardFooter({ children, className, ref, ...props }: React.ComponentPropsWithRef<'div'>): JSX.Element;
 
 /**
  * The card's top row. A plain layout slot — it carries the rhythm, not a heading: a card's
  * heading level depends on the page it sits in, so it stays the caller's to choose (the same
  * reason `ProjectInfo` and `TaskTableGroup` take a `headingLevel`).
  */
-export declare function CardHeader({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>): JSX.Element;
+export declare function CardHeader({ children, className, ref, ...props }: React.ComponentPropsWithRef<'div'>): JSX.Element;
 
 export declare interface CardProps extends React.HTMLAttributes<HTMLElement> {
     /** Card content. Compose it with `Card.Header`, `Card.Body` and `Card.Footer`. */
@@ -674,6 +686,13 @@ export declare interface CardProps extends React.HTMLAttributes<HTMLElement> {
      * @default 'div'
      */
     as?: 'div' | 'article' | 'section' | 'li';
+    /**
+     * Ref to the root element (#11). Typed to the common `HTMLElement` base rather than
+     * whichever of `div`/`article`/`section`/`li` `as` resolves to — `Card` is polymorphic,
+     * so there is no single element type to narrow it to without a generic the four call
+     * sites in this kit have no need for.
+     */
+    ref?: React.Ref<HTMLElement>;
     /**
      * Reveals a border on hover, for a card that is clickable as a whole.
      * @default false
@@ -760,7 +779,7 @@ declare const COLUMN_ORDER: readonly ["name", "tags", "estimation", "assignee", 
  */
 export declare function CommentIcon(props: IconProps): JSX.Element;
 
-export declare function Datepicker({ label, isLabelVisible, error, description, className, ...props }: DatepickerProps): JSX.Element;
+export declare function Datepicker({ label, isLabelVisible, error, description, className, ref: forwardedRef, ...props }: DatepickerProps): JSX.Element;
 
 /**
  * DatePickerMenu
@@ -820,9 +839,9 @@ export declare function Datepicker({ label, isLabelVisible, error, description, 
  * correct, standard grid semantics is a net accessibility improvement, not a regression against
  * verified spec.
  */
-export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, label, previousYearLabel, previousMonthLabel, nextMonthLabel, nextYearLabel, todayLabel, className, }: DatePickerMenuProps): JSX.Element;
+export declare function DatePickerMenu({ value: controlledValue, defaultValue, onChange, onClose, triggerRef, dismissExemptRef, timeZone, label, previousYearLabel, previousMonthLabel, nextMonthLabel, nextYearLabel, todayLabel, className, ref, }: DatePickerMenuProps): JSX.Element;
 
-export declare interface DatePickerMenuProps {
+export declare interface DatePickerMenuProps extends Pick<PopoverProps, 'ref'> {
     /**
      * Currently selected date. Passing this makes the component controlled;
      * pair it with `onChange` to update the selection.
@@ -897,6 +916,11 @@ export declare interface DatePickerMenuProps {
 }
 
 export declare interface DatepickerProps extends AriaTextFieldProps {
+    /**
+     * Ref to the root `<input>` (#11). Merged with the internal ref `useTextField` needs via
+     * `useObjectRef`, the same pattern the icon `Button` uses.
+     */
+    ref?: React.Ref<HTMLInputElement>;
     /** Label text. Rendered `sr-only` unless `isLabelVisible`. When omitted, no label. */
     label?: string;
     /**
@@ -968,9 +992,9 @@ export declare const DUE_DATE_URGENCY_COLOR: Record<DueDateUrgency, AccentColor>
 export declare const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string>;
 
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
-export declare function DueDateCell({ date, dueDateUrgency, dueDateUrgencyLabel, }: DueDateCellProps): JSX.Element;
+export declare function DueDateCell({ date, dueDateUrgency, dueDateUrgencyLabel, className, ref, ...rest }: DueDateCellProps): JSX.Element;
 
-export declare interface DueDateCellProps {
+export declare interface DueDateCellProps extends React.ComponentPropsWithRef<'span'> {
     /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
     date: string;
     /**
@@ -1029,9 +1053,9 @@ export declare type DueDateUrgency = 'normal' | 'soon' | 'overdue';
  * not re-add `role="status"` here expecting it to work. It stays a labelled `group` so
  * it is still something a screen-reader user can find and step into.
  */
-export declare function EmptyState({ title, description, icon, action, label, className, }: EmptyStateProps): JSX.Element;
+export declare function EmptyState({ title, description, icon, action, label, className, ref, ...rest }: EmptyStateProps): JSX.Element;
 
-export declare interface EmptyStateProps {
+export declare interface EmptyStateProps extends React.ComponentPropsWithRef<'div'> {
     /** The headline — what is missing, in the user's terms. Required: an empty state with no text is just a gap. */
     title: string;
     /** Optional second line explaining why it is empty or what would fill it. */
@@ -1067,9 +1091,9 @@ export declare interface EmptyStateProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export declare function EstimateModal({ value, onAction, onClose, triggerRef, dismissExemptRef, formatPoints, label, className, }: EstimateModalProps): JSX.Element;
+export declare function EstimateModal({ value, onAction, onClose, triggerRef, dismissExemptRef, formatPoints, label, className, ref, }: EstimateModalProps): JSX.Element;
 
-export declare interface EstimateModalProps {
+export declare interface EstimateModalProps extends Pick<PopoverProps, 'ref'> {
     /** Currently selected point value, if any — highlights the matching row. */
     value?: number;
     /**
@@ -1119,9 +1143,9 @@ export declare interface EstimateModalProps {
  * "3 Days" sample text; the real in-context "Task Default View" mockup renders it as
  * "N Points") is plain Desktop/Body/M/regular text directly in the cell, no badge/pill chrome.
  */
-export declare function EstimationCell({ points, formatPoints }: EstimationCellProps): JSX.Element;
+export declare function EstimationCell({ points, formatPoints, className, ref, ...rest }: EstimationCellProps): JSX.Element;
 
-export declare interface EstimationCellProps {
+export declare interface EstimationCellProps extends React.ComponentPropsWithRef<'span'> {
     /** Numeric estimation (story points) rendered as `"N Points"` / `"1 Point"`. */
     points: number;
     /**
@@ -1222,9 +1246,9 @@ export declare function fieldLabelClass(isLabelVisible: boolean | undefined): st
  * at the exact moment the user is trying to read what went wrong, and the helper text
  * has usually just been superseded by the error anyway.
  */
-export declare function FieldMessages({ description, error, descriptionProps, errorMessageProps, }: FieldMessagesProps): JSX.Element | null;
+export declare function FieldMessages({ description, error, descriptionProps, errorMessageProps, className, ref, ...rest }: FieldMessagesProps): JSX.Element | null;
 
-export declare interface FieldMessagesProps {
+export declare interface FieldMessagesProps extends React.ComponentPropsWithRef<'span'> {
     /** Helper text. Hidden automatically while `error` is set, so the two never stack. */
     description?: string;
     /** Error message. Its presence is what puts the field in its invalid state. */
@@ -1280,7 +1304,7 @@ export declare interface FieldMessagesProps {
  * stopping propagation after closing, makes Escape dismiss exactly the
  * topmost layer.
  */
-export declare function FloatingPopover({ state, children, popoverRef, className, ...props }: FloatingPopoverProps): JSX.Element;
+export declare function FloatingPopover({ state, children, className, ref: forwardedRef, ...props }: FloatingPopoverProps): JSX.Element;
 
 export declare interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'popoverRef'> {
     /**
@@ -1290,8 +1314,14 @@ export declare interface FloatingPopoverProps extends Omit<AriaPopoverProps, 'po
      */
     state: OverlayTriggerState;
     children: React.ReactNode;
-    /** Ref to the popover element. Provide only if a caller needs to measure/observe it directly. */
-    popoverRef?: React.RefObject<HTMLDivElement | null>;
+    /**
+     * Ref to the popover element (#11). Was the bespoke `popoverRef` — retired in favor of
+     * the universal `ref`, per kit#129's decision that a bespoke ref channel goes with #11
+     * wherever it reaches the same node a plain `ref` would. This one does: `usePopover`
+     * needs the identical element a caller measuring/observing the popover would want.
+     * Neither this kit nor the consuming app had a caller passing the old name.
+     */
+    ref?: React.Ref<HTMLDivElement>;
     /** Additional class names applied to the popover surface, merged last via `cn()`. */
     className?: string;
 }
@@ -1315,7 +1345,7 @@ export declare const formatPointsShort: PointsFormatter;
  * Built on react-aria's `useField`, so the ids and `aria-describedby` wiring come from
  * the same implementation the field hooks use rather than a parallel hand-rolled one.
  */
-export declare function FormField({ label, isLabelVisible, description, error, isRequired, children, className, ...props }: FormFieldProps): JSX.Element;
+export declare function FormField({ label, isLabelVisible, description, error, isRequired, children, className, ref, ...props }: FormFieldProps): JSX.Element;
 
 export declare interface FormFieldProps extends Omit<AriaFieldProps, 'errorMessage'> {
     /** Label text. Rendered `sr-only` unless `isLabelVisible`. */
@@ -1347,6 +1377,12 @@ export declare interface FormFieldProps extends Omit<AriaFieldProps, 'errorMessa
     children: (fieldProps: React.HTMLAttributes<HTMLElement>) => React.ReactNode;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
+    /**
+     * Ref to the root element (#11). `AriaFieldProps` (the base this interface extends)
+     * carries no `ref` of its own — it is a hook-options type, not a DOM props type — so
+     * this is declared explicitly rather than inherited.
+     */
+    ref?: React.Ref<HTMLDivElement>;
 }
 
 /**
@@ -1446,11 +1482,16 @@ export declare type HeadingLevel = 2 | 3 | 4 | 5 | 6;
  * and matches how the kit's icon slots are already typed (`React.ReactNode`, i.e. you pass
  * `<PlusIcon />`, not a string).
  */
-export declare type IconProps = SVGProps<SVGSVGElement>;
+export declare type IconProps = React.ComponentPropsWithRef<'svg'>;
 
-export declare function Input({ label, isLabelVisible, error, description, className, ...props }: InputProps): JSX.Element;
+export declare function Input({ label, isLabelVisible, error, description, className, ref: forwardedRef, ...props }: InputProps): JSX.Element;
 
 export declare interface InputProps extends AriaTextFieldProps {
+    /**
+     * Ref to the root `<input>` (#11). Merged with the internal ref `useTextField` needs via
+     * `useObjectRef`, the same pattern `Datepicker` uses.
+     */
+    ref?: React.Ref<HTMLInputElement>;
     /** Label text. Rendered `sr-only` unless `isLabelVisible`. When omitted, no label. */
     label?: string;
     /**
@@ -1485,9 +1526,15 @@ export declare interface InputProps extends AriaTextFieldProps {
  * like the two vector states a real checkbox input would render.
  * Uses react-aria useCheckbox for full accessibility.
  */
-export declare function LabelCheckbox({ children, isSelected, defaultSelected, onChange, isDisabled, isIndeterminate, error, description, isRequired, label, className, }: LabelCheckboxProps): JSX.Element;
+export declare function LabelCheckbox({ children, isSelected, defaultSelected, onChange, isDisabled, isIndeterminate, error, description, isRequired, label, className, ref: forwardedRef, }: LabelCheckboxProps): JSX.Element;
 
 export declare interface LabelCheckboxProps {
+    /**
+     * Ref to the underlying `<input type="checkbox">` (#11), matching the form-control
+     * convention `Datepicker`/`Input` already follow. Merged with the internal ref
+     * `useCheckbox` needs via `useObjectRef`.
+     */
+    ref?: React.Ref<HTMLInputElement>;
     /** Label content rendered next to the checkbox. */
     children: React.ReactNode;
     /** Controlled selected state. Omit to let the component manage its own state via `defaultSelected`. */
@@ -1573,9 +1620,9 @@ export declare function LabelIcon(props: IconProps): JSX.Element;
  * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
  * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export declare function LabelModal({ labels, onAction, onClose, triggerRef, dismissExemptRef, label, className, }: LabelModalProps): JSX.Element;
+export declare function LabelModal({ labels, onAction, onClose, triggerRef, dismissExemptRef, label, className, ref, }: LabelModalProps): JSX.Element;
 
-export declare interface LabelModalProps {
+export declare interface LabelModalProps extends Pick<PopoverProps, 'ref'> {
     /** Full list of selectable labels shown as rows. */
     labels: TaskLabel[];
     /**
@@ -1621,7 +1668,7 @@ export declare interface LabelModalProps {
  * `useListBox`/`useOption` for free; this component only renders what they
  * report.
  */
-export declare function ListBox<T extends object>({ state, listBoxRef, className, ...props }: ListBoxProps<T>): JSX.Element;
+export declare function ListBox<T extends object>({ state, className, ref: forwardedRef, ...props }: ListBoxProps<T>): JSX.Element;
 
 export declare interface ListBoxProps<T extends object> extends AriaListBoxOptions<T> {
     /**
@@ -1633,8 +1680,13 @@ export declare interface ListBoxProps<T extends object> extends AriaListBoxOptio
      * rendering/keyboard logic works no matter which hook produced the state.
      */
     state: ListState<T>;
-    /** Ref to the underlying `<ul>` element. */
-    listBoxRef?: React.RefObject<HTMLUListElement | null>;
+    /**
+     * Ref to the underlying `<ul>` element (#11). Was the bespoke `listBoxRef` — retired in
+     * favor of the universal `ref`, per kit#129's decision #3: neither this kit nor the
+     * consuming app had a caller passing the old name, and it reached the same node a plain
+     * `ref` would.
+     */
+    ref?: React.Ref<HTMLUListElement>;
     /** Additional class names applied to the `<ul>`, merged last via `cn()`. */
     className?: string;
 }
@@ -1696,7 +1748,7 @@ export declare function LogoMark(props: IconProps): JSX.Element;
  * directly in the `<Item>`'s own children, the same way `MenuItem` below
  * always renders `item.rendered` untouched.
  */
-export declare function Menu<T extends object>({ label, triggerContent, isDisabled, triggerClassName, ...menuProps }: MenuProps<T>): JSX.Element;
+export declare function Menu<T extends object>({ label, triggerContent, isDisabled, triggerClassName, ref: forwardedRef, ...menuProps }: MenuProps<T>): JSX.Element;
 
 /**
  * Overflow / "more actions" affordance — opens a task card's options menu.
@@ -1718,6 +1770,11 @@ export declare interface MenuProps<T extends object> extends Omit<AriaMenuProps<
      * component doc comment for why.
      */
     triggerClassName?: string;
+    /**
+     * Ref to the trigger button (#11). Merged with the internal ref
+     * `useMenuTrigger`/`useButton` need via `useObjectRef`.
+     */
+    ref?: React.Ref<HTMLButtonElement>;
 }
 
 /**
@@ -1727,10 +1784,18 @@ export declare interface MenuProps<T extends object> extends Omit<AriaMenuProps<
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export declare function Modal({ title, isOpen, onClose, children, className, role, isDismissable, closeLabel, }: ModalProps): default_2.JSX.Element | null;
+export declare function Modal({ title, isOpen, onClose, children, className, role, isDismissable, closeLabel, ref: forwardedRef, ...rest }: ModalProps): default_2.JSX.Element | null;
 
-export declare interface ModalProps {
-    /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
+export declare interface ModalProps extends Omit<default_2.ComponentPropsWithRef<'div'>, 'title' | 'role'> {
+    /**
+     * Dialog heading, rendered in the header and programmatically associated via
+     * `aria-labelledby`.
+     *
+     * Omitted from the inherited `div` attributes above rather than left to collide with them
+     * (#11): the native `title` is a hover tooltip, this is the dialog's actual heading, and a
+     * required `string` silently narrowing an inherited optional `string` would typecheck
+     * without saying so.
+     */
     title: string;
     /** Whether the modal is currently open. When `false`, nothing is rendered. */
     isOpen: boolean;
@@ -1817,9 +1882,14 @@ export declare interface ModalProps {
  * the list and toggle the item off, where its checkmark already shows what is
  * selected.
  */
-export declare function MultiSelect<T extends object>({ label, placeholder, icon, isDisabled, error, description, className, ...props }: MultiSelectProps<T>): JSX.Element;
+export declare function MultiSelect<T extends object>({ label, placeholder, icon, isDisabled, error, description, className, ref: forwardedRef, ...props }: MultiSelectProps<T>): JSX.Element;
 
 export declare interface MultiSelectProps<T extends object> extends Omit<ListProps<T>, 'selectionMode' | 'selectionBehavior'> {
+    /**
+     * Ref to the trigger button (#11), the same shape as `Select.ref`. Merged with the
+     * internal ref `useButton` needs via `useObjectRef`.
+     */
+    ref?: React.Ref<HTMLButtonElement>;
     /** Accessible name for the control, announced on the trigger and the option list. */
     label: string;
     /** Shown inside the trigger when no item is selected yet. */
@@ -1934,9 +2004,9 @@ export declare function PointsIcon(props: IconProps): JSX.Element;
  * content has an explicit way to close the popover, rather than needing to
  * know Escape or find the trigger again.
  */
-export declare function Popover({ isOpen, onClose, triggerRef, dismissExemptRef, children, className, ...ariaProps }: PopoverProps): default_2.JSX.Element | null;
+export declare function Popover({ isOpen, onClose, triggerRef, dismissExemptRef, children, className, ref: forwardedRef, ...ariaProps }: PopoverProps): JSX.Element | null;
 
-export declare interface PopoverProps {
+export declare interface PopoverProps extends React.ComponentPropsWithRef<'div'> {
     /** Whether the popover is currently open. When `false`, nothing is rendered. */
     isOpen: boolean;
     /** Called when the popover should close — Escape, an outside click, or a `DismissButton`. */
@@ -1955,7 +2025,7 @@ export declare interface PopoverProps {
      *
      * `triggerRef` exempts one such control. `dismissExemptRef` below exempts a region of them.
      */
-    triggerRef?: default_2.RefObject<HTMLElement | null>;
+    triggerRef?: React.RefObject<HTMLElement | null>;
     /**
      * A region that does not count as "outside" for dismissal, beyond `triggerRef` itself — for a
      * group of sibling triggers that share one popover slot (#82).
@@ -1969,10 +2039,10 @@ export declare interface PopoverProps {
      * selects itself, and the previously-open popover unmounts because its `isOpen` went false.
      * Clicking genuinely outside the group still dismisses normally.
      */
-    dismissExemptRef?: default_2.RefObject<HTMLElement | null>;
+    dismissExemptRef?: React.RefObject<HTMLElement | null>;
     /** Accessible name for the popover surface, read by screen readers on open. */
     'aria-label'?: string;
-    children: default_2.ReactNode;
+    children: React.ReactNode;
     /** Additional class names controlling the popover surface's position/size/appearance. */
     className?: string;
 }
@@ -1990,10 +2060,15 @@ export declare interface PopoverProps {
  * clickable card or row gets a keyboard path: one real control named by the title, with the
  * container's own click handler left as a redundant pointer target beside it.
  */
-export declare function ProjectInfo({ title, icon, onTitleClick, headingLevel, titleId, className, }: ProjectInfoProps): JSX.Element;
+export declare function ProjectInfo({ title, icon, onTitleClick, headingLevel, titleId, className, ref, ...rest }: ProjectInfoProps): JSX.Element;
 
-export declare interface ProjectInfoProps {
-    /** Task/project title. Grows to fill the row and truncates to a single line. */
+export declare interface ProjectInfoProps extends Omit<React.ComponentPropsWithRef<'div'>, 'title'> {
+    /**
+     * Task/project title. Grows to fill the row and truncates to a single line.
+     *
+     * Omitted from the inherited attributes above (#11), same reason as `TaskCard.title`:
+     * the native `title` is a tooltip, this is the row's real title text.
+     */
     title: string;
     /**
      * Which `<h*>` the title renders as. Was hardcoded to `3`, which is why a board's column
@@ -2088,9 +2163,15 @@ export declare interface ResolvedTaskTableColumn {
  * - Icon: 24x24, neutral-2
  * - Text: Desktop/Body/M/regular — SF Pro Display 15px/24px, letter-spacing 0.75px, neutral-2
  */
-export declare function SearchBar({ placeholder, value: controlledValue, onChange, onSubmit, label, id, className, }: SearchBarProps): JSX.Element;
+export declare function SearchBar({ placeholder, value: controlledValue, onChange, onSubmit, label, id, className, ref: forwardedRef, }: SearchBarProps): JSX.Element;
 
 export declare interface SearchBarProps {
+    /**
+     * Ref to the underlying `<input>` (#11), matching the form-control convention
+     * `Datepicker`/`Input`/`LabelCheckbox` already follow. Merged with the internal ref
+     * `useTextField` needs via `useObjectRef`.
+     */
+    ref?: React.Ref<HTMLInputElement>;
     /**
      * Placeholder text shown in the input.
      * @default 'Search...'
@@ -2164,7 +2245,7 @@ export declare function SearchIcon(props: IconProps): JSX.Element;
  * radiogroup pattern those hooks implement (selection follows focus, one
  * tab stop for the whole group).
  */
-export declare function SegmentedControl({ options, value: controlledValue, defaultValue, onChange, label, className, }: SegmentedControlProps): default_2.JSX.Element;
+export declare function SegmentedControl({ options, value: controlledValue, defaultValue, onChange, label, className, ref, ...rest }: SegmentedControlProps): default_2.JSX.Element;
 
 export declare interface SegmentedControlOption {
     /** Unique identifier for the option, used to match against `value`/`defaultValue` and reported by `onChange`. */
@@ -2175,14 +2256,20 @@ export declare interface SegmentedControlOption {
     icon?: default_2.ReactNode;
 }
 
-export declare interface SegmentedControlProps {
+export declare interface SegmentedControlProps extends Omit<default_2.ComponentPropsWithRef<'div'>, 'onChange'> {
     /** The list of segments rendered as selectable options, in display order. */
     options: SegmentedControlOption[];
     /** Selected option `id` for controlled usage. When provided, the component no longer manages its own selection state. */
     value?: string;
     /** Initial selected option `id` for uncontrolled usage. Falls back to the first option's `id` when omitted. */
     defaultValue?: string;
-    /** Called with the newly selected option's `id` whenever the user picks a segment. */
+    /**
+     * Called with the newly selected option's `id` whenever the user picks a segment.
+     *
+     * Omitted from the inherited `div` attributes above (#11): every `HTMLAttributes` type
+     * carries a generic `onChange: FormEventHandler`, and this one takes the selected id
+     * directly rather than a form event — a real signature conflict, not just a name clash.
+     */
     onChange?: (value: string) => void;
     /**
      * Accessible name for the group as a whole, announced before the selected segment.
@@ -2215,9 +2302,15 @@ export declare interface SegmentedControlProps {
  * native picker UI, and lets autofill/password managers see a field they
  * recognize. The visible chip-shaped trigger below is purely presentational.
  */
-export declare function Select<T extends object>({ isLabelVisible, placeholder, icon, error, description, className, ...props }: SelectProps<T>): JSX.Element;
+export declare function Select<T extends object>({ isLabelVisible, placeholder, icon, error, description, className, ref: forwardedRef, ...props }: SelectProps<T>): JSX.Element;
 
 export declare interface SelectProps<T extends object> extends AriaSelectProps<T> {
+    /**
+     * Ref to the trigger button (#11) — the actual interactive control, analogous to
+     * `Datepicker`/`Input`'s ref pointing at their own `<input>` rather than a wrapping div.
+     * Merged with the internal ref `useSelect`/`useButton` need via `useObjectRef`.
+     */
+    ref?: React.Ref<HTMLButtonElement>;
     /**
      * Renders `label` visibly above the trigger instead of `sr-only`.
      *
@@ -2256,7 +2349,7 @@ export declare interface ShowToastOptions {
     timeout?: number | null;
 }
 
-export declare function SidebarItem({ icon, label, isActive, badgeCount, onPress, className, }: SidebarItemProps): JSX.Element;
+export declare function SidebarItem({ icon, label, isActive, badgeCount, onPress, className, ref, ...rest }: SidebarItemProps): JSX.Element;
 
 /**
  * @remarks
@@ -2295,7 +2388,7 @@ export declare function SidebarItem({ icon, label, isActive, badgeCount, onPress
  * sentence naming it as a sibling of this abstract class. So that variant
  * remains unimplemented, gated on real anatomy data not yet provided.
  */
-export declare interface SidebarItemProps {
+export declare interface SidebarItemProps extends React.ComponentPropsWithRef<'button'> {
     /** Optional icon rendered before the label (Figma "Icon Placeholder", 24×24). Should use `currentColor` so it inherits the row's state color. */
     icon?: React.ReactNode;
     /** Text label displayed for the item. */
@@ -2340,9 +2433,9 @@ export declare interface SidebarItemProps {
  * `motion-reduce:animate-none` on each call site, moves an accessibility property out into
  * every future caller, where the next one omits it and nothing notices.
  */
-export declare function Skeleton({ className }: SkeletonProps): JSX.Element;
+export declare function Skeleton({ className, ref, ...rest }: SkeletonProps): JSX.Element;
 
-export declare interface SkeletonProps {
+export declare interface SkeletonProps extends React.ComponentPropsWithRef<'div'> {
     /**
      * Tailwind size/shape classes (width, height, rounding) — the primitive has no
      * intrinsic size of its own so it can stand in for text lines, avatars, cards, etc.
@@ -2411,9 +2504,9 @@ export declare interface TabItem {
  * than hand-rolled ARIA. Previously this was a hand-rolled, click-only
  * implementation with no arrow-key support.
  */
-export declare function Tabs({ items, panels, defaultSelectedKey, selectedKey, onSelectionChange, label, className, }: TabsProps): default_2.JSX.Element;
+export declare function Tabs({ items, panels, defaultSelectedKey, selectedKey, onSelectionChange, label, className, ref, ...rest }: TabsProps): default_2.JSX.Element;
 
-export declare interface TabsProps {
+export declare interface TabsProps extends default_2.ComponentPropsWithRef<'div'> {
     /** Tab item definitions */
     items: TabItem[];
     /** Content to render per tab (keyed by tab id) */
@@ -2439,12 +2532,12 @@ export declare interface TabsProps {
 }
 
 /** Compact labeled pill (Style=Solid/Outline × Icon=None/Left × Type=General/Green/Blue/Yellow/Red), optionally removable via a trailing "×" button. */
-export declare function Tag({ accent, appearance, icon, children, onRemove, removeLabel, className, }: TagProps): JSX.Element;
+export declare function Tag({ accent, appearance, icon, children, onRemove, removeLabel, className, ref, ...rest }: TagProps): JSX.Element;
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
-export declare function TagCell({ labels }: TagCellProps): JSX.Element;
+export declare function TagCell({ labels, className, ref, ...rest }: TagCellProps): JSX.Element;
 
-export declare interface TagCellProps {
+export declare interface TagCellProps extends React.ComponentPropsWithRef<'div'> {
     /**
      * Tags to render, each with its own label text and optional color variant (defaults to
      * `'neutral'` per tag).
@@ -2457,7 +2550,7 @@ export declare interface TagCellProps {
     labels: TaskTag[];
 }
 
-export declare interface TagProps {
+export declare interface TagProps extends React.ComponentPropsWithRef<'span'> {
     /**
      * Which accent colour the chip is painted in — Figma's `Type` property
      * (General/Green/Blue/Yellow/Red) by its own names. Carries no meaning of its own;
@@ -2537,10 +2630,20 @@ export declare const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, formatPoints, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onPress, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, formatPoints, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onPress, ref, ...rest }: TaskCardProps): JSX.Element;
 
-export declare interface TaskCardProps {
-    /** Task title, shown in the header row and truncated to a single line. */
+export declare interface TaskCardProps extends Omit<React.ComponentPropsWithRef<'article'>, 'title'> {
+    /**
+     * Task title, shown in the header row and truncated to a single line.
+     *
+     * Shadows the native `article` `title` attribute (a tooltip) on purpose — this is the
+     * far more common thing a consumer means by `title` on a task card, and a component
+     * cannot expose both under one name. Omitted from the inherited attributes for the same
+     * reason `Omit<..., 'title'>` appears above: without it, the DOM tooltip's optional
+     * `string | undefined` and this required `string` would still typecheck (a required
+     * member can narrow an inherited optional one), silently hiding the shadowing from
+     * anyone reading the type.
+     */
     title: string;
     /**
      * Story point estimate. Omitted entirely when `undefined`.
@@ -2697,10 +2800,15 @@ export declare interface TaskLabel {
  * badge, or "add task" affordance on the frame itself in any real instance
  * across the isolated doc export or the in-context dashboard mockup.
  */
-export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, empty, headingLevel, label, className, }: TaskListViewProps): JSX.Element;
+export declare function TaskListView({ title, icon, tasks, isLoading, emptyTitle, emptyDescription, emptyAction, empty, headingLevel, label, className, ref, ...rest }: TaskListViewProps): JSX.Element;
 
-export declare interface TaskListViewProps {
-    /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
+export declare interface TaskListViewProps extends Omit<React.ComponentPropsWithRef<'div'>, 'title' | 'ref'> {
+    /**
+     * Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`).
+     *
+     * Omitted from the inherited attributes above (#11), same reason as `TaskCard.title`:
+     * the native `title` is a tooltip, this is the column's real heading text.
+     */
     title: string;
     /**
      * Which `<h*>` the column title renders as, forwarded to `ProjectInfo`. A board is
@@ -2760,6 +2868,12 @@ export declare interface TaskListViewProps {
     isLoading?: boolean;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
+    /**
+     * Ref to the root element (#11). Typed to `HTMLElement` rather than `HTMLDivElement`/
+     * `HTMLElement` (section) specifically — this is polymorphic between `div` and `section`
+     * depending on whether `label` is given, the same shape `Card`'s `as` prop is.
+     */
+    ref?: React.Ref<HTMLElement>;
 }
 
 /** One badge in the row: announced (`label`) or decorative (`decorative: true`), never both. */
@@ -2836,9 +2950,9 @@ export declare interface TaskMetaBadgeLabelled extends TaskMetaBadgeBase {
  * badge with `count` omitted). Every real captured instance renders as plain white text+icon with
  * no fill, border, or radius (Cards00.md L595-875, Cards01.md L552-833) — preserved exactly.
  */
-export declare function TaskMetaBadges({ badges, className }: TaskMetaBadgesProps): JSX.Element;
+export declare function TaskMetaBadges({ badges, className, ref, ...rest }: TaskMetaBadgesProps): JSX.Element;
 
-export declare interface TaskMetaBadgesProps {
+export declare interface TaskMetaBadgesProps extends React.ComponentPropsWithRef<'div'> {
     /** Ordered list of metadata badges to render (e.g. attachment/subtask/comment counts). */
     badges: TaskMetaBadge[];
     /** Additional class names, merged last via `cn()` so they can override defaults. */
@@ -2871,7 +2985,7 @@ export declare type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE' | '
  * bordered cells in `TaskTableRow` merge into single hairlines instead of doubling, resolving
  * the boxed-grid-vs-flat-row mismatch this chunk was flagged to fix.
  */
-export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, columnLabels, columns, className, }: TaskTableProps): JSX.Element;
+export declare function TaskTable({ groups, isLoading, emptyTitle, emptyDescription, emptyAction, empty, columnLabels, columns, className, ref, ...rest }: TaskTableProps): JSX.Element;
 
 /** One of the five cells this component knows how to draw. */
 export declare interface TaskTableBuiltInColumn {
@@ -2958,7 +3072,7 @@ export declare interface TaskTableGroup {
     actions?: React.ReactNode;
 }
 
-export declare interface TaskTableProps {
+export declare interface TaskTableProps extends React.ComponentPropsWithRef<'div'> {
     /** Status groups rendered top to bottom, each its own bordered box per Figma's "Task Table". */
     groups: TaskTableGroup[];
     /**
@@ -3037,16 +3151,22 @@ export declare interface TaskTableProps {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, accent, reactions, isSelected, onChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, columns, columnLabels, onPress, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, accent, reactions, isSelected, onChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, columns, columnLabels, onPress, onViewDetails, className, ref, ...rest }: TaskTableRowProps): JSX.Element;
 
-export declare interface TaskTableRowProps {
+export declare interface TaskTableRowProps extends Omit<React.ComponentPropsWithRef<'tr'>, 'title' | 'onChange'> {
     /**
      * Row index shown before the title (Figma's "01"/"02" sample text), zero-padded to 2 digits.
      * Restarts per status group, matching the real "Task Default View" mockup ("To Do (05)"'s
      * rows read 01-05, "In Progress"'s restart at 01).
      */
     index: number;
-    /** Task title shown in the Task Name column, truncated to a single line. */
+    /**
+     * Task title shown in the Task Name column, truncated to a single line.
+     *
+     * Omitted from the inherited `tr` attributes above (#11), same reason as `TaskCard.title`:
+     * the native `title` is a tooltip, this is the row's actual task title, and a required
+     * `string` narrowing an inherited optional one would typecheck without saying so.
+     */
     title: string;
     /**
      * Color of the "Line 1" status/priority stripe flush against the row's left edge. Takes the
@@ -3104,6 +3224,10 @@ export declare interface TaskTableRowProps {
      * `AriaCheckboxProps` — this checkbox toggle is exactly that shape, not the multi-item
      * `Selection`/`onSelectionChange` shape `Tabs` uses, which is why it gets Checkbox's
      * vocabulary and not Tabs's.
+     *
+     * Omitted from the inherited `tr` attributes (#11): every `HTMLAttributes` type carries
+     * a generic `onChange: FormEventHandler`, and this one takes the next selected state
+     * directly — a real signature conflict, the same one `SegmentedControl.onChange` has.
      */
     onChange?: (isSelected: boolean) => void;
     /**
@@ -3297,7 +3421,7 @@ export declare interface TaskTag {
  * `variant="primary"` uses the same fill and is *not* affected: an icon is non-text, so
  * 1.4.11's 3:1 applies to it and 3.83:1 clears that.
  */
-export declare function TextButton({ variant, isSelected, className, isDisabled, ...props }: TextButtonProps): JSX.Element;
+export declare function TextButton({ variant, isSelected, className, isDisabled, ref: forwardedRef, ...props }: TextButtonProps): JSX.Element;
 
 export declare interface TextButtonProps extends AriaButtonProps {
     /**
@@ -3312,6 +3436,11 @@ export declare interface TextButtonProps extends AriaButtonProps {
     children: React.ReactNode;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
+    /**
+     * Ref to the root `<button>` (#11). Merged with the internal ref `useButton` needs via
+     * `useObjectRef`, the same pattern the icon `Button` uses.
+     */
+    ref?: React.Ref<HTMLButtonElement>;
 }
 
 export declare interface ToastApi {
@@ -3336,6 +3465,13 @@ export declare interface ToastContent {
  * knowledge belongs in the design system rather than in one of its consumers.
  *
  * Wrap the app once, then call `useToast().show(...)` from anywhere beneath it.
+ *
+ * **No `ref` (#11).** `ToastProvider` renders no root element of its own — `children` pass
+ * through `ToastContext.Provider` untouched, and the only real DOM this component owns is
+ * `ToastRegion`'s portalled container, mounted conditionally and only while a toast is
+ * visible. Neither is a stable node a `ref` could usefully point at, unlike every other
+ * component in this pass, which forwards to a root it always renders. If a consumer needs
+ * the region node directly, that is a reason to export `ToastRegion`, not to fake a ref here.
  */
 export declare function ToastProvider({ children, duration, maxVisibleToasts, label, closeLabel, }: ToastProviderProps): JSX.Element;
 
@@ -3398,9 +3534,9 @@ export declare type ToastTone = StatusTone;
  * default, but this is a values-based judgment call, not a confirmed fact. No `title` prop:
  * no title/heading layer exists anywhere in the real component.
  */
-export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, clearSearchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, userSlot, actions, className, }: TopNavProps): JSX.Element;
+export declare function TopNav({ searchValue: controlledSearchValue, searchPlaceholder, onSearchChange, onSearchSubmit, searchLabel, clearSearchLabel, icon, onNotificationsClick, notificationsLabel, userName, userAvatar, userSlot, actions, className, ref, ...rest }: TopNavProps): JSX.Element;
 
-export declare interface TopNavProps {
+export declare interface TopNavProps extends React.ComponentPropsWithRef<'header'> {
     /** Controlled search value. */
     searchValue?: string;
     /** Placeholder text shown in the search input. */
@@ -3493,9 +3629,15 @@ export declare function useModalState(defaultOpen?: boolean): {
  *   ground truth — see the Chunk 9 note in `application-sidebar.tsx`)
  * - Background: transparent
  */
-export declare function UserRow({ name, role, avatarSrc, size, isOnline, className, onPress, }: UserRowProps): JSX.Element;
+export declare function UserRow({ name, role, avatarSrc, size, isOnline, className, onPress, ref, ...rest }: UserRowProps): JSX.Element;
 
-export declare interface UserRowProps {
+export declare interface UserRowProps extends React.HTMLAttributes<HTMLElement> {
+    /**
+     * Ref to the root element (#11). Typed to the common `HTMLElement` base rather than
+     * `HTMLButtonElement`/`HTMLDivElement` specifically — this row is polymorphic between the
+     * two depending on whether `onPress` is given, the same shape `Card`'s `as` prop is.
+     */
+    ref?: React.Ref<HTMLElement>;
     /** Full name of the user */
     name: string;
     /** Job title or role (e.g. "Frontend Developer") */
@@ -3560,12 +3702,18 @@ export declare function useToast(): ToastApi;
  * nothing in the accessibility tree said which side was active, or that the two buttons
  * were related at all.
  */
-export declare function ViewSwitcher({ value, onChange, leftIcon, rightIcon, leftLabel, rightLabel, label, className, }: ViewSwitcherProps): JSX.Element;
+export declare function ViewSwitcher({ value, onChange, leftIcon, rightIcon, leftLabel, rightLabel, label, className, ref, ...rest }: ViewSwitcherProps): JSX.Element;
 
-export declare interface ViewSwitcherProps {
+export declare interface ViewSwitcherProps extends Omit<React.ComponentPropsWithRef<'div'>, 'onChange'> {
     /** Which side is currently active. */
     value: 'left' | 'right';
-    /** Called with the side that was pressed. */
+    /**
+     * Called with the side that was pressed.
+     *
+     * Omitted from the inherited `div` attributes above (#11): every `HTMLAttributes` type
+     * carries a generic `onChange: FormEventHandler`, and this one takes the selected side
+     * directly — the same real signature conflict `SegmentedControl.onChange` has.
+     */
     onChange?: (value: 'left' | 'right') => void;
     /** 24×24 icon for the left button (`currentColor`). */
     leftIcon: React.ReactNode;
