@@ -94,6 +94,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   `className="max-w-[578px]"` in their place. App-side follow-up tracked as
   [app#157](https://github.com/f3r21/ravn-task-management-challenge/issues/157) alongside
   the `tags[].variant`→`accent` one below. **Minor.**
+
 ### Fixed
 
 - **`AddTaskModal`'s four-chip trigger row wraps instead of silently overflowing under a
