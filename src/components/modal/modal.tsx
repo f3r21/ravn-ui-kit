@@ -16,10 +16,21 @@ export interface ModalProps {
   /** Modal body content. */
   children: React.ReactNode;
   /**
-   * Tailwind max-width class controlling the dialog's width.
-   * @default 'max-w-md'
+   * Additional class names, merged last via `cn()` so they can override defaults — including
+   * the dialog's default `max-w-md` width.
+   *
+   * Replaces `width?: string` (#14) — that prop was typed as a raw string standing in for "a
+   * Tailwind max-width class," so `width="400px"` typechecked and silently did nothing.
+   * **No component in this kit ever passed it** (two of this kit's own *stories* did —
+   * `WideVariant`/`Playground` below, migrated to `className` in this same PR, so nothing
+   * here still uses the old name). The consuming app has two real production callers, both
+   * still on the old name until it updates: `task-form-dialog.tsx:158` and
+   * `delete-task-dialog.tsx:96`, both `width="max-w-[578px]"` — caught in review, not by
+   * the original claim, which said "no caller, kit or app" and was wrong on two counts, not
+   * one. Pass `className="max-w-[578px]"` in their place; behavior is unchanged, only the
+   * prop name is. Tracked as an app-side follow-up alongside this PR's other renamed props.
    */
-  width?: string;
+  className?: string;
   /**
    * ARIA role for the dialog. Use `'alertdialog'` for a destructive-action
    * confirmation (e.g. a delete confirmation) — it tells assistive tech
@@ -62,7 +73,7 @@ export function Modal({
   isOpen,
   onClose,
   children,
-  width = 'max-w-md',
+  className,
   role = 'dialog',
   isDismissable = true,
   closeLabel = 'Close modal',
@@ -108,7 +119,7 @@ export function Modal({
           into the dialog on open, restore it on close), not the raw DOM
           autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
-        <div {...modalProps} ref={overlayRef} className={cn('w-full', width)}>
+        <div {...modalProps} ref={overlayRef} className={cn('w-full max-w-md', className)}>
           <div
             {...dialogProps}
             ref={dialogRef}

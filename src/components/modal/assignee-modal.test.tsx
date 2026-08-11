@@ -10,16 +10,16 @@ const ASSIGNEES = [
 
 describe('AssigneeModal Component', () => {
   it('renders as a dialog popover listing every assignee', () => {
-    render(<AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={vi.fn()} />);
+    render(<AssigneeModal assignees={ASSIGNEES} onAction={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByRole('dialog', { name: 'Assignee' })).toBeDefined();
     expect(screen.getByText('Jerome Bell')).toBeDefined();
     expect(screen.getByText('Courtney Henry')).toBeDefined();
   });
 
-  it('calls onSelect with the clicked assignee', async () => {
+  it('calls onAction with the clicked assignee', async () => {
     const handleSelect = vi.fn();
     const user = userEvent.setup();
-    render(<AssigneeModal assignees={ASSIGNEES} onSelect={handleSelect} onClose={vi.fn()} />);
+    render(<AssigneeModal assignees={ASSIGNEES} onAction={handleSelect} onClose={vi.fn()} />);
     await user.click(screen.getByText('Courtney Henry'));
     expect(handleSelect).toHaveBeenCalledWith(ASSIGNEES[1]);
   });
@@ -27,7 +27,7 @@ describe('AssigneeModal Component', () => {
   it('calls onClose when Escape is pressed', async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
-    render(<AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={handleClose} />);
+    render(<AssigneeModal assignees={ASSIGNEES} onAction={vi.fn()} onClose={handleClose} />);
     await user.keyboard('{Escape}');
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
@@ -38,7 +38,7 @@ describe('AssigneeModal Component', () => {
     render(
       <div>
         <button type="button">Outside</button>
-        <AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={handleClose} />
+        <AssigneeModal assignees={ASSIGNEES} onAction={vi.fn()} onClose={handleClose} />
       </div>,
     );
     await user.click(screen.getByRole('button', { name: 'Outside' }));
@@ -53,7 +53,7 @@ describe('AssigneeModal Component', () => {
    */
   it('renames the header and the popover’s accessible name from one prop', () => {
     render(
-      <AssigneeModal assignees={ASSIGNEES} onSelect={vi.fn()} onClose={vi.fn()} label="Owner" />,
+      <AssigneeModal assignees={ASSIGNEES} onAction={vi.fn()} onClose={vi.fn()} label="Owner" />,
     );
 
     expect(screen.getByRole('dialog', { name: 'Owner' })).toBeDefined();

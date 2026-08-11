@@ -6,18 +6,27 @@ export interface TagProps {
    * Which accent colour the chip is painted in — Figma's `Type` property
    * (General/Green/Blue/Yellow/Red) by its own names. Carries no meaning of its own;
    * for a chip that says what a state *means*, use `Badge` and its `StatusTone`.
+   *
+   * Named `accent` (#14) — every `AccentColor`-typed prop in the kit shares this name now,
+   * so a consumer reading `TaskTableRow.accent` or `TaskTag.accent` already knows this one.
    * @default 'neutral'
    */
-  variant?: AccentColor;
+  accent?: AccentColor;
   /**
-   * Renders the "Style=Outline" variant (border, transparent fill) instead of
-   * the default "Style=Solid" (10%-alpha fill, no border).
-   * @default false
+   * `'outline'` renders the "Style=Outline" variant (border, transparent fill) instead of
+   * the default `'solid'` (10%-alpha fill, no border) — Figma's own `Style` property.
+   *
+   * Was a boolean (#14) — a two-value axis crammed into `true`/`false` can never grow a
+   * third style. Named `appearance`, not `style`: kit#11 lands in this same release and
+   * adds rest-spread to every component, and a prop literally named `style` would collide
+   * with the native DOM `style: CSSProperties` attribute the moment rest-spread reaches
+   * this element — kit#129's suggested name didn't account for that.
+   * @default 'solid'
    */
-  outline?: boolean;
+  appearance?: 'solid' | 'outline';
   /**
    * Optional leading icon (Figma "Icon=Left" slot, 24×24px). Should use
-   * `currentColor` for its fill/stroke so it inherits the tag's variant color.
+   * `currentColor` for its fill/stroke so it inherits the tag's accent color.
    */
   icon?: React.ReactNode;
   /** Tag label content. */
@@ -40,8 +49,8 @@ export interface TagProps {
 
 /** Compact labeled pill (Style=Solid/Outline × Icon=None/Left × Type=General/Green/Blue/Yellow/Red), optionally removable via a trailing "×" button. */
 export function Tag({
-  variant = 'neutral',
-  outline = false,
+  accent = 'neutral',
+  appearance = 'solid',
   icon,
   children,
   onRemove,
@@ -124,7 +133,7 @@ export function Tag({
         // all Type variants, Tags00/01.md). Typography: Desktop/Body/M/bold - SF Pro
         // Display, 15px/24px, letter-spacing 0.75px (tracking-wider @ 15px), weight 600.
         'inline-flex items-center gap-2 px-4 py-1 text-body-m font-semibold rounded font-sans select-none',
-        outline ? styles[variant].outline : styles[variant].solid,
+        appearance === 'outline' ? styles[accent].outline : styles[accent].solid,
         className,
       )}
     >

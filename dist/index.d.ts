@@ -149,15 +149,9 @@ export declare interface AddTaskModalProps {
     /** People selectable in the assignee trigger's popover. */
     assignees?: Assignee[];
     /** Labels selectable in the label trigger's popover — see `LabelModal`. */
-    labels?: Label[];
+    labels?: TaskLabel[];
     /** Called with the form values when the user submits a valid (non-empty title) task. */
-    onSubmit?: (data: {
-        title: string;
-        dueDate?: Date;
-        points?: number;
-        assignee?: Assignee;
-        label?: Label;
-    }) => void;
+    onSubmit?: (data: AddTaskSubmitData) => void;
     /**
      * Pre-fills the title field (edit flow — reopening on an existing task). Uncontrolled:
      * read when the widget opens, then owned by the field until it closes and reopens.
@@ -171,7 +165,7 @@ export declare interface AddTaskModalProps {
     /** Pre-fills the assignee trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
     defaultAssignee?: Assignee;
     /** Pre-fills the label trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
-    defaultLabel?: Label;
+    defaultLabel?: TaskLabel;
     /**
      * The widget's visible copy, merged over the English defaults (#90).
      *
@@ -197,6 +191,21 @@ export declare interface AddTaskModalProps {
     formatDueDate?: (date: Date) => string;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
+}
+
+/**
+ * The form values `AddTaskModal.onSubmit` is called with.
+ *
+ * Named and exported (#14) — this was an anonymous object literal inline on `onSubmit`'s
+ * type, so a consumer building a handler for it had nothing to import and had to retype the
+ * shape by hand or reach for `Parameters<NonNullable<AddTaskModalProps['onSubmit']>>[0]`.
+ */
+export declare interface AddTaskSubmitData {
+    title: string;
+    dueDate?: Date;
+    points?: number;
+    assignee?: Assignee;
+    label?: TaskLabel;
 }
 
 /**
@@ -334,7 +343,7 @@ export declare interface AppShellProps {
 }
 
 export declare interface Assignee {
-    /** Unique identifier, echoed back in `onSelect`. */
+    /** Unique identifier, echoed back in `onAction`. */
     id: string;
     /** Display name shown in the row. */
     name: string;
@@ -366,13 +375,19 @@ export declare function AssigneeIcon(props: IconProps): JSX.Element;
  * action (every real "User" row instance renders identically, with no highlighted/selected
  * variant anywhere in the export).
  */
-export declare function AssigneeModal({ assignees, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: AssigneeModalProps): JSX.Element;
+export declare function AssigneeModal({ assignees, onAction, onClose, triggerRef, dismissExemptRef, label, className, }: AssigneeModalProps): JSX.Element;
 
 export declare interface AssigneeModalProps {
     /** Full list of assignable people shown as rows. */
     assignees: Assignee[];
-    /** Called with the assignee of the row the user clicked. */
-    onSelect: (assignee: Assignee) => void;
+    /**
+     * Called with the assignee of the row the user clicked.
+     *
+     * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+     * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state
+     * (`Tabs`'s `onSelectionChange` shape), which is why it takes `Menu`'s vocabulary.
+     */
+    onAction: (assignee: Assignee) => void;
     /** Called when the popover should close without a selection — Escape or an outside click. */
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -482,7 +497,7 @@ export declare interface AvatarProps {
     className?: string;
 }
 
-export declare function Badge({ variant, children, className }: BadgeProps): JSX.Element;
+export declare function Badge({ tone, children, className }: BadgeProps): JSX.Element;
 
 export declare interface BadgeProps {
     /**
@@ -493,9 +508,13 @@ export declare interface BadgeProps {
      * `Secondary`/`Tertiary`/`Primary` (`success-4` `#80DA5B` is not `secondary-4` `#70B252`;
      * `danger-5` `#E82F39` is not `primary-4` `#DA584B`). Reach for `Tag` when the colour is
      * a category with no meaning attached, and `Badge` when it is a status.
+     *
+     * Named `tone` (#14) — every `StatusTone`-typed prop in the kit shares this name now;
+     * `Toast.tone` already used it, and `toast.tsx`'s `ToastTone = StatusTone` alias is the
+     * same type under a different name for the same reason this one used to say `variant`.
      * @default 'neutral'
      */
-    variant?: StatusTone;
+    tone?: StatusTone;
     /** Badge label / content. */
     children: React.ReactNode;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
@@ -949,29 +968,34 @@ export declare const DUE_DATE_URGENCY_COLOR: Record<DueDateUrgency, AccentColor>
 export declare const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string>;
 
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
-export declare function DueDateCell({ date, urgency, urgencyLabel }: DueDateCellProps): JSX.Element;
+export declare function DueDateCell({ date, dueDateUrgency, dueDateUrgencyLabel, }: DueDateCellProps): JSX.Element;
 
 export declare interface DueDateCellProps {
     /** Due date text to display (already formatted, e.g. `"6 July, 2020"`). */
     date: string;
     /**
      * Color treatment conveying how urgent the due date is.
+     *
+     * Named `dueDateUrgency` (#14), matching `TaskCard`/`TaskTableRow` — this cell used to say
+     * `urgency` while the row wrapping it said `dueDateUrgency` for the exact same value,
+     * documented at the time as "matching each component's own prop vocabulary." That is the
+     * inconsistency #14 exists to remove, not a reason two spellings were ever needed.
      * @default 'normal'
      */
-    urgency?: DueDateUrgency;
+    dueDateUrgency?: DueDateUrgency;
     /**
      * What each urgency *says*, announced to assistive tech beside the date. Merged over the
      * shared `DUE_DATE_URGENCY_LABEL` defaults.
      *
-     * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Named `urgencyLabel` here and
-     * `dueDateUrgencyLabel` on `TaskCard` to match each component's own prop vocabulary; both
-     * read the same defaults, so the two renderers cannot disagree about what "overdue" says
-     * any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how it looks.
+     * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Both this and `TaskCard`'s
+     * `dueDateUrgencyLabel` read the same defaults, so the two renderers cannot disagree about
+     * what "overdue" says any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how
+     * it looks.
      *
      * Pass `''` for an urgency to announce nothing for it; `normal` is already `''`.
      * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
      */
-    urgencyLabel?: Partial<Record<DueDateUrgency, string>>;
+    dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
 }
 
 /**
@@ -1043,13 +1067,18 @@ export declare interface EmptyStateProps {
  * (icon + label, 4px/16px padding, 4px radius, no background by default) with no footer —
  * clicking a row is the confirm action.
  */
-export declare function EstimateModal({ value, onSelect, onClose, triggerRef, dismissExemptRef, formatPoints, label, className, }: EstimateModalProps): JSX.Element;
+export declare function EstimateModal({ value, onAction, onClose, triggerRef, dismissExemptRef, formatPoints, label, className, }: EstimateModalProps): JSX.Element;
 
 export declare interface EstimateModalProps {
     /** Currently selected point value, if any — highlights the matching row. */
     value?: number;
-    /** Called with the point value of the row the user clicked. */
-    onSelect: (points: number) => void;
+    /**
+     * Called with the point value of the row the user clicked.
+     *
+     * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+     * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state.
+     */
+    onAction: (points: number) => void;
     /** Called when the popover should close without a selection — Escape or an outside click. */
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -1443,15 +1472,6 @@ export declare interface InputProps extends AriaTextFieldProps {
     className?: string;
 }
 
-export declare interface Label {
-    /** Unique identifier, echoed back in `onSelect`. */
-    id: string;
-    /** Label text shown on the tag pill. */
-    text: string;
-    /** Color variant applied to the tag pill, matching `Tag`'s own variant palette. */
-    variant?: TagProps['variant'];
-}
-
 /**
  * LabelCheckbox
  *
@@ -1553,13 +1573,18 @@ export declare function LabelIcon(props: IconProps): JSX.Element;
  * primitive (see that file's doc comment) for real Escape/outside-click dismissal and focus
  * management, previously missing entirely, same as its `AssigneeModal`/`EstimateModal` siblings.
  */
-export declare function LabelModal({ labels, onSelect, onClose, triggerRef, dismissExemptRef, label, className, }: LabelModalProps): JSX.Element;
+export declare function LabelModal({ labels, onAction, onClose, triggerRef, dismissExemptRef, label, className, }: LabelModalProps): JSX.Element;
 
 export declare interface LabelModalProps {
     /** Full list of selectable labels shown as rows. */
-    labels: Label[];
-    /** Called with the label of the row the user clicked. */
-    onSelect: (label: Label) => void;
+    labels: TaskLabel[];
+    /**
+     * Called with the label of the row the user clicked.
+     *
+     * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+     * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state.
+     */
+    onAction: (label: TaskLabel) => void;
     /** Called when the popover should close without a selection — Escape or an outside click. */
     onClose: () => void;
     /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -1702,7 +1727,7 @@ export declare interface MenuProps<T extends object> extends Omit<AriaMenuProps<
  * the dialog is `inert`/`aria-hidden` to assistive tech — not just visually
  * obscured behind the backdrop.
  */
-export declare function Modal({ title, isOpen, onClose, children, width, role, isDismissable, closeLabel, }: ModalProps): default_2.JSX.Element | null;
+export declare function Modal({ title, isOpen, onClose, children, className, role, isDismissable, closeLabel, }: ModalProps): default_2.JSX.Element | null;
 
 export declare interface ModalProps {
     /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
@@ -1714,10 +1739,21 @@ export declare interface ModalProps {
     /** Modal body content. */
     children: default_2.ReactNode;
     /**
-     * Tailwind max-width class controlling the dialog's width.
-     * @default 'max-w-md'
+     * Additional class names, merged last via `cn()` so they can override defaults — including
+     * the dialog's default `max-w-md` width.
+     *
+     * Replaces `width?: string` (#14) — that prop was typed as a raw string standing in for "a
+     * Tailwind max-width class," so `width="400px"` typechecked and silently did nothing.
+     * **No component in this kit ever passed it** (two of this kit's own *stories* did —
+     * `WideVariant`/`Playground` below, migrated to `className` in this same PR, so nothing
+     * here still uses the old name). The consuming app has two real production callers, both
+     * still on the old name until it updates: `task-form-dialog.tsx:158` and
+     * `delete-task-dialog.tsx:96`, both `width="max-w-[578px]"` — caught in review, not by
+     * the original claim, which said "no caller, kit or app" and was wrong on two counts, not
+     * one. Pass `className="max-w-[578px]"` in their place; behavior is unchanged, only the
+     * prop name is. Tracked as an app-side follow-up alongside this PR's other renamed props.
      */
-    width?: string;
+    className?: string;
     /**
      * ARIA role for the dialog. Use `'alertdialog'` for a destructive-action
      * confirmation (e.g. a delete confirmation) — it tells assistive tech
@@ -1898,7 +1934,7 @@ export declare function PointsIcon(props: IconProps): JSX.Element;
  * content has an explicit way to close the popover, rather than needing to
  * know Escape or find the trigger again.
  */
-export declare function Popover({ isOpen, onClose, triggerRef, dismissExemptRef, role, children, className, ...ariaProps }: PopoverProps): default_2.JSX.Element | null;
+export declare function Popover({ isOpen, onClose, triggerRef, dismissExemptRef, children, className, ...ariaProps }: PopoverProps): default_2.JSX.Element | null;
 
 export declare interface PopoverProps {
     /** Whether the popover is currently open. When `false`, nothing is rendered. */
@@ -1934,19 +1970,6 @@ export declare interface PopoverProps {
      * Clicking genuinely outside the group still dismisses normally.
      */
     dismissExemptRef?: default_2.RefObject<HTMLElement | null>;
-    /**
-     * ARIA role for the popover surface. `'dialog'` fits every current consumer:
-     * `DatePickerMenu` (a calendar grid — `role="grid"` — inside a dialog
-     * popover, the same composition a native date input's popup uses) and the
-     * `Assignee`/`Estimate`/`Label` pick-one-option lists, none of which
-     * implement full `listbox`/`option` semantics (roving tabindex,
-     * `aria-selected`) yet — that is the `ListBox`/`Select`/`MultiSelect`
-     * family, which exists in this kit and is out of scope for this shell.
-     * `'dialog'` is the honest role for "a floating region with interactive
-     * content and no listbox wiring," not a placeholder for one.
-     * @default 'dialog'
-     */
-    role?: 'dialog';
     /** Accessible name for the popover surface, read by screen readers on open. */
     'aria-label'?: string;
     children: default_2.ReactNode;
@@ -2233,7 +2256,7 @@ export declare interface ShowToastOptions {
     timeout?: number | null;
 }
 
-export declare function SidebarItem({ icon, label, isActive, badgeCount, onClick, className, }: SidebarItemProps): JSX.Element;
+export declare function SidebarItem({ icon, label, isActive, badgeCount, onPress, className, }: SidebarItemProps): JSX.Element;
 
 /**
  * @remarks
@@ -2284,8 +2307,14 @@ export declare interface SidebarItemProps {
     isActive?: boolean;
     /** Optional numeric badge rendered at the end of the item (e.g. unread count). */
     badgeCount?: number;
-    /** Called when the item is clicked. */
-    onClick?: () => void;
+    /**
+     * Called when the item is clicked.
+     *
+     * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+     * This renders as a real `<button>` regardless, so the rename carries no behaviour gap —
+     * unlike `TaskCard`/`TaskTableRow`, there is no non-button wrapper for it to leave behind.
+     */
+    onPress?: () => void;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
 }
@@ -2322,7 +2351,7 @@ export declare interface SkeletonProps {
 }
 
 /**
- * Turns a task's status into the accent colour its `TaskTableRow.indicatorColor` stripe should
+ * Turns a task's status into the accent colour its `TaskTableRow.accent` stripe should
  * render. A thin wrapper over `TASK_STATUS_INDICATOR_COLOR` so a consumer imports one name
  * rather than indexing a `Record` directly.
  */
@@ -2410,7 +2439,7 @@ export declare interface TabsProps {
 }
 
 /** Compact labeled pill (Style=Solid/Outline × Icon=None/Left × Type=General/Green/Blue/Yellow/Red), optionally removable via a trailing "×" button. */
-export declare function Tag({ variant, outline, icon, children, onRemove, removeLabel, className, }: TagProps): JSX.Element;
+export declare function Tag({ accent, appearance, icon, children, onRemove, removeLabel, className, }: TagProps): JSX.Element;
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
 export declare function TagCell({ labels }: TagCellProps): JSX.Element;
@@ -2433,18 +2462,27 @@ export declare interface TagProps {
      * Which accent colour the chip is painted in — Figma's `Type` property
      * (General/Green/Blue/Yellow/Red) by its own names. Carries no meaning of its own;
      * for a chip that says what a state *means*, use `Badge` and its `StatusTone`.
+     *
+     * Named `accent` (#14) — every `AccentColor`-typed prop in the kit shares this name now,
+     * so a consumer reading `TaskTableRow.accent` or `TaskTag.accent` already knows this one.
      * @default 'neutral'
      */
-    variant?: AccentColor;
+    accent?: AccentColor;
     /**
-     * Renders the "Style=Outline" variant (border, transparent fill) instead of
-     * the default "Style=Solid" (10%-alpha fill, no border).
-     * @default false
+     * `'outline'` renders the "Style=Outline" variant (border, transparent fill) instead of
+     * the default `'solid'` (10%-alpha fill, no border) — Figma's own `Style` property.
+     *
+     * Was a boolean (#14) — a two-value axis crammed into `true`/`false` can never grow a
+     * third style. Named `appearance`, not `style`: kit#11 lands in this same release and
+     * adds rest-spread to every component, and a prop literally named `style` would collide
+     * with the native DOM `style: CSSProperties` attribute the moment rest-spread reaches
+     * this element — kit#129's suggested name didn't account for that.
+     * @default 'solid'
      */
-    outline?: boolean;
+    appearance?: 'solid' | 'outline';
     /**
      * Optional leading icon (Figma "Icon=Left" slot, 24×24px). Should use
-     * `currentColor` for its fill/stroke so it inherits the tag's variant color.
+     * `currentColor` for its fill/stroke so it inherits the tag's accent color.
      */
     icon?: React.ReactNode;
     /** Tag label content. */
@@ -2467,7 +2505,7 @@ export declare interface TagProps {
 
 /**
  * Shared mapping from a task's status onto the accent palette, so a consumer rendering
- * `TaskTableRow.indicatorColor` does not have to invent one — every row defaulted to the same
+ * `TaskTableRow.accent` does not have to invent one — every row defaulted to the same
  * green stripe before this existed (ravn-ui-kit#141).
  *
  * **Not spec-verified, and the design vault says more than merely "unverified" here.** The
@@ -2486,7 +2524,7 @@ export declare interface TagProps {
  * | `DONE`                 | success                        | `green`        |
  * | `CANCELLED`            | danger: negative terminal      | `red`          |
  *
- * `blue` is unused, matching `indicatorColorMap`'s own doc comment on `TaskTableRow` — no accent
+ * `blue` is unused, matching `TaskTableRow`'s own `indicatorColorMap` doc comment — no accent
  * sample in the mockup ever draws it.
  */
 export declare const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor>;
@@ -2499,7 +2537,7 @@ export declare const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor
  * component), "Timer" (points text + due-date `Tag`), "Tags" (colored variant tags), "Reactions"
  * (avatar + `TaskMetaBadges`, formerly named `Reactions` — see that component's doc comment).
  */
-export declare function TaskCard({ title, points, formatPoints, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onClick, }: TaskCardProps): JSX.Element;
+export declare function TaskCard({ title, points, formatPoints, dueDateText, dueDateUrgency, dueDateUrgencyLabel, tags, assigneeName, assigneeAvatar, metaBadges, actions, icon, headingLevel, titleId, className, onPress, }: TaskCardProps): JSX.Element;
 
 export declare interface TaskCardProps {
     /** Task title, shown in the header row and truncated to a single line. */
@@ -2550,7 +2588,7 @@ export declare interface TaskCardProps {
      */
     dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
     /**
-     * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to
+     * Labeled tags rendered below the title/due date row. Each tag's `accent` defaults to
      * `'neutral'` when omitted.
      *
      * **Rendered `uppercase`, and the label string is never touched** (#102). The design draws
@@ -2618,8 +2656,32 @@ export declare interface TaskCardProps {
      * Called when the card is opened. Providing it renders the title as a real `<button>`
      * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes
      * the whole card surface clickable for a pointer user. Fires once either way.
+     *
+     * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+     * **The name change is not yet a behaviour change**: this is still wired to a native
+     * `onClick` internally rather than react-aria's `usePress`, so real touch/pen/drag-
+     * cancellation parity with `Button` is not here yet. Keyboard access is unaffected either
+     * way — it has always come from the real `<button>` `ProjectInfo` renders for the title,
+     * not from this handler. Tracked as its own follow-up: #147.
      */
-    onClick?: () => void;
+    onPress?: () => void;
+}
+
+/**
+ * One selectable label option in `LabelModal`'s list.
+ *
+ * Named `TaskLabel`, not `Label` (#14) — a bare `Label` exported into the kit's root
+ * namespace was a near-certain collision with a consumer's own `Label` (a form-field label
+ * is an extremely common thing to name that), and generic enough to say nothing about what
+ * it actually is.
+ */
+export declare interface TaskLabel {
+    /** Unique identifier, echoed back in `onAction`. */
+    id: string;
+    /** Label text shown on the tag pill. */
+    text: string;
+    /** Color accent applied to the tag pill, matching `Tag`'s own accent palette. */
+    accent?: TagProps['accent'];
 }
 
 /**
@@ -2786,7 +2848,7 @@ export declare interface TaskMetaBadgesProps {
 /**
  * The consuming app's task lifecycle, as a domain concept the kit renders directly — the same
  * shape as `DueDateUrgency` above: a status vocabulary the kit does not otherwise model, carried
- * here because a Task-domain component (`TaskTableRow.indicatorColor`, ravn-ui-kit#141) needs to
+ * here because a Task-domain component (`TaskTableRow.accent`, ravn-ui-kit#141) needs to
  * render it and the app should not have to reinvent the mapping.
  *
  * Matches the consuming app's own generated `Status` enum
@@ -2966,13 +3028,6 @@ export declare interface TaskTableProps {
     className?: string;
 }
 
-export declare interface TaskTableReaction {
-    /** Emoji/glyph shown next to the count, also used as its React key. */
-    emoji: string;
-    /** Count value shown before the glyph. */
-    count: number;
-}
-
 /**
  * TaskTableRow
  *
@@ -2982,7 +3037,7 @@ export declare interface TaskTableReaction {
  * border, resolving the structural mismatch this chunk was flagged to fix. Must be rendered
  * inside a `<table><tbody>` (see `TaskTable`) so the cell borders collapse into hairlines.
  */
-export declare function TaskTableRow({ index, title, indicatorColor, reactions, isSelected, onSelectedChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, columns, columnLabels, onClick, onViewDetails, }: TaskTableRowProps): JSX.Element;
+export declare function TaskTableRow({ index, title, accent, reactions, isSelected, onChange, isSelectable, selectLabel, detailsLabel, headingLevel, tags, estimationPoints, formatPoints, assigneeName, assigneeAvatar, unassignedLabel, dueDate, dueDateUrgency, dueDateUrgencyLabel, actions, columns, columnLabels, onPress, onViewDetails, }: TaskTableRowProps): JSX.Element;
 
 export declare interface TaskTableRowProps {
     /**
@@ -3006,17 +3061,26 @@ export declare interface TaskTableRowProps {
      * of leaving this unset: `statusToIndicatorColor()` / `TASK_STATUS_INDICATOR_COLOR`
      * (`../../types/color-variants`) map the consuming app's five task statuses onto this prop's
      * vocabulary.
+     *
+     * Named `accent` (#14), matching `Tag.accent` and every other `AccentColor`-typed prop —
+     * this was `indicatorColor` when #141 added it, before #14 settled the axis vocabulary.
      * @default 'neutral'
      */
-    indicatorColor?: AccentColor;
+    accent?: AccentColor;
     /**
-     * Reaction counters (e.g. comment count, subtask count) rendered after the title, via a plain
-     * `count`+`emoji` pair -- read-only, not the clickable/toggleable footer reactions `Reactions`
-     * renders on `TaskCard`. Figma's 3rd slot in this same row is a separate "Details" link, not
-     * another count widget -- see `onViewDetails` below.
+     * Reaction counters (e.g. comment count, subtask count) rendered after the title -- read-only,
+     * not the clickable/toggleable footer reactions `TaskMetaBadges` renders on `TaskCard`.
+     * Figma's 3rd slot in this same row is a separate "Details" link, not another count widget --
+     * see `onViewDetails` below.
+     *
+     * Was `TaskTableReaction[]` (`{ emoji: string; count: number }`) — a second, contradictory
+     * model for the same concept `TaskMetaBadge` already models correctly (#14). Converged onto
+     * `TaskMetaBadge`: real icon nodes instead of emoji characters (Figma's actual "Reactions"
+     * component renders named icons, not emoji — see `task-meta-badges.tsx`'s own doc comment),
+     * and each badge now carries a real accessible name instead of rendering as unlabelled text.
      * @default []
      */
-    reactions?: TaskTableReaction[];
+    reactions?: TaskMetaBadge[];
     /**
      * Called when the row's trailing "Details" link is clicked; renders a "Details" label with a
      * right-chevron icon when provided, hidden otherwise. Confirmed via live Figma access (Chunk 25,
@@ -3033,8 +3097,15 @@ export declare interface TaskTableRowProps {
      * @default false
      */
     isSelected?: boolean;
-    /** Called with the row's next selected state when the checkbox is toggled. */
-    onSelectedChange?: (isSelected: boolean) => void;
+    /**
+     * Called with the row's next selected state when the checkbox is toggled.
+     *
+     * Named `onChange` (#14), matching React Aria's own `isSelected`/`onChange` pairing on
+     * `AriaCheckboxProps` — this checkbox toggle is exactly that shape, not the multi-item
+     * `Selection`/`onSelectionChange` shape `Tabs` uses, which is why it gets Checkbox's
+     * vocabulary and not Tabs's.
+     */
+    onChange?: (isSelected: boolean) => void;
     /**
      * Whether the row renders its select checkbox at all. The checkbox is `sr-only` and
      * merely `opacity-0` until hover, so it was always in the accessibility tree even for a
@@ -3099,7 +3170,7 @@ export declare interface TaskTableRowProps {
     dueDateUrgency?: DueDateUrgency;
     /**
      * What each urgency *says*, forwarded to this row's `DueDateCell` — see
-     * `DueDateCell.urgencyLabel`. Without it a row states its urgency in colour only (#92).
+     * `DueDateCell.dueDateUrgencyLabel`. Without it a row states its urgency in colour only (#92).
      * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
      */
     dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
@@ -3112,7 +3183,7 @@ export declare interface TaskTableRowProps {
      * rows otherwise offers a screen-reader user a list of identical "options" buttons.
      *
      * **A click here does not open the row.** Like the select checkbox and the "Details" link, it
-     * is one of the row's own controls, so `onClick` does not fire — including from the keyboard,
+     * is one of the row's own controls, so `onPress` does not fire — including from the keyboard,
      * where activating a control synthesises a click that would otherwise bubble.
      *
      * It lands in the Task Name cell rather than a sixth column on purpose: the five column widths
@@ -3140,8 +3211,15 @@ export declare interface TaskTableRowProps {
      * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
      * whole row clickable for a pointer user. Fires once either way, and not at all when the
      * row's own controls — the select checkbox, the "Details" link — are used.
+     *
+     * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+     * **The name change is not yet a behaviour change**: this is still wired to a native
+     * `onClick` internally rather than react-aria's `usePress`, so real touch/pen/drag-
+     * cancellation parity with `Button` is not here yet. Keyboard access is unaffected either
+     * way — it has always come from the real `<button>` this renders as the title, not from
+     * this handler. Tracked as its own follow-up: #147.
      */
-    onClick?: () => void;
+    onPress?: () => void;
 }
 
 /**
@@ -3155,9 +3233,11 @@ export declare interface TaskTag {
     label: string;
     /**
      * Which accent colour the chip is painted in.
+     *
+     * Named `accent` (#14), matching `Tag.accent` and every other `AccentColor`-typed prop.
      * @default 'neutral'
      */
-    variant?: AccentColor;
+    accent?: AccentColor;
     /**
      * Extra classes for this one chip, merged last so they override the defaults (#102).
      *
@@ -3413,7 +3493,7 @@ export declare function useModalState(defaultOpen?: boolean): {
  *   ground truth — see the Chunk 9 note in `application-sidebar.tsx`)
  * - Background: transparent
  */
-export declare function UserRow({ name, role, avatarSrc, size, isOnline, className, onClick, }: UserRowProps): JSX.Element;
+export declare function UserRow({ name, role, avatarSrc, size, isOnline, className, onPress, }: UserRowProps): JSX.Element;
 
 export declare interface UserRowProps {
     /** Full name of the user */
@@ -3434,8 +3514,15 @@ export declare interface UserRowProps {
     isOnline?: boolean;
     /** Additional class names, merged last via `cn()` so they can override defaults. */
     className?: string;
-    /** Called when the row is clicked. When provided, the row renders as a `<button>` instead of a `<div>`. */
-    onClick?: () => void;
+    /**
+     * Called when the row is clicked. When provided, the row renders as a `<button>` instead
+     * of a `<div>`.
+     *
+     * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+     * This renders as a real `<button>` whenever it's provided, so the rename carries no
+     * behaviour gap.
+     */
+    onPress?: () => void;
 }
 
 /**

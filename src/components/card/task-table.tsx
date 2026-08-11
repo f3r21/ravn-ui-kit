@@ -9,6 +9,7 @@ import type { HeadingLevel } from '../../types/heading-level';
 import { EmptyState } from '../empty-state/empty-state';
 import { formatPointsLong, type PointsFormatter } from '../../utils/format-points';
 import { DueDateUrgencyState } from './due-date-urgency-state';
+import type { TaskMetaBadge } from './task-meta-badges';
 
 // Column widths straight off "Task Table Row" / "Table Header Cell" (Task Column02.md) and
 // the in-context "Table View" instance (Mockups/Task Default View/My Task Mockup.md): Task Name
@@ -69,26 +70,35 @@ export interface DueDateCellProps {
   date: string;
   /**
    * Color treatment conveying how urgent the due date is.
+   *
+   * Named `dueDateUrgency` (#14), matching `TaskCard`/`TaskTableRow` — this cell used to say
+   * `urgency` while the row wrapping it said `dueDateUrgency` for the exact same value,
+   * documented at the time as "matching each component's own prop vocabulary." That is the
+   * inconsistency #14 exists to remove, not a reason two spellings were ever needed.
    * @default 'normal'
    */
-  urgency?: DueDateUrgency;
+  dueDateUrgency?: DueDateUrgency;
   /**
    * What each urgency *says*, announced to assistive tech beside the date. Merged over the
    * shared `DUE_DATE_URGENCY_LABEL` defaults.
    *
-   * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Named `urgencyLabel` here and
-   * `dueDateUrgencyLabel` on `TaskCard` to match each component's own prop vocabulary; both
-   * read the same defaults, so the two renderers cannot disagree about what "overdue" says
-   * any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how it looks.
+   * The colour was the whole signal (#92) — WCAG 2.2 1.4.1. Both this and `TaskCard`'s
+   * `dueDateUrgencyLabel` read the same defaults, so the two renderers cannot disagree about
+   * what "overdue" says any more than `DUE_DATE_URGENCY_COLOR` lets them disagree about how
+   * it looks.
    *
    * Pass `''` for an urgency to announce nothing for it; `normal` is already `''`.
    * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
    */
-  urgencyLabel?: Partial<Record<DueDateUrgency, string>>;
+  dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
 }
 
 /** Renders a task's due date with color-coded urgency. Figma "Due Date Cell" (Task Column02.md). */
-export function DueDateCell({ date, urgency = 'normal', urgencyLabel }: DueDateCellProps) {
+export function DueDateCell({
+  date,
+  dueDateUrgency = 'normal',
+  dueDateUrgencyLabel,
+}: DueDateCellProps) {
   // Same three urgency levels as the due-date Tag, expressed as text colour instead of a
   // chip. Kept in step with DUE_DATE_URGENCY_COLOR by hand rather than derived from it —
   // the Tag maps to a fill+text pair, this is text alone, so there is no shared class to
@@ -111,12 +121,12 @@ export function DueDateCell({ date, urgency = 'normal', urgencyLabel }: DueDateC
     overdue: 'text-primary-2',
   };
   return (
-    <span className={cn(CELL_TEXT, styles[urgency])}>
+    <span className={cn(CELL_TEXT, styles[dueDateUrgency])}>
       {date}
       {/* The state the colour above was carrying alone (#92). Inside the same span as the
           date so it is announced as one phrase — "6 July, 2020, overdue" — rather than as a
           loose fragment after it. */}
-      <DueDateUrgencyState urgency={urgency} labels={urgencyLabel} />
+      <DueDateUrgencyState urgency={dueDateUrgency} labels={dueDateUrgencyLabel} />
     </span>
   );
 }
@@ -213,19 +223,12 @@ export function TagCell({ labels }: TagCellProps) {
     <div className="flex flex-wrap items-center gap-2">
       {labels.map((t, i) => (
         // Same class, same reason, same override as `TaskCard` — see `TaskTag.className`.
-        <Tag key={i} variant={t.variant ?? 'neutral'} className={cn('uppercase', t.className)}>
+        <Tag key={i} accent={t.accent ?? 'neutral'} className={cn('uppercase', t.className)}>
           {t.label}
         </Tag>
       ))}
     </div>
   );
-}
-
-export interface TaskTableReaction {
-  /** Emoji/glyph shown next to the count, also used as its React key. */
-  emoji: string;
-  /** Count value shown before the glyph. */
-  count: number;
 }
 
 // ── TaskTableRow ──────────────────────────────────────────────────
@@ -252,17 +255,26 @@ export interface TaskTableRowProps {
    * of leaving this unset: `statusToIndicatorColor()` / `TASK_STATUS_INDICATOR_COLOR`
    * (`../../types/color-variants`) map the consuming app's five task statuses onto this prop's
    * vocabulary.
+   *
+   * Named `accent` (#14), matching `Tag.accent` and every other `AccentColor`-typed prop —
+   * this was `indicatorColor` when #141 added it, before #14 settled the axis vocabulary.
    * @default 'neutral'
    */
-  indicatorColor?: AccentColor;
+  accent?: AccentColor;
   /**
-   * Reaction counters (e.g. comment count, subtask count) rendered after the title, via a plain
-   * `count`+`emoji` pair -- read-only, not the clickable/toggleable footer reactions `Reactions`
-   * renders on `TaskCard`. Figma's 3rd slot in this same row is a separate "Details" link, not
-   * another count widget -- see `onViewDetails` below.
+   * Reaction counters (e.g. comment count, subtask count) rendered after the title -- read-only,
+   * not the clickable/toggleable footer reactions `TaskMetaBadges` renders on `TaskCard`.
+   * Figma's 3rd slot in this same row is a separate "Details" link, not another count widget --
+   * see `onViewDetails` below.
+   *
+   * Was `TaskTableReaction[]` (`{ emoji: string; count: number }`) — a second, contradictory
+   * model for the same concept `TaskMetaBadge` already models correctly (#14). Converged onto
+   * `TaskMetaBadge`: real icon nodes instead of emoji characters (Figma's actual "Reactions"
+   * component renders named icons, not emoji — see `task-meta-badges.tsx`'s own doc comment),
+   * and each badge now carries a real accessible name instead of rendering as unlabelled text.
    * @default []
    */
-  reactions?: TaskTableReaction[];
+  reactions?: TaskMetaBadge[];
   /**
    * Called when the row's trailing "Details" link is clicked; renders a "Details" label with a
    * right-chevron icon when provided, hidden otherwise. Confirmed via live Figma access (Chunk 25,
@@ -279,8 +291,15 @@ export interface TaskTableRowProps {
    * @default false
    */
   isSelected?: boolean;
-  /** Called with the row's next selected state when the checkbox is toggled. */
-  onSelectedChange?: (isSelected: boolean) => void;
+  /**
+   * Called with the row's next selected state when the checkbox is toggled.
+   *
+   * Named `onChange` (#14), matching React Aria's own `isSelected`/`onChange` pairing on
+   * `AriaCheckboxProps` — this checkbox toggle is exactly that shape, not the multi-item
+   * `Selection`/`onSelectionChange` shape `Tabs` uses, which is why it gets Checkbox's
+   * vocabulary and not Tabs's.
+   */
+  onChange?: (isSelected: boolean) => void;
   /**
    * Whether the row renders its select checkbox at all. The checkbox is `sr-only` and
    * merely `opacity-0` until hover, so it was always in the accessibility tree even for a
@@ -345,7 +364,7 @@ export interface TaskTableRowProps {
   dueDateUrgency?: DueDateUrgency;
   /**
    * What each urgency *says*, forwarded to this row's `DueDateCell` — see
-   * `DueDateCell.urgencyLabel`. Without it a row states its urgency in colour only (#92).
+   * `DueDateCell.dueDateUrgencyLabel`. Without it a row states its urgency in colour only (#92).
    * @default DUE_DATE_URGENCY_LABEL — `''` / `'due soon'` / `'overdue'`
    */
   dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
@@ -358,7 +377,7 @@ export interface TaskTableRowProps {
    * rows otherwise offers a screen-reader user a list of identical "options" buttons.
    *
    * **A click here does not open the row.** Like the select checkbox and the "Details" link, it
-   * is one of the row's own controls, so `onClick` does not fire — including from the keyboard,
+   * is one of the row's own controls, so `onPress` does not fire — including from the keyboard,
    * where activating a control synthesises a click that would otherwise bubble.
    *
    * It lands in the Task Name cell rather than a sixth column on purpose: the five column widths
@@ -386,8 +405,15 @@ export interface TaskTableRowProps {
    * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes the
    * whole row clickable for a pointer user. Fires once either way, and not at all when the
    * row's own controls — the select checkbox, the "Details" link — are used.
+   *
+   * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+   * **The name change is not yet a behaviour change**: this is still wired to a native
+   * `onClick` internally rather than react-aria's `usePress`, so real touch/pen/drag-
+   * cancellation parity with `Button` is not here yet. Keyboard access is unaffected either
+   * way — it has always come from the real `<button>` this renders as the title, not from
+   * this handler. Tracked as its own follow-up: #147.
    */
-  onClick?: () => void;
+  onPress?: () => void;
 }
 
 // Fill-only counterpart to `Tag`'s fill+text pairs, on the same tokens.
@@ -411,10 +437,10 @@ const indicatorColorMap: Record<AccentColor, string> = {
 export function TaskTableRow({
   index,
   title,
-  indicatorColor = 'neutral',
+  accent = 'neutral',
   reactions = [],
   isSelected = false,
-  onSelectedChange,
+  onChange,
   isSelectable = true,
   selectLabel,
   detailsLabel = 'Details',
@@ -431,7 +457,7 @@ export function TaskTableRow({
   actions,
   columns,
   columnLabels,
-  onClick,
+  onPress,
   onViewDetails,
 }: TaskTableRowProps) {
   // The row reads the same resolver the header, the colgroup and the skeleton read. That shared
@@ -444,10 +470,10 @@ export function TaskTableRow({
   const rowProps: TaskTableRowProps = {
     index,
     title,
-    indicatorColor,
+    accent,
     reactions,
     isSelected,
-    onSelectedChange,
+    onChange,
     isSelectable,
     selectLabel,
     detailsLabel,
@@ -462,11 +488,11 @@ export function TaskTableRow({
     dueDateUrgency,
     dueDateUrgencyLabel,
     actions,
-    onClick,
+    onPress,
     onViewDetails,
   };
   // A click on one of the row's own controls is not a click on the row. Without this, ticking
-  // the select checkbox or following the "Details" link also fired `onClick` and opened the
+  // the select checkbox or following the "Details" link also fired `onPress` and opened the
   // task — including from the keyboard, where activating a control synthesises a click that
   // bubbles just the same.
   const stopRowOpen = (e: React.MouseEvent) => e.stopPropagation();
@@ -475,12 +501,12 @@ export function TaskTableRow({
   // Sizing lives on whichever element is outermost, so the two shapes do not both claim it.
   const titleSizing = TitleHeading ? 'inline-block max-w-full align-bottom' : 'flex-1 min-w-0';
 
-  const titleControl = onClick ? (
+  const titleControl = onPress ? (
     <button
       type="button"
       onClick={(e) => {
         stopRowOpen(e);
-        onClick();
+        onPress();
       }}
       className={cn(
         CELL_TEXT,
@@ -502,7 +528,7 @@ export function TaskTableRow({
   const cellBody: Record<TaskTableColumnKey, React.ReactNode> = {
     name: (
       <div className="flex items-center gap-2 h-full">
-        <span className={cn('w-1 h-full shrink-0', indicatorColorMap[indicatorColor])} />
+        <span className={cn('w-1 h-full shrink-0', indicatorColorMap[accent])} />
         {/* `has-[:focus-visible]:outline-solid` is load-bearing — see `LabelCheckbox`
             for the full reasoning. The row-select checkbox is `sr-only`, so its ring is
             drawn on this label via `:has()`, and under that variant `outline-2` alone
@@ -521,7 +547,7 @@ export function TaskTableRow({
               type="checkbox"
               className="sr-only"
               checked={isSelected}
-              onChange={(e) => onSelectedChange?.(e.target.checked)}
+              onChange={(e) => onChange?.(e.target.checked)}
               aria-label={selectLabel ?? `Select ${title}`}
             />
             <CheckboxBoxIcon
@@ -550,10 +576,26 @@ export function TaskTableRow({
         ) : (
           titleControl
         )}
-        {reactions.map((r) => (
-          <span key={r.emoji} className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}>
-            <span className="tabular-nums">{r.count}</span>
-            <span>{r.emoji}</span>
+        {/* Per-badge markup matches `TaskMetaBadges` exactly (accessible name via `sr-only`,
+            `aria-hidden` on a decorative badge's whole wrapper) rather than importing that
+            component directly — `TaskMetaBadges` wraps its badges in one `gap-4` container,
+            and this row's badges are siblings of the title/details-link flex items instead,
+            spaced by the row's own gap. Same accessibility contract, this row's own layout. */}
+        {reactions.map((b, i) => (
+          <span
+            key={b.decorative ? `decorative-${i}` : b.label}
+            aria-hidden={b.decorative || undefined}
+            className={cn(CELL_TEXT, 'inline-flex items-center gap-1 shrink-0')}
+          >
+            {b.decorative ? null : <span className="sr-only">{b.label}</span>}
+            {b.count !== undefined ? (
+              <span className="tabular-nums" aria-hidden>
+                {b.count}
+              </span>
+            ) : null}
+            <span className="w-6 h-6 shrink-0" aria-hidden>
+              {b.icon}
+            </span>
           </span>
         ))}
         {onViewDetails ? (
@@ -615,7 +657,11 @@ export function TaskTableRow({
     dueDate: (
       <div className="flex items-center gap-2 h-full">
         {dueDate ? (
-          <DueDateCell date={dueDate} urgency={dueDateUrgency} urgencyLabel={dueDateUrgencyLabel} />
+          <DueDateCell
+            date={dueDate}
+            dueDateUrgency={dueDateUrgency}
+            dueDateUrgencyLabel={dueDateUrgencyLabel}
+          />
         ) : null}
       </div>
     ),
@@ -628,7 +674,7 @@ export function TaskTableRow({
     // the Task Name cell below, exactly as `TaskCard` now does it. Before that button
     // existed this handler was the only way to open a task from the table, and it was
     // unreachable without a pointer: no `role`, no `tabIndex`, no `onKeyDown`.
-    <tr onClick={onClick} className={cn('group', onClick && 'cursor-pointer')}>
+    <tr onClick={onPress} className={cn('group', onPress && 'cursor-pointer')}>
       {resolved.map((col, i) => (
         <td
           key={col.key}
@@ -1001,7 +1047,7 @@ export function TaskTable({
   // Which groups are collapsed, keyed by the same `gi` index the groups are rendered and keyed
   // with below (#140). Internal rather than a controlled/uncontrolled prop pair: nothing here
   // calls for a consumer to read or drive this state from outside, and `TaskTableRow`'s own
-  // `isSelected`/`onSelectedChange` split is the shape to reach for later if that changes.
+  // `isSelected`/`onChange` split is the shape to reach for later if that changes.
   const [collapsedGroups, setCollapsedGroups] = useState<ReadonlySet<number>>(() => new Set());
   const toggleGroup = (index: number) => {
     setCollapsedGroups((prev) => {

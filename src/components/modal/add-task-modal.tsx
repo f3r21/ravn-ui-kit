@@ -6,8 +6,23 @@ import { Avatar } from '../avatar/avatar';
 import { DatePickerMenu } from '../datepicker/datepicker-menu';
 import { EstimateModal } from './estimate-modal';
 import { AssigneeModal, type Assignee } from './assignee-modal';
-import { LabelModal, type Label } from './label-modal';
+import { LabelModal, type TaskLabel } from './label-modal';
 import { AssigneeIcon, CalendarIcon, LabelIcon, PointsIcon } from '../icons/icons';
+
+/**
+ * The form values `AddTaskModal.onSubmit` is called with.
+ *
+ * Named and exported (#14) — this was an anonymous object literal inline on `onSubmit`'s
+ * type, so a consumer building a handler for it had nothing to import and had to retype the
+ * shape by hand or reach for `Parameters<NonNullable<AddTaskModalProps['onSubmit']>>[0]`.
+ */
+export interface AddTaskSubmitData {
+  title: string;
+  dueDate?: Date;
+  points?: number;
+  assignee?: Assignee;
+  label?: TaskLabel;
+}
 
 export interface AddTaskModalProps {
   /** Whether the widget is currently mounted. */
@@ -17,15 +32,9 @@ export interface AddTaskModalProps {
   /** People selectable in the assignee trigger's popover. */
   assignees?: Assignee[];
   /** Labels selectable in the label trigger's popover — see `LabelModal`. */
-  labels?: Label[];
+  labels?: TaskLabel[];
   /** Called with the form values when the user submits a valid (non-empty title) task. */
-  onSubmit?: (data: {
-    title: string;
-    dueDate?: Date;
-    points?: number;
-    assignee?: Assignee;
-    label?: Label;
-  }) => void;
+  onSubmit?: (data: AddTaskSubmitData) => void;
   /**
    * Pre-fills the title field (edit flow — reopening on an existing task). Uncontrolled:
    * read when the widget opens, then owned by the field until it closes and reopens.
@@ -39,7 +48,7 @@ export interface AddTaskModalProps {
   /** Pre-fills the assignee trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
   defaultAssignee?: Assignee;
   /** Pre-fills the label trigger (edit flow). Uncontrolled, same as `defaultTitle`. */
-  defaultLabel?: Label;
+  defaultLabel?: TaskLabel;
   /**
    * The widget's visible copy, merged over the English defaults (#90).
    *
@@ -151,14 +160,14 @@ export function AddTaskModal({
   className,
 }: AddTaskModalProps) {
   // Named `copy`, not `labels`: `labels` is already this component's list of selectable
-  // `Label`s. Two different meanings of the same word on one component is how a consumer
+  // `TaskLabel`s. Two different meanings of the same word on one component is how a consumer
   // reaches for the wrong one.
   const copy = { ...DEFAULT_COPY, ...copyOverrides };
   const [title, setTitle] = React.useState(defaultTitle);
   const [dueDate, setDueDate] = React.useState<Date | undefined>(defaultDueDate);
   const [points, setPoints] = React.useState<number | undefined>(defaultPoints);
   const [assignee, setAssignee] = React.useState<Assignee | undefined>(defaultAssignee);
-  const [label, setLabel] = React.useState<Label | undefined>(defaultLabel);
+  const [label, setLabel] = React.useState<TaskLabel | undefined>(defaultLabel);
 
   const [openPopover, setOpenPopover] = React.useState<
     'estimate' | 'assignee' | 'label' | 'date' | null
@@ -301,7 +310,7 @@ export function AddTaskModal({
           {openPopover === 'estimate' ? (
             <EstimateModal
               value={points}
-              onSelect={(p) => {
+              onAction={(p) => {
                 setPoints(p);
                 setOpenPopover(null);
               }}
@@ -343,7 +352,7 @@ export function AddTaskModal({
           {openPopover === 'assignee' ? (
             <AssigneeModal
               assignees={assignees}
-              onSelect={(a) => {
+              onAction={(a) => {
                 setAssignee(a);
                 setOpenPopover(null);
               }}
@@ -377,13 +386,13 @@ export function AddTaskModal({
               aria-expanded={openPopover === 'label'}
               className="cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
             >
-              <Tag variant={label.variant ?? 'neutral'}>{label.text}</Tag>
+              <Tag accent={label.accent ?? 'neutral'}>{label.text}</Tag>
             </button>
           )}
           {openPopover === 'label' ? (
             <LabelModal
               labels={labels}
-              onSelect={(l) => {
+              onAction={(l) => {
                 setLabel(l);
                 setOpenPopover(null);
               }}

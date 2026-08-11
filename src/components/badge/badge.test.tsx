@@ -10,7 +10,7 @@ import type { StatusTone } from '../../types/color-variants';
  * Painting a status ramp's own step-4/5 on its step-1 fill — which is what this component
  * did — measures 1.69:1 for success, 2.34:1 for warning and 3.90:1 for danger, none of
  * them AA. Warning and danger step to the dark rung their ramps already carry; success has
- * none, so it borrows the `neutral` variant's label and lets its fill carry the status.
+ * none, so it borrows the `neutral` tone's label and lets its fill carry the status.
  *
  * The ratios live in `src/styles/contrast.test.ts`, computed from `tokens.css`. This pins
  * only that the component reaches for the right token, so a refactor cannot quietly put
@@ -32,15 +32,15 @@ const EXPECTED_FILL: Record<StatusTone, string> = {
 };
 
 describe('Badge', () => {
-  describe.each(Object.keys(EXPECTED_LABEL) as StatusTone[])('variant="%s"', (variant) => {
+  describe.each(Object.keys(EXPECTED_LABEL) as StatusTone[])('tone="%s"', (tone) => {
     it('keeps the design’s fill', () => {
-      render(<Badge variant={variant}>Status</Badge>);
-      expect(screen.getByText('Status').className).toContain(EXPECTED_FILL[variant]);
+      render(<Badge tone={tone}>Status</Badge>);
+      expect(screen.getByText('Status').className).toContain(EXPECTED_FILL[tone]);
     });
 
     it('labels in the contrast-checked colour', () => {
-      render(<Badge variant={variant}>Status</Badge>);
-      expect(screen.getByText('Status').className).toContain(EXPECTED_LABEL[variant]);
+      render(<Badge tone={tone}>Status</Badge>);
+      expect(screen.getByText('Status').className).toContain(EXPECTED_LABEL[tone]);
     });
   });
 

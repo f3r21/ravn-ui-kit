@@ -64,7 +64,7 @@ export interface TaskCardProps {
    */
   dueDateUrgencyLabel?: Partial<Record<DueDateUrgency, string>>;
   /**
-   * Labeled tags rendered below the title/due date row. Each tag's `variant` defaults to
+   * Labeled tags rendered below the title/due date row. Each tag's `accent` defaults to
    * `'neutral'` when omitted.
    *
    * **Rendered `uppercase`, and the label string is never touched** (#102). The design draws
@@ -132,8 +132,15 @@ export interface TaskCardProps {
    * Called when the card is opened. Providing it renders the title as a real `<button>`
    * (the keyboard and screen-reader path — click, Enter or Space) and additionally makes
    * the whole card surface clickable for a pointer user. Fires once either way.
+   *
+   * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+   * **The name change is not yet a behaviour change**: this is still wired to a native
+   * `onClick` internally rather than react-aria's `usePress`, so real touch/pen/drag-
+   * cancellation parity with `Button` is not here yet. Keyboard access is unaffected either
+   * way — it has always come from the real `<button>` `ProjectInfo` renders for the title,
+   * not from this handler. Tracked as its own follow-up: #147.
    */
-  onClick?: () => void;
+  onPress?: () => void;
 }
 
 /**
@@ -160,7 +167,7 @@ export function TaskCard({
   headingLevel = 3,
   titleId,
   className,
-  onClick,
+  onPress,
 }: TaskCardProps) {
   const generatedTitleId = useId();
   const headingId = titleId ?? generatedTitleId;
@@ -211,8 +218,8 @@ export function TaskCard({
       as="article"
       isInteractive
       aria-labelledby={headingId}
-      onClick={onClick}
-      className={cn(onClick && 'cursor-pointer', className)}
+      onClick={onPress}
+      className={cn(onPress && 'cursor-pointer', className)}
     >
       {/* Title Row (Figma "Project Info" auto-layout, Cards01.md L249-317) — same real component
           as the standalone `ProjectInfo`, reused here rather than duplicated. Figma's "Project
@@ -235,7 +242,7 @@ export function TaskCard({
           <ProjectInfo
             title={title}
             icon={icon}
-            onTitleClick={onClick}
+            onTitleClick={onPress}
             headingLevel={headingLevel}
             titleId={headingId}
             className="flex-1 min-w-0"
@@ -250,7 +257,7 @@ export function TaskCard({
         <ProjectInfo
           title={title}
           icon={icon}
-          onTitleClick={onClick}
+          onTitleClick={onPress}
           headingLevel={headingLevel}
           titleId={headingId}
         />
@@ -272,7 +279,7 @@ export function TaskCard({
             // radius 4px, alarm-line icon, Desktop/Body/M/bold) — reusing `Tag` directly instead
             // of a bespoke span gets typography/spacing/color right for free.
             <Tag
-              variant={DUE_DATE_URGENCY_COLOR[dueDateUrgency]}
+              accent={DUE_DATE_URGENCY_COLOR[dueDateUrgency]}
               icon={<AlarmIcon className="size-6" />}
             >
               {dueDateText}
@@ -298,11 +305,7 @@ export function TaskCard({
             // normally, so transforming the string would trade an accessibility property for a
             // visual one. `t.className` is merged last, and `cn()` is `twMerge`, so
             // `normal-case` from a consumer wins.
-            <Tag
-              key={idx}
-              variant={t.variant || 'neutral'}
-              className={cn('uppercase', t.className)}
-            >
+            <Tag key={idx} accent={t.accent || 'neutral'} className={cn('uppercase', t.className)}>
               {t.label}
             </Tag>
           ))}

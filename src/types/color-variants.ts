@@ -77,9 +77,11 @@ export interface TaskTag {
   label: string;
   /**
    * Which accent colour the chip is painted in.
+   *
+   * Named `accent` (#14), matching `Tag.accent` and every other `AccentColor`-typed prop.
    * @default 'neutral'
    */
-  variant?: AccentColor;
+  accent?: AccentColor;
   /**
    * Extra classes for this one chip, merged last so they override the defaults (#102).
    *
@@ -166,7 +168,7 @@ export const DUE_DATE_URGENCY_LABEL: Record<DueDateUrgency, string> = {
 /**
  * The consuming app's task lifecycle, as a domain concept the kit renders directly — the same
  * shape as `DueDateUrgency` above: a status vocabulary the kit does not otherwise model, carried
- * here because a Task-domain component (`TaskTableRow.indicatorColor`, ravn-ui-kit#141) needs to
+ * here because a Task-domain component (`TaskTableRow.accent`, ravn-ui-kit#141) needs to
  * render it and the app should not have to reinvent the mapping.
  *
  * Matches the consuming app's own generated `Status` enum
@@ -180,7 +182,7 @@ export type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLE
 
 /**
  * Shared mapping from a task's status onto the accent palette, so a consumer rendering
- * `TaskTableRow.indicatorColor` does not have to invent one — every row defaulted to the same
+ * `TaskTableRow.accent` does not have to invent one — every row defaulted to the same
  * green stripe before this existed (ravn-ui-kit#141).
  *
  * **Not spec-verified, and the design vault says more than merely "unverified" here.** The
@@ -199,7 +201,7 @@ export type TaskStatus = 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLE
  * | `DONE`                 | success                        | `green`        |
  * | `CANCELLED`            | danger: negative terminal      | `red`          |
  *
- * `blue` is unused, matching `indicatorColorMap`'s own doc comment on `TaskTableRow` — no accent
+ * `blue` is unused, matching `TaskTableRow`'s own `indicatorColorMap` doc comment — no accent
  * sample in the mockup ever draws it.
  */
 export const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor> = {
@@ -211,7 +213,7 @@ export const TASK_STATUS_INDICATOR_COLOR: Record<TaskStatus, AccentColor> = {
 };
 
 /**
- * Turns a task's status into the accent colour its `TaskTableRow.indicatorColor` stripe should
+ * Turns a task's status into the accent colour its `TaskTableRow.accent` stripe should
  * render. A thin wrapper over `TASK_STATUS_INDICATOR_COLOR` so a consumer imports one name
  * rather than indexing a `Record` directly.
  */

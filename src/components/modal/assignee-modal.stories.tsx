@@ -16,7 +16,7 @@ const meta: Meta<typeof AssigneeModal> = {
   decorators: [withSurface('neutral-5')],
   args: {
     assignees: ASSIGNEES,
-    onSelect: fn(),
+    onAction: fn(),
     onClose: fn(),
   },
 };

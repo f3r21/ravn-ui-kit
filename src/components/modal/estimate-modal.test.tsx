@@ -5,7 +5,7 @@ import { EstimateModal } from './estimate-modal';
 
 describe('EstimateModal Component', () => {
   it('renders as a dialog popover listing every point option', () => {
-    render(<EstimateModal onSelect={vi.fn()} onClose={vi.fn()} />);
+    render(<EstimateModal onAction={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByRole('dialog', { name: 'Estimate' })).toBeDefined();
     expect(screen.getByText('1 Point')).toBeDefined();
     expect(screen.getByText('2 Points')).toBeDefined();
@@ -13,7 +13,7 @@ describe('EstimateModal Component', () => {
   });
 
   it('marks the row matching `value` as pressed', () => {
-    render(<EstimateModal value={3} onSelect={vi.fn()} onClose={vi.fn()} />);
+    render(<EstimateModal value={3} onAction={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByRole('button', { name: '3 Points' }).getAttribute('aria-pressed')).toBe(
       'true',
     );
@@ -22,10 +22,10 @@ describe('EstimateModal Component', () => {
     );
   });
 
-  it('calls onSelect with the clicked point value', async () => {
+  it('calls onAction with the clicked point value', async () => {
     const handleSelect = vi.fn();
     const user = userEvent.setup();
-    render(<EstimateModal onSelect={handleSelect} onClose={vi.fn()} />);
+    render(<EstimateModal onAction={handleSelect} onClose={vi.fn()} />);
     await user.click(screen.getByRole('button', { name: '5 Points' }));
     expect(handleSelect).toHaveBeenCalledWith(5);
   });
@@ -33,7 +33,7 @@ describe('EstimateModal Component', () => {
   it('calls onClose when Escape is pressed', async () => {
     const handleClose = vi.fn();
     const user = userEvent.setup();
-    render(<EstimateModal onSelect={vi.fn()} onClose={handleClose} />);
+    render(<EstimateModal onAction={vi.fn()} onClose={handleClose} />);
     await user.keyboard('{Escape}');
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
@@ -44,7 +44,7 @@ describe('EstimateModal Component', () => {
     render(
       <div>
         <button type="button">Outside</button>
-        <EstimateModal onSelect={vi.fn()} onClose={handleClose} />
+        <EstimateModal onAction={vi.fn()} onClose={handleClose} />
       </div>,
     );
     await user.click(screen.getByRole('button', { name: 'Outside' }));
@@ -53,7 +53,7 @@ describe('EstimateModal Component', () => {
 
   it('renames the header and the popover’s accessible name from one prop', () => {
     // Both halves asserted for the reason spelled out in `assignee-modal.test.tsx`.
-    render(<EstimateModal onSelect={vi.fn()} onClose={vi.fn()} label="Story points" />);
+    render(<EstimateModal onAction={vi.fn()} onClose={vi.fn()} label="Story points" />);
 
     expect(screen.getByRole('dialog', { name: 'Story points' })).toBeDefined();
     expect(screen.queryByRole('dialog', { name: 'Estimate' })).toBeNull();

@@ -22,7 +22,7 @@ const meta: Meta<typeof SidebarItem> = {
     isActive: { control: 'boolean' },
   },
   args: {
-    onClick: fn(),
+    onPress: fn(),
     icon: <PlaceholderIcon />,
   },
 };

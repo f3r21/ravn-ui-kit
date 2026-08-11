@@ -9,7 +9,7 @@ const meta: Meta<typeof EstimateModal> = {
   tags: ['autodocs'],
   decorators: [withSurface('neutral-5')],
   args: {
-    onSelect: fn(),
+    onAction: fn(),
     onClose: fn(),
   },
 };

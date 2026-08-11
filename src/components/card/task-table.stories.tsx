@@ -6,6 +6,38 @@ import { Menu } from '../menu/menu';
 import { MenuDotsIcon } from '../icons/icons';
 import { withSurface } from '../../../.storybook/decorators';
 
+// Same shapes as `task-meta-badges.stories.tsx` — kept local rather than shared, since a
+// story file importing icons from another story file is its own kind of coupling.
+const CommentIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
+const AttachmentIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
+    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+  </svg>
+);
+
 const meta: Meta<typeof TaskTable> = {
   title: 'Layout/TaskTable',
   component: TaskTable,
@@ -28,7 +60,7 @@ export const Default: Story = {
           {
             index: 1,
             title: 'Create wireframe',
-            indicatorColor: 'red',
+            accent: 'red',
             estimationPoints: 4,
             assigneeName: 'Amelia Nellson',
             dueDate: 'Yesterday',
@@ -37,14 +69,14 @@ export const Default: Story = {
           {
             index: 2,
             title: 'Slack Logo Design',
-            indicatorColor: 'green',
+            accent: 'green',
             reactions: [
-              { emoji: '💬', count: 3 },
-              { emoji: '🔗', count: 5 },
+              { icon: <CommentIcon />, count: 3, label: '3 comments' },
+              { icon: <AttachmentIcon />, count: 5, label: '5 attachments' },
             ],
             tags: [
-              { label: 'IOS APP', variant: 'green' },
-              { label: '+2', variant: 'neutral' },
+              { label: 'IOS APP', accent: 'green' },
+              { label: '+2', accent: 'neutral' },
             ],
             estimationPoints: 2,
             assigneeName: 'Jonah Doe',
@@ -55,8 +87,8 @@ export const Default: Story = {
           {
             index: 3,
             title: 'Dashboard Design',
-            indicatorColor: 'yellow',
-            reactions: [{ emoji: '🔗', count: 5 }],
+            accent: 'yellow',
+            reactions: [{ icon: <AttachmentIcon />, count: 5, label: '5 attachments' }],
             estimationPoints: 8,
             assigneeName: 'Jason Joe',
             dueDate: '6 July, 2020',
@@ -64,7 +96,7 @@ export const Default: Story = {
           {
             index: 4,
             title: 'Create wireframe',
-            indicatorColor: 'green',
+            accent: 'green',
             estimationPoints: 4,
             assigneeName: 'Martina Strand',
             dueDate: '6 July, 2020',
@@ -72,7 +104,7 @@ export const Default: Story = {
           {
             index: 5,
             title: 'Micromax Logo Design',
-            indicatorColor: 'red',
+            accent: 'red',
             estimationPoints: 4,
             assigneeName: 'Macky Nielsen',
             dueDate: '6 July, 2020',
@@ -112,7 +144,7 @@ export const Playground: Story = {
             estimationPoints: 1,
             assigneeName: 'Fernando Ramirez',
             dueDate: 'Aug 20',
-            tags: [{ label: 'DOCS', variant: 'neutral' }],
+            tags: [{ label: 'DOCS', accent: 'neutral' }],
           },
         ],
       },
@@ -121,7 +153,7 @@ export const Playground: Story = {
 };
 
 /**
- * Rows with an `onClick`. The title becomes a real `<button>` — tab to it and press Enter or
+ * Rows with an `onPress`. The title becomes a real `<button>` — tab to it and press Enter or
  * Space — and the rest of the row stays clickable for a pointer user. The row's own controls
  * (select checkbox, "Details") do not open the task.
  */
@@ -137,8 +169,8 @@ export const ClickableRows: Story = {
             estimationPoints: 4,
             assigneeName: 'Amelia Nellson',
             dueDate: '6 July, 2020',
-            onClick: fn(),
-            onSelectedChange: fn(),
+            onPress: fn(),
+            onChange: fn(),
           },
           {
             index: 2,
@@ -146,7 +178,7 @@ export const ClickableRows: Story = {
             estimationPoints: 2,
             assigneeName: 'Jonah Doe',
             dueDate: '6 July, 2020',
-            onClick: fn(),
+            onPress: fn(),
             onViewDetails: fn(),
           },
         ],
@@ -186,7 +218,7 @@ export const RowActions: Story = {
             headingLevel: 3,
             assigneeName: 'Amelia Nellson',
             dueDate: '6 July, 2020',
-            onClick: fn(),
+            onPress: fn(),
             actions: (
               <Menu<{ id: string; label: string }>
                 label="Task options for Create wireframe"
@@ -212,7 +244,7 @@ export const RowActions: Story = {
             headingLevel: 3,
             assigneeName: 'Jonah Doe',
             dueDate: '6 July, 2020',
-            onClick: fn(),
+            onPress: fn(),
           },
         ],
       },

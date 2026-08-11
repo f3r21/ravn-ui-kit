@@ -3,7 +3,7 @@ import { UserRow } from '../avatar/user-row';
 import { Popover, type PopoverProps } from '../popover/popover';
 
 export interface Assignee {
-  /** Unique identifier, echoed back in `onSelect`. */
+  /** Unique identifier, echoed back in `onAction`. */
   id: string;
   /** Display name shown in the row. */
   name: string;
@@ -16,8 +16,14 @@ export interface Assignee {
 export interface AssigneeModalProps {
   /** Full list of assignable people shown as rows. */
   assignees: Assignee[];
-  /** Called with the assignee of the row the user clicked. */
-  onSelect: (assignee: Assignee) => void;
+  /**
+   * Called with the assignee of the row the user clicked.
+   *
+   * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+   * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state
+   * (`Tabs`'s `onSelectionChange` shape), which is why it takes `Menu`'s vocabulary.
+   */
+  onAction: (assignee: Assignee) => void;
   /** Called when the popover should close without a selection — Escape or an outside click. */
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -59,7 +65,7 @@ export interface AssigneeModalProps {
  */
 export function AssigneeModal({
   assignees,
-  onSelect,
+  onAction,
   onClose,
   triggerRef,
   dismissExemptRef,
@@ -89,7 +95,7 @@ export function AssigneeModal({
         <button
           key={a.id}
           type="button"
-          onClick={() => onSelect(a)}
+          onClick={() => onAction(a)}
           className="flex items-center w-full h-14 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2"
         >
           <UserRow name={a.name} role={a.role} avatarSrc={a.avatarSrc} size="sm" />

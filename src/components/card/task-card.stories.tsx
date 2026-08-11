@@ -46,7 +46,7 @@ const meta: Meta<typeof TaskCard> = {
     },
   },
   args: {
-    onClick: fn(),
+    onPress: fn(),
     title: 'Working (03) - RAVN Challenge',
   },
 };
@@ -61,8 +61,8 @@ export const Default: Story = {
     dueDateText: '3 DAYS',
     dueDateUrgency: 'soon',
     tags: [
-      { label: 'BACKEND', variant: 'green' },
-      { label: 'HIGH', variant: 'yellow' },
+      { label: 'BACKEND', accent: 'green' },
+      { label: 'HIGH', accent: 'yellow' },
     ],
     assigneeName: 'Jerome Bell',
     metaBadges: [
@@ -95,9 +95,9 @@ export const WithActions: Story = {
     points: 5,
     dueDateText: '3 DAYS',
     dueDateUrgency: 'soon',
-    tags: [{ label: 'BUG', variant: 'red' }],
+    tags: [{ label: 'BUG', accent: 'red' }],
     assigneeName: 'Fernando Ramirez',
-    onClick: fn(),
+    onPress: fn(),
     actions: (
       <button
         type="button"
@@ -116,7 +116,7 @@ export const Overdue: Story = {
     points: 5,
     dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue',
-    tags: [{ label: 'BUG', variant: 'red' }],
+    tags: [{ label: 'BUG', accent: 'red' }],
     assigneeName: 'Fernando Ramirez',
     metaBadges: [{ icon: <CommentIcon />, count: 12, label: '12 comments' }],
   },
@@ -174,9 +174,9 @@ export const TagCasing: Story = {
   args: {
     title: 'Fix Critical GraphQL Bug',
     tags: [
-      { label: 'Design system', variant: 'green' },
-      { label: 'iOS app', variant: 'blue' },
-      { label: 'left as typed', variant: 'neutral', className: 'normal-case' },
+      { label: 'Design system', accent: 'green' },
+      { label: 'iOS app', accent: 'blue' },
+      { label: 'left as typed', accent: 'neutral', className: 'normal-case' },
     ],
     assigneeName: 'Fernando Ramirez',
   },

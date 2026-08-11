@@ -16,7 +16,7 @@ const meta: Meta<typeof UserRow> = {
   },
   args: {
     name: 'Jerome Bell',
-    onClick: fn(),
+    onPress: fn(),
   },
 };
 export default meta;

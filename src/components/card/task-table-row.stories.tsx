@@ -6,6 +6,39 @@ import { Menu } from '../menu/menu';
 import { MenuDotsIcon } from '../icons/icons';
 import { withSurface } from '../../../.storybook/decorators';
 
+// Same shapes as `task-meta-badges.stories.tsx` and `task-table.stories.tsx` — kept local
+// rather than shared, since a story file importing icons from another story file is its own
+// kind of coupling.
+const CommentIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
+const AttachmentIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-full h-full"
+    aria-hidden
+  >
+    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+  </svg>
+);
+
 /**
  * `TaskTableRow` renders a `<tr>`, so a story that mounts it bare produces invalid DOM — the
  * browser hoists the row out of its container and the cell borders never collapse.
@@ -65,8 +98,8 @@ export const Default: Story = {};
  */
 export const Populated: Story = {
   args: {
-    indicatorColor: 'red',
-    tags: [{ label: 'Design', variant: 'blue' }],
+    accent: 'red',
+    tags: [{ label: 'Design', accent: 'blue' }],
     estimationPoints: 4,
     assigneeName: 'Amelia Nellson',
     dueDate: 'Yesterday',
@@ -90,8 +123,8 @@ export const Unassigned: Story = {
 export const ReactionsAndDetails: Story = {
   args: {
     reactions: [
-      { emoji: '💬', count: 3 },
-      { emoji: '🔗', count: 5 },
+      { icon: <CommentIcon />, count: 3, label: '3 comments' },
+      { icon: <AttachmentIcon />, count: 5, label: '5 attachments' },
     ],
     onViewDetails: fn(),
   },
@@ -106,7 +139,7 @@ export const Selectable: Story = {
   args: {
     isSelected: true,
     selectLabel: 'Select Create wireframe in To Do',
-    onSelectedChange: fn(),
+    onChange: fn(),
   },
 };
 
@@ -116,7 +149,7 @@ export const Selectable: Story = {
  */
 export const WithActions: Story = {
   args: {
-    onClick: fn(),
+    onPress: fn(),
     actions: (
       <Menu<{ id: string; label: string }>
         label="Task options for Create wireframe"
@@ -141,7 +174,7 @@ export const WithActions: Story = {
 /** Controls for every prop. */
 export const Playground: Story = {
   args: {
-    indicatorColor: 'green',
+    accent: 'green',
     estimationPoints: 2,
     assigneeName: 'Jerome Bell',
     dueDate: 'In 3 days',

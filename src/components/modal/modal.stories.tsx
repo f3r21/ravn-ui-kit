@@ -8,7 +8,7 @@ const meta: Meta<typeof Modal> = {
   component: Modal,
   tags: ['autodocs'],
   argTypes: {
-    width: { control: 'text' },
+    className: { control: 'text' },
   },
   args: {
     onClose: fn(),
@@ -25,7 +25,7 @@ export const Default: Story = {
         <TextButton onPress={open}>Open modal</TextButton>
         <Modal
           title={args.title ?? 'Modal title'}
-          width={args.width}
+          className={args.className}
           isOpen={isOpen}
           onClose={close}
         >
@@ -47,7 +47,7 @@ export const WideVariant: Story = {
   args: {
     ...Default.args,
     title: 'Wide modal',
-    width: 'max-w-lg',
+    className: 'max-w-lg',
   },
 };
 
@@ -69,14 +69,14 @@ export const AlertDialog: Story = {
 };
 
 /**
- * Every control live: the title, the width override, `role` — which switches the dialog to an
- * `alertdialog` for a destructive confirmation — `isDismissable`, and `closeLabel`, the close
- * button's accessible name.
+ * Every control live: the title, the width override (via `className`), `role` — which
+ * switches the dialog to an `alertdialog` for a destructive confirmation — `isDismissable`,
+ * and `closeLabel`, the close button's accessible name.
  */
 export const Playground: Story = {
   args: {
     title: 'Modal title',
-    width: 'w-[520px]',
+    className: 'w-[520px]',
     role: 'dialog',
     isDismissable: true,
     closeLabel: 'Close this dialog',
