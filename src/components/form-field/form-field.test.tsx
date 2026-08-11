@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Item } from 'react-stately';
@@ -220,5 +221,15 @@ describe('FormField', () => {
       expect(screen.getByText('Sprint').className).not.toContain('sr-only');
       expect(screen.getByRole('textbox', { name: /Sprint/ })).not.toBeNull();
     });
+  });
+
+  it('forwards a ref to the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <FormField label="Sprint" ref={ref}>
+        {(fieldProps) => <input {...fieldProps} />}
+      </FormField>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
 });
