@@ -174,6 +174,38 @@ null>` retired in favor of the universal `ref`** (#11) — same DOM node, one na
   definition site instead (`TopNav`'s fallback `CloseIcon`/`BellIcon`), leaving a
   consumer-supplied icon fully in control of its own size.
 
+### Added
+
+- **`Popover` gets its own story** (#16) — it was the only shared-shell component absent from
+  Storybook entirely (11 tests, 0 stories) despite being the primitive behind
+  `DatePickerMenu`/`AssigneeModal`/`EstimateModal`/`LabelModal`. Includes this repo's first
+  `play()` function in any story file (#16's core gap: 0 across all 40), driving a real
+  click-to-open/Escape-to-close cycle rather than asserting only that the component renders.
+- **`play()` functions on `SegmentedControl`, `Menu` and `TextButton`** (#16), chosen for
+  genuinely different interaction shapes: `SegmentedControl`'s hand-rolled roving-tabindex
+  keyboard nav (no react-aria hook underneath), `Menu`'s open/pick/close cycle through a
+  portalled `FloatingPopover`, and `TextButton`'s press plus a disabled button a real browser
+  refuses to even dispatch a click to. Every assertion was sabotaged (inverted, confirmed the
+  failure, restored) before landing, per #16's own verification bar.
+- **`argTypes` added to `Card`, `ProjectInfo`, `TaskListView`, `TaskTableRow`, `TaskTable` and
+  `FormField`'s stories** (#16) — re-measured the issue's "22 of 39 missing" figure against
+  current `main` (now 21 of 40) and checked each file's actual component props rather than
+  adding `argTypes` mechanically wherever a grep flagged the file absent. Most of the 21 had
+  no genuine boolean/string-union prop at their own top level to control (`icons.stories.tsx`'s
+  `IconProps` is 200+ inherited HTML attributes, none of them a real axis; the four
+  trigger-plus-popover modal stories all manage `isOpen` via internal state rather than
+  `args`, so a control on it would silently do nothing) — those are left as-is rather than
+  padded with an empty or non-functional block.
+
+### Fixed
+
+- **`TaskListView`'s story sample tags render with no accent colour, silently** (#16). Found
+  while adding `argTypes` to the same file: `sampleTasks` used the pre-#14 field name
+  `variant` instead of `accent` on its `TaskTag` literals, and because it's assigned to an
+  untyped `const` before being passed as a prop, TypeScript's excess-property check never
+  caught it — the file type-checked clean while the demo quietly dropped both tags' intended
+  green/red tint. Fixed and verified with a rendered screenshot, not just by type-checking.
+
 ## [0.9.0] - 2026-08-10
 
 ### Added
