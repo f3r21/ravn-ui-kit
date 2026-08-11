@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -6,6 +7,7 @@ import {
   TaskTableRow,
   DueDateCell,
   EstimationCell,
+  TagCell,
   DEFAULT_COLUMNS,
   resolveColumns,
   type TaskTableRowProps,
@@ -1092,5 +1094,14 @@ describe('TaskTableRow reactions render via TaskMetaBadge, not raw emoji text (#
     );
     expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
     expect(container.querySelector('.sr-only')).toBeNull();
+  });
+});
+
+describe('TagCell ref and rest-spread (#11)', () => {
+  it('forwards a ref and spreads unrecognised props onto the root element', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<TagCell labels={[{ label: 'BUG' }]} ref={ref} data-testid="tag-cell" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('tag-cell')).toBe(ref.current);
   });
 });

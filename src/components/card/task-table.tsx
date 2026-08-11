@@ -204,7 +204,7 @@ export function EstimationCell({ points, formatPoints = formatPointsLong }: Esti
   return <span className={cn(CELL_TEXT, 'tabular-nums')}>{formatPoints(points)}</span>;
 }
 
-export interface TagCellProps {
+export interface TagCellProps extends React.ComponentPropsWithRef<'div'> {
   /**
    * Tags to render, each with its own label text and optional color variant (defaults to
    * `'neutral'` per tag).
@@ -218,9 +218,9 @@ export interface TagCellProps {
 }
 
 /** Renders a wrapping list of `Tag` pills for a task row. Figma "Task Tag Cell" (Task Column02.md). */
-export function TagCell({ labels }: TagCellProps) {
+export function TagCell({ labels, className, ref, ...rest }: TagCellProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div {...rest} ref={ref} className={cn('flex flex-wrap items-center gap-2', className)}>
       {labels.map((t, i) => (
         // Same class, same reason, same override as `TaskCard` — see `TaskTag.className`.
         <Tag key={i} accent={t.accent ?? 'neutral'} className={cn('uppercase', t.className)}>
