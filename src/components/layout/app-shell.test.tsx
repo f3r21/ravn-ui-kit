@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AppShell } from './app-shell';
@@ -122,5 +123,16 @@ describe('AppShell', () => {
       expect(screen.queryByRole('navigation')).toBeNull();
       expect(screen.getByText('Main content')).toBeDefined();
     });
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <AppShell sidebarItems={ITEMS} ref={ref} data-testid="shell">
+        <p>Main content</p>
+      </AppShell>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('shell')).toBe(ref.current);
   });
 });

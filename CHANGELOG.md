@@ -130,6 +130,50 @@ sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> D
   Font in any software programs or other products," restricted to Apple-platform interface
   mockups by registered Apple Developers.
 
+### Added
+
+- **Every kit component now forwards a real `ref` to its root DOM element, and spreads
+  unrecognised props onto it** (#11), using React 19's plain-prop `ref` — no component in
+  this kit uses `forwardRef` any more. This covers all 21 icons (via one shared
+  `IconProps = React.ComponentPropsWithRef<'svg'>`), `Tag`, `Badge`, `TaskCard`,
+  `SidebarItem`, the `Card` family, `Button`/`TextButton`, `Avatar`, `EmptyState`,
+  `Skeleton`, `UserRow`, `Modal`, `Popover`, `FloatingPopover`, `AssigneeModal`/
+  `EstimateModal`/`LabelModal`/`AddTaskModal`, `Datepicker`/`DatePickerMenu`, `Select`/
+  `MultiSelect`/`ListBox`, `Menu`, `Tabs`/`SegmentedControl`, `TagCell`/`LabelCheckbox`,
+  every `TaskTable*`/`TaskListView`/`TaskMetaBadges`/`ProjectInfo` export,
+  `ApplicationSidebar`/`AppShell`/`ViewSwitcher`/`TopNav`/`SearchBar`, and `FormField`/
+  `FieldMessages`/`Input`. Before this, a consumer could not get a DOM handle on almost
+  anything the kit rendered, and unrecognised props (`data-testid`, `id`, ARIA overrides)
+  were silently dropped rather than reaching the element they were meant for.
+  `RequiredIndicator` is the one deliberate exception: it takes zero props by design (a
+  fixed, non-configurable `*` glyph), so there is nothing for a ref or rest-spread to add.
+  `ToastProvider` is the other: it renders no root element of its own, only
+  `ToastContext.Provider` wrapping `children` and a conditionally-portalled region, so
+  there is no stable node a ref would point at.
+- Where a component's own prop name collided with a same-named inherited HTML attribute
+  with a genuinely different signature, the inherited one is `Omit`-ted rather than
+  silently shadowed, each documented at its declaration: `title` (tooltip text vs. a task's
+  real title, on `TaskCard`/`TaskTableRow`/`TaskListView`/`ProjectInfo`), `onChange`
+  (native `FormEventHandler` vs. a typed value callback, on `SegmentedControl`/
+  `TaskTableRow`/`ViewSwitcher`), `onSubmit` (native form event vs. `AddTaskSubmitData`,
+  on `AddTaskModal`), and `role` (native ARIA role vs. `Modal`'s own dialog semantics).
+
+### Changed
+
+- **BREAKING: `FloatingPopover`'s bespoke `popoverRef?: React.RefObject<HTMLDivElement |
+null>` retired in favor of the universal `ref`** (#11) — same DOM node, one name instead
+  of two. Verified zero live callers of `popoverRef` in this kit or the consuming app
+  before removing it. **Minor.**
+- **BREAKING: `ListBox`'s bespoke `listBoxRef?: React.RefObject<HTMLUListElement | null>`
+  retired in favor of the universal `ref`** (#11), same reasoning. **Minor.**
+- **Icon-sizing specificity trap fixed on `EmptyState` and `TopNav`** (#11). Both wrapped
+  their icon slot in `[&>svg]:w-full [&>svg]:h-full`, a Tailwind arbitrary-variant that
+  compiles to a descendant selector at (0,2,0) specificity — it silently overrode a
+  consumer's own `size-4`/`size-6` utility (0,1,0) on an icon they passed in. The default
+  icon each component renders when no icon prop is given is now sized directly at its own
+  definition site instead (`TopNav`'s fallback `CloseIcon`/`BellIcon`), leaving a
+  consumer-supplied icon fully in control of its own size.
+
 ## [0.9.0] - 2026-08-10
 
 ### Added

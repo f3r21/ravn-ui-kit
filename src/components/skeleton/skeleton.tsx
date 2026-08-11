@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 
-export interface SkeletonProps {
+export interface SkeletonProps extends React.ComponentPropsWithRef<'div'> {
   /**
    * Tailwind size/shape classes (width, height, rounding) — the primitive has no
    * intrinsic size of its own so it can stand in for text lines, avatars, cards, etc.
@@ -29,9 +29,11 @@ export interface SkeletonProps {
  * `motion-reduce:animate-none` on each call site, moves an accessibility property out into
  * every future caller, where the next one omits it and nothing notices.
  */
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, ref, ...rest }: SkeletonProps) {
   return (
     <div
+      {...rest}
+      ref={ref}
       aria-hidden
       className={cn('motion-safe:animate-pulse rounded-sm bg-neutral-3', className)}
     />

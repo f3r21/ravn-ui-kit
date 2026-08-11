@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { createRef, useRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -6,7 +6,13 @@ import { useButton } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 import { FloatingPopover } from './floating-popover';
 
-function Harness({ onOpenChange }: { onOpenChange?: (isOpen: boolean) => void }) {
+function Harness({
+  onOpenChange,
+  popoverRef,
+}: {
+  onOpenChange?: (isOpen: boolean) => void;
+  popoverRef?: React.Ref<HTMLDivElement>;
+}) {
   const state = useOverlayTriggerState({ onOpenChange });
   const triggerRef = useRef<HTMLButtonElement>(null);
   const { buttonProps } = useButton({ onPress: () => state.toggle() }, triggerRef);
@@ -18,7 +24,12 @@ function Harness({ onOpenChange }: { onOpenChange?: (isOpen: boolean) => void })
         Trigger
       </button>
       {state.isOpen ? (
-        <FloatingPopover state={state} triggerRef={triggerRef} placement="bottom start">
+        <FloatingPopover
+          state={state}
+          triggerRef={triggerRef}
+          placement="bottom start"
+          ref={popoverRef}
+        >
           {/* eslint-disable-next-line jsx-a11y/no-autofocus -- stands in for
               a composing component's own autoFocus (e.g. ListBox's), which
               is what moves focus inside the popover in real usage so
@@ -83,5 +94,14 @@ describe('FloatingPopover Component', () => {
     await user.click(screen.getByRole('button', { name: 'Trigger' }));
     const option = screen.getByRole('button', { name: 'Option' });
     expect(container.contains(option)).toBe(false);
+  });
+
+  it('forwards a ref to the popover surface (#11)', async () => {
+    const ref = createRef<HTMLDivElement>();
+    const user = userEvent.setup();
+    render(<Harness popoverRef={ref} />);
+    await user.click(screen.getByRole('button', { name: 'Trigger' }));
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current?.contains(screen.getByRole('button', { name: 'Option' }))).toBe(true);
   });
 });

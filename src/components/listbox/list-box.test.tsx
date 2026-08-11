@@ -1,4 +1,4 @@
-import { act } from 'react';
+import { act, createRef } from 'react';
 import { useListState, Item } from 'react-stately';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -20,9 +20,11 @@ const ITEMS: DemoItem[] = [
 function Harness({
   selectionMode = 'single' as 'single' | 'multiple',
   onSelectionChange,
+  listRef,
 }: {
   selectionMode?: 'single' | 'multiple';
   onSelectionChange?: (keys: Set<string>) => void;
+  listRef?: React.Ref<HTMLUListElement>;
 }) {
   const state = useListState<DemoItem>({
     items: ITEMS,
@@ -38,7 +40,7 @@ function Harness({
     ),
   });
 
-  return <ListBox aria-label="Demo options" state={state} />;
+  return <ListBox aria-label="Demo options" state={state} ref={listRef} />;
 }
 
 describe('ListBox Component', () => {
@@ -105,5 +107,11 @@ describe('ListBox Component', () => {
     await user.click(screen.getByRole('option', { name: 'Option B' }));
     const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1][0];
     expect(new Set(lastCall)).toEqual(new Set(['a', 'b']));
+  });
+
+  it('forwards a ref to the root ul (#11)', () => {
+    const ref = createRef<HTMLUListElement>();
+    render(<Harness listRef={ref} />);
+    expect(ref.current).toBe(screen.getByRole('listbox'));
   });
 });

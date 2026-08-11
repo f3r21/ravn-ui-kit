@@ -1,13 +1,21 @@
 import React, { useRef } from 'react';
-import { useDialog, useModalOverlay, FocusScope } from 'react-aria';
+import { useDialog, useModalOverlay, useObjectRef, FocusScope } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { CloseIcon } from '../icons/icons';
 
 // ─── Shared Modal Shell ───────────────────────────────────────────
 
-export interface ModalProps {
-  /** Dialog heading, rendered in the header and programmatically associated via `aria-labelledby`. */
+export interface ModalProps extends Omit<React.ComponentPropsWithRef<'div'>, 'title' | 'role'> {
+  /**
+   * Dialog heading, rendered in the header and programmatically associated via
+   * `aria-labelledby`.
+   *
+   * Omitted from the inherited `div` attributes above rather than left to collide with them
+   * (#11): the native `title` is a hover tooltip, this is the dialog's actual heading, and a
+   * required `string` silently narrowing an inherited optional `string` would typecheck
+   * without saying so.
+   */
   title: string;
   /** Whether the modal is currently open. When `false`, nothing is rendered. */
   isOpen: boolean;
@@ -77,8 +85,14 @@ export function Modal({
   role = 'dialog',
   isDismissable = true,
   closeLabel = 'Close modal',
+  ref: forwardedRef,
+  ...rest
 }: ModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
+  // `overlayRef`, not a fresh internal one, so an external ref and `useModalOverlay`'s own
+  // positioning needs point at the same node (#11) — the same `useObjectRef` merge `Button`
+  // uses. This is the dialog surface itself (`modalProps` below), not the backdrop: the
+  // backdrop is chrome a consumer has no reason to hold a ref to.
+  const overlayRef = useObjectRef(forwardedRef);
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // useModalOverlay takes a react-stately OverlayTriggerState rather than a
@@ -119,7 +133,12 @@ export function Modal({
           into the dialog on open, restore it on close), not the raw DOM
           autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
-        <div {...modalProps} ref={overlayRef} className={cn('w-full max-w-md', className)}>
+        <div
+          {...rest}
+          {...modalProps}
+          ref={overlayRef}
+          className={cn('w-full max-w-md', className)}
+        >
           <div
             {...dialogProps}
             ref={dialogRef}

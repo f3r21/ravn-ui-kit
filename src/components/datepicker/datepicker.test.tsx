@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Datepicker } from './datepicker';
@@ -27,5 +28,12 @@ describe('Datepicker Component', () => {
     render(<Datepicker label="Due date" isDisabled />);
     const input = screen.getByLabelText('Due date') as HTMLInputElement;
     expect(input.disabled).toBe(true);
+  });
+
+  it('forwards a ref to the input (#11)', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Datepicker label="Due date" ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current).toBe(screen.getByLabelText('Due date'));
   });
 });

@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -267,5 +268,12 @@ describe('todayLabel (#90)', () => {
     await user.click(screen.getByRole('button', { name: 'Hoy' }));
     // Renaming it must not stop it working — the control that a label change is only a label.
     expect(handleChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards a ref to the popover surface (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<DatePickerMenu onClose={vi.fn()} ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toBe(screen.getByRole('dialog'));
   });
 });

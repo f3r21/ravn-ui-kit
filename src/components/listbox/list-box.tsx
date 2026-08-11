@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useListBox, useOption, type AriaListBoxOptions } from 'react-aria';
+import { useListBox, useOption, useObjectRef, type AriaListBoxOptions } from 'react-aria';
 import type { ListState, Node } from 'react-stately';
 import { cn } from '../../utils/cn';
 
@@ -13,8 +13,13 @@ export interface ListBoxProps<T extends object> extends AriaListBoxOptions<T> {
    * rendering/keyboard logic works no matter which hook produced the state.
    */
   state: ListState<T>;
-  /** Ref to the underlying `<ul>` element. */
-  listBoxRef?: React.RefObject<HTMLUListElement | null>;
+  /**
+   * Ref to the underlying `<ul>` element (#11). Was the bespoke `listBoxRef` — retired in
+   * favor of the universal `ref`, per kit#129's decision #3: neither this kit nor the
+   * consuming app had a caller passing the old name, and it reached the same node a plain
+   * `ref` would.
+   */
+  ref?: React.Ref<HTMLUListElement>;
   /** Additional class names applied to the `<ul>`, merged last via `cn()`. */
   className?: string;
 }
@@ -37,12 +42,11 @@ export interface ListBoxProps<T extends object> extends AriaListBoxOptions<T> {
  */
 export function ListBox<T extends object>({
   state,
-  listBoxRef,
   className,
+  ref: forwardedRef,
   ...props
 }: ListBoxProps<T>) {
-  const fallbackRef = useRef<HTMLUListElement>(null);
-  const ref = listBoxRef ?? fallbackRef;
+  const ref = useObjectRef(forwardedRef);
   const { listBoxProps } = useListBox(props, state, ref);
 
   return (

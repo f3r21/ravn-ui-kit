@@ -56,7 +56,7 @@ export const MultipleSelection: Story = {
 
 /**
  * Every control live — which for this component is a short list, and saying so is the point.
- * `state` comes from `useListState` and `listBoxRef` is a ref, so `className` is the only prop a
+ * `state` comes from `useListState` and `ref` is a ref, so `className` is the only prop a
  * control can edit. `selectionMode` below belongs to the demo wrapper rather than to `ListBox`,
  * and is exposed here because it is the axis a reader actually wants to try.
  */

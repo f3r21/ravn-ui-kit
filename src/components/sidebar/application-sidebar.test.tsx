@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -70,5 +71,12 @@ describe('ApplicationSidebar', () => {
 
     await user.click(screen.getByRole('button', { name: 'DASHBOARD' }));
     expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLElement>();
+    render(<ApplicationSidebar items={ITEMS} ref={ref} data-testid="sidebar" />);
+    expect(ref.current).toBeInstanceOf(HTMLElement);
+    expect(screen.getByTestId('sidebar')).toBe(ref.current);
   });
 });

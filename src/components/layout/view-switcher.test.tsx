@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -133,5 +133,12 @@ describe('ViewSwitcher Component', () => {
 
     expect(radio.className).not.toContain('outline-none');
     expect(radio.className).toContain('focus-visible:outline-2');
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<ViewSwitcher {...icons} value="left" ref={ref} data-testid="switcher" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('switcher')).toBe(ref.current);
   });
 });

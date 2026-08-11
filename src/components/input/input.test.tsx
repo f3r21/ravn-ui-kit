@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -32,5 +33,12 @@ describe('Input Component', () => {
     render(<Input label="Task name" onChange={(v) => (value = v)} />);
     await user.type(screen.getByRole('textbox', { name: 'Task name' }), 'Design prototype');
     expect(value).toBe('Design prototype');
+  });
+
+  it('forwards a ref to the root input element (#11)', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Input label="Task name" ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current).toBe(screen.getByRole('textbox', { name: 'Task name' }));
   });
 });

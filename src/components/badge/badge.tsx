@@ -1,7 +1,7 @@
 import { cn } from '../../utils/cn';
 import type { StatusTone } from '../../types/color-variants';
 
-export interface BadgeProps {
+export interface BadgeProps extends React.ComponentPropsWithRef<'span'> {
   /**
    * What the badge's state *means*, on the design's status ramps.
    *
@@ -23,7 +23,7 @@ export interface BadgeProps {
   className?: string;
 }
 
-export function Badge({ tone = 'neutral', children, className }: BadgeProps) {
+export function Badge({ tone = 'neutral', children, className, ref, ...rest }: BadgeProps) {
   // Same shape of problem as `Tag`, and the same resolution: the pale step-1 fill and the
   // saturated same-hue label were never far enough apart to read. Measured on the fill
   // each label actually sits on, `success-4` was **1.69:1**, `warning-5` **2.34:1** and
@@ -50,6 +50,8 @@ export function Badge({ tone = 'neutral', children, className }: BadgeProps) {
 
   return (
     <span
+      {...rest}
+      ref={ref}
       className={cn(
         'inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border font-sans',
         tones[tone],

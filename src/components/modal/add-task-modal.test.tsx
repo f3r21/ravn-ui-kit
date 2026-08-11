@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -255,6 +256,13 @@ describe('visible copy is overridable (#90)', () => {
     // Without this, a fix that dropped the default entirely would pass the case above.
     render(<AddTaskModal isOpen onClose={vi.fn()} defaultDueDate={new Date(2026, 2, 15)} />);
     expect(screen.getByText('3/15/2026')).toBeDefined();
+  });
+
+  it('forwards a ref to the root form and spreads unrecognised props (#11)', () => {
+    const ref = createRef<HTMLFormElement>();
+    render(<AddTaskModal isOpen onClose={vi.fn()} ref={ref} data-testid="add-task-form" />);
+    expect(ref.current).toBeInstanceOf(HTMLFormElement);
+    expect(screen.getByTestId('add-task-form')).toBe(ref.current);
   });
 });
 

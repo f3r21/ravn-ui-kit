@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Tag } from './tag';
@@ -116,6 +117,24 @@ describe('Tag', () => {
     expect(screen.getByRole('button', { name: 'Remove Design' })).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Remove Backend' })).not.toBeNull();
     expect(screen.queryByRole('button', { name: 'Remove tag' })).toBeNull();
+  });
+
+  /**
+   * #11. Zero components in the kit forwarded a ref or spread rest props before this — a
+   * `ref` silently attached to nothing, and `data-testid`/`aria-*` overrides compiled and
+   * then vanished at runtime. Fails against the pre-fix component: `ref.current` stays
+   * `null` and the `data-testid` attribute never reaches the DOM.
+   */
+  it('forwards a ref to the root element', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(<Tag ref={ref}>Label</Tag>);
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+    expect(ref.current?.textContent).toBe('Label');
+  });
+
+  it('spreads unrecognised props onto the root element', () => {
+    render(<Tag data-testid="design-tag">Label</Tag>);
+    expect(screen.getByTestId('design-tag')).toBeDefined();
   });
 });
 

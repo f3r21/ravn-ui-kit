@@ -207,6 +207,13 @@ export interface ToastProviderProps {
  * knowledge belongs in the design system rather than in one of its consumers.
  *
  * Wrap the app once, then call `useToast().show(...)` from anywhere beneath it.
+ *
+ * **No `ref` (#11).** `ToastProvider` renders no root element of its own — `children` pass
+ * through `ToastContext.Provider` untouched, and the only real DOM this component owns is
+ * `ToastRegion`'s portalled container, mounted conditionally and only while a toast is
+ * visible. Neither is a stable node a `ref` could usefully point at, unlike every other
+ * component in this pass, which forwards to a root it always renders. If a consumer needs
+ * the region node directly, that is a reason to export `ToastRegion`, not to fake a ref here.
  */
 export function ToastProvider({
   children,

@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -60,5 +61,12 @@ describe('AssigneeModal Component', () => {
     expect(screen.queryByRole('dialog', { name: 'Assignee' })).toBeNull();
     expect(screen.getByText('Owner')).toBeDefined();
     expect(screen.queryByText('Assignee')).toBeNull();
+  });
+
+  it('forwards a ref to the popover surface (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<AssigneeModal assignees={ASSIGNEES} onAction={vi.fn()} onClose={vi.fn()} ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toBe(screen.getByRole('dialog'));
   });
 });

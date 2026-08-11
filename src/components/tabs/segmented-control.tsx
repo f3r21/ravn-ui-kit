@@ -10,14 +10,23 @@ export interface SegmentedControlOption {
   icon?: React.ReactNode;
 }
 
-export interface SegmentedControlProps {
+export interface SegmentedControlProps extends Omit<
+  React.ComponentPropsWithRef<'div'>,
+  'onChange'
+> {
   /** The list of segments rendered as selectable options, in display order. */
   options: SegmentedControlOption[];
   /** Selected option `id` for controlled usage. When provided, the component no longer manages its own selection state. */
   value?: string;
   /** Initial selected option `id` for uncontrolled usage. Falls back to the first option's `id` when omitted. */
   defaultValue?: string;
-  /** Called with the newly selected option's `id` whenever the user picks a segment. */
+  /**
+   * Called with the newly selected option's `id` whenever the user picks a segment.
+   *
+   * Omitted from the inherited `div` attributes above (#11): every `HTMLAttributes` type
+   * carries a generic `onChange: FormEventHandler`, and this one takes the selected id
+   * directly rather than a form event — a real signature conflict, not just a name clash.
+   */
   onChange?: (value: string) => void;
   /**
    * Accessible name for the group as a whole, announced before the selected segment.
@@ -73,6 +82,8 @@ export function SegmentedControl({
   onChange,
   label = 'View',
   className,
+  ref,
+  ...rest
 }: SegmentedControlProps) {
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? options[0]?.id ?? '');
   const isControlled = controlledValue !== undefined;
@@ -116,6 +127,8 @@ export function SegmentedControl({
 
   return (
     <div
+      {...rest}
+      ref={ref}
       role="radiogroup"
       aria-label={label}
       className={cn('inline-flex items-center gap-0 p-1 bg-surface-panel rounded-10', className)}

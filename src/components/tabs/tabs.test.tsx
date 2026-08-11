@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -92,5 +93,12 @@ describe('Tabs Component', () => {
     expect(screen.getByRole('tablist', { name: 'Project sections' })).toBeDefined();
     expect(screen.getByRole('tablist', { name: 'Task views' })).toBeDefined();
     expect(screen.queryByRole('tablist', { name: 'Tab navigation' })).toBeNull();
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<Tabs items={ITEMS} ref={ref} data-testid="tabs-root" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('tabs-root')).toBe(ref.current);
   });
 });

@@ -72,11 +72,23 @@ describe('prop-surface: the kit measures its own public surface', () => {
     expect(button.inherited.map((p) => p.name)).toContain('onPress');
   });
 
-  it('Tag inherits nothing — it extends no external interface', () => {
-    // Button's counterpart. `TagProps` is a bare interface, so a classifier that marked
-    // everything "inherited" fails here while Button's case above still passes.
+  it('RequiredIndicator inherits nothing — it extends no external interface', () => {
+    // Button's counterpart. Used to be `Tag`, until #11 gave `Tag` a `ComponentPropsWithRef`
+    // extension of its own — inheriting hundreds of DOM props is the *point* of #11, so a
+    // component that gained it is no longer a valid "inherits nothing" example.
+    // `RequiredIndicator` survives as the new one on purpose: it takes zero arguments (a
+    // fixed, non-configurable `*` glyph), so #11's ref/rest-spread pass has nothing to add —
+    // there is no per-instance state or DOM attribute a caller could need on a component
+    // with no configuration surface at all. A classifier that marked everything "inherited"
+    // fails here while Button's case above still passes.
+    const indicator = result.components.find((c) => c.name === 'RequiredIndicator');
+    expect(indicator.inherited).toEqual([]);
+    expect(indicator.declared).toEqual([]);
+  });
+
+  it('Tag now inherits from ComponentPropsWithRef, and still declares accent (#11, #14)', () => {
     const tag = result.components.find((c) => c.name === 'Tag');
-    expect(tag.inherited).toEqual([]);
+    expect(tag.inherited.length).toBeGreaterThan(0);
     // `accent`, not `variant` (#14) — `Tag`'s `AccentColor`-typed prop was renamed for
     // axis-naming consistency with `TaskTableRow.accent` and `TaskTag.accent`.
     expect(tag.declared.map((p) => p.name)).toContain('accent');

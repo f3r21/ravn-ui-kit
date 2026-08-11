@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { Item, type Selection } from 'react-stately';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -20,9 +20,11 @@ const ITEMS: DemoItem[] = [
 function Harness({
   onSelectionChange,
   isDisabled,
+  triggerRef,
 }: {
   onSelectionChange?: (keys: Selection) => void;
   isDisabled?: boolean;
+  triggerRef?: React.Ref<HTMLButtonElement>;
 }) {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
 
@@ -34,6 +36,7 @@ function Harness({
       disabledKeys={ITEMS.filter((item) => item.isDisabled).map((item) => item.id)}
       selectedKeys={selectedKeys}
       isDisabled={isDisabled}
+      ref={triggerRef}
       onSelectionChange={(keys) => {
         setSelectedKeys(keys);
         onSelectionChange?.(keys);
@@ -151,5 +154,11 @@ describe('MultiSelect Component', () => {
     expect(wontfix.getAttribute('aria-disabled')).toBe('true');
     await user.click(wontfix);
     expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards a ref to the trigger button (#11)', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<Harness triggerRef={ref} />);
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'Labels' }));
   });
 });

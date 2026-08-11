@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -367,5 +368,23 @@ describe('points wording (#94)', () => {
   it('takes a caller-supplied formatter, so the wording is not baked in', () => {
     render(<TaskCard title="Fix auth bug" points={1} formatPoints={(n) => `${n} punto`} />);
     expect(screen.getByText('1 punto')).toBeDefined();
+  });
+});
+
+/**
+ * #11. Fails against the pre-fix component: `ref.current` stayed `null` and a `data-testid`
+ * typechecked but never reached the DOM, since `TaskCardProps` extended nothing.
+ */
+describe('ref and rest-spread (#11)', () => {
+  it('forwards a ref to the root article', () => {
+    const ref = createRef<HTMLElement>();
+    render(<TaskCard title="Fix auth bug" ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLElement);
+    expect(ref.current?.tagName).toBe('ARTICLE');
+  });
+
+  it('spreads unrecognised props onto the root article', () => {
+    render(<TaskCard title="Fix auth bug" data-testid="fix-auth-bug-card" />);
+    expect(screen.getByTestId('fix-auth-bug-card')).toBeDefined();
   });
 });

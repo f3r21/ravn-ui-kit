@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { createRef, useRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -102,6 +102,17 @@ describe('Popover Component', () => {
     expect(screen.getByRole('button', { name: 'Option' })).toBe(document.activeElement);
     await user.tab();
     expect(screen.getByRole('button', { name: 'After' })).toBe(document.activeElement);
+  });
+
+  it('forwards a ref to the popover surface and spreads unrecognised props (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Popover isOpen onClose={vi.fn()} aria-label="Options" ref={ref} data-testid="popover">
+        <button type="button">Option</button>
+      </Popover>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('popover')).toBe(ref.current);
   });
 });
 

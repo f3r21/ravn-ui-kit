@@ -33,7 +33,7 @@ function toNativeDate(date: CalendarDate, timeZone: string): Date {
   return date.toDate(timeZone);
 }
 
-export interface DatePickerMenuProps {
+export interface DatePickerMenuProps extends Pick<PopoverProps, 'ref'> {
   /**
    * Currently selected date. Passing this makes the component controlled;
    * pair it with `onChange` to update the selection.
@@ -180,6 +180,7 @@ export function DatePickerMenu({
   nextYearLabel = 'Next year',
   todayLabel = 'Today',
   className,
+  ref,
 }: DatePickerMenuProps) {
   const valueProps =
     controlledValue !== undefined
@@ -219,6 +220,7 @@ export function DatePickerMenu({
     <Popover
       isOpen
       onClose={onClose}
+      ref={ref}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
       aria-label={label}

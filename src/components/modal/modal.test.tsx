@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -233,5 +234,16 @@ describe('Modal accessible description (#64)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Dismiss' }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards a ref to the dialog surface and spreads unrecognised props (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Modal title="Add Task" isOpen onClose={vi.fn()} ref={ref} data-testid="add-task-modal">
+        <p>Content</p>
+      </Modal>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('add-task-modal')).toBe(ref.current);
   });
 });

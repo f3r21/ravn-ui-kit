@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -37,5 +38,12 @@ describe('TextButton Component', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(handlePress).not.toHaveBeenCalled();
+  });
+
+  /** #11. Same `useObjectRef` merge as the icon `Button` — see that file's equivalent test. */
+  it('forwards a ref to the root button', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<TextButton ref={ref}>Save</TextButton>);
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement);
   });
 });

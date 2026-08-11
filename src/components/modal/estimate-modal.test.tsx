@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -58,5 +59,12 @@ describe('EstimateModal Component', () => {
     expect(screen.getByRole('dialog', { name: 'Story points' })).toBeDefined();
     expect(screen.queryByRole('dialog', { name: 'Estimate' })).toBeNull();
     expect(screen.getByText('Story points')).toBeDefined();
+  });
+
+  it('forwards a ref to the popover surface (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<EstimateModal onAction={vi.fn()} onClose={vi.fn()} ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toBe(screen.getByRole('dialog'));
   });
 });

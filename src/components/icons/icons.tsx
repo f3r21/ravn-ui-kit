@@ -1,5 +1,3 @@
-import type { SVGProps } from 'react';
-
 /**
  * The kit's icon vocabulary.
  *
@@ -73,7 +71,11 @@ import type { SVGProps } from 'react';
  * and matches how the kit's icon slots are already typed (`React.ReactNode`, i.e. you pass
  * `<PlusIcon />`, not a string).
  */
-export type IconProps = SVGProps<SVGSVGElement>;
+// `ComponentPropsWithRef`, not the plain `SVGProps` this used to be (#11) — React 19 makes
+// `ref` an ordinary prop, so a type that omits it silently drops any ref a caller passes.
+// Every icon forwards `IconProps` straight through to `Icon`, which spreads it onto the
+// real `<svg>`, so this one change is what makes all 21 icons ref-able at once.
+export type IconProps = React.ComponentPropsWithRef<'svg'>;
 
 /**
  * Shared `<svg>` shell: applies the decorative-by-default accessibility rule described

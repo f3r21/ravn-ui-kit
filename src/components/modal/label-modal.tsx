@@ -19,7 +19,7 @@ export interface TaskLabel {
   accent?: TagProps['accent'];
 }
 
-export interface LabelModalProps {
+export interface LabelModalProps extends Pick<PopoverProps, 'ref'> {
   /** Full list of selectable labels shown as rows. */
   labels: TaskLabel[];
   /**
@@ -75,11 +75,13 @@ export function LabelModal({
   dismissExemptRef,
   label = 'Label',
   className,
+  ref,
 }: LabelModalProps) {
   return (
     <Popover
       isOpen
       onClose={onClose}
+      ref={ref}
       triggerRef={triggerRef}
       dismissExemptRef={dismissExemptRef}
       aria-label={label}

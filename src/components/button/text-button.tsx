@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { useButton, type AriaButtonProps } from 'react-aria';
+import { useButton, useObjectRef, type AriaButtonProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 
 export interface TextButtonProps extends AriaButtonProps {
@@ -15,6 +14,11 @@ export interface TextButtonProps extends AriaButtonProps {
   children: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /**
+   * Ref to the root `<button>` (#11). Merged with the internal ref `useButton` needs via
+   * `useObjectRef`, the same pattern the icon `Button` uses.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
 }
 
 /**
@@ -69,9 +73,10 @@ export function TextButton({
   isSelected = false,
   className,
   isDisabled,
+  ref: forwardedRef,
   ...props
 }: TextButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useObjectRef(forwardedRef);
   const { buttonProps } = useButton({ ...props, isDisabled }, ref);
 
   const variants = {

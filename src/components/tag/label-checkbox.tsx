@@ -1,10 +1,15 @@
-import { useRef } from 'react';
-import { useCheckbox, useField } from 'react-aria';
+import { useCheckbox, useField, useObjectRef } from 'react-aria';
 import { useToggleState } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface LabelCheckboxProps {
+  /**
+   * Ref to the underlying `<input type="checkbox">` (#11), matching the form-control
+   * convention `Datepicker`/`Input` already follow. Merged with the internal ref
+   * `useCheckbox` needs via `useObjectRef`.
+   */
+  ref?: React.Ref<HTMLInputElement>;
   /** Label content rendered next to the checkbox. */
   children: React.ReactNode;
   /** Controlled selected state. Omit to let the component manage its own state via `defaultSelected`. */
@@ -89,13 +94,14 @@ export function LabelCheckbox({
   isRequired = false,
   label,
   className,
+  ref: forwardedRef,
 }: LabelCheckboxProps) {
   const state = useToggleState({
     isSelected,
     defaultSelected,
     onChange,
   });
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useObjectRef(forwardedRef);
   // useCheckbox has no description/error association of its own, so useField supplies
   // the ids and the aria-describedby that ties the input to the messages below.
   const { fieldProps, descriptionProps, errorMessageProps } = useField({

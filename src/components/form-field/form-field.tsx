@@ -108,7 +108,7 @@ export const FIELD_DESCRIPTION_CLASS = 'text-xs text-muted-on-dark font-sans';
  */
 export const FIELD_ERROR_CLASS = 'text-xs text-danger-text font-sans';
 
-export interface FieldMessagesProps {
+export interface FieldMessagesProps extends React.ComponentPropsWithRef<'span'> {
   /** Helper text. Hidden automatically while `error` is set, so the two never stack. */
   description?: string;
   /** Error message. Its presence is what puts the field in its invalid state. */
@@ -133,17 +133,25 @@ export function FieldMessages({
   error,
   descriptionProps,
   errorMessageProps,
+  className,
+  ref,
+  ...rest
 }: FieldMessagesProps) {
   if (error) {
     return (
-      <span {...errorMessageProps} className={FIELD_ERROR_CLASS}>
+      <span {...rest} {...errorMessageProps} ref={ref} className={cn(FIELD_ERROR_CLASS, className)}>
         {error}
       </span>
     );
   }
   if (description) {
     return (
-      <span {...descriptionProps} className={FIELD_DESCRIPTION_CLASS}>
+      <span
+        {...rest}
+        {...descriptionProps}
+        ref={ref}
+        className={cn(FIELD_DESCRIPTION_CLASS, className)}
+      >
         {description}
       </span>
     );
@@ -181,6 +189,12 @@ export interface FormFieldProps extends Omit<AriaFieldProps, 'errorMessage'> {
   children: (fieldProps: React.HTMLAttributes<HTMLElement>) => React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /**
+   * Ref to the root element (#11). `AriaFieldProps` (the base this interface extends)
+   * carries no `ref` of its own — it is a hook-options type, not a DOM props type — so
+   * this is declared explicitly rather than inherited.
+   */
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 /**
@@ -204,6 +218,7 @@ export function FormField({
   isRequired = false,
   children,
   className,
+  ref,
   ...props
 }: FormFieldProps) {
   // `useField` has no `isRequired` of its own — it only builds label/description/error
@@ -218,7 +233,7 @@ export function FormField({
   });
 
   return (
-    <div className={cn('flex flex-col gap-1.5', className)}>
+    <div ref={ref} className={cn('flex flex-col gap-1.5', className)}>
       {label ? (
         <label {...labelProps} className={fieldLabelClass(isLabelVisible)}>
           {label}

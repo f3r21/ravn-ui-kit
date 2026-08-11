@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -83,5 +84,12 @@ describe('SegmentedControl Component', () => {
 
     rerender(<SegmentedControl options={OPTIONS} label="Density" />);
     expect(screen.getByRole('radiogroup', { name: 'Density' })).toBeDefined();
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<SegmentedControl options={OPTIONS} ref={ref} data-testid="segmented" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(screen.getByTestId('segmented')).toBe(ref.current);
   });
 });

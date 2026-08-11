@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 
-export interface AvatarProps {
+export interface AvatarProps extends React.ComponentPropsWithRef<'div'> {
   /** Image URL to render. Falls back to initials derived from `name` when omitted. */
   src?: string;
   /**
@@ -50,6 +50,8 @@ export function Avatar({
   fallbackLabel = 'Unassigned',
   size = 'md',
   className,
+  ref,
+  ...rest
 }: AvatarProps) {
   // Sizes match the Figma "Avatar" component variants (Property 1=Default/Variant2/Variant3):
   // 32px / 40px / 48px. Initials font-size per variant has no dedicated Figma spec (exported
@@ -75,6 +77,8 @@ export function Avatar({
 
   return (
     <div
+      {...rest}
+      ref={ref}
       role="img"
       aria-label={label}
       // Same string as `aria-label`, deliberately, and not a second prop. This is the hover

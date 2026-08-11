@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -104,5 +105,12 @@ describe('LabelCheckbox accessible name', () => {
     expect(screen.getByRole('checkbox', { name: 'Mark task as done' })).toBeDefined();
     // The visible label is untouched — this names the control, it does not relabel it.
     expect(screen.getByText('Done')).toBeDefined();
+  });
+
+  it('forwards a ref to the underlying checkbox input (#11)', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<LabelCheckbox ref={ref}>Done</LabelCheckbox>);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
+    expect(ref.current).toBe(screen.getByRole('checkbox'));
   });
 });

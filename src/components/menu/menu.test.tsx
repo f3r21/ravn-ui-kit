@@ -1,4 +1,4 @@
-import { act } from 'react';
+import { act, createRef } from 'react';
 import { Item } from 'react-stately';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -126,5 +126,11 @@ describe('Menu Component', () => {
     const trigger = renderMenu({ isDisabled: true });
     await user.click(trigger);
     expect(screen.queryByRole('menu')).toBeNull();
+  });
+
+  it('forwards a ref to the trigger button (#11)', () => {
+    const ref = createRef<HTMLButtonElement>();
+    const trigger = renderMenu({ ref });
+    expect(ref.current).toBe(trigger);
   });
 });

@@ -1,7 +1,7 @@
 import { cn } from '../../utils/cn';
 import type { AccentColor } from '../../types/color-variants';
 
-export interface TagProps {
+export interface TagProps extends React.ComponentPropsWithRef<'span'> {
   /**
    * Which accent colour the chip is painted in — Figma's `Type` property
    * (General/Green/Blue/Yellow/Red) by its own names. Carries no meaning of its own;
@@ -56,6 +56,8 @@ export function Tag({
   onRemove,
   removeLabel = 'Remove tag',
   className,
+  ref,
+  ...rest
 }: TagProps) {
   // Style=Solid: 10%-alpha fill, no border. Style=Outline: 1px border, transparent
   // fill. "general" (neutral) is the only type where the fill tint (neutral.2)
@@ -127,6 +129,8 @@ export function Tag({
 
   return (
     <span
+      {...rest}
+      ref={ref}
       className={cn(
         // padding: 4px 16px, gap: 8px, border-radius: 4px (Tailwind's unmodified
         // `rounded` step) -- matches Figma "Tag" component exactly (Style=Solid/Outline,

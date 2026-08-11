@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 import { ApplicationSidebar, type ApplicationSidebarProps } from '../sidebar/application-sidebar';
 import { TopNav, type TopNavProps } from '../top-nav/top-nav';
 
-export interface AppShellProps {
+export interface AppShellProps extends React.ComponentPropsWithRef<'div'> {
   /** Forwarded to the built-in `ApplicationSidebar`. Ignored when `sidebar` is supplied. */
   logo?: ApplicationSidebarProps['logo'];
   /**
@@ -85,6 +85,8 @@ export function AppShell({
   topBar,
   children,
   className,
+  ref,
+  ...rest
 }: AppShellProps) {
   // `undefined` means "not supplied, build the default"; an explicit `null` means "no
   // sidebar". `??` distinguishes them and `||` would not — `null || fallback` renders the
@@ -100,6 +102,8 @@ export function AppShell({
 
   return (
     <div
+      {...rest}
+      ref={ref}
       className={cn('flex items-start gap-8 w-full min-h-screen bg-surface-shell p-8', className)}
     >
       {sidebarNode}

@@ -5,8 +5,16 @@ import { TaskCard, type TaskCardProps } from './task-card';
 import { Skeleton } from '../skeleton/skeleton';
 import { EmptyState } from '../empty-state/empty-state';
 
-export interface TaskListViewProps {
-  /** Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`). */
+export interface TaskListViewProps extends Omit<
+  React.ComponentPropsWithRef<'div'>,
+  'title' | 'ref'
+> {
+  /**
+   * Project/section title, rendered via `ProjectInfo` (e.g. `"Working (03)"`).
+   *
+   * Omitted from the inherited attributes above (#11), same reason as `TaskCard.title`:
+   * the native `title` is a tooltip, this is the column's real heading text.
+   */
   title: string;
   /**
    * Which `<h*>` the column title renders as, forwarded to `ProjectInfo`. A board is
@@ -66,6 +74,12 @@ export interface TaskListViewProps {
   isLoading?: boolean;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
+  /**
+   * Ref to the root element (#11). Typed to `HTMLElement` rather than `HTMLDivElement`/
+   * `HTMLElement` (section) specifically — this is polymorphic between `div` and `section`
+   * depending on whether `label` is given, the same shape `Card`'s `as` prop is.
+   */
+  ref?: React.Ref<HTMLElement>;
 }
 
 function TaskCardSkeleton() {
@@ -111,13 +125,24 @@ export function TaskListView({
   headingLevel = 3,
   label,
   className,
+  ref,
+  ...rest
 }: TaskListViewProps) {
   // `<section>` is only a landmark once it has an accessible name — an unnamed one is a
   // plain generic container, so there is no point rendering it without `label`.
-  const Root = label ? 'section' : 'div';
+  //
+  // Cast to a single concrete tag for the same reason `Card` does — see that file's
+  // comment. Neither this component nor a caller reads anything off the ref that differs
+  // between `div` and `section`.
+  const Root = (label ? 'section' : 'div') as 'div';
 
   return (
-    <Root aria-label={label} className={cn('flex flex-col gap-4 w-full', className)}>
+    <Root
+      {...rest}
+      ref={ref as React.Ref<HTMLDivElement>}
+      aria-label={label}
+      className={cn('flex flex-col gap-4 w-full', className)}
+    >
       <ProjectInfo title={title} icon={icon} headingLevel={headingLevel} />
       {isLoading ? (
         <>

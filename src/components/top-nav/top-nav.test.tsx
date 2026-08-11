@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -145,5 +146,29 @@ describe('TopNav composition slots (#15)', () => {
     render(<TopNav />);
     expect(screen.queryByRole('button')).toBeNull();
     expect(screen.queryByRole('img')).toBeNull();
+  });
+
+  /**
+   * #11. `[&>svg]:w-full [&>svg]:h-full` used to sit on the notifications trigger, at
+   * (0,2,0) specificity — it outranked a consumer's own `size-*` utility on `icon`.
+   */
+  it('does not carry a class that would outrank a consumer icon size', async () => {
+    render(
+      <TopNav
+        onNotificationsClick={vi.fn()}
+        icon={<svg data-testid="glyph" className="size-4" />}
+      />,
+    );
+    const trigger = screen.getByRole('button', { name: 'Notifications' });
+    expect(trigger.className).not.toContain('[&>svg]:w-full');
+    expect(trigger.className).not.toContain('[&>svg]:h-full');
+    expect([...screen.getByTestId('glyph').classList]).toContain('size-4');
+  });
+
+  it('forwards a ref and spreads unrecognised props onto the root element (#11)', () => {
+    const ref = createRef<HTMLElement>();
+    render(<TopNav ref={ref} data-testid="top-nav" />);
+    expect(ref.current).toBeInstanceOf(HTMLElement);
+    expect(screen.getByTestId('top-nav')).toBe(ref.current);
   });
 });
