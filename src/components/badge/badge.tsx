@@ -10,16 +10,20 @@ export interface BadgeProps {
    * `Secondary`/`Tertiary`/`Primary` (`success-4` `#80DA5B` is not `secondary-4` `#70B252`;
    * `danger-5` `#E82F39` is not `primary-4` `#DA584B`). Reach for `Tag` when the colour is
    * a category with no meaning attached, and `Badge` when it is a status.
+   *
+   * Named `tone` (#14) — every `StatusTone`-typed prop in the kit shares this name now;
+   * `Toast.tone` already used it, and `toast.tsx`'s `ToastTone = StatusTone` alias is the
+   * same type under a different name for the same reason this one used to say `variant`.
    * @default 'neutral'
    */
-  variant?: StatusTone;
+  tone?: StatusTone;
   /** Badge label / content. */
   children: React.ReactNode;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
 
-export function Badge({ variant = 'neutral', children, className }: BadgeProps) {
+export function Badge({ tone = 'neutral', children, className }: BadgeProps) {
   // Same shape of problem as `Tag`, and the same resolution: the pale step-1 fill and the
   // saturated same-hue label were never far enough apart to read. Measured on the fill
   // each label actually sits on, `success-4` was **1.69:1**, `warning-5` **2.34:1** and
@@ -33,11 +37,11 @@ export function Badge({ variant = 'neutral', children, className }: BadgeProps) 
   //
   // Success has no step 6. Its ramp stops at 4 (`#80DA5B`) and there is no other dark
   // green in the palette — `secondary-4`, the closest, manages 2.50:1 on `success-1`. So
-  // its label falls back to `neutral-4`, the same colour the `neutral` variant already
+  // its label falls back to `neutral-4`, the same colour the `neutral` tone already
   // uses (13.09:1), and the green fill carries the status on its own. That is a palette
   // gap rather than a component decision: the honest fix is a `success-6` from the
   // design, and until one exists no component-level change can produce it.
-  const variants: Record<StatusTone, string> = {
+  const tones: Record<StatusTone, string> = {
     neutral: 'bg-surface-neutral text-neutral-4 border-subtle',
     success: 'bg-success-1 text-neutral-4 border-success-2',
     warning: 'bg-warning-1 text-warning-6 border-warning-2',
@@ -48,7 +52,7 @@ export function Badge({ variant = 'neutral', children, className }: BadgeProps) 
     <span
       className={cn(
         'inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border font-sans',
-        variants[variant],
+        tones[tone],
         className,
       )}
     >

@@ -90,7 +90,7 @@ export const BesideATaskCard: Story = {
         title="Fix auth bug"
         points={4}
         dueDateText="3 DAYS"
-        tags={[{ label: 'BUG', variant: 'red' }]}
+        tags={[{ label: 'BUG', accent: 'red' }]}
         assigneeName="Fernando Ramirez"
         className="w-72"
       />

@@ -12,8 +12,13 @@ const POINT_OPTIONS = [1, 2, 3, 5, 8];
 export interface EstimateModalProps {
   /** Currently selected point value, if any — highlights the matching row. */
   value?: number;
-  /** Called with the point value of the row the user clicked. */
-  onSelect: (points: number) => void;
+  /**
+   * Called with the point value of the row the user clicked.
+   *
+   * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+   * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state.
+   */
+  onAction: (points: number) => void;
   /** Called when the popover should close without a selection — Escape or an outside click. */
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -64,7 +69,7 @@ export interface EstimateModalProps {
  */
 export function EstimateModal({
   value,
-  onSelect,
+  onAction,
   onClose,
   triggerRef,
   dismissExemptRef,
@@ -117,7 +122,7 @@ export function EstimateModal({
         <button
           key={points}
           type="button"
-          onClick={() => onSelect(points)}
+          onClick={() => onAction(points)}
           aria-pressed={value === points}
           className={cn(
             'flex items-center gap-2 h-8 px-4 rounded-xs text-body-m font-normal text-main font-sans transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',

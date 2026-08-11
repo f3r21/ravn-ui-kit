@@ -64,11 +64,11 @@ describe('ApplicationSidebar', () => {
   });
 
   it('forwards a click on an item to that item’s handler', async () => {
-    const onClick = vi.fn();
+    const onPress = vi.fn();
     const user = userEvent.setup();
-    render(<ApplicationSidebar items={[{ label: 'DASHBOARD', onClick }]} />);
+    render(<ApplicationSidebar items={[{ label: 'DASHBOARD', onPress }]} />);
 
     await user.click(screen.getByRole('button', { name: 'DASHBOARD' }));
-    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

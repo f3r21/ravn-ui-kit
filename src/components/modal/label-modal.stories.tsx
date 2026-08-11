@@ -4,10 +4,10 @@ import { withSurface } from '../../../.storybook/decorators';
 import { LabelModal } from './label-modal';
 
 const LABELS = [
-  { id: '1', text: 'Bug', variant: 'red' as const },
-  { id: '2', text: 'Feature', variant: 'green' as const },
-  { id: '3', text: 'Urgent', variant: 'yellow' as const },
-  { id: '4', text: 'Docs', variant: 'neutral' as const },
+  { id: '1', text: 'Bug', accent: 'red' as const },
+  { id: '2', text: 'Feature', accent: 'green' as const },
+  { id: '3', text: 'Urgent', accent: 'yellow' as const },
+  { id: '4', text: 'Docs', accent: 'neutral' as const },
 ];
 
 const meta: Meta<typeof LabelModal> = {
@@ -17,7 +17,7 @@ const meta: Meta<typeof LabelModal> = {
   decorators: [withSurface('neutral-5')],
   args: {
     labels: LABELS,
-    onSelect: fn(),
+    onAction: fn(),
     onClose: fn(),
   },
 };

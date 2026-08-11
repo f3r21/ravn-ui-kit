@@ -45,16 +45,16 @@ const EXPECTED_LABEL: Record<AccentColor, string> = {
 
 describe('Tag', () => {
   describe.each(Object.entries(EXPECTED_SOLID) as [AccentColor, string][])(
-    'variant="%s"',
-    (variant, expectedFill) => {
+    'accent="%s"',
+    (accent, expectedFill) => {
       it('paints the accent colour the design specifies', () => {
-        render(<Tag variant={variant}>Label</Tag>);
+        render(<Tag accent={accent}>Label</Tag>);
         expect(screen.getByText('Label').className).toContain(expectedFill);
       });
 
-      it('swaps fill for a border in the outline style', () => {
+      it('swaps fill for a border in the outline appearance', () => {
         render(
-          <Tag variant={variant} outline>
+          <Tag accent={accent} appearance="outline">
             Label
           </Tag>,
         );
@@ -63,16 +63,16 @@ describe('Tag', () => {
         expect(cls).not.toContain(expectedFill);
       });
 
-      it('labels in the contrast-checked colour, in both styles', () => {
-        const { rerender } = render(<Tag variant={variant}>Label</Tag>);
-        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[variant]);
+      it('labels in the contrast-checked colour, in both appearances', () => {
+        const { rerender } = render(<Tag accent={accent}>Label</Tag>);
+        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[accent]);
 
         rerender(
-          <Tag variant={variant} outline>
+          <Tag accent={accent} appearance="outline">
             Label
           </Tag>,
         );
-        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[variant]);
+        expect(screen.getByText('Label').className).toContain(EXPECTED_LABEL[accent]);
       });
     },
   );

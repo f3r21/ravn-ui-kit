@@ -77,7 +77,9 @@ describe('prop-surface: the kit measures its own public surface', () => {
     // everything "inherited" fails here while Button's case above still passes.
     const tag = result.components.find((c) => c.name === 'Tag');
     expect(tag.inherited).toEqual([]);
-    expect(tag.declared.map((p) => p.name)).toContain('variant');
+    // `accent`, not `variant` (#14) — `Tag`'s `AccentColor`-typed prop was renamed for
+    // axis-naming consistency with `TaskTableRow.accent` and `TaskTag.accent`.
+    expect(tag.declared.map((p) => p.name)).toContain('accent');
   });
 
   it('a compound sub-component carries the dotted name a consumer renders', () => {

@@ -8,6 +8,78 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING: `Tag.variant` renamed to `Tag.accent`; `Tag.outline?: boolean` replaced by
+  `Tag.appearance?: 'solid' | 'outline'`** (#14). Every `AccentColor`-typed prop in the kit
+  now shares one name — `variant` stays reserved for `Button`/`TextButton`'s action-hierarchy
+  axis, `accent` for a categorical colour, `tone` for a semantic status. `outline` was a
+  two-value axis crammed into a boolean, unable to grow a third style; it is not named
+  `style` (kit#129's own suggestion) because kit#11 lands rest-spread in this same release,
+  and `style` would collide with the native DOM `style: CSSProperties` attribute the moment
+  it does. **Minor**, under `CONTRIBUTING.md`'s pre-1.0 carve-out.
+- **BREAKING: `Badge.variant` renamed to `Badge.tone`** (#14), matching `Toast.tone` and the
+  `StatusTone` axis it already shared a type with under two different prop names. **Minor.**
+- **BREAKING: `TaskTag.variant` (the shared tag-descriptor shape) renamed to
+  `TaskTag.accent`** (#14), in `types/color-variants.ts`. `TaskTag` was already exported and
+  shared by `TaskCard.tags`/`TagCell.labels` — the issue that prompted this rename claimed no
+  such type existed to import; that claim was stale, re-derived and corrected rather than
+  trusted. **Minor.**
+- **BREAKING: `DueDateCell.urgency`/`urgencyLabel` renamed to `dueDateUrgency`/
+  `dueDateUrgencyLabel`** (#14), matching `TaskCard` and `TaskTableRow`, which already used
+  the longer name for the identical value — previously documented as "matching each
+  component's own prop vocabulary," which is the inconsistency this removes. **Minor.**
+- **BREAKING: `TaskTableRow.indicatorColor` renamed to `TaskTableRow.accent`** (#14), same
+  axis-naming convention as `Tag`. **Minor.**
+- **BREAKING: `TaskTableRow.onSelectedChange` renamed to `onChange`** (#14), matching React
+  Aria's own `isSelected`/`onChange` pairing on `AriaCheckboxProps` — this is a per-row
+  boolean checkbox toggle, not the multi-item `Selection`/`onSelectionChange` shape `Tabs`
+  uses, so it takes Checkbox's vocabulary rather than Tabs's. **Minor.**
+- **BREAKING: `onClick` renamed to `onPress` on `TaskCard`, `TaskTableRow`, `SidebarItem`,
+  `UserRow`** (#14), matching `Button`'s React Aria vocabulary. For `SidebarItem`/`UserRow`
+  this is a clean rename — both already render a real `<button>` whenever the handler is
+  provided. For `TaskCard`/`TaskTableRow` the name change is **not yet a behaviour change**:
+  the outer row/card surface is still wired to a native `onClick` internally rather than
+  react-aria's `usePress`, so real touch/pen/drag-cancellation parity with `Button` is not
+  here yet — tracked separately as #147. Keyboard access is unaffected either way; it has
+  always come from the real `<button>` each component renders for its title. **Minor.**
+- **BREAKING: `AssigneeModal.onSelect`, `EstimateModal.onSelect`, `LabelModal.onSelect`
+  renamed to `onAction`** (#14), matching this kit's own `Menu.onAction` precedent for a
+  one-shot pick that closes the choice, rather than a persistent `Selection` state.
+  **Minor.**
+- **BREAKING: `LabelModal`'s exported `Label` interface renamed to `TaskLabel`, and its
+  `variant` field renamed to `accent`** (#14). A bare `Label` exported into the kit's root
+  namespace was a near-certain collision with a consumer's own `Label` — a form-field label
+  is an extremely common thing to name that — and said nothing about what it actually was.
+  **Minor.**
+- **BREAKING: `TaskTableRow.reactions` changed from `TaskTableReaction[]`
+  (`{ emoji: string; count: number }`) to `TaskMetaBadge[]`** (#14), converging onto the
+  model `TaskMetaBadges`/`TaskCard.metaBadges` already uses correctly, instead of a second,
+  contradictory shape for the same concept. The old shape rendered as raw, unlabelled text —
+  `screen.getByText(r.emoji)` was the only way to find one in a test. Every reaction now
+  carries either a real accessible `label` or an explicit `decorative: true`, the same
+  contract `TaskMetaBadges` already enforces. **Minor.**
+- **BREAKING: `AddTaskModal.onSubmit`'s payload type is now the exported `AddTaskSubmitData`
+  interface**, not an anonymous object literal (#14). A consumer building a handler for it
+  previously had nothing to import. **Additive in practice** (the shape is unchanged), but
+  the type is now nameable rather than reconstructed via
+  `Parameters<NonNullable<AddTaskModalProps['onSubmit']>>[0]`.
+
+### Removed
+
+- **BREAKING: `PopoverProps.role?: 'dialog'` deleted** (#14). A single-member union cannot
+  vary, so it was never a real prop — every consumer already got `'dialog'`, which is the
+  honest role for every current caller (`DatePickerMenu`, `AssigneeModal`, `EstimateModal`,
+  `LabelModal`). The popover surface now always renders `role="dialog"` with no prop to set
+  it, and the reasoning that justified `'dialog'` moved to a comment beside the JSX instead
+  of a doc comment nobody could override anyway. **Minor.**
+- **BREAKING: `Modal.width?: string` removed; fold the same Tailwind class into
+  `className`** (#14), which `Modal` did not previously accept. `width` was typed as a raw
+  string standing in for "a Tailwind max-width class," so `width="400px"` typechecked and
+  silently did nothing. No caller in this kit or the consuming app ever passed it — every one
+  used the `max-w-md` default — so this is a pure rename with no behaviour change for anyone:
+  pass `className="max-w-lg"` where you would have passed `width="max-w-lg"`. **Minor.**
+
 ## [0.9.0] - 2026-08-10
 
 ### Added

@@ -101,7 +101,7 @@ const boardTasks = [
     points: 3,
     dueDateText: '2 DAYS',
     dueDateUrgency: 'soon' as const,
-    tags: [{ label: 'FRONTEND', variant: 'green' as const }],
+    tags: [{ label: 'FRONTEND', accent: 'green' as const }],
     assigneeName: 'Jerome Bell',
   },
   {
@@ -109,7 +109,7 @@ const boardTasks = [
     points: 8,
     dueDateText: 'OVERDUE',
     dueDateUrgency: 'overdue' as const,
-    tags: [{ label: 'BUG', variant: 'red' as const }],
+    tags: [{ label: 'BUG', accent: 'red' as const }],
     assigneeName: 'Jane Doe',
   },
 ];
@@ -153,7 +153,7 @@ export const TaskDefaultView: Story = {
               {
                 index: 1,
                 title: 'Create wireframe',
-                indicatorColor: 'red',
+                accent: 'red',
                 estimationPoints: 4,
                 assigneeName: 'Amelia Nellson',
                 dueDate: 'Yesterday',
@@ -162,8 +162,8 @@ export const TaskDefaultView: Story = {
               {
                 index: 2,
                 title: 'Slack Logo Design',
-                indicatorColor: 'green',
-                tags: [{ label: 'IOS APP', variant: 'green' }],
+                accent: 'green',
+                tags: [{ label: 'IOS APP', accent: 'green' }],
                 estimationPoints: 2,
                 assigneeName: 'Jonah Doe',
                 dueDate: 'Today',

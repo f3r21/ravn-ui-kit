@@ -20,8 +20,15 @@ export interface UserRowProps {
   isOnline?: boolean;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
-  /** Called when the row is clicked. When provided, the row renders as a `<button>` instead of a `<div>`. */
-  onClick?: () => void;
+  /**
+   * Called when the row is clicked. When provided, the row renders as a `<button>` instead
+   * of a `<div>`.
+   *
+   * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+   * This renders as a real `<button>` whenever it's provided, so the rename carries no
+   * behaviour gap.
+   */
+  onPress?: () => void;
 }
 
 /**
@@ -40,7 +47,7 @@ export function UserRow({
   size = 'md',
   isOnline = false,
   className,
-  onClick,
+  onPress,
 }: UserRowProps) {
   // Name text is fixed (SF Pro Display 15px/24px regular, tracking 0.75px) per the
   // Figma "User" component — the only avatar+name typography spec in the ground
@@ -52,16 +59,16 @@ export function UserRow({
     lg: 'text-sm',
   };
 
-  const Wrapper = onClick ? 'button' : 'div';
+  const Wrapper = onPress ? 'button' : 'div';
 
   return (
     <Wrapper
-      type={onClick ? 'button' : undefined}
-      onClick={onClick}
+      type={onPress ? 'button' : undefined}
+      onClick={onPress}
       className={cn(
         // padding: 4px 16px, gap: 8px -- matches Figma "User" component (Avatar frame, 239x56)
         'flex items-center gap-2 px-4 py-1 min-w-0',
-        onClick &&
+        onPress &&
           'cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2 rounded-sm',
         className,
       )}

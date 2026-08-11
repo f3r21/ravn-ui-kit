@@ -16,10 +16,16 @@ export interface ModalProps {
   /** Modal body content. */
   children: React.ReactNode;
   /**
-   * Tailwind max-width class controlling the dialog's width.
-   * @default 'max-w-md'
+   * Additional class names, merged last via `cn()` so they can override defaults — including
+   * the dialog's default `max-w-md` width.
+   *
+   * Replaces `width?: string` (#14) — that prop was typed as a raw string standing in for "a
+   * Tailwind max-width class," so `width="400px"` typechecked and silently did nothing. No
+   * caller in this kit or the consuming app ever passed it (every one used the `max-w-md`
+   * default), so folding it into `className` is a pure rename with no behavior change for
+   * anyone: pass `className="max-w-lg"` where you would have passed `width="max-w-lg"`.
    */
-  width?: string;
+  className?: string;
   /**
    * ARIA role for the dialog. Use `'alertdialog'` for a destructive-action
    * confirmation (e.g. a delete confirmation) — it tells assistive tech
@@ -62,7 +68,7 @@ export function Modal({
   isOpen,
   onClose,
   children,
-  width = 'max-w-md',
+  className,
   role = 'dialog',
   isDismissable = true,
   closeLabel = 'Close modal',
@@ -108,7 +114,7 @@ export function Modal({
           into the dialog on open, restore it on close), not the raw DOM
           autofocus anti-pattern this rule targets. */}
       <FocusScope contain restoreFocus autoFocus>
-        <div {...modalProps} ref={overlayRef} className={cn('w-full', width)}>
+        <div {...modalProps} ref={overlayRef} className={cn('w-full max-w-md', className)}>
           <div
             {...dialogProps}
             ref={dialogRef}

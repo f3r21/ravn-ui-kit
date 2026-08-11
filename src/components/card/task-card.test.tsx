@@ -7,7 +7,7 @@ import { TagCell } from './task-table';
 
 describe('TaskCard Component keyboard accessibility', () => {
   it('exposes the title as a real button, not the whole card as an ARIA one', () => {
-    render(<TaskCard title="Test Task" onClick={vi.fn()} />);
+    render(<TaskCard title="Test Task" onPress={vi.fn()} />);
     const opener = screen.getByRole('button', { name: 'Test Task' });
 
     // A native <button>, so focus, Enter and Space come from the platform rather than
@@ -19,31 +19,31 @@ describe('TaskCard Component keyboard accessibility', () => {
     expect(screen.getAllByRole('button')).toHaveLength(1);
   });
 
-  it('does not render an opener when onClick is not provided', () => {
+  it('does not render an opener when onPress is not provided', () => {
     render(<TaskCard title="Test Task" />);
     expect(screen.queryByRole('button')).toBeNull();
     // The title is still there, just as static text under its heading.
     expect(screen.getByRole('heading', { name: 'Test Task' })).toBeDefined();
   });
 
-  it('calls onClick when the card surface is clicked', async () => {
+  it('calls onPress when the card surface is clicked', async () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
 
-    render(<TaskCard title="Test Task" onClick={handleClick} assigneeName="Jerome Bell" />);
+    render(<TaskCard title="Test Task" onPress={handleClick} assigneeName="Jerome Bell" />);
     await user.click(screen.getByText('Jerome Bell'));
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onClick exactly once when the title button itself is clicked', async () => {
+  it('calls onPress exactly once when the title button itself is clicked', async () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
 
-    render(<TaskCard title="Test Task" onClick={handleClick} />);
+    render(<TaskCard title="Test Task" onPress={handleClick} />);
     await user.click(screen.getByRole('button', { name: 'Test Task' }));
 
-    // Both the button and the card surface below it are wired to `onClick`; the button
+    // Both the button and the card surface below it are wired to `onPress`; the button
     // stops the click from bubbling so the task opens once, not twice.
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -52,7 +52,7 @@ describe('TaskCard Component keyboard accessibility', () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
 
-    render(<TaskCard title="Test Task" onClick={handleClick} />);
+    render(<TaskCard title="Test Task" onPress={handleClick} />);
     await user.tab();
 
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Test Task' }));
@@ -65,7 +65,7 @@ describe('TaskCard Component keyboard accessibility', () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
 
-    render(<TaskCard title="Test Task" onClick={handleClick} />);
+    render(<TaskCard title="Test Task" onPress={handleClick} />);
     await user.tab();
     await user.keyboard(' ');
 
@@ -114,13 +114,13 @@ describe('TaskCard Component keyboard accessibility', () => {
 
   it('does not open the card when a control in the actions slot is used', async () => {
     // A menu trigger sitting on a clickable card must not also open the card behind it.
-    const onClick = vi.fn();
+    const onPress = vi.fn();
     const onOptions = vi.fn();
     const user = userEvent.setup();
     render(
       <TaskCard
         title="Fix auth bug"
-        onClick={onClick}
+        onPress={onPress}
         actions={
           <button type="button" onClick={onOptions}>
             Task options
@@ -131,7 +131,7 @@ describe('TaskCard Component keyboard accessibility', () => {
 
     await user.click(screen.getByRole('button', { name: 'Task options' }));
     expect(onOptions).toHaveBeenCalledTimes(1);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(onPress).not.toHaveBeenCalled();
   });
 
   it('forwards headingLevel so cards nest under their column header', () => {

@@ -24,7 +24,7 @@ const meta: Meta<typeof Tag> = {
   tags: ['autodocs'],
   decorators: [withSurface('neutral-4')],
   argTypes: {
-    variant: {
+    accent: {
       control: 'select',
       options: ['neutral', 'red', 'green', 'yellow', 'blue'],
     },
@@ -39,7 +39,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { variant: 'neutral', onRemove: undefined },
+  args: { accent: 'neutral', onRemove: undefined },
 };
 
 export const Playground: Story = {
@@ -51,7 +51,7 @@ export const SolidVariants: Story = {
   render: (args) => (
     <div className="flex gap-3">
       {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
-        <Tag key={v} {...args} variant={v}>
+        <Tag key={v} {...args} accent={v}>
           {v}
         </Tag>
       ))}
@@ -65,7 +65,7 @@ export const OutlineVariants: Story = {
   render: (args) => (
     <div className="flex gap-3">
       {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
-        <Tag key={v} {...args} variant={v} outline>
+        <Tag key={v} {...args} accent={v} appearance="outline">
           {v}
         </Tag>
       ))}
@@ -79,7 +79,7 @@ export const WithIcon: Story = {
   render: (args) => (
     <div className="flex gap-3">
       {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
-        <Tag key={v} {...args} variant={v} icon={<CheckIcon />}>
+        <Tag key={v} {...args} accent={v} icon={<CheckIcon />}>
           {v}
         </Tag>
       ))}
@@ -89,7 +89,7 @@ export const WithIcon: Story = {
 };
 
 export const Removable: Story = {
-  args: { children: 'REACT 19', variant: 'red' },
+  args: { children: 'REACT 19', accent: 'red' },
 };
 
 /**
@@ -119,10 +119,10 @@ export const OnEverySurface: Story = {
       ).map(([surface, label]) => (
         <div key={surface} className={`${surface} p-6 flex flex-col gap-3`}>
           <p className="text-xs text-muted-on-dark font-sans">{label}</p>
-          {([false, true] as const).map((outline) => (
-            <div key={String(outline)} className="flex gap-3">
+          {(['solid', 'outline'] as const).map((appearance) => (
+            <div key={appearance} className="flex gap-3">
               {(['neutral', 'green', 'blue', 'yellow', 'red'] as const).map((v) => (
-                <Tag key={v} {...args} variant={v} outline={outline}>
+                <Tag key={v} {...args} accent={v} appearance={appearance}>
                   {v}
                 </Tag>
               ))}

@@ -45,18 +45,16 @@ describe('TaskTable Component', () => {
     expect(screen.getByText('02')).toBeDefined();
   });
 
-  it('toggles the row checkbox and calls onSelectedChange', async () => {
+  it('toggles the row checkbox and calls onChange', async () => {
     const user = userEvent.setup();
-    const onSelectedChange = vi.fn();
+    const onChange = vi.fn();
     render(
       <TaskTable
-        groups={[
-          { title: 'To Do', rows: [{ index: 1, title: 'Create wireframe', onSelectedChange }] },
-        ]}
+        groups={[{ title: 'To Do', rows: [{ index: 1, title: 'Create wireframe', onChange }] }]}
       />,
     );
     await user.click(screen.getByRole('checkbox', { name: 'Select Create wireframe' }));
-    expect(onSelectedChange).toHaveBeenCalledWith(true);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
   it('omits empty columns instead of rendering a placeholder dash', () => {
@@ -87,8 +85,8 @@ describe('TaskTable Component', () => {
      */
     it('reaches the opener by tabbing and fires it with Enter', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
-      renderRow({ onClick });
+      const onPress = vi.fn();
+      renderRow({ onPress });
 
       await user.tab(); // the group header toggle (#140)
       await user.tab(); // the row-select checkbox
@@ -99,64 +97,64 @@ describe('TaskTable Component', () => {
       expect(opener.tagName).toBe('BUTTON');
 
       await user.keyboard('{Enter}');
-      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('fires the opener with Space', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
-      renderRow({ onClick });
+      const onPress = vi.fn();
+      renderRow({ onPress });
 
       screen.getByRole('button', { name: 'Create wireframe' }).focus();
       await user.keyboard(' ');
 
-      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('opens once, not twice, when the opener is clicked with a pointer', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
-      renderRow({ onClick });
+      const onPress = vi.fn();
+      renderRow({ onPress });
 
       await user.click(screen.getByRole('button', { name: 'Create wireframe' }));
 
       // The row itself is still clickable for a pointer user, so the opener has to stop the
       // click from bubbling into that handler as well.
-      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('still opens from a click anywhere else in the row', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
-      renderRow({ onClick, assigneeName: 'Jonah Doe' });
+      const onPress = vi.fn();
+      renderRow({ onPress, assigneeName: 'Jonah Doe' });
 
       await user.click(screen.getByText('Jonah Doe'));
 
-      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onPress).toHaveBeenCalledTimes(1);
     });
 
     it('does not open the task when the row-select checkbox is used', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
-      const onSelectedChange = vi.fn();
-      renderRow({ onClick, onSelectedChange });
+      const onPress = vi.fn();
+      const onChange = vi.fn();
+      renderRow({ onPress, onChange });
 
       await user.click(screen.getByRole('checkbox', { name: 'Select Create wireframe' }));
 
-      expect(onSelectedChange).toHaveBeenCalledWith(true);
-      expect(onClick).not.toHaveBeenCalled();
+      expect(onChange).toHaveBeenCalledWith(true);
+      expect(onPress).not.toHaveBeenCalled();
     });
 
     it('does not open the task when the Details link is used', async () => {
       const user = userEvent.setup();
-      const onClick = vi.fn();
+      const onPress = vi.fn();
       const onViewDetails = vi.fn();
-      renderRow({ onClick, onViewDetails });
+      renderRow({ onPress, onViewDetails });
 
       await user.click(screen.getByRole('button', { name: 'Details' }));
 
       expect(onViewDetails).toHaveBeenCalledTimes(1);
-      expect(onClick).not.toHaveBeenCalled();
+      expect(onPress).not.toHaveBeenCalled();
     });
   });
 
@@ -173,7 +171,7 @@ describe('TaskTable Component', () => {
         groups={[
           {
             title: 'To Do',
-            rows: [{ index: 1, title: 'Create wireframe', onSelectedChange: vi.fn() }],
+            rows: [{ index: 1, title: 'Create wireframe', onChange: vi.fn() }],
           },
         ]}
       />,
@@ -234,11 +232,11 @@ describe('TaskTable Component', () => {
   it('keeps the title operable as a button inside its heading', () => {
     // The heading must wrap the control, not replace it — otherwise the opt-in silently
     // costs the row its keyboard path.
-    const onClick = vi.fn();
+    const onPress = vi.fn();
     render(
       <table>
         <tbody>
-          <TaskTableRow index={1} title="Fix auth bug" headingLevel={3} onClick={onClick} />
+          <TaskTableRow index={1} title="Fix auth bug" headingLevel={3} onPress={onPress} />
         </tbody>
       </table>,
     );
@@ -265,7 +263,7 @@ describe('TaskTable Component', () => {
               index={1}
               title="Fix auth bug"
               selectLabel="Select Fix auth bug in To Do"
-              onSelectedChange={onToDo}
+              onChange={onToDo}
             />
           </tbody>
         </table>
@@ -297,12 +295,12 @@ describe('TaskTable Component', () => {
  */
 describe('due-date urgency is not conveyed by colour alone (#92)', () => {
   it('states that an overdue date is overdue', () => {
-    render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    render(<DueDateCell date="20 July, 2026" dueDateUrgency="overdue" />);
     expect(screen.getByText(/20 July, 2026/).textContent).toContain('overdue');
   });
 
   it('control: says nothing when the date is not urgent', () => {
-    const { container } = render(<DueDateCell date="20 July, 2026" urgency="normal" />);
+    const { container } = render(<DueDateCell date="20 July, 2026" dueDateUrgency="normal" />);
     expect(screen.getByText(/20 July, 2026/).textContent).not.toContain('overdue');
     expect(container.querySelector('.sr-only')).toBeNull();
   });
@@ -310,7 +308,7 @@ describe('due-date urgency is not conveyed by colour alone (#92)', () => {
   it('keeps the colour treatment it always had', () => {
     // The state is additive. If a refactor ever traded the colour for the text, a
     // colour-blind sighted user would gain nothing and a sighted user would lose the cue.
-    render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    render(<DueDateCell date="20 July, 2026" dueDateUrgency="overdue" />);
     expect(screen.getByText(/20 July, 2026/).className).toContain('text-primary-2');
   });
 
@@ -366,7 +364,7 @@ describe('TaskCard and DueDateCell say the same thing for the same urgency (#92)
     const cardState = card.container.querySelector('.sr-only')?.textContent ?? '';
     card.unmount();
 
-    const cell = render(<DueDateCell date="20 July, 2026" urgency={urgency} />);
+    const cell = render(<DueDateCell date="20 July, 2026" dueDateUrgency={urgency} />);
     const cellState = cell.container.querySelector('.sr-only')?.textContent ?? '';
 
     expect(cardState).toBe(cellState);
@@ -374,11 +372,11 @@ describe('TaskCard and DueDateCell say the same thing for the same urgency (#92)
 
   it('control: the probe can tell them apart, so agreement above is not vacuous', () => {
     // If the reader returned '' for everything, every case above would pass regardless.
-    const overdue = render(<DueDateCell date="20 July, 2026" urgency="overdue" />);
+    const overdue = render(<DueDateCell date="20 July, 2026" dueDateUrgency="overdue" />);
     expect(overdue.container.querySelector('.sr-only')?.textContent).toBe(', overdue');
     overdue.unmount();
 
-    const soon = render(<DueDateCell date="20 July, 2026" urgency="soon" />);
+    const soon = render(<DueDateCell date="20 July, 2026" dueDateUrgency="soon" />);
     expect(soon.container.querySelector('.sr-only')?.textContent).toBe(', due soon');
   });
 });
@@ -456,12 +454,12 @@ describe('TaskTableRow actions slot (#95)', () => {
    * `element.click()`, which under-reports React Aria press handling.
    */
   it('using the slot does not open the row', async () => {
-    const onClick = vi.fn();
+    const onPress = vi.fn();
     const onAction = vi.fn();
     const user = userEvent.setup();
     render(
       rowWith({
-        onClick,
+        onPress,
         actions: (
           <button type="button" aria-label="Task options for Fix auth bug" onClick={onAction}>
             ⋯
@@ -472,16 +470,16 @@ describe('TaskTableRow actions slot (#95)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Task options for Fix auth bug' }));
     expect(onAction).toHaveBeenCalledTimes(1);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(onPress).not.toHaveBeenCalled();
   });
 
   it('and the same holds from the keyboard, where activation synthesises a click', async () => {
-    const onClick = vi.fn();
+    const onPress = vi.fn();
     const onAction = vi.fn();
     const user = userEvent.setup();
     render(
       rowWith({
-        onClick,
+        onPress,
         actions: (
           <button type="button" aria-label="Task options for Fix auth bug" onClick={onAction}>
             ⋯
@@ -493,17 +491,17 @@ describe('TaskTableRow actions slot (#95)', () => {
     screen.getByRole('button', { name: 'Task options for Fix auth bug' }).focus();
     await user.keyboard('{Enter}');
     expect(onAction).toHaveBeenCalledTimes(1);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(onPress).not.toHaveBeenCalled();
   });
 
   it('control: the row still opens when the row itself is clicked', async () => {
-    // Otherwise "onClick did not fire" would pass on a row whose onClick never fires at all.
-    const onClick = vi.fn();
+    // Otherwise "onPress did not fire" would pass on a row whose onPress never fires at all.
+    const onPress = vi.fn();
     const user = userEvent.setup();
-    render(rowWith({ onClick, actions: <button type="button">⋯</button> }));
+    render(rowWith({ onPress, actions: <button type="button">⋯</button> }));
 
     await user.click(screen.getByText('Fix auth bug'));
-    expect(onClick).toHaveBeenCalled();
+    expect(onPress).toHaveBeenCalled();
   });
 });
 
@@ -993,12 +991,12 @@ describe('header labels do not wrap (#142)', () => {
 });
 
 /**
- * #141. `indicatorColor` defaulted unconditionally to `'green'`, so every row in every group
+ * #141. `accent` defaulted unconditionally to `'green'`, so every row in every group
  * rendered the same stripe regardless of status — this default swap and the status mapping are
  * what fix it. Fails against the pre-fix component: the first case below reads `bg-secondary-4`
  * (green) rather than `bg-neutral-2`, and the mapping export does not exist at all.
  */
-describe('TaskTableRow.indicatorColor no longer defaults to green, and a status mapping exists (#141)', () => {
+describe('TaskTableRow.accent no longer defaults to green, and a status mapping exists (#141)', () => {
   const stripeClass = (container: HTMLElement) =>
     container.querySelector('.w-1.h-full.shrink-0')?.className ?? '';
 
@@ -1018,7 +1016,7 @@ describe('TaskTableRow.indicatorColor no longer defaults to green, and a status 
     const { container } = render(
       <table>
         <tbody>
-          <TaskTableRow index={1} title="Fix auth bug" indicatorColor="red" />
+          <TaskTableRow index={1} title="Fix auth bug" accent="red" />
         </tbody>
       </table>,
     );
@@ -1050,5 +1048,49 @@ describe('TaskTableRow.indicatorColor no longer defaults to green, and a status 
     // typecheck, which is what `npm run gate`'s typecheck step actually proves. If this stops
     // erroring, the union widened silently and this control caught it.
     expect(() => statusToIndicatorColor('ARCHIVED')).not.toThrow();
+  });
+});
+
+/**
+ * #14. `reactions` used to be `TaskTableReaction[]` (`{ emoji: string; count: number }`),
+ * rendered as raw text with no accessible name at all — `screen.getByText(r.emoji)` was the
+ * only way to find one. Converged onto `TaskMetaBadge`, which requires either a real `label`
+ * or an explicit `decorative: true`. Fails against the pre-fix component: it accepted
+ * `{ emoji, count }` and rendered no `sr-only` text for any of it.
+ */
+describe('TaskTableRow reactions render via TaskMetaBadge, not raw emoji text (#14)', () => {
+  it('announces a labelled badge by its label, count included', () => {
+    render(
+      <table>
+        <tbody>
+          <TaskTableRow
+            index={1}
+            title="Fix auth bug"
+            reactions={[{ icon: <svg aria-hidden />, count: 3, label: '3 comments' }]}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText('3 comments')).toBeDefined();
+    expect(screen.getByText('3 comments').className).toContain('sr-only');
+  });
+
+  it('hides a decorative badge from assistive tech entirely, with no label', () => {
+    // isSelectable={false} rules out the row's own sr-only select checkbox, isolating this
+    // assertion to the reactions badge under test.
+    const { container } = render(
+      <table>
+        <tbody>
+          <TaskTableRow
+            index={1}
+            title="Fix auth bug"
+            isSelectable={false}
+            reactions={[{ icon: <svg aria-hidden />, decorative: true }]}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
+    expect(container.querySelector('.sr-only')).toBeNull();
   });
 });

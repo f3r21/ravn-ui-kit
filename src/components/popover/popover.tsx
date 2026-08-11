@@ -35,19 +35,6 @@ export interface PopoverProps {
    * Clicking genuinely outside the group still dismisses normally.
    */
   dismissExemptRef?: React.RefObject<HTMLElement | null>;
-  /**
-   * ARIA role for the popover surface. `'dialog'` fits every current consumer:
-   * `DatePickerMenu` (a calendar grid — `role="grid"` — inside a dialog
-   * popover, the same composition a native date input's popup uses) and the
-   * `Assignee`/`Estimate`/`Label` pick-one-option lists, none of which
-   * implement full `listbox`/`option` semantics (roving tabindex,
-   * `aria-selected`) yet — that is the `ListBox`/`Select`/`MultiSelect`
-   * family, which exists in this kit and is out of scope for this shell.
-   * `'dialog'` is the honest role for "a floating region with interactive
-   * content and no listbox wiring," not a placeholder for one.
-   * @default 'dialog'
-   */
-  role?: 'dialog';
   /** Accessible name for the popover surface, read by screen readers on open. */
   'aria-label'?: string;
   children: React.ReactNode;
@@ -85,7 +72,6 @@ export function Popover({
   onClose,
   triggerRef,
   dismissExemptRef,
-  role = 'dialog',
   children,
   className,
   ...ariaProps
@@ -112,7 +98,16 @@ export function Popover({
   return (
     // eslint-disable-next-line jsx-a11y/no-autofocus
     <FocusScope restoreFocus autoFocus>
-      <div {...overlayProps} {...ariaProps} ref={overlayRef} role={role} className={className}>
+      {/* Always `'dialog'` (#14 removed the prop — a single-member union cannot vary, so it
+          was never a real prop). Fits every current consumer: `DatePickerMenu` (a calendar
+          grid — `role="grid"` — inside a dialog popover, the same composition a native date
+          input's popup uses) and the `Assignee`/`Estimate`/`Label` pick-one-option lists,
+          none of which implement full `listbox`/`option` semantics (roving tabindex,
+          `aria-selected`) yet — that is the `ListBox`/`Select`/`MultiSelect` family, which
+          exists in this kit and is out of scope for this shell. `'dialog'` is the honest role
+          for "a floating region with interactive content and no listbox wiring," not a
+          placeholder for one. */}
+      <div {...overlayProps} {...ariaProps} ref={overlayRef} role="dialog" className={className}>
         <DismissButton onDismiss={onClose} />
         {children}
         <DismissButton onDismiss={onClose} />

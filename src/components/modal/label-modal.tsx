@@ -2,20 +2,33 @@ import { cn } from '../../utils/cn';
 import { Tag, type TagProps } from '../tag/tag';
 import { Popover, type PopoverProps } from '../popover/popover';
 
-export interface Label {
-  /** Unique identifier, echoed back in `onSelect`. */
+/**
+ * One selectable label option in `LabelModal`'s list.
+ *
+ * Named `TaskLabel`, not `Label` (#14) — a bare `Label` exported into the kit's root
+ * namespace was a near-certain collision with a consumer's own `Label` (a form-field label
+ * is an extremely common thing to name that), and generic enough to say nothing about what
+ * it actually is.
+ */
+export interface TaskLabel {
+  /** Unique identifier, echoed back in `onAction`. */
   id: string;
   /** Label text shown on the tag pill. */
   text: string;
-  /** Color variant applied to the tag pill, matching `Tag`'s own variant palette. */
-  variant?: TagProps['variant'];
+  /** Color accent applied to the tag pill, matching `Tag`'s own accent palette. */
+  accent?: TagProps['accent'];
 }
 
 export interface LabelModalProps {
   /** Full list of selectable labels shown as rows. */
-  labels: Label[];
-  /** Called with the label of the row the user clicked. */
-  onSelect: (label: Label) => void;
+  labels: TaskLabel[];
+  /**
+   * Called with the label of the row the user clicked.
+   *
+   * Named `onAction` (#14) — this fires once and closes the choice, the same one-shot-pick
+   * shape `Menu.onAction` already models in this kit, not a persistent `Selection` state.
+   */
+  onAction: (label: TaskLabel) => void;
   /** Called when the popover should close without a selection — Escape or an outside click. */
   onClose: () => void;
   /** Ref to the trigger button that opens this popover — see `Popover`'s `triggerRef`. */
@@ -56,7 +69,7 @@ export interface LabelModalProps {
  */
 export function LabelModal({
   labels,
-  onSelect,
+  onAction,
   onClose,
   triggerRef,
   dismissExemptRef,
@@ -86,10 +99,10 @@ export function LabelModal({
         <button
           key={l.id}
           type="button"
-          onClick={() => onSelect(l)}
+          onClick={() => onAction(l)}
           className="flex items-center w-full px-4 py-1.5 hover:bg-neutral-2/10 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2"
         >
-          <Tag variant={l.variant ?? 'neutral'}>{l.text}</Tag>
+          <Tag accent={l.accent ?? 'neutral'}>{l.text}</Tag>
         </button>
       ))}
     </Popover>

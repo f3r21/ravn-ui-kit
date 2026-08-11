@@ -6,14 +6,14 @@ const meta: Meta<typeof Badge> = {
   component: Badge,
   tags: ['autodocs'],
   argTypes: {
-    variant: {
+    tone: {
       control: 'select',
       options: ['neutral', 'success', 'warning', 'danger'],
     },
   },
   args: {
     children: 'Draft',
-    variant: 'neutral',
+    tone: 'neutral',
   },
 };
 
@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { variant: 'neutral', children: 'Draft' },
+  args: { tone: 'neutral', children: 'Draft' },
 };
 
 export const Playground: Story = {
@@ -32,7 +32,7 @@ export const Variants: Story = {
   render: (args) => (
     <div className="flex gap-3">
       {(['neutral', 'success', 'warning', 'danger'] as const).map((v) => (
-        <Badge key={v} {...args} variant={v}>
+        <Badge key={v} {...args} tone={v}>
           {v}
         </Badge>
       ))}
@@ -43,27 +43,27 @@ export const Variants: Story = {
 export const Neutral: Story = {
   args: {
     children: 'Draft',
-    variant: 'neutral',
+    tone: 'neutral',
   },
 };
 
 export const Success: Story = {
   args: {
     children: 'Completed',
-    variant: 'success',
+    tone: 'success',
   },
 };
 
 export const Warning: Story = {
   args: {
     children: 'In Progress',
-    variant: 'warning',
+    tone: 'warning',
   },
 };
 
 export const Danger: Story = {
   args: {
     children: 'Blocked',
-    variant: 'danger',
+    tone: 'danger',
   },
 };

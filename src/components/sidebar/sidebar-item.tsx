@@ -49,8 +49,14 @@ export interface SidebarItemProps {
   isActive?: boolean;
   /** Optional numeric badge rendered at the end of the item (e.g. unread count). */
   badgeCount?: number;
-  /** Called when the item is clicked. */
-  onClick?: () => void;
+  /**
+   * Called when the item is clicked.
+   *
+   * Named `onPress` (#14), matching `Button`'s React Aria vocabulary rather than `onClick`.
+   * This renders as a real `<button>` regardless, so the rename carries no behaviour gap —
+   * unlike `TaskCard`/`TaskTableRow`, there is no non-button wrapper for it to leave behind.
+   */
+  onPress?: () => void;
   /** Additional class names, merged last via `cn()` so they can override defaults. */
   className?: string;
 }
@@ -60,13 +66,13 @@ export function SidebarItem({
   label,
   isActive = false,
   badgeCount,
-  onClick,
+  onPress,
   className,
 }: SidebarItemProps) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={onPress}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         'relative w-full h-14 flex items-center gap-4 pl-4 font-sans text-body-m font-semibold transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:-outline-offset-2',
