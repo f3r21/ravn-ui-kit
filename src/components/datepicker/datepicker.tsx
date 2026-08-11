@@ -1,9 +1,13 @@
-import { useRef } from 'react';
-import { useTextField, type AriaTextFieldProps } from 'react-aria';
+import { useTextField, useObjectRef, type AriaTextFieldProps } from 'react-aria';
 import { cn } from '../../utils/cn';
 import { fieldLabelClass, FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface DatepickerProps extends AriaTextFieldProps {
+  /**
+   * Ref to the root `<input>` (#11). Merged with the internal ref `useTextField` needs via
+   * `useObjectRef`, the same pattern the icon `Button` uses.
+   */
+  ref?: React.Ref<HTMLInputElement>;
   /** Label text. Rendered `sr-only` unless `isLabelVisible`. When omitted, no label. */
   label?: string;
   /**
@@ -31,9 +35,10 @@ export function Datepicker({
   error,
   description,
   className,
+  ref: forwardedRef,
   ...props
 }: DatepickerProps) {
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useObjectRef(forwardedRef);
   const { labelProps, inputProps, descriptionProps, errorMessageProps } = useTextField(
     { ...props, label, description, type: 'date', isInvalid: !!error, errorMessage: error },
     ref,

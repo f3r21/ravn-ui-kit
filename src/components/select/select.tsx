@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { HiddenSelect, useButton, useSelect, type AriaSelectProps } from 'react-aria';
+import { HiddenSelect, useButton, useSelect, useObjectRef, type AriaSelectProps } from 'react-aria';
 import { useSelectState } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { ListBox } from '../listbox/list-box';
@@ -8,6 +7,12 @@ import { ChevronDownIcon } from '../icons/icons';
 import { fieldLabelClass, FieldMessages, RequiredIndicator } from '../form-field/form-field';
 
 export interface SelectProps<T extends object> extends AriaSelectProps<T> {
+  /**
+   * Ref to the trigger button (#11) — the actual interactive control, analogous to
+   * `Datepicker`/`Input`'s ref pointing at their own `<input>` rather than a wrapping div.
+   * Merged with the internal ref `useSelect`/`useButton` need via `useObjectRef`.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
   /**
    * Renders `label` visibly above the trigger instead of `sr-only`.
    *
@@ -62,10 +67,11 @@ export function Select<T extends object>({
   error,
   description,
   className,
+  ref: forwardedRef,
   ...props
 }: SelectProps<T>) {
   const state = useSelectState(props);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useObjectRef(forwardedRef);
 
   // `isInvalid`/`errorMessage`/`description` are what make useSelect emit the
   // descriptionProps/errorMessageProps and the aria-describedby that points at them. The

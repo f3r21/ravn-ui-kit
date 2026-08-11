@@ -1,4 +1,4 @@
-import { act } from 'react';
+import { act, createRef } from 'react';
 import { Item } from 'react-stately';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -149,5 +149,11 @@ describe('Select Component', () => {
     const trigger = renderSelect();
     expect(trigger.className).toContain('bg-neutral-2/10');
     expect(trigger.className).not.toContain('bg-surface-neutral');
+  });
+
+  it('forwards a ref to the trigger button (#11)', () => {
+    const ref = createRef<HTMLButtonElement>();
+    const trigger = renderSelect({ ref });
+    expect(ref.current).toBe(trigger);
   });
 });

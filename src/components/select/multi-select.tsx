@@ -1,5 +1,5 @@
-import { Fragment, useRef } from 'react';
-import { useButton, useField } from 'react-aria';
+import { Fragment } from 'react';
+import { useButton, useField, useObjectRef } from 'react-aria';
 import { useListState, useOverlayTriggerState, type ListProps } from 'react-stately';
 import { cn } from '../../utils/cn';
 import { ListBox } from '../listbox/list-box';
@@ -11,6 +11,11 @@ export interface MultiSelectProps<T extends object> extends Omit<
   ListProps<T>,
   'selectionMode' | 'selectionBehavior'
 > {
+  /**
+   * Ref to the trigger button (#11), the same shape as `Select.ref`. Merged with the
+   * internal ref `useButton` needs via `useObjectRef`.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
   /** Accessible name for the control, announced on the trigger and the option list. */
   label: string;
   /** Shown inside the trigger when no item is selected yet. */
@@ -78,10 +83,11 @@ export function MultiSelect<T extends object>({
   error,
   description,
   className,
+  ref: forwardedRef,
   ...props
 }: MultiSelectProps<T>) {
   const overlayState = useOverlayTriggerState({});
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useObjectRef(forwardedRef);
 
   const listState = useListState<T>({
     ...props,
