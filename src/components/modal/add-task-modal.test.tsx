@@ -257,3 +257,17 @@ describe('visible copy is overridable (#90)', () => {
     expect(screen.getByText('3/15/2026')).toBeDefined();
   });
 });
+
+/**
+ * #20. jsdom computes no layout (no line-breaking, no `getBoundingClientRect`), so this can
+ * only pin the class that lets the row wrap rather than the wrap itself — the same structural
+ * limit #142's header-label test names. The overflow this fixes (555px of real content
+ * against a 546px box under a DejaVu Sans fallback) was measured separately, via
+ * `scripts/font-fallback-sweep.mjs` against a real rendered Storybook build.
+ */
+it('the chip row can wrap under a wider font fallback (#20)', () => {
+  render(<AddTaskModal isOpen onClose={vi.fn()} />);
+  const trigger = screen.getByRole('button', { name: 'Estimate' });
+  const chipRow = trigger.parentElement?.parentElement;
+  expect(chipRow?.className).toContain('flex-wrap');
+});

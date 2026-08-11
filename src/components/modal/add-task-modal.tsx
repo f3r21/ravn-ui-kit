@@ -275,8 +275,16 @@ export function AddTaskModal({
 
       {/* The whole chip row is exempt from every popover's outside-dismiss (#82). Without it,
           clicking a sibling chip is consumed by the open popover's capture-phase dismiss and
-          never reaches that chip, so the first click does nothing and it takes two. */}
-      <div ref={chipRowRef} className="flex items-center gap-4 w-full">
+          never reaches that chip, so the first click does nothing and it takes two.
+
+          `flex-wrap` (#20): the four chips' combined content width is calibrated to
+          `--font-sans`'s first two entries, 'SF Pro Display'/`system-ui`, neither of which
+          this kit ships — on a Linux runner's `sans-serif` fallback (DejaVu Sans, wider),
+          the row's real content measures 555px against this card's 546px content box, a
+          9px overflow invisible on macOS. Wrapping costs nothing on the common case (every
+          existing story fits on one line under a resolved system font) and turns the
+          font-substitution case into a second row instead of a silent horizontal overflow. */}
+      <div ref={chipRowRef} className="flex flex-wrap items-center gap-4 w-full">
         {/* Estimate trigger */}
         <div className="relative">
           {points === undefined ? (
