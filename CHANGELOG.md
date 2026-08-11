@@ -129,6 +129,7 @@ sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> D
   that shipping SF Pro Display itself is not an available fix: "You may not embed the Apple
   Font in any software programs or other products," restricted to Apple-platform interface
   mockups by registered Apple Developers.
+
 ### Added
 
 - **Every kit component now forwards a real `ref` to its root DOM element, and spreads

@@ -2424,7 +2424,7 @@ function ns({
             className: "w-full bg-transparent text-body-xl font-semibold text-main placeholder:text-muted-on-dark font-sans rounded-xs focus-visible:outline-2 focus-visible:outline-interactive-text focus-visible:outline-offset-2"
           }
         ),
-        /* @__PURE__ */ u("div", { ref: Z, className: "flex items-center gap-4 w-full", children: [
+        /* @__PURE__ */ u("div", { ref: Z, className: "flex flex-wrap items-center gap-4 w-full", children: [
           /* @__PURE__ */ u("div", { className: "relative", children: [
             k === void 0 ? /* @__PURE__ */ e(
               "button",
