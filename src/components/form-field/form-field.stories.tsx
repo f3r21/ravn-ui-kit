@@ -14,6 +14,10 @@ const meta: Meta<typeof FormField> = {
   component: FormField,
   tags: ['autodocs'],
   decorators: [withSurface('neutral-5')],
+  argTypes: {
+    isLabelVisible: { control: 'boolean' },
+    isRequired: { control: 'boolean' },
+  },
   args: {
     label: 'Sprint',
   },

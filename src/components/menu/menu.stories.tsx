@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn, screen, userEvent, within } from 'storybook/test';
 import { Item } from 'react-stately';
 import { withSurface } from '../../../.storybook/decorators';
 import { Menu, type MenuProps } from './menu';
@@ -64,6 +64,41 @@ export const Playground: Story = {
     label: 'Task options for Create wireframe',
     isDisabled: false,
     triggerClassName: 'w-8 h-8 rounded-sm inline-flex items-center justify-center text-main',
+  },
+};
+
+/**
+ * Drives the actual open → pick → close cycle (#16), rather than asserting only that a menu
+ * renders. Also confirms the disabled item is truly inert: `Archive` never fires `onAction`
+ * and the menu stays open through the attempted click, which is `aria-disabled`'s contract,
+ * not merely a visual dimming.
+ *
+ * Queries the menu via `screen`, not `within(canvasElement)`: `Menu` composes the portalled
+ * `FloatingPopover`, so the open menu renders as a sibling of `document.body`, outside the
+ * canvas root entirely — the same reason `FloatingPopover`'s own story exists to prove escape
+ * from a clipping ancestor.
+ */
+export const OpensPicksAndCloses: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Task options' });
+
+    await userEvent.click(trigger);
+    const menu = await screen.findByRole('menu');
+    expect(menu).toBeInTheDocument();
+
+    await userEvent.click(within(menu).getByRole('menuitem', { name: 'Archive' }));
+    expect(args.onAction).not.toHaveBeenCalled();
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    await userEvent.click(within(menu).getByRole('menuitem', { name: 'Duplicate' }));
+    // `onAction`'s own contract (`AriaMenuProps<T>['onAction']`, untouched by this kit) is
+    // one argument, a `Key` — but the real call, caught here rather than assumed, also
+    // carries the full item node as a second argument. `expect.anything()` pins that a
+    // second argument exists without pinning its exact shape to a react-aria implementation
+    // detail one version bump could change either way.
+    expect(args.onAction).toHaveBeenCalledWith('duplicate', expect.anything());
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   },
 };
 

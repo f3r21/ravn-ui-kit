@@ -81,6 +81,13 @@ const meta: Meta<typeof TaskTableRow> = {
   tags: ['autodocs'],
   decorators: [inTable, withSurface('neutral-5')],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    accent: { control: 'select', options: ['neutral', 'red', 'green', 'yellow', 'blue'] },
+    dueDateUrgency: { control: 'select', options: ['normal', 'soon', 'overdue'] },
+    headingLevel: { control: 'select', options: [2, 3, 4, 5, 6] },
+    isSelected: { control: 'boolean' },
+    isSelectable: { control: 'boolean' },
+  },
   args: {
     index: 1,
     title: 'Create wireframe',

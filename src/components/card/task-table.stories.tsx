@@ -47,6 +47,9 @@ const meta: Meta<typeof TaskTable> = {
   // rendered white-on-white. Same fix as `Input`/`Datepicker` took earlier.
   decorators: [withSurface('neutral-5')],
   parameters: { layout: 'fullscreen' },
+  argTypes: {
+    isLoading: { control: 'boolean' },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

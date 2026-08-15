@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { withSurface } from '../../../.storybook/decorators';
 import { SegmentedControl } from './segmented-control';
 
@@ -52,5 +52,43 @@ export const CustomGroupLabel: Story = {
   args: {
     defaultValue: 'board',
     label: 'Density',
+  },
+};
+
+/**
+ * Drives the hand-rolled keyboard handling directly (#16) — this component does not wrap a
+ * react-aria hook (see the component's own doc comment for why). `segmented-control.test.tsx`
+ * already covers this in jsdom -- `:38` for the roving tabindex and `:45` for ArrowRight/ArrowLeft
+ * with wrapping -- so what this story adds is the SAME assertions in a real browser, not new
+ * behaviour. An earlier version of this comment claimed nothing else exercised it, which the tree
+ * contradicts; the claim is corrected rather than deleted, because a story that oversells itself
+ * as coverage is how a duplicate gets counted twice.
+ *
+ * Clicking "List" selects it and calls `onChange`; the options are Board, List, Table, so
+ * ArrowRight from List moves to "Table" and a second ArrowRight wraps to "Board" (modular
+ * arithmetic, not a hardcoded last index), moving focus without a click and matching the
+ * WAI-ARIA radiogroup pattern the component's own comment cites.
+ */
+export const KeyboardNavigation: Story = {
+  args: {
+    defaultValue: 'board',
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    const list = canvas.getByRole('radio', { name: 'List' });
+    await userEvent.click(list);
+    expect(list).toHaveAttribute('aria-checked', 'true');
+    expect(args.onChange).toHaveBeenCalledWith('list');
+
+    await userEvent.keyboard('{ArrowRight}');
+    const table = canvas.getByRole('radio', { name: 'Table' });
+    expect(table).toHaveAttribute('aria-checked', 'true');
+    expect(table).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}');
+    const board = canvas.getByRole('radio', { name: 'Board' });
+    expect(board).toHaveAttribute('aria-checked', 'true');
+    expect(board).toHaveFocus();
   },
 };
