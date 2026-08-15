@@ -49,17 +49,17 @@ in `.claude/commands/start-issue.md`.
 ## Decisions already made — do not re-open
 
 - **The kit is desktop-only, and its floor is 833px.** `ApplicationSidebar` is a rigid
-  `w-[232px] shrink-0` (`application-sidebar.tsx:48`) and nothing in `src/` carries a responsive
+  `w-[232px] shrink-0` (`application-sidebar.tsx:68`) and nothing in `src/` carries a responsive
   variant or a media query. 833 is exact rather than approximate: on story
   `layout-appshell--dashboard`, `document.documentElement.scrollWidth` reads 833 at every
   narrower viewport — 832 overflows, 833 does not. Below the floor the shell scrolls; it does not
   shrink. Re-measure by reading that property on the story's `iframe.html` at a few widths, which
   is how the number above was checked against this branch's own Storybook build.
-  **Quote it** — a consumer deciding whether to adopt `AppShell` needs it. An earlier version of
-  this line said no floor had ever been measured and forbade quoting one, which is worse than
-  merely wrong: a session that measured 833 correctly would have assumed it had erred and thrown
-  the finding away. The number does not re-open the decision — the kit stays desktop-only, the
-  derivation is on the **Decisions** page, and the consuming app keeps its own shell permanently.
+  **Quote it** — a consumer deciding whether to adopt `AppShell` needs it. Do not replace this
+  with a claim that no floor has been measured: a session that then measured 833 correctly would
+  assume it had erred and discard the finding. The number does not re-open the decision — the kit
+  stays desktop-only, the derivation is on the **Decisions** page, and the consuming app keeps
+  its own shell permanently.
 - **WCAG AA wins over Figma fidelity where they conflict**, and the deviation is documented in a
   comment with its measured ratio. `src/styles/contrast.test.ts` pins those ratios so a
   regression fails the suite.
