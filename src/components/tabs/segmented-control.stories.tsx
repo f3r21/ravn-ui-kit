@@ -57,11 +57,17 @@ export const CustomGroupLabel: Story = {
 
 /**
  * Drives the hand-rolled keyboard handling directly (#16) — this component does not wrap a
- * react-aria hook (see the component's own doc comment for why), so nothing else in this repo
- * exercises `handleKeyDown`'s roving tabindex. Clicking "List" selects it and calls `onChange`;
- * ArrowRight from there wraps to "Board" (modular arithmetic, not a hardcoded last index) and
- * moves focus there without a click, matching the WAI-ARIA radiogroup pattern the component's
- * own comment cites.
+ * react-aria hook (see the component's own doc comment for why). `segmented-control.test.tsx`
+ * already covers this in jsdom -- `:38` for the roving tabindex and `:45` for ArrowRight/ArrowLeft
+ * with wrapping -- so what this story adds is the SAME assertions in a real browser, not new
+ * behaviour. An earlier version of this comment claimed nothing else exercised it, which the tree
+ * contradicts; the claim is corrected rather than deleted, because a story that oversells itself
+ * as coverage is how a duplicate gets counted twice.
+ *
+ * Clicking "List" selects it and calls `onChange`; the options are Board, List, Table, so
+ * ArrowRight from List moves to "Table" and a second ArrowRight wraps to "Board" (modular
+ * arithmetic, not a hardcoded last index), moving focus without a click and matching the
+ * WAI-ARIA radiogroup pattern the component's own comment cites.
  */
 export const KeyboardNavigation: Story = {
   args: {

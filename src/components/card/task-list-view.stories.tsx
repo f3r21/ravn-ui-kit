@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TaskListView } from './task-list-view';
+import type { TaskCardProps } from './task-card';
 import { EmptyState } from '../empty-state/empty-state';
 import { withSurface } from '../../../.storybook/decorators';
 
-const sampleTasks = [
+// Annotated, and that is the point of this PR rather than a detail of it: the `variant` ->
+// `accent` bug fixed below reached main because this const was untyped, so the excess
+// property check never ran. `TaskListView` declares `tasks: TaskCardProps[]`; saying so
+// here makes a recurrence a compile error instead of a silently ignored prop.
+const sampleTasks: TaskCardProps[] = [
   {
     title: 'Set up project',
     points: 3,

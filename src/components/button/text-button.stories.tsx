@@ -90,11 +90,18 @@ export const PressFires: Story = {
  */
 export const DisabledBlocksPress: Story = {
   args: { isDisabled: true, children: 'Disabled' },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button', { name: 'Disabled' });
 
     expect(button).toBeDisabled();
-    expect(args.onPress).not.toHaveBeenCalled();
+    // NOT `expect(args.onPress).not.toHaveBeenCalled()`. Nothing in this play() presses the
+    // button, and the spy is fresh per render, so that assertion could not fail whatever `src/`
+    // did -- it read as a guarantee and was a decoration. Its real presence pair lives in
+    // `text-button.test.tsx`, which does click a disabled button and does assert the silence.
+    // What jsdom CANNOT check, and what this runtime therefore earns, is the class that makes the
+    // click impossible in a browser at all -- the same `pointer-events: none` the note above
+    // says throws when you try.
+    expect(getComputedStyle(button).pointerEvents).toBe('none');
   },
 };
