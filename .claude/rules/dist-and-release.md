@@ -71,9 +71,12 @@ Release workflow's first run, so it was cut by hand when a matching release was 
 automatic. The app pins tags rather than releases, so nothing consuming this package is affected.
 It is recorded because the two lists disagreeing is otherwise a puzzle.
 
-**Do not cut tags by hand.** It still works, since this repo has no tag protection
-(`gh api repos/f3r21/ravn-ui-kit/rulesets -q length` returns 0, where the app returns 1, so the
-query works) and #59 is what would close it. If you do anyway,
+**Do not cut tags by hand, and moving or deleting one is now refused by the server.** Ruleset
+`20572278`, "Published v* tags are never moved or deleted", is active on `refs/tags/v*` with
+`update` and `deletion` rules, which is what #59 asked for. Re-derive with
+`gh api repos/f3r21/ravn-ui-kit/rulesets -q '.[] | "\(.name) \(.target)"'`. This file said the
+repo had none until 2026-09-09, a figure carried forward from `CLAUDE.md` without re-deriving it.
+Creating a tag by hand is still possible. If you do,
 `.github/workflows/tag-check.yml` fires on the tag push and re-checks facts 1 and 3; a tag it
 fails is not a release, so do not pin it.
 
