@@ -3,7 +3,7 @@ import { auditText, isBlindPipe } from './figure-audit.mjs';
 
 /**
  * `figure-audit.mjs` scores every issue and PR body in this repo and had no test at all — the
- * same shape as the Claude Code hooks `CLAUDE.md` records, which were installed, running and
+ * same shape as the Claude Code hooks `.claude/rules/hooks.md` records, which were installed, running and
  * completely inert. A scorer nobody can run is a scorer nobody notices has drifted, and this one
  * had: it taught `npm run gate 2>&1 | tail -6` as its exemplar and credited it (#53).
  */

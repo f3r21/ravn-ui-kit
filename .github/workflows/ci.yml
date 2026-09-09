@@ -142,7 +142,7 @@ jobs:
       # `MIGRATION_GAPS.md` and `UI_KIT_MASTER_PLAN.md` are ignored at `.gitignore:42-43` and
       # exist in exactly one working directory on one machine. Nine doc comments used to carry
       # pointers to them into `dist/index.d.ts`, which is what a consumer installs — and the
-      # consuming app's own CLAUDE.md names that file as the way to answer "what does this
+      # consuming app's own .claude/rules/ui-kit.md names that file as the way to answer "what does this
       # component do". So the documented reading path terminated in a reference the reader has
       # no way to resolve, or even to tell had ever existed.
       #

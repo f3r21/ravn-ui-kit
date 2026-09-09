@@ -33,7 +33,7 @@ describe('prop-surface: the kit measures its own public surface', () => {
     // all pass vacuously. These floors are deliberately far below the real figures — this asserts
     // that the checker resolved something, not what the current numbers are. The numbers move
     // every time a prop lands; pinning them here would make this file a second source competing
-    // with the instrument, which is what `CLAUDE.md` forbids.
+    // with the instrument, which is what the figures rule forbids.
     expect(result.totals.components).toBeGreaterThan(30);
     expect(result.totals.declaredProps).toBeGreaterThan(100);
     expect(result.totals.inheritedProps).toBeGreaterThan(100);

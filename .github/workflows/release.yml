@@ -14,7 +14,7 @@ name: Release
 # still does not prevent a hand-cut tag. Adding `creation` to it is what would.
 #
 # `v0.5.0` is why this exists. Its `package.json` still read `0.4.0` and its `[Unreleased]` was
-# never rolled, because `CLAUDE.md`'s tagging checklist is a checklist — steps a person performs
+# never rolled, because `.claude/rules/dist-and-release.md`'s tagging list is a checklist — steps a person performs
 # under release pressure, in the order they remember them.
 #
 # The shape matters, and two nearer shapes were rejected:
@@ -24,7 +24,8 @@ name: Release
 #     comment names this gap verbatim. It was not run. Adding a second thing to remember repeats
 #     the error while feeling like a fix.
 #   - A git hook is weaker still: `.git/hooks` is not cloned, so it protects one machine, and
-#     this repo has a documented case of hooks installed, running, and inert (`CLAUDE.md`).
+#     this repo has a documented case of hooks installed, running, and inert
+#     (`.claude/rules/hooks.md`).
 #
 # **A hand-cut tag is checked now — #56 landed as `tag-check.yml`.** This comment used to say it
 # was "checked by nothing" and that #56 was "NOT built yet"; both were true when written and are
@@ -86,7 +87,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # A release tag must be cut on `main`. `CLAUDE.md`: a tag on an integration branch is
+      # A release tag must be cut on `main`. Per `.claude/rules/dist-and-release.md`: a tag on
+      # an integration branch is
       # orphaned by the squash merge that lands it, leaving the version reachable only via the
       # tag and `git describe` on `main` broken permanently. `workflow_dispatch` lets the caller
       # pick any ref, so this is a real input to validate rather than a formality.
