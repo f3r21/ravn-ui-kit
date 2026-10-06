@@ -185,8 +185,8 @@ that no longer reports it _also_ fails, so the list can only be paid down, never
 quietly padded. It is the only authoritative answer to "what does this kit still fail",
 and it is worth reading over any count written in prose, including this one.
 
-**`color-contrast` is accepted on 14 stories.** Twelve of them render `TextButton
-variant="primary"`; the other two render a trigger that
+**`color-contrast` is accepted on 17 stories.** Fourteen of them render `TextButton
+variant="primary"`; the other three render a trigger that
 `floating-popover.stories.tsx` hand-rolls with the same `bg-primary-4 text-main`
 pairing on markup the kit does not ship.
 
@@ -208,13 +208,14 @@ to being silent. `text-button.tsx:36` carries the full argument, and
 `src/styles/contrast.test.ts` asserts the failing ratios explicitly so the failure can
 never be mistaken for a pass.
 
-**Not everything in that allowlist is accepted.** `aria-prohibited-attr` on four stories
-is a real defect with an issue number attached (`TaskMetaBadges` labels its badges with
-`aria-label` on a role-less `<span>`, where the attribute is prohibited and therefore
-dropped). Five `incomplete` entries cover `SidebarItem`'s active label on a gradient,
-which axe cannot compute a ratio against at all — that one has been measured by hand at
-6.67:1 and 6.02:1 at either end of the wash, both clearing AA. The file distinguishes
-the three cases in writing; a bare count would not.
+**Not everything in that allowlist is a contrast failure.** Six `incomplete` entries
+cover `SidebarItem`'s active label on a gradient, which axe cannot compute a ratio against
+at all. That label has been measured by hand at 6.67:1 and 6.02:1 at either end of the
+wash, both clearing AA. The allowlist also used to carry `aria-prohibited-attr` on four
+stories, a real defect: `TaskMetaBadges` labelled its badges with `aria-label` on a
+role-less `<span>`, where the attribute is dropped. #19 fixed it and closed on 2026-08-07,
+and the entries are gone; the file keeps a note of why. It distinguishes these cases in
+writing; a bare count would not.
 
 ---
 

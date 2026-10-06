@@ -9,6 +9,18 @@ See the **Introduction** page there for the full component catalog and fidelity 
 
 Built for, and consumed by, **[ravn-task-management-challenge](https://github.com/f3r21/ravn-task-management-challenge)** ([live app](https://ravn-task-management-challenge.vercel.app)).
 
+## Product, design and QA
+
+Who the kit is for, how it departs from Figma and how it is tested, read back after the
+build and dated 2026-10-06:
+
+- **[Product](docs/product.md)**: the users (assumptions), what was built and cut, the
+  go/no-go for the next release, and what comes next.
+- **[Design](docs/design.md)**: how the kit reaches an app, which piece covers each screen
+  state, and the four places it departs from Figma.
+- **[QA](docs/qa/test-plan.md)**: the test plan with entry and exit criteria, a risk
+  register, and what each suite proves and does not prove.
+
 ---
 
 ## 🚀 Installation and usage

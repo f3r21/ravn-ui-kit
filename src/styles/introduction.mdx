@@ -32,9 +32,15 @@ call site (`Dashboard Mockup.md:237-254`, `Cards01.md L552-833`, and so on).
 
 ## Installation
 
+This package is not on any registry, and `npm install @ravn/ui-kit` installs something
+else. Install it from the repository, pinned to a released tag:
+
 ```bash
-npm install @ravn/ui-kit
+npm install github:f3r21/ravn-ui-kit#<tag>
 ```
+
+`gh release list -R f3r21/ravn-ui-kit --limit 1` prints the latest tag. The README explains
+why the tag is not written here.
 
 Styles come from one of two paths, depending on whether your app runs its own
 Tailwind CSS v4 build:
