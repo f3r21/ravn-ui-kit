@@ -71,11 +71,11 @@ Release workflow's first run, so it was cut by hand when a matching release was 
 automatic. The app pins tags rather than releases, so nothing consuming this package is affected.
 It is recorded because the two lists disagreeing is otherwise a puzzle.
 
-**Do not cut tags by hand, and moving or deleting one is now refused by the server.** Ruleset
-`20572278`, "Published v* tags are never moved or deleted", is active on `refs/tags/v*` with
-`update` and `deletion` rules, which is what #59 asked for. Re-derive with
-`gh api repos/f3r21/ravn-ui-kit/rulesets -q '.[] | "\(.name) \(.target)"'`. This file said the
-repo had none until 2026-09-09, a figure carried forward from `CLAUDE.md` without re-deriving it.
+**Do not cut tags by hand, and treat a published `v*` tag as permanent.** Moving or deleting a
+`v*` tag is blocked by ruleset `20572278`, "Published v* tags are never moved or deleted", whose
+`update` and `deletion` rules are what #59 asked for. The admin can bypass it, so the server
+does not guarantee permanence; this rule does. Re-derive the rules and the bypass with
+`gh api repos/f3r21/ravn-ui-kit/rulesets/20572278 -q '{enforcement, rules: [.rules[].type], bypass: .bypass_actors}'`.
 Creating a tag by hand is still possible. If you do,
 `.github/workflows/tag-check.yml` fires on the tag push and re-checks facts 1 and 3; a tag it
 fails is not a release, so do not pin it.
