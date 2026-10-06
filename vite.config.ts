@@ -32,7 +32,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    dts({ include: ['src'], rollupTypes: true }),
+    dts({ include: ['src'], bundleTypes: true }),
     copyThemeTokens(),
   ],
   build: {

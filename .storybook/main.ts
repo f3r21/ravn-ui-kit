@@ -13,8 +13,11 @@ import remarkGfm from 'remark-gfm';
  * api-extractor a `mainEntryPointFilePath` that did not exist either. Both only ever
  * passed in CI because `npm run build` happens to run first in the same job — step
  * ordering standing in for correctness.
+ *
+ * vite-plugin-dts 5 is a wrapper over unplugin-dts and reports its name as `unplugin-dts`,
+ * not `vite:dts`, so the list names the plugin by what it reports today.
  */
-const LIBRARY_ONLY_PLUGINS = ['vite:dts', 'copy-theme-tokens'];
+const LIBRARY_ONLY_PLUGINS = ['unplugin-dts', 'copy-theme-tokens'];
 
 /**
  * Packages whose prop declarations are part of this kit's published API even though they
