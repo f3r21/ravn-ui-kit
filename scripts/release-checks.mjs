@@ -7,8 +7,8 @@
  * Exits 0 and prints the `CHANGELOG.md` section for <version> on stdout — that text becomes the
  * annotated tag's message. Exits 1 and prints a `::error::` naming exactly which fact failed.
  *
- * This lives in a script rather than inline in the workflow YAML for the reason `CLAUDE.md`
- * records about the Claude Code hooks: an integration point nobody can run is an integration
+ * This lives in a script rather than inline in the workflow YAML for the reason
+ * `.claude/rules/hooks.md` records about the Claude Code hooks: an integration point nobody can run is an integration
  * point nobody notices is inert. `scripts/release-checks.test.mjs` drives every branch here,
  * Vitest collects it, so it runs inside `npm run gate`.
  *

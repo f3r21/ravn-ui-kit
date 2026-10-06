@@ -15,7 +15,8 @@ link on the "Second-session review" line below is what records that it happened.
 
 <!-- The problem this solves, not a restatement of the diff. Link the issue.
      If a design value deviates from Figma, state the measured ratio and the rule
-     that forced it (see CLAUDE.md). If something was deliberately NOT done, say
+     that forced it (see `.claude/rules/decisions.md`). If something was deliberately NOT
+     done, say
      what and why here — a reviewer with none of your context cannot tell an
      omission from a decision. -->
 
@@ -23,11 +24,11 @@ Closes #
 
 ## Figures
 
-<!-- Every number this PR asserts, with the command that re-derives it — same line,
-     after an em-dash or an arrow. See CLAUDE.md. If this PR asserts no numbers,
+<!-- Every number this PR asserts, with the command that re-derives it, on the same line,
+     after an arrow. If this PR asserts no numbers,
      write exactly "No figures in this PR."
 
-     - 527 tests, 33 files — `npm run gate 2>&1 | grep -E 'Test Files|Tests  '`
+     - 527 tests, 33 files -> `out=$(npm run gate 2>&1); rc=$?; echo "$out" | grep -E 'Tests  '`
 
      `node scripts/figure-audit.mjs` counts how many of yours carry one. Do not
      write a number you have not just run the command for: a command that does not
