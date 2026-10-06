@@ -233,11 +233,17 @@ export default defineConfig({
       // hide tests you did not write. Distinguish them by the denominator: same denominator
       // and fewer covered is a real regression, so write the test. Different denominator is a
       // new basis, so re-derive and say which bump moved it in the commit message.
+      //
+      // Then #159 moved vitest and @vitest/coverage-v8 from 3 to 5, and the denominator moved
+      // with it over the same 44 source files: statements 3005/3057 -> 439/464, branches
+      // 491/521 -> 458/495, functions 145/157 -> 185/197, lines 3005/3057 -> 417/440. The v8
+      // provider counts differently from vitest 4 on, so this is a new basis, not a
+      // regression. The values below are the new exact ratios, identical across three runs.
       thresholds: {
-        statements: 98.01,
-        branches: 93.36,
-        functions: 92.15,
-        lines: 98.01,
+        statements: 94.61,
+        branches: 92.52,
+        functions: 93.9,
+        lines: 94.77,
       },
     },
   },
