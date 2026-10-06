@@ -686,7 +686,7 @@ function Gn({
     var k;
     const y = t.findIndex((P) => P.id === m);
     if (y === -1) return;
-    let g = null;
+    let g;
     switch (b.key) {
       case "ArrowRight":
       case "ArrowDown":
