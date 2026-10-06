@@ -143,9 +143,9 @@ describe('Popover dismissExemptRef (#82)', () => {
       </div>
     );
   }
-  let onCloseSpy: ReturnType<typeof vi.fn>;
+  let onCloseSpy: ReturnType<typeof vi.fn<() => void>>;
   beforeEach(() => {
-    onCloseSpy = vi.fn();
+    onCloseSpy = vi.fn<() => void>();
   });
 
   it('does not dismiss when the interaction is inside the exempt region', async () => {
