@@ -228,12 +228,15 @@ jobs:
           path: storybook-static
 
       # `high` is a policy about what stops a merge. It is not a record of anything
-      # accepted, and nothing is accepted: `npm audit` reports **0 vulnerabilities even
-      # at `moderate`**. (This comment used to describe a known-accepted moderate `uuid`
-      # advisory via `@storybook/addon-essentials`, said fixing it meant downgrading to
-      # Storybook 7.0.6, and outlived the actual fix — `"overrides": { "uuid": "^11.1.1" }`
-      # in package.json — by several releases, leaving every reader since believing there
-      # was an open hole.)
+      # accepted. As of 2026-10-06 `npm audit` reports no high or critical advisory; the
+      # moderates left sit under four devDependencies, `vitest`, `@vitest/coverage-v8`,
+      # `@storybook/test-runner` and `vite-plugin-dts`, whose fixes are breaking majors.
+      # Two overrides in package.json close what a major would otherwise be needed
+      # for: `uuid` (via `@storybook/addon-essentials`) and `tinypool` `^2.1.2`, the
+      # critical advisories GHSA-5gmw-xhrv-c9v3 and GHSA-85c8-ppgw-ccpr, which vitest 3
+      # pins below the fix.
+      # (This comment once described a `uuid` hole for several releases after the
+      # override had closed it. Re-run `npm audit` rather than trusting the date above.)
       #
       # The bar stays at `high` because everything this audit sees below the two runtime
       # dependencies is devDependencies: the package ships no server, and Storybook's
