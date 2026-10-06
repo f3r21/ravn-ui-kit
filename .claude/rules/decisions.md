@@ -31,9 +31,11 @@ fails the suite.
 is keyed to story times rule, never to a count. `color-contrast` is accepted on the stories
 rendering `TextButton variant="primary"` and on the hand-rolled trigger in
 `floating-popover.stories.tsx` that reproduces the same pairing, because no palette colour clears
-4.5:1 on `primary-4` and inventing a darker red is forbidden. **Not every entry in that file is
-accepted**: `aria-prohibited-attr` is open debt (#19). Read the file rather than a count from
-here, and quote it verbatim rather than re-deriving a figure from prose that summarised it.
+4.5:1 on `primary-4` and inventing a darker red is forbidden. **Not every entry in that file is a
+failure**: the `incomplete` entries are `SidebarItem`'s active label on a gradient, which axe
+cannot measure and which clears AA when measured by hand. `aria-prohibited-attr` is no longer
+listed: #19 fixed it on 2026-08-07. Read the file rather than a count from here, and quote it
+verbatim rather than re-deriving a figure from prose that summarised it.
 
 **Gaps the consumer hits get fixed here**, not worked around in the app. This repo is the fix
 site, which is the whole point of it existing separately.

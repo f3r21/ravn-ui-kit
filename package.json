@@ -1,6 +1,9 @@
 {
   "name": "@ravn/ui-kit",
   "version": "0.9.0",
+  "description": "Accessible React 19 UI kit built with TypeScript, Tailwind CSS v4 and React Aria hooks.",
+  "homepage": "https://f3r21.github.io/ravn-ui-kit/",
+  "repository": "github:f3r21/ravn-ui-kit",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,8 +11,8 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./theme.css": "./dist/theme.css",
     "./ui-kit.css": "./dist/ui-kit.css"

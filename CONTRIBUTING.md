@@ -3,13 +3,13 @@
 ## Design values
 
 - Every visual value (color, spacing, radius, typography) must come from a
-  verified source — `src/styles/theme.css` tokens, or exact values pasted
+  verified source: `src/styles/tokens.css` tokens, or exact values pasted
   from Figma's Dev Mode / Inspect panel. Never invent or approximate a style.
   If a value is uncertain, flag it in a code comment and leave the existing
   behavior unchanged rather than guessing.
 - **WCAG AA wins where it conflicts with Figma fidelity**, and the deviation
   gets written down at the call site with the ratio that forced it. This is
-  the house style rather than an exception — `tag.tsx:47`, `badge.test.tsx:9`
+  the house style rather than an exception: `tag.tsx:69-89`, `badge.test.tsx:9`
   and `form-field.tsx:45` are the worked examples, and `colors.mdx` collects
   them for readers of the published docs. `src/styles/contrast.test.ts`
   computes the ratios from `tokens.css` itself, so a changed hex fails the
@@ -23,20 +23,20 @@
   4.5:1. No label colour in the palette clears `primary-4` (`neutral-5`, the
   darkest thing in it, reaches 4.02:1) and `primary-4` is already its ramp's
   darkest step — so the only fix is a red Figma does not contain, which the
-  first rule above forbids. `text-button.tsx:36` carries the full argument.
+  first rule above forbids. `text-button.tsx:38` carries the full argument.
   It is a judgement call with a measurement behind it, not a bug someone has
   not got to. **`.storybook/a11y-allowlist.ts` is the only place that says
   what is currently accepted**; read it rather than quoting a count from
-  prose, and note that not every entry in it is an acceptance — some are
-  open debt with an issue number attached.
+  prose, and note that not every entry is a failure: the six `incomplete`
+  entries are a gradient axe cannot measure, measured by hand as passing.
 - **The kit is desktop-only, and that is a decision rather than a gap.**
   Nothing in `src/` carries a Tailwind responsive variant (`sm:`/`md:`/`lg:`)
   or a `@media` query, and the layout pieces are built to fixed widths taken
   from the 1440px Figma canvas: `ApplicationSidebar` is `w-[232px] shrink-0`
-  (`application-sidebar.tsx:48`), `TaskTable`'s grid is `min-w-[1108px]`
-  (`task-table.tsx:515`), `AddTaskModal` is a hard `w-[578px]`
-  (`add-task-modal.tsx:163`). The consuming app keeps its own `AppLayout`
-  and `AppSidebar` permanently for this reason. Do not add a breakpoint to
+  (`application-sidebar.tsx:68`), `TaskTable`'s grid has a computed minimum
+  of 1108px for its default columns (`task-table.tsx:1084`), `AddTaskModal`
+  is a hard `w-[578px]` (`add-task-modal.tsx:263`). The consuming app keeps
+  its own `AppLayout` and `AppSidebar` permanently for this reason. Do not add a breakpoint to
   one component in isolation — it makes that component responsive inside a
   shell that is not, which is worse than either answer on its own.
 - **A fixed pixel width around text is a claim about the font that renders it, and this kit
@@ -53,9 +53,9 @@
   **The house pattern, absent a reason to do otherwise, is `truncate` plus letting the box's
   automatic minimum size drop to 0** (`overflow: hidden` does both at once) — `EstimateModal`,
   `LabelModal` and `AssigneeModal` all take this path for a header inside a Figma-fixed card
-  width that has no room to grow (`estimate-modal.tsx:93-117`). Prefer `flex-wrap` over a
-  hard truncate when the box is a row of independent items rather than a single label —
-  `add-task-modal.tsx:270`'s chip row wraps instead of clipping, because there is no single
+  width that has no room to grow (`estimate-modal.tsx:94-127`). Prefer `flex-wrap` over a
+  hard truncate when the box is a row of independent items rather than a single label:
+  `add-task-modal.tsx:298`'s chip row wraps instead of clipping, because there is no single
   "less important" chip to cut. **Do not ship SF Pro Display itself to close this** —
   Apple's font license (developer.apple.com/fonts) states plainly "You may not embed the
   Apple Font in any software programs or other products," restricted to mockups of Apple-
@@ -145,12 +145,9 @@ Two things about MDX here that a green build will not tell you:
   `<td>` to a single element — a cell mixing text and an element becomes a `<p>`
   and gains vertical padding the other cells do not have.
 
-  Configure MDX options on `@storybook/addon-docs` by name, listed before
-  `@storybook/addon-essentials`. Nesting them under essentials' own `docs` key
-  is the obvious spelling and is silently ignored: it builds green and changes
-  nothing, which is indistinguishable from the bug it is meant to fix. Verify a
-  table by rendering the page and looking for a real `<table>` element, never by
-  a green build.
+  Configure MDX options on `@storybook/addon-docs` directly, by name, in
+  `.storybook/main.ts`. Verify a table by rendering the page and looking for a
+  real `<table>` element, never by a green build.
 
 - **`{/* … */}` comments do not survive `npm run format`.** Prettier treats
   `.mdx` as Markdown, rewrites the `*` as emphasis, and leaves `{/_ … _/}`,
@@ -175,7 +172,7 @@ const meta: Meta<typeof MyComponent> = {
     // Only document props that actually exist — never invent an axis.
   },
   args: {
-    onSomeCallback: fn(), // import fn from '@storybook/test' for every callback prop
+    onSomeCallback: fn(), // import { fn } from 'storybook/test' for every callback prop
   },
 };
 ```

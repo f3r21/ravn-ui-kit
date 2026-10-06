@@ -73,6 +73,19 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   previously had nothing to import. **Additive in practice** (the shape is unchanged), but
   the type is now nameable rather than reconstructed via
   `Parameters<NonNullable<AddTaskModalProps['onSubmit']>>[0]`.
+- **BREAKING: `FloatingPopover`'s bespoke `popoverRef?: React.RefObject<HTMLDivElement |
+null>` retired in favor of the universal `ref`** (#11) — same DOM node, one name instead
+  of two. Verified zero live callers of `popoverRef` in this kit or the consuming app
+  before removing it. **Minor.**
+- **BREAKING: `ListBox`'s bespoke `listBoxRef?: React.RefObject<HTMLUListElement | null>`
+  retired in favor of the universal `ref`** (#11), same reasoning. **Minor.**
+- **Icon-sizing specificity trap fixed on `EmptyState` and `TopNav`** (#11). Both wrapped
+  their icon slot in `[&>svg]:w-full [&>svg]:h-full`, a Tailwind arbitrary-variant that
+  compiles to a descendant selector at (0,2,0) specificity — it silently overrode a
+  consumer's own `size-4`/`size-6` utility (0,1,0) on an icon they passed in. The default
+  icon each component renders when no icon prop is given is now sized directly at its own
+  definition site instead (`TopNav`'s fallback `CloseIcon`/`BellIcon`), leaving a
+  consumer-supplied icon fully in control of its own size.
 
 ### Removed
 
@@ -88,7 +101,7 @@ for the specific policy this repo follows for what bumps major/minor/patch.
   silently did nothing. **No component in this kit ever passed it** (two of this kit's own
   stories did — `WideVariant`/`Playground`, migrated to `className` in this same PR). **The
   consuming app has two real production callers**, both still on the old name until it
-  updates: `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:96`, both
+  updates: `task-form-dialog.tsx:158` and `delete-task-dialog.tsx:97`, both
   `width="max-w-[578px]"` — caught in review after this entry originally (and wrongly)
   claimed zero callers anywhere, kit or app. Behavior is unchanged, only the prop name is:
   `className="max-w-[578px]"` in their place. App-side follow-up tracked as
@@ -98,7 +111,14 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 ### Fixed
 
 - **Storybook's Introduction page no longer tells consumers to `npm install @ravn/ui-kit`**,
-  which installs an unrelated package. It now gives the git-tag install the README uses.
+  which fails, since nothing publishes that name. It now gives the git-tag install the README
+  uses.
+- **The README, the Storybook pages and the contributor docs match the source again.** The
+  Introduction lists every published component, the Decisions, Colors and Typography pages
+  cite current line numbers and consumers, and the README gains a Known limitations section,
+  contributor setup, and a note that the live app runs on seeded mock data.
+- **`package.json` lists `types` before `import` in `exports["."]`.** With `import` first,
+  TypeScript found the declarations only because `index.d.ts` sits beside `index.js`.
 - **The Decisions page's allowlist figures match `.storybook/a11y-allowlist.ts`**:
   `color-contrast` is accepted on 17 stories, not 14, and six `incomplete` entries cover the
   sidebar gradient, not five. It also stops calling `aria-prohibited-attr` an open defect;
@@ -116,9 +136,17 @@ sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> D
   constrains this component's width today, so this was a story-authoring gap rather than a
   product defect, but the sweep tool below would have flagged it as a false positive on
   every future run otherwise.
+- **`TaskListView`'s story sample tags render with no accent colour, silently** (#16). Found
+  while adding `argTypes` to the same file: `sampleTasks` used the pre-#14 field name
+  `variant` instead of `accent` on its `TaskTag` literals, and because it's assigned to an
+  untyped `const` before being passed as a prop, TypeScript's excess-property check never
+  caught it — the file type-checked clean while the demo quietly dropped both tags' intended
+  green/red tint. Fixed and verified with a rendered screenshot, not just by type-checking.
 
 ### Added
 
+- **`package.json` has a `description`, a `homepage` (the published Storybook) and a
+  `repository`.**
 - **`scripts/font-fallback-sweep.mjs`** (#20): renders every Storybook story twice — once as
   the running machine naturally resolves `--font-sans`, once with it forced to a substitute
   font via an injected `@font-face` — and reports any element that newly overflows its own
@@ -135,9 +163,6 @@ sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> D
   that shipping SF Pro Display itself is not an available fix: "You may not embed the Apple
   Font in any software programs or other products," restricted to Apple-platform interface
   mockups by registered Apple Developers.
-
-### Added
-
 - **Every kit component now forwards a real `ref` to its root DOM element, and spreads
   unrecognised props onto it** (#11), using React 19's plain-prop `ref` — no component in
   this kit uses `forwardRef` any more. This covers all 21 icons (via one shared
@@ -163,25 +188,6 @@ sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> D
   (native `FormEventHandler` vs. a typed value callback, on `SegmentedControl`/
   `TaskTableRow`/`ViewSwitcher`), `onSubmit` (native form event vs. `AddTaskSubmitData`,
   on `AddTaskModal`), and `role` (native ARIA role vs. `Modal`'s own dialog semantics).
-
-### Changed
-
-- **BREAKING: `FloatingPopover`'s bespoke `popoverRef?: React.RefObject<HTMLDivElement |
-null>` retired in favor of the universal `ref`** (#11) — same DOM node, one name instead
-  of two. Verified zero live callers of `popoverRef` in this kit or the consuming app
-  before removing it. **Minor.**
-- **BREAKING: `ListBox`'s bespoke `listBoxRef?: React.RefObject<HTMLUListElement | null>`
-  retired in favor of the universal `ref`** (#11), same reasoning. **Minor.**
-- **Icon-sizing specificity trap fixed on `EmptyState` and `TopNav`** (#11). Both wrapped
-  their icon slot in `[&>svg]:w-full [&>svg]:h-full`, a Tailwind arbitrary-variant that
-  compiles to a descendant selector at (0,2,0) specificity — it silently overrode a
-  consumer's own `size-4`/`size-6` utility (0,1,0) on an icon they passed in. The default
-  icon each component renders when no icon prop is given is now sized directly at its own
-  definition site instead (`TopNav`'s fallback `CloseIcon`/`BellIcon`), leaving a
-  consumer-supplied icon fully in control of its own size.
-
-### Added
-
 - **`Popover` gets its own story** (#16) — it was the only shared-shell component absent from
   Storybook entirely (11 tests, 0 stories) despite being the primitive behind
   `DatePickerMenu`/`AssigneeModal`/`EstimateModal`/`LabelModal`. Includes this repo's first
@@ -205,15 +211,6 @@ null>` retired in favor of the universal `ref`** (#11) — same DOM node, one na
   internally since their parent conditionally mounts them instead) — no control would do
   anything useful on any of the four, for two different reasons, so those are left as-is
   rather than padded with an empty or non-functional block.
-
-### Fixed
-
-- **`TaskListView`'s story sample tags render with no accent colour, silently** (#16). Found
-  while adding `argTypes` to the same file: `sampleTasks` used the pre-#14 field name
-  `variant` instead of `accent` on its `TaskTag` literals, and because it's assigned to an
-  untyped `const` before being passed as a prop, TypeScript's excess-property check never
-  caught it — the file type-checked clean while the demo quietly dropped both tags' intended
-  green/red tint. Fixed and verified with a rendered screenshot, not just by type-checking.
 
 ## [0.9.0] - 2026-08-10
 

@@ -21,7 +21,7 @@ as raw `|` characters and built green for this repo's whole history. **Render th
 - **React Aria hooks only**, `react-aria` and `react-stately`. Never `react-aria-components`.
 - **Never invent or approximate a design value.** Every colour, radius, shadow and z-index comes
   from `src/styles/tokens.css`. If Figma has no value, say so in a comment rather than eyeballing
-  one. Two existing violations are self-flagged in `user-row.tsx`.
+  one. One existing violation is self-flagged in `user-row.tsx`: the role text sizes.
 - **Every exported prop carries JSDoc.** Storybook's autodocs is the published API reference.
   Nothing here computes a compliance percentage, so do not quote one: the rule is every prop and
   the check is the rendered prop table.
