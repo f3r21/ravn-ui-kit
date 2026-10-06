@@ -97,6 +97,12 @@ for the specific policy this repo follows for what bumps major/minor/patch.
 
 ### Fixed
 
+- **Storybook's Introduction page no longer tells consumers to `npm install @ravn/ui-kit`**,
+  which installs an unrelated package. It now gives the git-tag install the README uses.
+- **The Decisions page's allowlist figures match `.storybook/a11y-allowlist.ts`**:
+  `color-contrast` is accepted on 17 stories, not 14, and six `incomplete` entries cover the
+  sidebar gradient, not five. It also stops calling `aria-prohibited-attr` an open defect;
+  #19 fixed it on 2026-08-07.
 - **`AddTaskModal`'s four-chip trigger row wraps instead of silently overflowing under a
   non-Apple font fallback** (#20). `--font-sans` is `'SF Pro Display', system-ui,
 sans-serif`, which this kit ships none of; on a Linux runner's `sans-serif` -> DejaVu Sans
