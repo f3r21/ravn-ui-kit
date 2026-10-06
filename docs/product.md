@@ -50,11 +50,11 @@ No RICE table: reach, impact and effort were never measured.
 
 ## Top three risks
 
-| Risk                                                                                              | L × I     | Response                                                                               |
-| ------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------- |
-| The next release breaks the app: five `tsc` errors and one silent tag-colour regression (app#157) | 2 × 3 = 6 | The app pins a tag; the bump is its own pull request with app#157's fixes              |
-| Tooling falls behind: vitest 5, eslint 10, TypeScript 7 and vite 8 bumps fail CI (#122, #123)     | 3 × 2 = 6 | Held as open Dependabot pull requests; an override closed the critical advisory (#161) |
-| One consumer shapes the whole API, so a second one would meet surprises                           | 2 × 2 = 4 | Decisions are written down; one prop name per axis since #148                          |
+| Risk                                                                                                                           | L × I     | Response                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------- |
+| The next release breaks the app: five `tsc` errors and one silent tag-colour regression (app#157)                              | 2 × 3 = 6 | The app pins a tag; the bump is its own pull request with app#157's fixes |
+| One consumer shapes the whole API, so a second one would meet surprises                                                        | 2 × 2 = 4 | Decisions are written down; one prop name per axis since #148             |
+| TypeScript 7 cannot land: typescript-eslint, vite-plugin-dts and Storybook's docgen need the compiler API it no longer exports | 3 × 1 = 3 | #155 stays open; TypeScript 5.9 keeps working                             |
 
 ## The core flow: install, style, render
 
@@ -62,14 +62,16 @@ No RICE table: reach, impact and effort were never measured.
 | --------------------- | ------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | a released tag        | an app installs `github:f3r21/ravn-ui-kit#<tag>` | it gets exactly the built `dist/` that was tagged          | CI step "Check committed dist/ is fresh"                                    |
 | the app pins `v0.9.0` | its tests import the kit                         | every component it uses is there, at the pinned version    | app `ui-kit-smoke.test.tsx`: "installed the version the pin names"          |
-| any story             | axe runs in Chromium                             | nothing is reported outside `.storybook/a11y-allowlist.ts` | CI step "Accessibility (axe over every story)": 190 passed, run 37478798834 |
+| any story             | axe runs in Chromium                             | nothing is reported outside `.storybook/a11y-allowlist.ts` | CI step "Accessibility (axe over every story)": 190 passed, run 37490232705 |
 | a token's hex changes | the suite runs                                   | a pairing that drops below AA fails                        | `src/styles/contrast.test.ts`                                               |
 
 ## Go or no-go
 
-- **`v0.9.0` to the app: go**, and already live. CI on 2026-10-06 (run 37478798834): 998
-  tests in 52 files, coverage 98.29% of statements against a 98.01% ratchet, axe clean
-  outside the allowlist, no high or critical advisory.
+- **`v0.9.0` to the app: go**, and already live. CI on `main` on 2026-10-06, after the
+  tooling upgrades (run 37490232705): 998 tests in 52 files, coverage 94.61% of statements
+  against a 94.61% ratchet, axe clean outside the allowlist, no high or critical advisory.
+  vitest 5 counts coverage on a new basis; under vitest 3 the same suite read 98.29%
+  (run 37478798834).
 - **The next release: no-go** until the app has a pull request ready for app#157.
 - **Owner:** Fernando Ramirez. **Rollback:** the app re-pins the previous tag; published
   `v*` tags cannot be moved or deleted (repository ruleset).
@@ -82,8 +84,7 @@ built from it ([pilot](https://github.com/f3r21/ravn-task-management-challenge/b
 
 ## Now, next, later
 
-- **Now:** keep `main` green; keep the held Dependabot pull requests open with their reason.
+- **Now:** keep `main` green. #155 (TypeScript 7) stays open until its tools support it.
 - **Next:** release the prop renames together with the app's pull request for app#157.
-  Unblock vitest and vite (#122, #123).
 - **Later:** a second consumer, then a registry. A darker red, if the brand owner adds one
   to Figma.
