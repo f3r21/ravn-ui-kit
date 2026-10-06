@@ -1,6 +1,6 @@
 ---
 name: decisions
-description: Settled design decisions not to re-open: the 833px desktop floor, WCAG AA over Figma, and the axe allowlist.
+description: 'Settled design decisions not to re-open: the 833px desktop floor, WCAG AA over Figma, and the axe allowlist.'
 paths:
   - 'src/**/*.tsx'
   - 'src/styles/**'
