@@ -228,14 +228,14 @@ jobs:
           path: storybook-static
 
       # `high` is a policy about what stops a merge. It is not a record of anything
-      # accepted. As of 2026-10-06 `npm audit` reports no high or critical advisory; the
-      # moderates left sit under four devDependencies, `vitest`, `@vitest/coverage-v8`,
-      # `@storybook/test-runner` and `vite-plugin-dts`, whose fixes are breaking majors.
-      # Three overrides in package.json close what a major would otherwise be needed
-      # for: `uuid` (via `@storybook/addon-essentials`); `tinypool` `^2.1.2`, the
-      # critical advisories GHSA-5gmw-xhrv-c9v3 and GHSA-85c8-ppgw-ccpr, which vitest 3
-      # pins below the fix; and `shell-quote` `^1.11.0`, the critical GHSA-pqg4-j6r4-53mv
-      # published on 2026-10-06, which `concurrently` 10.0.5 pins at 1.9.0.
+      # accepted. As of 2026-10-06, after vitest 5 and vite 8 landed (#159, #30), `npm audit`
+      # reports no high or critical advisory, and all 24 moderates sit under one direct
+      # devDependency, `@storybook/test-runner`.
+      # Overrides in package.json close what a major would otherwise be needed for: `uuid`
+      # (via `@storybook/addon-essentials`), and `shell-quote` `^1.11.0`, the critical
+      # GHSA-pqg4-j6r4-53mv published on 2026-10-06, which `concurrently` 10.0.5 pins at
+      # 1.9.0. The `tinypool` `^2.1.2` override (GHSA-5gmw-xhrv-c9v3, GHSA-85c8-ppgw-ccpr)
+      # is inert since vitest 5, which no longer depends on it.
       # (This comment once described a `uuid` hole for several releases after the
       # override had closed it. Re-run `npm audit` rather than trusting the date above.)
       #
