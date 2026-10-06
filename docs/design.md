@@ -12,7 +12,7 @@ flowchart LR
   T --> S["src/components"]
   S --> B["npm run build"]
   B --> D["dist/, committed and checked fresh in CI"]
-  D --> G["git tag v*, cannot be moved or deleted"]
+  D --> G["git tag v*, protected by a ruleset"]
   G --> A["App: npm install github:f3r21/ravn-ui-kit#tag"]
   A --> W["App's Tailwind scans dist/ through @source"]
   S --> SB["Storybook on GitHub Pages, from main"]

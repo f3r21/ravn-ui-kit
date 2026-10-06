@@ -143,15 +143,15 @@ export const A11Y_ALLOWLIST: Readonly<Record<string, A11yAllowlistEntry>> = {
   // requirement on exactly that silence being permanent.
 
   // --- `incomplete` — `SidebarItem`'s selected gradient --------------------------------
-  // 5 nodes across 5 stories, all one element: the active item's label, which sits on
+  // 6 nodes across 6 stories, all one element: the active item's label, which sits on
   // `bg-gradient-to-r from-transparent to-primary-4/10`. axe reports `bgGradient` — it
   // cannot compute a ratio against a gradient at all, so this is "unmeasurable by axe",
   // not "unmeasured". It has been measured: `text-interactive-text` (`primary-2`) is
   // 6.67:1 on the bare panel and 6.02:1 at the far end of the wash, both clearing AA, and
   // `sidebar-item.tsx` records the arithmetic at the call site.
   //
-  // This is the case that justifies ratcheting `incomplete` rather than ignoring it: five
-  // entries that a human has resolved, pinned so that a sixth one nobody has looked at
+  // This is the case that justifies ratcheting `incomplete` rather than ignoring it: six
+  // entries that a human has resolved, pinned so that a seventh one nobody has looked at
   // fails the build.
   'layout-sidebaritem--selected': { incomplete: ['color-contrast'] },
   'layout-applicationsidebar--default': { incomplete: ['color-contrast'] },

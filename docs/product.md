@@ -19,11 +19,11 @@ Inferred lines say **assumption**.
 
 Built from reasons written while the kit was built:
 
-| What the repository says                                                                  | Where                              | First written         |
-| ----------------------------------------------------------------------------------------- | ---------------------------------- | --------------------- |
-| `npm install @ravn/ui-kit` "resolves to something else entirely"; pin a tag, not a branch | `README.md`, "Install the package" | 2026-08-06, `51f82e3` |
-| Hiding field labels entirely "would have left screen-reader users with an unnamed input"  | Storybook, Decisions §4            | 2026-08-05, `c6395e2` |
-| Due-date urgency is stated in words, not by colour alone                                  | commit `2f7ead5`                   | 2026-08-08            |
+| What the repository says                                                                 | Where                              | First written         |
+| ---------------------------------------------------------------------------------------- | ---------------------------------- | --------------------- |
+| `npm install @ravn/ui-kit` fails; pin a tag, not a branch                                | `README.md`, "Install the package" | 2026-08-06, `51f82e3` |
+| Hiding field labels entirely "would have left screen-reader users with an unnamed input" | Storybook, Decisions §4            | 2026-08-05, `c6395e2` |
+| Due-date urgency is stated in words, not by colour alone                                 | commit `2f7ead5`                   | 2026-08-08            |
 
 **Problem (assumption).** The challenge's Figma file is a component library. Without a
 package, its components and tokens would exist only inside one app, and every screen would
@@ -50,11 +50,11 @@ No RICE table: reach, impact and effort were never measured.
 
 ## Top three risks
 
-| Risk                                                                                                                           | L × I     | Response                                                                  |
-| ------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------- |
-| The next release breaks the app: five `tsc` errors and one silent tag-colour regression (app#157)                              | 2 × 3 = 6 | The app pins a tag; the bump is its own pull request with app#157's fixes |
-| One consumer shapes the whole API, so a second one would meet surprises                                                        | 2 × 2 = 4 | Decisions are written down; one prop name per axis since #148             |
-| TypeScript 7 cannot land: typescript-eslint, vite-plugin-dts and Storybook's docgen need the compiler API it no longer exports | 3 × 1 = 3 | #155 stays open; TypeScript 5.9 keeps working                             |
+| Risk                                                                                                                           | L × I     | Response                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------ |
+| The next release breaks the app: five `tsc` errors and one silent tag-colour regression (app#157)                              | 2 × 3 = 6 | The app pins a tag; the bump is its own pull request with app#157's fixes                        |
+| One consumer shapes the whole API, so a second one would meet surprises                                                        | 2 × 2 = 4 | Decisions are written down; one prop name per axis since #148                                    |
+| TypeScript 7 cannot land: typescript-eslint, vite-plugin-dts and Storybook's docgen need the compiler API it no longer exports | 3 × 1 = 3 | TypeScript 5.9 keeps working. #155 was closed and Dependabot now skips 7.x, so re-check by hand. |
 
 ## The core flow: install, style, render
 
@@ -74,7 +74,8 @@ No RICE table: reach, impact and effort were never measured.
   (run 37478798834).
 - **The next release: no-go** until the app has a pull request ready for app#157.
 - **Owner:** Fernando Ramirez. **Rollback:** the app re-pins the previous tag; published
-  `v*` tags cannot be moved or deleted (repository ruleset).
+  `v*` tags are protected from moves and deletion by a repository ruleset, which the admin
+  can bypass.
 
 ## Validated by
 
@@ -84,7 +85,8 @@ built from it ([pilot](https://github.com/f3r21/ravn-task-management-challenge/b
 
 ## Now, next, later
 
-- **Now:** keep `main` green. #155 (TypeScript 7) stays open until its tools support it.
+- **Now:** keep `main` green. TypeScript 7 waits for its tools, and nothing automatic will
+  raise it again.
 - **Next:** release the prop renames together with the app's pull request for app#157.
 - **Later:** a second consumer, then a registry. A darker red, if the brand owner adds one
   to Figma.

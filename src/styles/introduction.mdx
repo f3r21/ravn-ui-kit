@@ -17,23 +17,24 @@ call site (`Dashboard Mockup.md:237-254`, `Cards01.md L552-833`, and so on).
 
 ## How this documentation is organized
 
-- **Design Tokens** — the raw color, radius, typography and shadow values
+- **Design Tokens**: the raw color, radius, typography and shadow values
   every component is built from, each one verified against a specific
   ground-truth export. Start here if you're building something new and need
   to know which token to reach for.
-- **Primitives** — the smallest reusable building blocks (Button, TextButton,
-  Tag, Input, Tabs, SegmentedControl, LabelCheckbox, Badge, Skeleton).
-- **Components** — composed pieces built from primitives (Avatar, UserRow,
-  Card, TaskCard, ProjectInfo, TaskMetaBadges, Modal and its task-flow variants,
-  DatePicker).
-- **Layout** — page-level composites (ApplicationSidebar, SidebarItem,
-  TopNav, SearchBar, TaskListView, TaskTable, ViewSwitcher, AppShell) that
+- **Primitives**: the smallest reusable building blocks (Button, TextButton,
+  Tag, Input, FormField, Tabs, SegmentedControl, LabelCheckbox, Badge, Skeleton,
+  Icons, ListBox, Popover, FloatingPopover).
+- **Components**: composed pieces built from primitives (Avatar, UserRow, Card,
+  TaskCard, ProjectInfo, TaskMetaBadges, EmptyState, Toast, Menu, Select,
+  MultiSelect, Modal and its task-flow variants, DatePicker).
+- **Layout**: page-level composites (ApplicationSidebar, SidebarItem, TopNav,
+  SearchBar, TaskListView, TaskTable, TaskTableRow, ViewSwitcher, AppShell) that
   assemble the above into the real product screens.
 
 ## Installation
 
-This package is not on any registry, and `npm install @ravn/ui-kit` installs something
-else. Install it from the repository, pinned to a released tag:
+This package is not on the npm registry, and `npm install @ravn/ui-kit` fails. Install it
+from the repository, pinned to a released tag:
 
 ```bash
 npm install github:f3r21/ravn-ui-kit#<tag>
@@ -60,6 +61,10 @@ Tailwind CSS v4 build:
   @import '@ravn/ui-kit/theme.css';
   @source "../node_modules/@ravn/ui-kit/dist";
   ```
+
+  The `@source` path is relative to the CSS file that holds it. The app's
+  `src/styles/base.css` is two folders deep, so it uses
+  `../../node_modules/@ravn/ui-kit/dist`.
 
 - **Your app does not run Tailwind CSS.** Import the fully-compiled stylesheet
   instead — it contains every utility class the components actually use, pre-generated:
@@ -91,6 +96,9 @@ export function UserForm() {
   );
 }
 ```
+
+This example targets the latest tag. The next release renames `Badge`'s `variant` to
+`tone`; this site documents `main`, so its prop tables already show `tone`.
 
 Note: `Button` (from `Primitives/Button`) is a fixed 40×40px icon-only control
 requiring an `aria-label` — use it for icon buttons, not labeled text CTAs

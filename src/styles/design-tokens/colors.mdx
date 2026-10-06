@@ -108,8 +108,8 @@ import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
     }}
   />
   <ColorItem
-    title="Blue (Tags only)"
-    subtitle="--color-blue, not part of any core ramp — used only by the Tag component's Blue type"
+    title="Blue (accent only)"
+    subtitle="--color-blue, not part of any core ramp: used by Tag's blue accent and TaskTableRow's blue indicator"
     colors={{ blue: '#2f61bf' }}
   />
 </ColorPalette>
@@ -183,21 +183,18 @@ There was nothing to weigh against the fix: the design has no initials state
 at all, so the pairing was invented rather than transcribed.
 
 `neutral-2` has one more un-aliased role, as a **10%-alpha fill** rather than a
-colour in its own right: `bg-neutral-2/10` is the design's chip surface —
-`rgba(148, 151, 154, 0.1)` — on `Tag` and on the `Select`/`MultiSelect` triggers
-that adopt `Tag`'s treatment. Neither `--color-muted` (text) nor
+colour in its own right: `bg-neutral-2/10` is the design's chip surface,
+`rgba(148, 151, 154, 0.1)`. It sits on `Tag`, on the `Select`/`MultiSelect` triggers and
+`Datepicker`'s field that adopt `Tag`'s treatment, and as the row hover in
+`AssigneeModal` and `LabelModal`. Neither `--color-muted` (text) nor
 `--color-subtle` (a border) describes a fill, and `--color-surface-neutral` is
 the light one, so this stays on the raw ramp step until the design gives the
 tint a name of its own.
 
 Similarly, `neutral-3`/`neutral-4`/`neutral-5` each play other real roles
 beyond the one `surface-*` alias above captures — deliberately left
-un-aliased since they don't share one coherent name: `neutral-3` as a
-hover/selected-state background (`text-button.tsx`, `datepicker-menu.tsx`,
-`sidebar-item.tsx`'s badge pill) and as a border (`task-table.tsx`'s cells);
-`neutral-4` as a divider border and button-hover background (`modal.tsx`) and
-as text (`badge.tsx`); `neutral-5` as body text (`input.tsx`/`datepicker.tsx`)
-and as a border (`user-row.tsx`'s status-dot cutout).
+un-aliased since they don't share one coherent name.
+`git grep -nE 'neutral-[345]' src/components` lists the current call sites.
 
 This list used to include "`neutral-3` as label text". It was wrong, and it was
 the only place in the repo that sanctioned the pairing: `#393D41` on the app
