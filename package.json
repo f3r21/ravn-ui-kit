@@ -91,6 +91,7 @@
     "shell-quote": "^1.11.0",
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
-    }
+    },
+    "@babel/plugin-transform-runtime": "^7.29.0"
   }
 }
