@@ -99,7 +99,7 @@ export function SegmentedControl({
     const currentIndex = options.findIndex((opt) => opt.id === selected);
     if (currentIndex === -1) return;
 
-    let nextIndex: number | null = null;
+    let nextIndex: number;
     switch (event.key) {
       case 'ArrowRight':
       case 'ArrowDown':
